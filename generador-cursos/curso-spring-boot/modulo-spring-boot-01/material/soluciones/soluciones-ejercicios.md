@@ -1,0 +1,259 @@
+# 🔑 Soluciones — Ejercicios Módulo 1
+
+Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
+subsección "Soluciones" de `specs/modulo-spring-boot-01.md`).
+
+## 🟢 Básico 01 — Modelar Biblioteca Universitaria con POO
+
+**Solución propuesta**:
+
+```java
+public abstract class Usuario {
+    protected final String nombre;
+    protected final String codigo;
+
+    protected Usuario(String nombre, String codigo) {
+        this.nombre = nombre;
+        this.codigo = codigo;
+    }
+
+    public abstract int limitePrestamosSimultaneos();
+}
+
+public class Estudiante extends Usuario {
+    public Estudiante(String nombre, String codigo) { super(nombre, codigo); }
+    @Override public int limitePrestamosSimultaneos() { return 3; }
+}
+
+public class Docente extends Usuario {
+    public Docente(String nombre, String codigo) { super(nombre, codigo); }
+    @Override public int limitePrestamosSimultaneos() { return 10; }
+}
+
+public interface Prestable {
+    int calcularDiasDevolucion();
+    String descripcion();
+}
+
+public class Libro implements Prestable {
+    @Override public int calcularDiasDevolucion() { return 14; }
+    @Override public String descripcion() { return "Libro"; }
+}
+
+public class RecursoDigital implements Prestable {
+    @Override public int calcularDiasDevolucion() { return 7; }
+    @Override public String descripcion() { return "Recurso digital"; }
+}
+```
+
+**Explicación**: `Usuario` agrupa lo común (nombre, código) y deja abstracto solo
+lo que varía (el límite). `Prestable` no tiene relación de herencia con `Usuario`:
+modela una capacidad ("puede prestarse"), no un tipo de usuario.
+
+**Verificación**: se revisa que no se dupliquen `nombre`/`codigo` en `Estudiante` o
+`Docente`, y que `Libro`/`RecursoDigital` no hereden de una clase común innecesaria.
+
+## 🟢 Básico 02 — Reescribir un bucle con streams y lambdas
+
+**Solución propuesta**:
+
+```java
+List<String> pendientesPediatria = citasDelDia.stream()
+        .filter(cita -> cita.especialidad().equals("Pediatría"))
+        .filter(cita -> !cita.confirmada())
+        .map(Cita::paciente)
+        .toList();
+```
+
+**Resultado esperado**: `["Luis Pérez", "Karina Ibáñez"]`.
+
+**Verificación**: se revisa que la solución no declare ninguna lista mutable ni use
+`for`/`while`, y que use dos condiciones de filtro (especialidad y confirmación).
+
+## 🟢 Básico 03 — Leer un `pom.xml` y traducirlo a Gradle
+
+**Respuesta esperada**:
+
+- `groupId=com.biblioteca`, `artifactId=biblioteca-api`, `version=0.1.0`,
+  `packaging=jar`.
+- 2 dependencias; `spring-boot-starter-test` es de prueba, identificable por
+  `<scope>test</scope>`.
+- Traducción a Gradle:
+
+```groovy
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+```
+
+**Verificación**: se revisa que la traducción use `testImplementation` (no
+`implementation`) para la dependencia con `<scope>test</scope>`.
+
+## 🟡 Intermedio 01 — Refactorizar `ServicioNotificaciones`
+
+**Solución propuesta**:
+
+```java
+public class ServicioNotificaciones {
+
+    private final RepositorioUsuarios repositorioUsuarios;
+    private final ClienteEmail clienteEmail;
+
+    public ServicioNotificaciones(RepositorioUsuarios repositorioUsuarios, ClienteEmail clienteEmail) {
+        this.repositorioUsuarios = repositorioUsuarios;
+        this.clienteEmail = clienteEmail;
+    }
+
+    public void notificarVencimientoProximo(String isbn, String codigoUsuario) {
+        Usuario usuario = repositorioUsuarios.buscarPorCodigo(codigoUsuario);
+        clienteEmail.enviar(
+            usuario.getEmail(),
+            "Tu préstamo del libro " + isbn + " vence pronto."
+        );
+    }
+}
+```
+
+**Beneficio para las pruebas**: ahora se puede escribir
+`new ServicioNotificaciones(repositorioDePrueba, clienteEmailDePrueba)` con un
+`RepositorioUsuarios` en memoria y un `ClienteEmail` que solo registra el mensaje
+en una lista, sin conectarse a una base de datos real ni enviar un correo real.
+
+**Verificación**: se revisa que no quede ningún `new RepositorioUsuariosJpa()` ni
+`new ClienteEmailSmtp()` dentro de la clase, y que ambos campos sean `private
+final` recibidos por constructor.
+
+## 🟡 Intermedio 02 — Elegir el tipo de Inyección de Dependencias
+
+**Solución propuesta**:
+
+```java
+@Service
+public class ServicioFacturacion {
+
+    private final RepositorioFacturas repositorioFacturas;
+    private ServicioDescuentos servicioDescuentos; // opcional
+
+    public ServicioFacturacion(RepositorioFacturas repositorioFacturas) {
+        this.repositorioFacturas = repositorioFacturas;
+    }
+
+    @Autowired(required = false)
+    public void setServicioDescuentos(ServicioDescuentos servicioDescuentos) {
+        this.servicioDescuentos = servicioDescuentos;
+    }
+
+    public double calcularTotal(double montoBase) {
+        double total = servicioDescuentos != null
+                ? servicioDescuentos.aplicar(montoBase)
+                : montoBase;
+        repositorioFacturas.registrar(total);
+        return total;
+    }
+}
+```
+
+**Explicación**: `repositorioFacturas` es obligatoria (sin ella la clase no puede
+registrar nada) → constructor. `servicioDescuentos` es opcional (puede no existir)
+→ setter, permitiendo que el campo quede en `null` si no se configura.
+
+**Verificación**: se revisa que `repositorioFacturas` sea `final` y esté en el
+constructor, y que `servicioDescuentos` no sea `final` ni esté en el constructor.
+
+## 🟡 Intermedio 03 — Ordenar el ciclo de vida de un bean
+
+**Respuesta esperada**: orden correcto (b) → (c) → (d) → (a).
+
+- (b) instanciación + inyección de dependencias (constructor con
+  `RepositorioLibros` ya resuelto).
+- (c) inicialización (`@PostConstruct` → `precargarCache()`).
+- (d) uso (la aplicación corre y se puede llamar a `prestar(isbn)`).
+- (a) destrucción (`@PreDestroy` → `cerrarConexiones()`, al cerrar el contexto).
+
+**Verificación**: se revisa que el orden sea exactamente ese y que cada evento se
+asocie a la fase correcta del ciclo de vida.
+
+## 🔴 Avanzado 01 — Combinar polimorfismo con Inyección de Dependencias
+
+**Solución propuesta**:
+
+```java
+public class NotificadorSms implements Notificador {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("SMS a " + destinatario + ": " + mensaje);
+    }
+}
+
+public class NotificadorEmail implements Notificador {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Email a " + destinatario + ": " + mensaje);
+    }
+}
+
+public class ServicioRecordatorios {
+    private final Notificador notificador;
+
+    public ServicioRecordatorios(Notificador notificador) {
+        this.notificador = notificador;
+    }
+
+    public void enviarRecordatorio(String destinatario, String mensaje) {
+        notificador.enviar(destinatario, mensaje);
+    }
+}
+
+public class Demo {
+    public static void main(String[] args) {
+        ServicioRecordatorios recordatoriosMediSalud = new ServicioRecordatorios(new NotificadorSms());
+        recordatoriosMediSalud.enviarRecordatorio("+54 11 5555-0100", "Su cita es mañana a las 10:00.");
+
+        ServicioRecordatorios recordatoriosBiblioteca = new ServicioRecordatorios(new NotificadorEmail());
+        recordatoriosBiblioteca.enviarRecordatorio("estudiante@universidad.edu", "Su préstamo vence en 2 días.");
+    }
+}
+```
+
+**Explicación**: es polimorfismo porque `NotificadorSms` y `NotificadorEmail`
+implementan el mismo contrato con comportamientos distintos; es inyección de
+dependencias porque `ServicioRecordatorios` no decide cuál usar: la implementación
+concreta se le entrega desde afuera, por constructor.
+
+**Verificación**: se revisa que `ServicioRecordatorios` no mencione
+`NotificadorSms` ni `NotificadorEmail` en su código, solo `Notificador`.
+
+## 🏆 Desafío 01 — Ensamblar a mano un grafo de objetos con Inyección de Dependencias
+
+**Solución propuesta**:
+
+```java
+public static void main(String[] args) {
+    RepositorioPacientes repositorioPacientes = new RepositorioPacientesEnMemoria();
+    ServicioNotificaciones servicioNotificaciones = new ServicioNotificaciones(repositorioPacientes);
+    ServicioCitas servicioCitas = new ServicioCitas(repositorioPacientes, servicioNotificaciones);
+    ControladorCitas controladorCitas = new ControladorCitas(servicioCitas);
+
+    controladorCitas.manejarSolicitudAgendar("P-001");
+}
+```
+
+**Orden de construcción**: `RepositorioPacientes` primero (no depende de nadie),
+luego `ServicioNotificaciones` (depende del repositorio), luego `ServicioCitas`
+(depende del repositorio y de las notificaciones), y por último
+`ControladorCitas` (depende de `ServicioCitas`). Invertir este orden es imposible
+en Java: no se puede pasar por constructor una referencia que todavía no existe.
+
+**Qué automatizaría un `ApplicationContext`**: si las cuatro clases estuvieran
+anotadas (`@Component`/`@Service`), el contenedor escanearía las clases, calcularía
+este mismo orden de dependencias, instanciaría cada bean e inyectaría las
+dependencias resueltas por constructor — exactamente lo que el `main` hizo a mano.
+Esto corresponde a las fases de **instanciación** e **inyección de dependencias**
+del ciclo de vida de un bean (Ejemplo 05): el contenedor decide el orden y ejecuta
+la resolución de dependencias que aquí se escribió explícitamente.
+
+**Verificación**: se revisa que el orden de construcción en el `main` respete las
+dependencias declaradas, que ninguna clase use `new` sobre sus propias
+dependencias, y que la explicación final relacione el automatismo con
+instanciación e inyección de dependencias, no solo con "Spring hace magia".

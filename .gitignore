@@ -1,0 +1,10 @@
+# Solo se publica el material del curso. Todo lo demas
+# (specs, herramientas del generador, scripts sueltos) queda fuera de GitHub.
+/generador-cursos/*
+!/generador-cursos/curso-spring-boot
+
+# Artefactos de build de Java/Maven/Gradle usados en ejemplos y ejercicios
+target/
+build/
+.gradle/
+*.class
