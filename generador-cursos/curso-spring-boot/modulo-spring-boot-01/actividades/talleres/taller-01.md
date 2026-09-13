@@ -64,10 +64,26 @@ public class ServicioCitas {
 
 ## 📦 Entregable
 
-Un archivo con: (a) las clases `Paciente`, `Medico`, `Cita`, `ServicioCitas` (en su
-versión final, con inyección por constructor), (b) el `main` que agenda al menos
-dos citas, y (c) la lista de acoplamientos identificados en el paso 6, redactada
-antes de la refactorización del paso 7.
+Un pequeño proyecto de archivos (en Java, cada clase o interfaz pública va en su
+propio `.java`), con esta estructura:
+
+```text
+taller-01-medisalud/
+├── Paciente.java
+├── Medico.java
+├── Cita.java
+├── RepositorioPacientes.java
+├── RepositorioMedicos.java
+├── RepositorioPacientesEnMemoria.java
+├── RepositorioMedicosEnMemoria.java
+├── ServicioCitas.java     (versión final, con inyección por constructor)
+├── Main.java              (agenda al menos dos citas)
+└── acoplamientos.md       (lista del paso 6, redactada antes de refactorizar)
+```
+
+`ServicioCitas.java` y `Main.java` se entregan en su versión final del paso 7; la
+versión acoplada del paso 4 no se entrega como archivo aparte, solo se documenta en
+`acoplamientos.md`.
 
 ## 🧪 Casos de prueba
 
