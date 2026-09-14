@@ -27,6 +27,24 @@ mismo nombre. Si abrieras este ejemplo como una carpeta en VS Code, el panel
 Cada bloque de código de abajo está encabezado con el nombre exacto del archivo
 en el que iría, en ese mismo orden.
 
+## 🧠 Por qué hay `@Service` y `@Autowired` si no vamos a usar Spring
+
+Las tres clases `ServicioPrestamos...` llevan `@Service` (y `@Autowired` en la
+versión por setter y por campo) porque así es como se **verían realmente** en un
+proyecto Spring Boot. Pero en este ejemplo **no se arranca ningún contenedor**
+(no hay `ApplicationContext` ni `@SpringBootApplication`): `Main.java` construye
+los objetos a mano, con `new` y reflexión.
+
+Esto no es una contradicción: como se vio en el Ejemplo 09, una anotación es
+solo un **metadato**, no ejecuta nada por sí sola. `@Service` y `@Autowired`
+solo tienen efecto si algo las **lee** — normalmente, el contenedor de Spring al
+arrancar. Si nadie arranca un contenedor (como acá), esas anotaciones quedan
+ahí, compiladas, pero completamente ignoradas: el código se comporta exactamente
+igual que si no las tuviera. Dejarlas puestas es intencional: sirve para mostrar
+que **la misma clase**, sin cambiar una línea, funciona tanto si Spring la
+administra (en la aplicación real) como si se instancia a mano (en `Main.java`,
+o en un test unitario).
+
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
@@ -141,8 +159,9 @@ public class ServicioPrestamosCampo {
 
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
-Para comparar las tres formas en un mismo programa (sin necesidad de un contenedor
-Spring), `Main` las instancia a mano, exactamente como lo haría un test unitario.
+Para comparar las tres formas en un mismo programa (sin necesidad de **arrancar**
+un contenedor Spring — las anotaciones siguen ahí, pero nadie las lee), `Main`
+instancia las tres clases a mano, exactamente como lo haría un test unitario.
 Las versiones por constructor y por setter se arman directamente; la de campo
 **no tiene ningún constructor ni setter público** para `repositorioLibros`, así
 que `Main` tiene que recurrir a reflexión para asignarlo — el mismo costo extra
