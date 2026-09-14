@@ -3,27 +3,35 @@
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
 subsección "Soluciones" de `specs/modulo-spring-boot-01.md`).
 
-| N.º | Respuesta correcta | Explicación breve | RA |
+Desde esta iteración, `quizzes/quiz-01.md` (formato entrevista técnica) ya incluye
+la respuesta de cada ítem oculta en un bloque `<details>` colapsado, pensada como
+autoevaluación inmediata para el estudiante. Esta tabla es un resumen de
+referencia rápida para el docente (por ejemplo, para corregir en grupo o
+verificar respuestas sin abrir cada bloque uno por uno).
+
+| N.º | Tipo | Respuesta correcta / síntesis | RA |
 |---|---|---|---|
-| 1 | B | Un framework ofrece una estructura predefinida (IoC, MVC, etc.) para reducir código repetitivo y facilitar el desarrollo ágil; no es "libre de estructura" como una librería. | RA-10 |
-| 2 | B | Una librería dinámica se carga en tiempo de ejecución; una estática se copia dentro del ejecutable al compilar. | RA-11 |
-| 3 | B | La diferencia clave es la Inversión de Control: quién llama a quién. | RA-12 |
-| 4 | B | Una clase abstracta comparte estado/comportamiento entre subclases relacionadas por herencia; una interfaz solo fija un contrato de comportamiento, sin exigir relación de herencia entre quienes la implementan. | RA-1 |
-| 5 | B | El polimorfismo permite que el mismo código invoque `calcularDiasDevolucion()` y cada tipo concreto ejecute su propia versión, sin `instanceof`. | RA-1 |
-| 6 | B | Streams describen la operación de forma declarativa; no implican por sí solos una mejora de rendimiento garantizada. | RA-2 |
-| 7 | B | `Optional` obliga a decidir explícitamente qué hacer ante la ausencia de valor, en vez de arriesgar un `NullPointerException`. | RA-3 |
-| 8 | B | Un `record` genera automáticamente constructor, *getters*, `equals`, `hashCode` y `toString`, y es inmutable por diseño. | RA-4 |
-| 9 | B | Maven es XML declarativo con fases fijas; Gradle es un DSL de Groovy/Kotlin más flexible para tareas. Ambos son compatibles con Spring Boot. | RA-5 |
-| 10 | B | Spring Boot no reemplaza los conceptos de Spring: automatiza su configuración (autoconfiguración, starters, servidor embebido). | RA-6 |
-| 11 | B | El paquete `repository` contiene las clases o interfaces responsables de acceder a los datos, por convención de la arquitectura por capas. | RA-13 |
-| 12 | B | `@RestController` + `@GetMapping` hacen que Spring Boot invoque el método al recibir la petición HTTP correspondiente, devolviendo el resultado serializado. | RA-14 |
-| 13 | B | Un bean es un objeto cuyo ciclo de vida administra el contenedor IoC, no el código cliente. | RA-7 |
-| 14 | A | Orden correcto: instanciación (II) → inyección de dependencias (IV) → inicialización (I) → destrucción (III). | RA-7 |
-| 15 | B | La inyección por constructor hace explícita la dependencia, permite `final`, y facilita instanciar la clase en un test sin contenedor. | RA-8 |
-| 16 | B | Instanciar con `new` dentro de la clase acopla la clase a esa implementación concreta e impide sustituirla en un test sin modificar el código. | RA-9 |
+| 1 | Selección | B — un framework impone estructura (IoC, MVC) para reducir código repetitivo. | RA-10 |
+| 2 | Selección múltiple | A, B, D — una dinámica se carga en ejecución, comparte memoria y se actualiza sin recompilar. | RA-11 |
+| 3 | Abierta | Diferencia = quién controla el flujo (Inversión de Control); framework impone estructura, librería no. | RA-12 |
+| 4 | Selección | B — clase abstracta comparte estado/comportamiento; interfaz solo fija un contrato. | RA-1 |
+| 5 | Abierta | Polimorfismo: invocar el método sobre el tipo `Prestable`, cada implementación resuelve su propia versión. | RA-1 |
+| 6 | Selección múltiple | A, B, D — streams son declarativos, evitan listas mutables intermedias y son más legibles; NO paralelizan solos ni eliminan excepciones. | RA-2 |
+| 7 | Selección | B — `Optional` obliga a manejar explícitamente la ausencia de valor. | RA-3 |
+| 8 | Abierta | `record`: constructor/getters/equals/hashCode/toString generados, inmutable; para objetos de valor simples. | RA-4 |
+| 9 | Selección múltiple | B, C, D, E — (A está invertida: Maven es XML, Gradle es DSL). | RA-5 |
+| 10 | Abierta | Spring Boot (2014) simplifica la configuración que Spring (2003) había acumulado; mencionar ≥3 de sus 6 características. | RA-6 |
+| 11 | Selección | B — `repository` accede a los datos. | RA-13 |
+| 12 | Selección múltiple | B, C, D — Spring usa el único constructor automáticamente desde 4.3; `@Service` especializa `@Component`; agregar `@Autowired` sería redundante pero válido. | RA-14 |
+| 13 | Abierta | `ApplicationContext` = contenedor IoC que escanea y administra beans; bean = objeto administrado por el contenedor, no creado con `new`. | RA-7 |
+| 14 | Selección | A — instanciación → inyección de dependencias → inicialización → destrucción. | RA-7 |
+| 15 | Abierta | Inyección por campo funciona pero oculta dependencias y dificulta testear sin contenedor; recomendar constructor. | RA-8 |
+| 16 | Abierta | `new` dentro de la clase acopla a la implementación concreta e impide sustituirla en un test; solución: inyección por constructor. | RA-9 |
 
 ## 📏 Criterios de corrección para ítems abiertos
 
-Ningún ítem de este quiz es de respuesta abierta (los 16 son de selección múltiple
-o identificación con una única opción correcta); no se requieren criterios de
-corrección adicionales más allá de la opción marcada en la tabla.
+Para los ítems marcados **[Abierta]**, la respuesta del estudiante no necesita
+coincidir palabra por palabra con la "respuesta modelo" del quiz: se considera
+correcta si cubre los puntos listados en "Debería mencionar" de cada ítem en
+`quiz-01.md`. Para los ítems de **Selección** y **Selección múltiple**, se
+considera correcta únicamente la combinación exacta de opciones indicada arriba.
