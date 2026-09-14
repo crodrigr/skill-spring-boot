@@ -14,6 +14,11 @@ código de un libro tenga el formato correcto de ISBN. Para eso no hace falta un
 framework completo: alcanza con una librería de validación que se invoca en el
 punto exacto del código donde se necesita.
 
+**Qué busca demostrar este ejemplo**: que una librería no exige ninguna
+estructura nueva ni cambia el flujo del programa — el mismo `main` que ya existía
+simplemente gana una línea de código que llama a la librería cuando lo decide,
+en contraste con lo que se vio en el Ejemplo 01 con un framework.
+
 ## 🧠 Concepto: dos tipos de librerías
 
 | Tipo | Cómo funciona | Consecuencia |

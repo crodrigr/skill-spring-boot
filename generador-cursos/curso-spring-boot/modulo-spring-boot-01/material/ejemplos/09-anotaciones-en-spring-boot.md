@@ -28,6 +28,13 @@ configuración con el mínimo esfuerzo.
   anotación, Spring Boot activa el comportamiento correspondiente sin
   configuración adicional.
 
+**Qué busca demostrar este ejemplo**: que un conjunto pequeño de anotaciones
+(`@Repository`, `@Service`, `@RestController`, un mapeo HTTP y
+`@SpringBootApplication`) alcanza para transformar cuatro clases Java comunes en
+una API funcional completa —sin un solo archivo de configuración XML—, y que
+cada anotación comunica, solo con su nombre, qué responsabilidad cumple esa
+clase dentro de la arquitectura por capas.
+
 ## 🔍 Anotaciones más comunes en Spring Boot
 
 | Anotación | Dónde se usa | Qué hace |

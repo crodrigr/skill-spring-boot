@@ -1,5 +1,22 @@
 # 💡 Ejemplo 05 — Java moderno: streams, lambdas, Optional y records
 
+## 🌍 Contexto
+
+Spring y sus ejemplos posteriores (repositorios, servicios) asumen un estilo de
+código concreto: **streams** para describir operaciones sobre colecciones sin
+escribir el bucle que las recorre, **lambdas** para pasar comportamiento como
+argumento, **`Optional`** para representar explícitamente que un valor puede no
+existir, y **records** para modelar objetos de valor inmutables sin código
+repetitivo. Antes de usar Spring, conviene dominar estas cuatro herramientas
+comparándolas contra su equivalente "tradicional".
+
+**Qué busca demostrar este ejemplo**: que, para cada una de las cuatro
+herramientas, la versión moderna produce **el mismo resultado** que su
+equivalente imperativo (bucle mutable, chequeo manual de `null`, clase escrita a
+mano), pero con menos código y menos superficie para introducir errores —
+comparación que el propio `main` deja a la vista, imprimiendo ambas versiones
+una junto a la otra.
+
 ## 🏥 Caso de estudio
 
 MediSalud: filtramos y transformamos una lista de citas médicas, buscamos la

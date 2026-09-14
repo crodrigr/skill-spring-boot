@@ -1,5 +1,21 @@
 # 💡 Ejemplo 04 — POO aplicada: clases, interfaces, herencia, polimorfismo
 
+## 🌍 Contexto
+
+Spring administra objetos (beans) que el propio equipo de desarrollo define como
+clases, y con frecuencia programa contra interfaces para poder cambiar una
+implementación sin tocar el código que la usa. Antes de delegarle esa gestión a
+un framework, conviene dominar cómo se modelan esas clases e interfaces a mano:
+cuándo usar **herencia** (tipos que "son un" algo más general) y cuándo usar una
+**interfaz** (tipos que "pueden hacer" algo, sin relación de herencia entre sí).
+
+**Qué busca demostrar este ejemplo**: que herencia e interfaz resuelven
+problemas distintos —reutilizar comportamiento común (`Usuario`) frente a
+garantizar una capacidad compartida entre tipos no relacionados
+(`Prestable`)— y que el **polimorfismo** permite que un mismo fragmento de
+código (`Main`) trate objetos de tipos concretos distintos de manera uniforme,
+sin `instanceof` ni *casts*.
+
 ## 🏥📚 Caso de estudio
 
 Biblioteca Universitaria: modelamos usuarios (`Estudiante`, `Docente`) que heredan

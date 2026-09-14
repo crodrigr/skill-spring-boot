@@ -8,6 +8,12 @@ cumplen roles muy distintos. Reconocer esa diferencia evita un error común de
 principiante: tratar cualquier dependencia agregada al proyecto como si fuera "lo
 mismo".
 
+**Qué busca demostrar este ejemplo**: que el mismo criterio (quién controla el
+flujo) permite clasificar sin ambigüedad cualquier herramienta nueva que se
+agregue al proyecto, comparando lado a lado un `main` que llama a una librería
+por su cuenta contra un método que un framework invoca sin que el desarrollador
+lo pida explícitamente.
+
 ## 🔍 Análisis comparado
 
 | Criterio | Framework | Librería |

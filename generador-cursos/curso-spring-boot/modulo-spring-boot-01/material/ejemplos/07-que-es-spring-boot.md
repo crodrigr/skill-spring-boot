@@ -18,6 +18,12 @@ integra sin fricción con el resto del ecosistema Spring: Spring Data JPA (acces
 bases de datos), Spring Security (seguridad) y Thymeleaf (vistas web), entre otros
 — piezas que se irán viendo en los módulos siguientes del curso.
 
+**Qué busca demostrar este ejemplo**: que, para levantar el mismo endpoint web,
+todo lo que Spring clásico exige configurar a mano (beans, `web.xml`, un
+servidor externo) se reduce a una anotación y una clase con `main` en Spring
+Boot; y que las seis características de Spring Boot no son ideas abstractas,
+sino explicaciones concretas de qué automatiza cada paso de esa reducción.
+
 ## 📖 Historia, en breve
 
 - **2003 — Spring Framework**: nace para simplificar el desarrollo empresarial en

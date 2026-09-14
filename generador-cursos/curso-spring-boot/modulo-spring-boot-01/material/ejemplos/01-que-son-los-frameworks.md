@@ -16,6 +16,11 @@ es especialmente valioso en aplicaciones web complejas, donde hay que gestionar
 grandes volúmenes de datos e integraciones entre módulos (por ejemplo, citas,
 historias clínicas y facturación dentro de un mismo sistema MediSalud).
 
+**Qué busca demostrar este ejemplo**: que resolver el mismo problema (responder
+una petición sobre las citas del día) "a mano" y con un framework no es
+solamente escribir menos código, sino invertir **quién decide cuándo se ejecuta
+el código del desarrollador** — la esencia de la Inversión de Control.
+
 ## 🧠 Concepto: las cinco características de un framework
 
 | Característica | Qué significa |

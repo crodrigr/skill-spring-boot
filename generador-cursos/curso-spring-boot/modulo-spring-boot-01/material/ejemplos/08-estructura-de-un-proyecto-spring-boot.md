@@ -7,6 +7,12 @@ organizan sus archivos y carpetas. Spring Boot no obliga una única estructura,
 pero sí existe una convención ampliamente adoptada que este curso sigue en todos
 sus ejemplos, aplicada aquí a un proyecto `biblioteca-api`.
 
+**Qué busca demostrar este ejemplo**: que la carpeta y el paquete en el que vive
+una clase no son un detalle arbitrario, sino que comunican su responsabilidad
+(recibir peticiones, aplicar reglas de negocio, acceder a datos, o representar
+una entidad); y que una única clase con `@SpringBootApplication` alcanza para
+que Spring Boot descubra y registre automáticamente todo lo demás.
+
 ## 🌳 Árbol de carpetas
 
 ```text

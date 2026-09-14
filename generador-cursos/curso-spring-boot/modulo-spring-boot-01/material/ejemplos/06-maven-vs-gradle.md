@@ -1,5 +1,19 @@
 # 💡 Ejemplo 06 — Maven vs Gradle
 
+## 🌍 Contexto
+
+Maven y Gradle son las dos herramientas de **build** más usadas para proyectos
+Java/Spring Boot: descargan dependencias, compilan el código, ejecutan pruebas y
+empaquetan la aplicación. Difieren en cómo se declara esa configuración (XML
+declarativo vs. un DSL de programación), pero ninguna de las dos cambia los
+conceptos de la aplicación en sí — eso es exactamente lo que este ejemplo pone a
+prueba.
+
+**Qué busca demostrar este ejemplo**: que un mismo proyecto (`medisalud-api`),
+descrito con las mismas dependencias en `pom.xml` y en `build.gradle`, compila y
+ejecuta **la misma clase Java** (`App.java`) con **la misma salida**; la
+elección de herramienta no altera en nada el comportamiento de la aplicación.
+
 ## 🏥 Caso de estudio
 
 Configuración de build para un proyecto `medisalud-api`, expresada primero con

@@ -1,5 +1,21 @@
 # 💡 Ejemplo 10 — IoC Container: ApplicationContext y ciclo de vida de un bean
 
+## 🌍 Contexto
+
+La Inversión de Control (mencionada desde el Ejemplo 01 como una de las
+características de todo framework) tiene, en Spring, un nombre concreto para su
+mecanismo: el **contenedor IoC**, representado por la interfaz
+`ApplicationContext`. En vez de que una clase cree sus propias dependencias con
+`new`, el contenedor las crea, las configura y se las entrega, administrando
+además cuándo nace y cuándo muere cada una de esas instancias (los **beans**).
+
+**Qué busca demostrar este ejemplo**: que el ciclo de vida de un bean no es una
+lista abstracta de fases, sino algo que se puede **ver ejecutarse en orden**: el
+propio `ServicioCitas` imprime un mensaje en cada fase (instanciación,
+inicialización, uso, destrucción), y `DemoContenedorIoC` deja en evidencia que
+el desarrollador nunca escribe `new ServicioCitas()` — solo se lo pide al
+contenedor.
+
 ## 🏥 Caso de estudio
 
 MediSalud: un `ServicioCitas` administrado por el contenedor IoC, para observar en

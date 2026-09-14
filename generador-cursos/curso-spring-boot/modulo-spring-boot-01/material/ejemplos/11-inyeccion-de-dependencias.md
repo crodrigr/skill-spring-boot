@@ -1,5 +1,20 @@
 # 💡 Ejemplo 11 — Inyección de Dependencias: constructor, setter y campo
 
+## 🌍 Contexto
+
+La Inyección de Dependencias es el mecanismo concreto con el que el contenedor
+IoC (Ejemplo 10) le entrega a un bean lo que necesita, en vez de que el propio
+bean lo cree. Spring ofrece tres formas de recibir esa dependencia —constructor,
+setter y campo— y las tres funcionan igual dentro de una aplicación en marcha;
+la diferencia real aparece recién cuando se necesita reemplazar esa dependencia
+por una versión de prueba, fuera del contenedor.
+
+**Qué busca demostrar este ejemplo**: que, aunque las tres formas dan el mismo
+resultado de negocio, solo la versión por constructor puede instanciarse con
+`new` en una línea; la de campo, en cambio, obliga a recurrir a reflexión — el
+"costo" de esa forma no es una afirmación teórica, es algo que el propio
+`Main.java` tiene que pagar para poder ejecutarla.
+
 ## 📚 Caso de estudio
 
 Biblioteca Universitaria: un `ServicioPrestamos` que depende de un
