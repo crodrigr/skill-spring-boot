@@ -6,15 +6,44 @@ Biblioteca Universitaria: un `ServicioPrestamos` que depende de un
 `RepositorioLibros`, implementado con las tres formas de inyección para poder
 compararlas.
 
-## 💻 Código — dependencia común a las tres versiones
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+En Java, cada clase o interfaz pública va en su propio archivo `.java` con su
+mismo nombre. Si abrieras este ejemplo como una carpeta en VS Code, el panel
+`EXPLORER` de la izquierda se vería así:
+
+```text
+📁 ejemplo-11-inyeccion-dependencias
+└── 📁 src
+    ├── 📄 RepositorioLibros.java          (interfaz)
+    ├── 📄 Libro.java                      (record)
+    ├── 📄 RepositorioLibrosEnMemoria.java (implementación del repositorio)
+    ├── 📄 ServicioPrestamosConstructor.java
+    ├── 📄 ServicioPrestamosSetter.java
+    ├── 📄 ServicioPrestamosCampo.java
+    └── 📄 Main.java                       (▶️ clase con el main que se ejecuta)
+```
+
+Cada bloque de código de abajo está encabezado con el nombre exacto del archivo
+en el que iría, en ese mismo orden.
+
+## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
+```
 
+## 💻 Archivo: `Libro.java`
+
+```java
 public record Libro(String isbn, String titulo) {}
+```
 
+## 💻 Archivo: `RepositorioLibrosEnMemoria.java`
+
+```java
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 
     private final List<Libro> libros = List.of(
@@ -28,7 +57,7 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 }
 ```
 
-## 💻 Código — por constructor (recomendada)
+## 💻 Archivo: `ServicioPrestamosConstructor.java` (recomendada)
 
 ```java
 @Service
@@ -46,7 +75,7 @@ public class ServicioPrestamosConstructor {
 }
 ```
 
-## 💻 Código — por setter
+## 💻 Archivo: `ServicioPrestamosSetter.java`
 
 ```java
 @Service
@@ -65,7 +94,7 @@ public class ServicioPrestamosSetter {
 }
 ```
 
-## 💻 Código — por campo
+## 💻 Archivo: `ServicioPrestamosCampo.java`
 
 ```java
 @Service
@@ -105,12 +134,12 @@ public class ServicioPrestamosCampo {
    constructor** como forma preferida para dependencias obligatorias, dejando
    setter para casos realmente opcionales y evitando la inyección por campo en
    código nuevo.
-5. `Main` hace visible esa diferencia: arma `porConstructor` y `porSetter` con una
-   línea de código normal, pero necesita `java.lang.reflect.Field` para asignar
-   `repositorioLibros` en `porCampo`, exactamente el "costo extra" del que habla
-   el análisis comparado.
+5. `Main.java` hace visible esa diferencia: arma `porConstructor` y `porSetter`
+   con una línea de código normal, pero necesita `java.lang.reflect.Field` para
+   asignar `repositorioLibros` en `porCampo`, exactamente el "costo extra" del
+   que habla el análisis comparado.
 
-## 💻 Código — clase principal (`Main`)
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 Para comparar las tres formas en un mismo programa (sin necesidad de un contenedor
 Spring), `Main` las instancia a mano, exactamente como lo haría un test unitario.
@@ -155,7 +184,8 @@ public class Main {
 
 ## ✅ Resultado esperado
 
-Al ejecutar `Main.main(...)`:
+En VS Code, al abrir `Main.java` aparece un botón **▶ Run** (o "Run Java")
+arriba del método `main`; al hacer clic, el panel `TERMINAL` de abajo muestra:
 
 ```text
 Por constructor -> true
@@ -166,4 +196,4 @@ ISBN inexistente por constructor -> false
 
 Las tres clases, con el mismo `RepositorioLibros`, devuelven el mismo resultado de
 negocio; la elección entre las tres no cambia **qué** responden, solo qué tan
-fácil es armarlas fuera de un contenedor Spring, como acaba de hacer `Main`.
+fácil es armarlas fuera de un contenedor Spring, como acaba de hacer `Main.java`.
