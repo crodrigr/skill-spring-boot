@@ -82,12 +82,19 @@ public class ServicioPrestamosSetter {
 
 ## 🗺️ Diagrama: acoplada vs. desacoplada
 
+### 🚧 Con acoplamiento
+
 ```mermaid
 classDiagram
     class ServicioPrestamosAcoplado
     class RepositorioLibrosEnMemoria
-    ServicioPrestamosAcoplado --> RepositorioLibrosEnMemoria : crea con new (acoplada)
+    ServicioPrestamosAcoplado --> RepositorioLibrosEnMemoria : crea con new
 ```
+
+La flecha apunta a una **clase concreta**: no hay forma de cambiar el destino
+sin editar `ServicioPrestamosAcoplado`.
+
+### 💡 Sin acoplamiento (con Inyección de Dependencias)
 
 ```mermaid
 classDiagram
@@ -102,11 +109,10 @@ classDiagram
     RepositorioLibros <|.. repositorioDePrueba
 ```
 
-En el primer diagrama, la flecha apunta a una **clase concreta**: no hay
-forma de cambiar el destino sin editar `ServicioPrestamosAcoplado`. En el
-segundo, la flecha apunta a la **interfaz**: cualquiera de las dos
-implementaciones de abajo puede conectarse, elegida desde afuera —eso es lo
-que permite enchufar `repositorioDePrueba` en un test.
+La flecha apunta a la **interfaz**, no a una clase concreta: cualquiera de las
+dos implementaciones de abajo puede conectarse, elegida desde afuera —eso es
+lo que permite enchufar `repositorioDePrueba` en un test, sin tocar
+`ServicioPrestamosConstructor`.
 
 ## 💻 Código — clase principal (`Main`): la diferencia se ve al testear
 
