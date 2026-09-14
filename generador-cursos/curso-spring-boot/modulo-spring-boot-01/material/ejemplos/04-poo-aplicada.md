@@ -6,7 +6,7 @@ Biblioteca Universitaria: modelamos usuarios (`Estudiante`, `Docente`) que hered
 de una clase común `Usuario`, y recursos que se pueden prestar (`Libro`,
 `RecursoDigital`) implementando una interfaz común `Prestable`.
 
-## 💻 Código
+## 💻 Código — clases del dominio
 
 ```java
 // Clase base: comportamiento y datos comunes a todo usuario de la biblioteca
@@ -97,6 +97,40 @@ public class RecursoDigital implements Prestable {
 }
 ```
 
+## 💻 Código — clase principal (`Main`)
+
+Cada clase de arriba iría en su propio archivo `.java` en un proyecto real
+(`Usuario.java`, `Estudiante.java`, etc.); `Main` es el punto de entrada que las
+pone a todas en juego.
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        // --- Herencia: Estudiante y Docente son ambos un Usuario ---
+        Usuario estudiante = new Estudiante("Ana Torres", "EST-001");
+        Usuario docente = new Docente("Carlos Ibáñez", "DOC-045");
+
+        System.out.println(estudiante.getNombre() + " puede tener hasta "
+                + estudiante.limitePrestamosSimultaneos() + " préstamos simultáneos.");
+        System.out.println(docente.getNombre() + " puede tener hasta "
+                + docente.limitePrestamosSimultaneos() + " préstamos simultáneos.");
+
+        // --- Polimorfismo: recorrer distintos tipos de Prestable con el mismo código ---
+        List<Prestable> recursos = List.of(
+                new Libro("Estructuras de Datos"),
+                new RecursoDigital("Curso de Spring Boot (video)")
+        );
+
+        for (Prestable recurso : recursos) {
+            System.out.println(recurso.descripcion() + " -> "
+                    + recurso.calcularDiasDevolucion() + " días");
+        }
+    }
+}
+```
+
 ## 🧭 Explicación paso a paso
 
 1. `Usuario` es una clase **abstracta**: agrupa el nombre y el código, comunes a
@@ -104,29 +138,35 @@ public class RecursoDigital implements Prestable {
    porque cada subtipo lo define distinto.
 2. `Estudiante` y `Docente` **heredan** de `Usuario` y solo agregan lo que las hace
    diferentes: su propio límite de préstamos. No duplican `nombre` ni `codigo`.
-3. `Prestable` es una **interfaz**: no le importa si el recurso es un libro físico o
+3. En `Main`, `estudiante` y `docente` se declaran como tipo `Usuario` (la
+   superclase), pero cada uno ejecuta la versión de `limitePrestamosSimultaneos()`
+   de su propia subclase: esto también es polimorfismo, aplicado a la jerarquía de
+   `Usuario`.
+4. `Prestable` es una **interfaz**: no le importa si el recurso es un libro físico o
    digital, solo que pueda responder cuántos días dura el préstamo y describirse.
-4. `Libro` y `RecursoDigital` **implementan** `Prestable`, cada uno con su propia
+5. `Libro` y `RecursoDigital` **implementan** `Prestable`, cada uno con su propia
    regla de negocio para `calcularDiasDevolucion()`.
-5. El **polimorfismo** aparece al recorrer una lista de `Prestable` (ver más abajo):
-   el mismo código llama a `calcularDiasDevolucion()` en cada elemento, y cada uno
-   ejecuta su propia versión, sin que el código que recorre la lista necesite saber
-   si es un `Libro` o un `RecursoDigital`.
-
-```java
-List<Prestable> recursos = List.of(
-    new Libro("Estructuras de Datos"),
-    new RecursoDigital("Curso de Spring Boot (video)")
-);
-
-for (Prestable recurso : recursos) {
-    System.out.println(recurso.descripcion() + " -> " + recurso.calcularDiasDevolucion() + " días");
-}
-```
+6. El segundo bloque de `Main` recorre una `List<Prestable>`: el mismo código llama
+   a `calcularDiasDevolucion()` en cada elemento, y cada uno ejecuta su propia
+   versión, sin que el bucle necesite saber si es un `Libro` o un `RecursoDigital`
+   (sin `instanceof`, sin *casts*).
 
 ## ✅ Resultado esperado
 
+Al ejecutar `Main.main(...)`, la salida por consola es:
+
 ```text
+Ana Torres puede tener hasta 3 préstamos simultáneos.
+Carlos Ibáñez puede tener hasta 10 préstamos simultáneos.
 Libro: Estructuras de Datos -> 14 días
 Recurso digital: Curso de Spring Boot (video) -> 7 días
 ```
+
+## 📌 Idea clave
+
+Las primeras dos líneas de la salida vienen de la jerarquía `Usuario` (herencia +
+polimorfismo sobre `limitePrestamosSimultaneos()`); las últimas dos vienen de la
+jerarquía `Prestable` (interfaz + polimorfismo sobre `calcularDiasDevolucion()`).
+Son dos aplicaciones distintas del mismo principio: el código que usa el objeto
+(`Main`) no necesita conocer su tipo concreto, solo el tipo declarado
+(`Usuario` o `Prestable`).
