@@ -9,6 +9,30 @@ sobre préstamos próximos a vencer. La clase crea sus propias dependencias con
 ## 💻 Código o contexto de partida
 
 ```java
+public record Usuario(String codigo, String email) {}
+
+public interface RepositorioUsuarios {
+    Usuario buscarPorCodigo(String codigo);
+}
+
+public class RepositorioUsuariosJpa implements RepositorioUsuarios {
+    @Override
+    public Usuario buscarPorCodigo(String codigo) {
+        return new Usuario(codigo, "usuario_" + codigo + "@universidad.edu"); // simplificado
+    }
+}
+
+public interface ClienteEmail {
+    void enviar(String destinatario, String mensaje);
+}
+
+public class ClienteEmailSmtp implements ClienteEmail {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("Email a " + destinatario + ": " + mensaje);
+    }
+}
+
 public class ServicioNotificaciones {
 
     private RepositorioUsuarios repositorioUsuarios = new RepositorioUsuariosJpa();
@@ -17,16 +41,26 @@ public class ServicioNotificaciones {
     public void notificarVencimientoProximo(String isbn, String codigoUsuario) {
         Usuario usuario = repositorioUsuarios.buscarPorCodigo(codigoUsuario);
         clienteEmail.enviar(
-            usuario.getEmail(),
+            usuario.email(),
             "Tu préstamo del libro " + isbn + " vence pronto."
         );
     }
 }
+
+public class Main {
+    public static void main(String[] args) {
+        ServicioNotificaciones servicio = new ServicioNotificaciones();
+        servicio.notificarVencimientoProximo("978-3-16-148410-0", "EST-010");
+    }
+}
 ```
 
-Refactorizá `ServicioNotificaciones` para que reciba `RepositorioUsuarios` y
-`ClienteEmail` por **constructor**, en vez de instanciarlos con `new`. Explicá, en
-2 o 3 líneas, qué beneficio concreto obtenés para las pruebas.
+Ejecutá `Main` primero para confirmar que la versión de partida funciona.
+Después, refactorizá `ServicioNotificaciones` para que reciba `RepositorioUsuarios`
+y `ClienteEmail` por **constructor**, en vez de instanciarlos con `new`, ajustando
+`Main` para construirlos afuera y pasárselos. `Main` debe seguir imprimiendo la
+misma línea después del cambio. Explicá, en 2 o 3 líneas, qué beneficio concreto
+obtenés para las pruebas.
 
 ## 📏 Criterios de evaluación de la solución
 
@@ -49,6 +83,12 @@ Refactorizá `ServicioNotificaciones` para que reciba `RepositorioUsuarios` y
 ## 📊 Dificultad
 
 Intermedio
+
+## ✅ Salida esperada al ejecutar `Main` (antes y después de refactorizar)
+
+```text
+Email a usuario_EST-010@universidad.edu: Tu préstamo del libro 978-3-16-148410-0 vence pronto.
+```
 
 ## 🎓 Resultados de aprendizaje
 

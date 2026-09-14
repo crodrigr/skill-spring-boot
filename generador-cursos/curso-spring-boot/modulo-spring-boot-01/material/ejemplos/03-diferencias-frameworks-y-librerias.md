@@ -26,10 +26,30 @@ librería cuando quiero"); con un framework, el control se invierte ("el framewo
 me llama a mí cuando corresponde: al recibir una petición HTTP, al arrancar la
 aplicación, al inyectar una dependencia").
 
-```java
-// Librería: el desarrollador decide cuándo llamarla
-boolean valido = ValidadorIsbn.esValido(isbn); // se llama explícitamente, donde se quiera
+## 💻 Código completo — el lado "librería" (ejecutable)
 
+```java
+public class QuienLlamaAQuienDemo {
+
+    static class ValidadorIsbn {
+        static boolean esValido(String isbn) {
+            return isbn.replace("-", "").length() == 13;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Librería: el desarrollador decide cuándo llamarla, y en qué orden
+        System.out.println("Antes de validar...");
+        boolean valido = ValidadorIsbn.esValido("978-3-16-148410-0");
+        System.out.println("¿ISBN válido? " + valido);
+        System.out.println("Después de validar: el programa sigue su propio flujo.");
+    }
+}
+```
+
+## 💻 Código — el lado "framework" (solo se ejecuta dentro de un contexto Spring)
+
+```java
 // Framework (Spring Boot): el framework decide cuándo llamar al código del desarrollador
 @RestController
 public class CatalogoController {
@@ -42,17 +62,41 @@ public class CatalogoController {
 }
 ```
 
+Este segundo bloque **no tiene un `main` propio que llame a `buscar(...)`**: a
+propósito. Ejecutarlo requiere que Spring Boot arranque el contenedor (Ejemplo
+07) y reciba una petición HTTP real; el desarrollador nunca escribe
+`catalogoController.buscar("...")` en ningún `main`.
+
 ## 🧭 Explicación paso a paso
 
-1. En el primer bloque, el desarrollador escribe `ValidadorIsbn.esValido(isbn)`
-   en el punto exacto del código donde lo necesita: tiene el control.
-2. En el segundo bloque, el desarrollador **nunca** escribe una llamada a
+1. En `QuienLlamaAQuienDemo`, el propio `main` decide, línea por línea, cuándo se
+   llama a `ValidadorIsbn.esValido(...)`: antes, después, o ni siquiera llamarlo.
+   Ese control es del desarrollador.
+2. En `CatalogoController`, el desarrollador **nunca** escribe una llamada a
    `buscar(...)`: ese método existe para que Spring Boot lo invoque cuando llega
    una petición HTTP a `/catalogo/{isbn}`. El control quedó invertido.
 3. Ninguna forma es "mejor" en abstracto: una librería es la herramienta correcta
    para una necesidad puntual y acotada; un framework es la herramienta correcta
    cuando se necesita una estructura completa y consistente para toda la
    aplicación.
+
+## ✅ Resultado esperado
+
+Al ejecutar `QuienLlamaAQuienDemo.main(...)`:
+
+```text
+Antes de validar...
+¿ISBN válido? true
+Después de validar: el programa sigue su propio flujo.
+```
+
+El lado framework, con Spring Boot corriendo y una petición real:
+
+```text
+GET http://localhost:8080/catalogo/978-3-16-148410-0
+→ 200 OK
+→ { "isbn": "978-3-16-148410-0", ... }
+```
 
 ## 📌 Idea clave
 

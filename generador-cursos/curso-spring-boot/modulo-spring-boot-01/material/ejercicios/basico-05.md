@@ -17,9 +17,29 @@ Clases a ubicar:
    aplicando las reglas de negocio de la biblioteca.
 ```
 
+Completá y ejecutá este programa con tu decisión para cada clase:
+
+```java
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) {
+        Map<String, String> paqueteDeCadaClase = new LinkedHashMap<>();
+
+        // TODO: completar, por ejemplo:
+        // paqueteDeCadaClase.put("Libro", "model");
+
+        paqueteDeCadaClase.forEach((clase, paquete) ->
+                System.out.println(clase + " -> " + paquete));
+    }
+}
+```
+
 Indicá, para cada clase, en qué paquete de la estructura del Ejemplo 08
 (`controller`, `service`, `repository` o `model`) debería ubicarse, y justificá
-brevemente cada elección.
+brevemente cada elección (podés escribir la justificación como comentario junto
+a cada `put`).
 
 ## 📏 Criterios de evaluación de la solución
 
@@ -33,8 +53,9 @@ brevemente cada elección.
 
 ## 🚧 Restricciones
 
-- No es necesario escribir código ni crear el proyecto; alcanza con indicar el
-  paquete y justificarlo.
+- La salida esperada no se publica en este archivo porque coincide con la
+  respuesta del ejercicio; verificá tu razonamiento contra los criterios de
+  evaluación de arriba (y, como docente, contra `soluciones-ejercicios.md`).
 
 ## 📊 Dificultad
 

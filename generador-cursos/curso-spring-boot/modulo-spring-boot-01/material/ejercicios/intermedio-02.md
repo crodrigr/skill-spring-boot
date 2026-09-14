@@ -10,21 +10,63 @@ descuento).
 ## 💻 Código o contexto de partida
 
 ```java
+import java.util.ArrayList;
+import java.util.List;
+
+public interface RepositorioFacturas {
+    void registrar(double monto);
+}
+
+public class RepositorioFacturasEnMemoria implements RepositorioFacturas {
+    private final List<Double> facturas = new ArrayList<>();
+
+    @Override
+    public void registrar(double monto) {
+        facturas.add(monto);
+        System.out.println("Factura registrada por $" + monto);
+    }
+}
+
+public interface ServicioDescuentos {
+    double aplicar(double montoBase);
+}
+
+public class ServicioDescuentos10 implements ServicioDescuentos {
+    @Override
+    public double aplicar(double montoBase) {
+        return montoBase * 0.9; // 10% de descuento
+    }
+}
+
 @Service
 public class ServicioFacturacion {
 
-    // completar: ¿cómo se reciben repositorioFacturas y servicioDescuentos?
+    // TODO: declarar repositorioFacturas (obligatoria) y servicioDescuentos (opcional)
+    // TODO: agregar el constructor y/o setter que correspondan a cada una
 
     public double calcularTotal(double montoBase) {
-        // usa repositorioFacturas para registrar, y servicioDescuentos si está presente
-        return montoBase; // simplificado para el ejercicio
+        // TODO: aplicar servicioDescuentos si está presente; si no, usar montoBase
+        // TODO: registrar el total en repositorioFacturas antes de devolverlo
+        return montoBase; // reemplazar
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ServicioFacturacion sinDescuento = new ServicioFacturacion(new RepositorioFacturasEnMemoria());
+        System.out.println("Total sin descuento: " + sinDescuento.calcularTotal(1000));
+
+        ServicioFacturacion conDescuento = new ServicioFacturacion(new RepositorioFacturasEnMemoria());
+        conDescuento.setServicioDescuentos(new ServicioDescuentos10());
+        System.out.println("Total con descuento: " + conDescuento.calcularTotal(1000));
     }
 }
 ```
 
 Decidí qué tipo de inyección usar para `repositorioFacturas` y cuál para
-`servicioDescuentos`, y escribí la declaración de la clase (campos y
-constructor/setter, según corresponda) que refleje esa decisión.
+`servicioDescuentos`, y completá la declaración de la clase (campos y
+constructor/setter, según corresponda) para que `Main` compile y produzca la
+salida esperada.
 
 ## 📏 Criterios de evaluación de la solución
 
@@ -38,12 +80,21 @@ constructor/setter, según corresponda) que refleje esa decisión.
 
 ## 🚧 Restricciones
 
-- No se pide implementar la lógica de descuentos ni de facturación, solo la forma
-  de recibir las dos dependencias.
+- No cambies `RepositorioFacturasEnMemoria`, `ServicioDescuentos10` ni `Main`;
+  solo completá `ServicioFacturacion`.
 
 ## 📊 Dificultad
 
 Intermedio
+
+## ✅ Salida esperada al ejecutar `Main`
+
+```text
+Factura registrada por $1000.0
+Total sin descuento: 1000.0
+Factura registrada por $900.0
+Total con descuento: 900.0
+```
 
 ## 🎓 Resultados de aprendizaje
 

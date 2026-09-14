@@ -17,10 +17,60 @@ Reglas de negocio:
 - Un Libro se presta por 14 días; un RecursoDigital, por 7 días.
 ```
 
-Diseñá (con nombres de clase, atributos, y qué es clase abstracta, interfaz o
-subclase) la jerarquía de tipos que modela estas reglas. No hace falta escribir
-todo el cuerpo de los métodos, solo la estructura (clases, interfaces, relaciones de
-herencia/implementación y las firmas de los métodos relevantes).
+Este esqueleto ya compila (con los métodos sin terminar de implementar,
+marcados `TODO`), pero `Main` no imprime todavía lo que debería. Completá las
+clases para que `Main` compile **y** produzca la salida esperada.
+
+```java
+import java.util.List;
+
+public abstract class Usuario {
+    // TODO: agregar nombre y código, y el método abstracto que falta
+
+    protected Usuario(String nombre, String codigo) {
+        // TODO
+    }
+}
+
+public class Estudiante extends Usuario {
+    // TODO: constructor y límite de préstamos (3)
+}
+
+public class Docente extends Usuario {
+    // TODO: constructor y límite de préstamos (10)
+}
+
+public interface Prestable {
+    // TODO: método(s) que debe implementar todo recurso prestable
+}
+
+public class Libro implements Prestable {
+    // TODO: 14 días de devolución
+}
+
+public class RecursoDigital implements Prestable {
+    // TODO: 7 días de devolución
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Usuario estudiante = new Estudiante("Valentina Ríos", "EST-010");
+        Usuario docente = new Docente("Marta Sosa", "DOC-002");
+
+        System.out.println(estudiante.getNombre() + ": " + estudiante.limitePrestamosSimultaneos());
+        System.out.println(docente.getNombre() + ": " + docente.limitePrestamosSimultaneos());
+
+        List<Prestable> recursos = List.of(
+                new Libro("Bases de Datos"),
+                new RecursoDigital("Podcast de Arquitectura")
+        );
+
+        for (Prestable recurso : recursos) {
+            System.out.println(recurso.descripcion() + " -> " + recurso.calcularDiasDevolucion() + " días");
+        }
+    }
+}
+```
 
 ## 📏 Criterios de evaluación de la solución
 
@@ -32,15 +82,24 @@ herencia/implementación y las firmas de los métodos relevantes).
 - Se distingue correctamente cuándo usar herencia (tipos que "son un" `Usuario`) y
   cuándo usar interfaz (tipos que "pueden hacer" algo, sin relación de herencia
   entre sí).
+- `Main` compila y, al ejecutarse, produce exactamente la salida esperada.
 
 ## 🚧 Restricciones
 
-- No es necesario compilar ni ejecutar código; alcanza con la estructura de clases
-  e interfaces y las firmas de los métodos.
+- No agregues atributos ni métodos que `Main` no necesite.
 
 ## 📊 Dificultad
 
 Básico
+
+## ✅ Salida esperada al ejecutar `Main`
+
+```text
+Valentina Ríos: 3
+Marta Sosa: 10
+Libro: Bases de Datos -> 14 días
+Recurso digital: Podcast de Arquitectura -> 7 días
+```
 
 ## 🎓 Resultados de aprendizaje
 

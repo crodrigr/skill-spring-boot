@@ -31,7 +31,30 @@ misma información en `build.gradle`.
 </project>
 ```
 
-1. Identificá el `groupId`, el `artifactId`, la `version` y el `packaging`.
+Completá este programa transcribiendo los valores que leas del `pom.xml` de
+arriba, y ejecutalo para confirmar que los identificaste bien:
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        String groupId = null;         // TODO: completar
+        String artifactId = null;      // TODO: completar
+        String version = null;         // TODO: completar
+        String packaging = null;       // TODO: completar
+        int cantidadDependencias = 0;  // TODO: completar
+        String dependenciaDePrueba = null; // TODO: completar (artifactId de la dependencia con scope test)
+
+        System.out.println(groupId + ":" + artifactId + ":" + version + ":" + packaging);
+        System.out.println("Cantidad de dependencias: " + cantidadDependencias);
+        System.out.println("Dependencia de prueba: " + dependenciaDePrueba);
+    }
+}
+```
+
+Además:
+
+1. Identificá el `groupId`, el `artifactId`, la `version` y el `packaging`
+   (ya completados arriba en `Main`).
 2. Indicá cuántas dependencias tiene y cuál de ellas es solo para pruebas, y con
    qué la reconociste.
 3. Describí (en prosa o con una línea de ejemplo) cómo se expresaría cada
@@ -49,12 +72,21 @@ misma información en `build.gradle`.
 
 ## 🚧 Restricciones
 
-- No es necesario ejecutar `mvn` ni `gradle`; el ejercicio se resuelve leyendo y
-  describiendo el archivo.
+- No es necesario ejecutar `mvn` ni `gradle`; solo el pequeño programa `Main`
+  (ejecutable con `java`), que sirve como autocorrección de la lectura del
+  `pom.xml`.
 
 ## 📊 Dificultad
 
 Básico
+
+## ✅ Salida esperada al ejecutar `Main`
+
+```text
+com.biblioteca:biblioteca-api:0.1.0:jar
+Cantidad de dependencias: 2
+Dependencia de prueba: spring-boot-starter-test
+```
 
 ## 🎓 Resultados de aprendizaje
 

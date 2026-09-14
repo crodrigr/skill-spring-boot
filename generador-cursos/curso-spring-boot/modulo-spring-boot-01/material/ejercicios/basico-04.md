@@ -19,6 +19,29 @@ está seguro de cuáles son frameworks y cuáles son librerías.
    invocada explícitamente con una línea de código en el punto donde se necesita.
 ```
 
+Completá y ejecutá este programa con tu clasificación y tu justificación para
+cada herramienta:
+
+```java
+public class Main {
+
+    record Analisis(String clasificacion, String justificacion) {}
+
+    public static void main(String[] args) {
+        Analisis[] analisis = new Analisis[4];
+
+        // TODO: completar los 4 elementos, por ejemplo:
+        // analisis[0] = new Analisis("Framework", "porque ...");
+        // analisis[1] = new Analisis("Librería", "porque ...");
+
+        for (int i = 0; i < analisis.length; i++) {
+            System.out.println("Herramienta " + (i + 1) + ": " + analisis[i].clasificacion()
+                    + " -> " + analisis[i].justificacion());
+        }
+    }
+}
+```
+
 Para cada herramienta, indicá si es un framework o una librería, y justificá tu
 respuesta usando el criterio de "quién controla el flujo" (Inversión de Control).
 
@@ -34,8 +57,9 @@ respuesta usando el criterio de "quién controla el flujo" (Inversión de Contro
 
 ## 🚧 Restricciones
 
-- No es necesario escribir código; el ejercicio se resuelve clasificando y
-  justificando en texto.
+- La salida esperada no se publica en este archivo porque coincide con la
+  respuesta del ejercicio; verificá tu razonamiento contra los criterios de
+  evaluación de arriba (y, como docente, contra `soluciones-ejercicios.md`).
 
 ## 📊 Dificultad
 

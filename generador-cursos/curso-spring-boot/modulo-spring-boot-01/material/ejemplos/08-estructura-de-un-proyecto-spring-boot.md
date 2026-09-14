@@ -33,6 +33,23 @@ biblioteca-api/
                 └── ServicioPrestamosTest.java
 ```
 
+## 💻 Código — la clase principal (`BibliotecaApiApplication.java`)
+
+```java
+package com.biblioteca.api;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class BibliotecaApiApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BibliotecaApiApplication.class, args);
+    }
+}
+```
+
 ## 🔍 Qué contiene cada parte
 
 | Ruta | Propósito |
@@ -67,10 +84,26 @@ biblioteca-api/
 
 ## ✅ Resultado esperado
 
-Al ejecutar `BibliotecaApiApplication`, Spring Boot escanea `com.biblioteca.api` y
-sus subpaquetes, registra `CatalogoController`, `ServicioPrestamos` y
-`RepositorioLibros` como beans, lee `application.properties`, y deja la aplicación
-escuchando en el puerto configurado (por defecto, `8080`).
+Al ejecutar `BibliotecaApiApplication.main(...)`, la consola muestra algo como:
+
+```text
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::
+
+Iniciando BibliotecaApiApplication...
+Tomcat inicializado en el puerto 8080
+Started BibliotecaApiApplication in 1.234 seconds
+```
+
+Spring Boot escaneó `com.biblioteca.api` y sus subpaquetes, registró
+`CatalogoController`, `ServicioPrestamos` y `RepositorioLibros` como beans, leyó
+`application.properties`, y dejó la aplicación escuchando en el puerto
+configurado (por defecto, `8080`), lista para recibir peticiones HTTP.
 
 ## 📌 Idea clave
 

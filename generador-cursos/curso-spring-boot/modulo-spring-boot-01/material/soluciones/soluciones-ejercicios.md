@@ -145,11 +145,27 @@ public class ServicioNotificaciones {
     public void notificarVencimientoProximo(String isbn, String codigoUsuario) {
         Usuario usuario = repositorioUsuarios.buscarPorCodigo(codigoUsuario);
         clienteEmail.enviar(
-            usuario.getEmail(),
+            usuario.email(),
             "Tu préstamo del libro " + isbn + " vence pronto."
         );
     }
 }
+
+public class Main {
+    public static void main(String[] args) {
+        RepositorioUsuarios repositorioUsuarios = new RepositorioUsuariosJpa();
+        ClienteEmail clienteEmail = new ClienteEmailSmtp();
+
+        ServicioNotificaciones servicio = new ServicioNotificaciones(repositorioUsuarios, clienteEmail);
+        servicio.notificarVencimientoProximo("978-3-16-148410-0", "EST-010");
+    }
+}
+```
+
+**Salida al ejecutar `Main`** (idéntica a la de la versión acoplada original):
+
+```text
+Email a usuario_EST-010@universidad.edu: Tu préstamo del libro 978-3-16-148410-0 vence pronto.
 ```
 
 **Beneficio para las pruebas**: ahora se puede escribir
@@ -195,6 +211,15 @@ public class ServicioFacturacion {
 registrar nada) → constructor. `servicioDescuentos` es opcional (puede no existir)
 → setter, permitiendo que el campo quede en `null` si no se configura.
 
+**Salida al ejecutar `Main`**:
+
+```text
+Factura registrada por $1000.0
+Total sin descuento: 1000.0
+Factura registrada por $900.0
+Total con descuento: 900.0
+```
+
 **Verificación**: se revisa que `repositorioFacturas` sea `final` y esté en el
 constructor, y que `servicioDescuentos` no sea `final` ni esté en el constructor.
 
@@ -208,8 +233,43 @@ constructor, y que `servicioDescuentos` no sea `final` ni esté en el constructo
 - (d) uso (la aplicación corre y se puede llamar a `prestar(isbn)`).
 - (a) destrucción (`@PreDestroy` → `cerrarConexiones()`, al cerrar el contexto).
 
-**Verificación**: se revisa que el orden sea exactamente ese y que cada evento se
-asocie a la fase correcta del ciclo de vida.
+**Mensajes propuestos para los `TODO`** (constructor, `precargarCache`,
+`prestar`, `cerrarConexiones`, en ese orden en el código, pero ejecutados en el
+orden b→c→d→a):
+
+```java
+public ServicioPrestamos(RepositorioLibros repositorioLibros) {
+    this.repositorioLibros = repositorioLibros;
+    System.out.println("Instanciación: constructor de ServicioPrestamos");
+}
+
+@PostConstruct
+public void precargarCache() {
+    System.out.println("Inicialización: precargarCache()");
+}
+
+public void prestar(String isbn) {
+    System.out.println("Uso: prestando " + isbn);
+}
+
+@PreDestroy
+public void cerrarConexiones() {
+    System.out.println("Destrucción: cerrarConexiones()");
+}
+```
+
+**Salida al ejecutar `Main`** (confirma empíricamente el orden razonado arriba):
+
+```text
+Instanciación: constructor de ServicioPrestamos
+Inicialización: precargarCache()
+Uso: prestando 978-3-16-148410-0
+Destrucción: cerrarConexiones()
+```
+
+**Verificación**: se revisa que el orden razonado sea exactamente b→c→d→a, que
+cada evento se asocie a la fase correcta del ciclo de vida, y que la salida real
+de `Main` coincida con ese orden.
 
 ## 🟡 Intermedio 04 — Anotar correctamente una mini-aplicación de MediSalud
 
@@ -218,7 +278,9 @@ asocie a la fase correcta del ciclo de vida.
 ```java
 @Repository
 public class RepositorioPacientes {
-    public Optional<Paciente> buscarPorCodigo(String codigo) { /* ... */ return Optional.empty(); }
+    public Optional<Paciente> buscarPorCodigo(String codigo) {
+        return Optional.of(new Paciente(codigo, "Paciente de ejemplo"));
+    }
 }
 
 @Service
@@ -255,6 +317,13 @@ public class CitasController {
 clases tienen un único constructor, y desde Spring 4.3 el framework lo usa
 automáticamente para inyectar las dependencias sin necesidad de la anotación
 explícita (Ejemplo 09).
+
+**Salida al ejecutar `Main`** (confirma que el contenedor pudo resolver las tres
+dependencias sin lanzar ninguna excepción):
+
+```text
+¿Paciente P-001 registrado? true
+```
 
 **Verificación**: se revisa que `RepositorioPacientes` use `@Repository` (no
 `@Component` ni `@Service`), que `ServicioCitas` use `@Service`, que
@@ -338,7 +407,7 @@ anotadas (`@Component`/`@Service`), el contenedor escanearía las clases, calcul
 este mismo orden de dependencias, instanciaría cada bean e inyectaría las
 dependencias resueltas por constructor — exactamente lo que el `main` hizo a mano.
 Esto corresponde a las fases de **instanciación** e **inyección de dependencias**
-del ciclo de vida de un bean (Ejemplo 05): el contenedor decide el orden y ejecuta
+del ciclo de vida de un bean (Ejemplo 10): el contenedor decide el orden y ejecuta
 la resolución de dependencias que aquí se escribió explícitamente.
 
 **Verificación**: se revisa que el orden de construcción en el `main` respete las

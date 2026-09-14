@@ -6,6 +6,28 @@ Biblioteca Universitaria: un `ServicioPrestamos` que depende de un
 `RepositorioLibros`, implementado con las tres formas de inyección para poder
 compararlas.
 
+## 💻 Código — dependencia común a las tres versiones
+
+```java
+public interface RepositorioLibros {
+    Optional<Libro> buscarPorIsbn(String isbn);
+}
+
+public record Libro(String isbn, String titulo) {}
+
+public class RepositorioLibrosEnMemoria implements RepositorioLibros {
+
+    private final List<Libro> libros = List.of(
+            new Libro("978-3-16-148410-0", "Estructuras de Datos")
+    );
+
+    @Override
+    public Optional<Libro> buscarPorIsbn(String isbn) {
+        return libros.stream().filter(libro -> libro.isbn().equals(isbn)).findFirst();
+    }
+}
+```
+
 ## 💻 Código — por constructor (recomendada)
 
 ```java
@@ -83,9 +105,65 @@ public class ServicioPrestamosCampo {
    constructor** como forma preferida para dependencias obligatorias, dejando
    setter para casos realmente opcionales y evitando la inyección por campo en
    código nuevo.
+5. `Main` hace visible esa diferencia: arma `porConstructor` y `porSetter` con una
+   línea de código normal, pero necesita `java.lang.reflect.Field` para asignar
+   `repositorioLibros` en `porCampo`, exactamente el "costo extra" del que habla
+   el análisis comparado.
+
+## 💻 Código — clase principal (`Main`)
+
+Para comparar las tres formas en un mismo programa (sin necesidad de un contenedor
+Spring), `Main` las instancia a mano, exactamente como lo haría un test unitario.
+Las versiones por constructor y por setter se arman directamente; la de campo
+**no tiene ningún constructor ni setter público** para `repositorioLibros`, así
+que `Main` tiene que recurrir a reflexión para asignarlo — el mismo costo extra
+que enfrentaría un test unitario real, y la prueba concreta de la desventaja de
+esta forma señalada en el análisis comparado.
+
+```java
+import java.lang.reflect.Field;
+
+public class Main {
+
+    public static void main(String[] args) throws Exception {
+        RepositorioLibros repositorio = new RepositorioLibrosEnMemoria();
+        String isbnExistente = "978-3-16-148410-0";
+        String isbnInexistente = "000-0-00-000000-0";
+
+        // Por constructor: se arma completo en una sola línea
+        ServicioPrestamosConstructor porConstructor = new ServicioPrestamosConstructor(repositorio);
+        System.out.println("Por constructor -> " + porConstructor.prestar(isbnExistente));
+
+        // Por setter: se arma en dos pasos
+        ServicioPrestamosSetter porSetter = new ServicioPrestamosSetter();
+        porSetter.setRepositorioLibros(repositorio);
+        System.out.println("Por setter -> " + porSetter.prestar(isbnExistente));
+
+        // Por campo: sin constructor ni setter, hace falta reflexión para asignarlo
+        // (fuera de un contenedor Spring, esto es exactamente lo que habría que
+        // hacer a mano en un test, o delegarlo en un framework como Mockito)
+        ServicioPrestamosCampo porCampo = new ServicioPrestamosCampo();
+        Field campoRepositorio = ServicioPrestamosCampo.class.getDeclaredField("repositorioLibros");
+        campoRepositorio.setAccessible(true);
+        campoRepositorio.set(porCampo, repositorio);
+        System.out.println("Por campo -> " + porCampo.prestar(isbnExistente));
+
+        System.out.println("ISBN inexistente por constructor -> " + porConstructor.prestar(isbnInexistente));
+    }
+}
+```
 
 ## ✅ Resultado esperado
 
-Las tres clases, con un `RepositorioLibros` que encuentra el ISBN pedido, devuelven
-`true` al llamar a `prestar(...)`; la elección entre las tres no cambia el
-resultado de negocio, solo la facilidad de mantener y probar el código.
+Al ejecutar `Main.main(...)`:
+
+```text
+Por constructor -> true
+Por setter -> true
+Por campo -> true
+ISBN inexistente por constructor -> false
+```
+
+Las tres clases, con el mismo `RepositorioLibros`, devuelven el mismo resultado de
+negocio; la elección entre las tres no cambia **qué** responden, solo qué tan
+fácil es armarlas fuera de un contenedor Spring, como acaba de hacer `Main`.

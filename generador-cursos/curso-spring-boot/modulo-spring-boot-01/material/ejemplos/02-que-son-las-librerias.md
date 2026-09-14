@@ -27,37 +27,64 @@ se agrega al *classpath* de la aplicación: conceptualmente se comporta como una
 librería dinámica, cargada por la JVM al ejecutar el programa, en vez de quedar
 copiada dentro del código fuente.
 
-## 💻 Ejemplo aplicado
+## 💻 Código completo
 
 ```java
-// Sin ninguna librería: validar un ISBN a mano, línea por línea
-public boolean esIsbnValido(String isbn) {
-    String limpio = isbn.replace("-", "");
-    if (limpio.length() != 13) return false;
-    for (char c : limpio.toCharArray()) {
-        if (!Character.isDigit(c)) return false;
-    }
-    return true; // simplificado: un caso real también verifica el dígito de control
-}
+public class ValidadorIsbnDemo {
 
-// Con una librería (por ejemplo, una utilidad ya probada de validación de formatos)
-boolean valido = ValidadorIsbn.esValido("978-3-16-148410-0");
+    // Sin ninguna librería: validar un ISBN a mano, línea por línea
+    static boolean esIsbnValidoManual(String isbn) {
+        String limpio = isbn.replace("-", "");
+        if (limpio.length() != 13) {
+            return false;
+        }
+        for (char c : limpio.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true; // simplificado: un caso real también verifica el dígito de control
+    }
+
+    // "Librería" ya escrita y probada por otros: el desarrollador solo la invoca
+    static class ValidadorIsbn {
+        static boolean esValido(String isbn) {
+            return esIsbnValidoManual(isbn); // misma lógica, ya empaquetada y reutilizable
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Validación manual:");
+        System.out.println(esIsbnValidoManual("978-3-16-148410-0"));
+        System.out.println(esIsbnValidoManual("123"));
+
+        System.out.println("Validación con la 'librería' ValidadorIsbn:");
+        System.out.println(ValidadorIsbn.esValido("978-3-16-148410-0"));
+        System.out.println(ValidadorIsbn.esValido("123"));
+    }
+}
 ```
 
 ## 🧭 Explicación paso a paso
 
-1. La primera versión resuelve el problema, pero el desarrollador debe mantener y
-   probar esa lógica de validación en cada proyecto donde la necesite.
-2. La versión con librería delega esa responsabilidad puntual a código ya escrito
-   y probado por otros, sin exigir ninguna estructura adicional al resto del
-   programa: solo se llama al método cuando se necesita.
-3. A diferencia de un framework, la librería **no decide** cómo se organiza la
-   aplicación ni cuándo se ejecuta el código del desarrollador: es el
-   desarrollador quien decide cuándo llamar a la librería.
+1. `esIsbnValidoManual` resuelve el problema, pero si otro proyecto de la
+   biblioteca necesita la misma validación, tendría que copiar y mantener esta
+   misma lógica por separado.
+2. `ValidadorIsbn.esValido(...)` representa cómo se vería usar una librería ya
+   escrita y probada: el desarrollador la llama en el punto exacto donde la
+   necesita (en `main`), sin que la librería le imponga ninguna estructura al
+   resto del programa.
+3. A diferencia de un framework, la librería **no decide** cuándo se ejecuta el
+   código del desarrollador: es el propio `main` quien decide, línea por línea,
+   cuándo llamar a `ValidadorIsbn.esValido(...)`.
 
 ## ✅ Resultado esperado
 
 ```text
-esIsbnValido("978-3-16-148410-0") → true
-esIsbnValido("123") → false
+Validación manual:
+true
+false
+Validación con la 'librería' ValidadorIsbn:
+true
+false
 ```

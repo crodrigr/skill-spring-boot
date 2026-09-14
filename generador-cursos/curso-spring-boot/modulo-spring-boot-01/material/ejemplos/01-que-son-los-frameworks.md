@@ -38,14 +38,46 @@ el mundo Java, esta evolución llevó primero a frameworks como Struts, luego a
 Spring (2003), y más adelante a Spring Boot (2014), que se estudia en detalle más
 adelante en este módulo.
 
-## 💻 Ejemplo aplicado
+## 💻 Código — sin framework (dispatcher manual, Java puro y ejecutable)
 
-Sin un framework, construir el endpoint web de MediSalud que lista las citas del
-día implicaría escribir a mano: el servidor que escucha peticiones HTTP, el
-código que interpreta la URL solicitada, la conversión de los datos a un formato
-de respuesta (por ejemplo JSON), y el manejo de errores. Con un framework como
-Spring Boot (que se detalla en el Ejemplo 07), gran parte de eso ya está resuelto:
-el desarrollador solo declara **qué** debe pasar para una ruta dada.
+Para sentir en carne propia qué resuelve un framework, esta primera versión
+**no usa Spring**: el propio programa tiene que decidir, a mano, qué código
+ejecutar para cada "ruta" solicitada.
+
+```java
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+public class SinFrameworkDemo {
+
+    record Cita(String paciente, String especialidad) {}
+
+    // El propio programa debe simular "recibir una petición" y decidir qué hacer
+    static List<Cita> citasDeHoy() {
+        return List.of(
+                new Cita("Ana Gómez", "Cardiología"),
+                new Cita("Luis Pérez", "Pediatría")
+        );
+    }
+
+    // Sin framework, hay que escribir a mano el "enrutador" que decide qué método llamar
+    static String manejarPeticion(String ruta) {
+        Map<String, Supplier<String>> rutasDisponibles = Map.of(
+                "/citas/hoy", () -> citasDeHoy().toString()
+        );
+        Supplier<String> manejador = rutasDisponibles.get(ruta);
+        return manejador != null ? manejador.get() : "404 Not Found";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(manejarPeticion("/citas/hoy"));
+        System.out.println(manejarPeticion("/citas/ayer"));
+    }
+}
+```
+
+## 💻 Código — con framework (Spring Boot: el mismo resultado, sin dispatcher propio)
 
 ```java
 // Con framework (Spring Boot): el desarrollador solo declara el "qué"
@@ -59,18 +91,38 @@ public class CitasController {
 }
 ```
 
+Nótese que este segundo bloque **no tiene un `main` que llame a `citasDeHoy()`**:
+el `main` de la aplicación (`SpringApplication.run(...)`, que se ve completo en
+el Ejemplo 07) arranca Spring Boot, y es Spring Boot quien invoca
+`citasDeHoy()` automáticamente cuando llega una petición `GET /citas/hoy` real.
+
 ## 🧭 Explicación paso a paso
 
-1. El desarrollador no escribe el código que abre un socket de red, interpreta el
-   protocolo HTTP ni convierte objetos Java a JSON: **el framework ya lo resuelve**.
-2. El framework impone una estructura (una clase anotada como controlador, un
-   método por ruta) a cambio de todo ese trabajo resuelto.
-3. Esta es la esencia de un framework: no es solo código reutilizable, es una
-   **estructura completa** dentro de la cual el desarrollador escribe su lógica de
-   negocio.
+1. En `SinFrameworkDemo`, el propio `main` arma el mapa de rutas y decide a mano
+   qué método corresponde a cada una: ese trabajo de "enrutar" es código que el
+   desarrollador debe escribir, mantener y probar.
+2. En la versión con Spring Boot, ese mismo trabajo de enrutamiento (y todo el
+   manejo de sockets, protocolo HTTP y conversión a JSON) ya está resuelto por el
+   framework: el desarrollador solo declara la ruta con `@GetMapping` y el
+   framework decide cuándo invocar el método.
+3. Esta es la esencia de un framework: no es solo código reutilizable (como
+   `Map.of(...)` sería en el primer ejemplo), es una **estructura completa** que
+   invierte el control — llama al código del desarrollador en vez de que el
+   desarrollador la llame a ella.
 
 ## ✅ Resultado esperado
 
-El endpoint `/citas/hoy` responde con la lista de citas del día en formato JSON,
-sin que el desarrollador haya escrito ninguna línea de manejo de sockets, HTTP ni
-serialización.
+Al ejecutar `SinFrameworkDemo.main(...)`:
+
+```text
+[Cita[paciente=Ana Gómez, especialidad=Cardiología], Cita[paciente=Luis Pérez, especialidad=Pediatría]]
+404 Not Found
+```
+
+Con Spring Boot corriendo (Ejemplo 07), una petición real equivalente se ve así:
+
+```text
+GET http://localhost:8080/citas/hoy
+→ 200 OK
+→ [{"paciente":"Ana Gómez","especialidad":"Cardiología"}, {"paciente":"Luis Pérez","especialidad":"Pediatría"}]
+```

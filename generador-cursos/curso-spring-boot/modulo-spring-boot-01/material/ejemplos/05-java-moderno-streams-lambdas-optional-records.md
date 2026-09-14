@@ -2,102 +2,132 @@
 
 ## 🏥 Caso de estudio
 
-MediSalud: filtramos y transformamos una lista de citas médicas, buscamos un
-médico por su identificador (que puede no existir), y modelamos un dato de
+MediSalud: filtramos y transformamos una lista de citas médicas, buscamos la
+especialidad de un paciente (que puede no existir), y modelamos un dato de
 contacto como objeto inmutable.
 
-## 💻 Código — streams y lambdas
+## 💻 Código completo
 
 ```java
-public record Cita(String paciente, String especialidad, boolean confirmada) {}
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
-List<Cita> citasDelDia = List.of(
-    new Cita("Ana Gómez", "Cardiología", true),
-    new Cita("Luis Pérez", "Pediatría", false),
-    new Cita("Marta Ruiz", "Cardiología", true),
-    new Cita("Diego Soto", "Pediatría", true)
-);
+public class JavaModernoDemo {
 
-// Forma imperativa tradicional
-List<String> pacientesConfirmadosCardiologiaImperativo = new ArrayList<>();
-for (Cita cita : citasDelDia) {
-    if (cita.especialidad().equals("Cardiología") && cita.confirmada()) {
-        pacientesConfirmadosCardiologiaImperativo.add(cita.paciente());
+    record Cita(String paciente, String especialidad, boolean confirmada) {}
+
+    record DatosContacto(String telefono, String email) {}
+
+    static List<Cita> citasDelDia() {
+        return List.of(
+                new Cita("Ana Gómez", "Cardiología", true),
+                new Cita("Luis Pérez", "Pediatría", false),
+                new Cita("Marta Ruiz", "Cardiología", true),
+                new Cita("Diego Soto", "Pediatría", true)
+        );
+    }
+
+    // Forma imperativa tradicional: bucle + lista mutable
+    static List<String> pacientesConfirmadosCardiologiaImperativo(List<Cita> citas) {
+        List<String> resultado = new java.util.ArrayList<>();
+        for (Cita cita : citas) {
+            if (cita.especialidad().equals("Cardiología") && cita.confirmada()) {
+                resultado.add(cita.paciente());
+            }
+        }
+        return resultado;
+    }
+
+    // Forma con streams y lambdas: mismo resultado, sin bucle ni lista mutable intermedia
+    static List<String> pacientesConfirmadosCardiologia(List<Cita> citas) {
+        return citas.stream()
+                .filter(cita -> cita.especialidad().equals("Cardiología"))
+                .filter(Cita::confirmada)
+                .map(Cita::paciente)
+                .toList();
+    }
+
+    static Optional<String> buscarEspecialidadPorPaciente(List<Cita> citas, String nombrePaciente) {
+        return citas.stream()
+                .filter(cita -> cita.paciente().equals(nombrePaciente))
+                .map(Cita::especialidad)
+                .findFirst(); // puede no encontrar ninguna coincidencia
+    }
+
+    public static void main(String[] args) {
+        List<Cita> citas = citasDelDia();
+
+        System.out.println("--- Streams y lambdas ---");
+        System.out.println("Imperativo: " + pacientesConfirmadosCardiologiaImperativo(citas));
+        System.out.println("Con streams: " + pacientesConfirmadosCardiologia(citas));
+
+        System.out.println("--- Optional ---");
+        String especialidad = buscarEspecialidadPorPaciente(citas, "Luis Pérez")
+                .orElse("Sin citas registradas");
+        System.out.println("Especialidad de Luis Pérez: " + especialidad);
+
+        try {
+            buscarEspecialidadPorPaciente(citas, "Paciente Inexistente")
+                    .orElseThrow(() -> new NoSuchElementException("No se encontró una cita para ese paciente"));
+        } catch (NoSuchElementException e) {
+            System.out.println("Excepción esperada: " + e.getMessage());
+        }
+
+        System.out.println("--- Records ---");
+        DatosContacto contacto = new DatosContacto("+54 11 5555-0100", "ana.gomez@mail.com");
+        System.out.println(contacto.telefono());
+        System.out.println(contacto);
     }
 }
-
-// Forma con streams y lambdas: mismo resultado, sin bucle ni lista mutable intermedia
-List<String> pacientesConfirmadosCardiologia = citasDelDia.stream()
-        .filter(cita -> cita.especialidad().equals("Cardiología"))
-        .filter(Cita::confirmada)
-        .map(Cita::paciente)
-        .toList();
 ```
 
-## 🧭 Explicación paso a paso (streams)
+## 🧭 Explicación paso a paso
 
-1. La versión imperativa necesita una lista mutable (`ArrayList`), una variable de
-   control del bucle y una condición anidada.
-2. La versión con streams describe **qué** se quiere (filtrar por especialidad,
-   filtrar por confirmada, quedarse con el nombre del paciente), no **cómo**
-   recorrerlo.
-3. `Cita::confirmada` y `Cita::paciente` son *method references*: una forma aún más
-   corta de escribir una lambda que solo invoca un método existente.
+### Streams y lambdas
+
+1. `pacientesConfirmadosCardiologiaImperativo` necesita una lista mutable
+   (`ArrayList`), una variable de control del bucle y una condición anidada.
+2. `pacientesConfirmadosCardiologia` describe **qué** se quiere (filtrar por
+   especialidad, filtrar por confirmada, quedarse con el nombre del paciente), no
+   **cómo** recorrerlo.
+3. `Cita::confirmada` y `Cita::paciente` son *method references*: una forma aún
+   más corta de escribir una lambda que solo invoca un método existente.
 4. Ambas versiones producen el mismo resultado; la de streams es más corta y más
    difícil de romper con un error de índice o de inicialización.
 
-## 💻 Código — Optional
+### Optional
 
-```java
-public Optional<String> buscarEspecialidadPorPaciente(List<Cita> citas, String nombrePaciente) {
-    return citas.stream()
-            .filter(cita -> cita.paciente().equals(nombrePaciente))
-            .map(Cita::especialidad)
-            .findFirst(); // puede no encontrar ninguna coincidencia
-}
-
-// Uso: nunca se accede al valor sin manejar el caso de ausencia
-String especialidad = buscarEspecialidadPorPaciente(citasDelDia, "Luis Pérez")
-        .orElse("Sin citas registradas");
-
-String especialidadObligatoria = buscarEspecialidadPorPaciente(citasDelDia, "Paciente Inexistente")
-        .orElseThrow(() -> new NoSuchElementException("No se encontró una cita para ese paciente"));
-```
-
-## 🧭 Explicación paso a paso (Optional)
-
-1. `findFirst()` sobre un stream ya devuelve un `Optional<String>`: el propio tipo
-   deja constancia de que el resultado puede no existir.
-2. `orElse("Sin citas registradas")` da un valor por defecto cuando no hay
+5. `findFirst()` sobre un stream ya devuelve un `Optional<String>`: el propio
+   tipo deja constancia de que el resultado puede no existir.
+6. `orElse("Sin citas registradas")` da un valor por defecto cuando no hay
    coincidencia, sin arriesgarse a un `NullPointerException`.
-3. `orElseThrow(...)` es la forma correcta de expresar "este valor es obligatorio
-   en este punto; si falta, es un error de negocio", en vez de dejar que un `null`
-   se propague silenciosamente.
+7. `orElseThrow(...)` es la forma correcta de expresar "este valor es obligatorio
+   en este punto; si falta, es un error de negocio": por eso el `main` lo captura
+   con un `try/catch`, a propósito, para mostrar que la excepción ocurre cuando
+   corresponde y no antes.
 
-## 💻 Código — record
+### Records
 
-```java
-public record DatosContacto(String telefono, String email) {}
-
-DatosContacto contacto = new DatosContacto("+54 11 5555-0100", "ana.gomez@mail.com");
-
-// Generados automáticamente por el record: getters, equals, hashCode y toString
-System.out.println(contacto.telefono());
-System.out.println(contacto);
-```
+8. `DatosContacto` reemplaza a una clase tradicional con campos `private final`,
+   constructor, *getters*, `equals`, `hashCode` y `toString` escritos a mano.
+9. Un `record` es **inmutable** por diseño: no tiene setters; para "cambiar" un
+   dato de contacto se crea una instancia nueva.
+10. `Cita`, usado en la sección de streams, también es un `record`: un objeto de
+    valor simple es un candidato natural para modelarse así.
 
 ## ✅ Resultado esperado
 
+Al ejecutar `JavaModernoDemo.main(...)`:
+
 ```text
+--- Streams y lambdas ---
+Imperativo: [Ana Gómez, Marta Ruiz]
+Con streams: [Ana Gómez, Marta Ruiz]
+--- Optional ---
+Especialidad de Luis Pérez: Pediatría
+Excepción esperada: No se encontró una cita para ese paciente
+--- Records ---
 +54 11 5555-0100
 DatosContacto[telefono=+54 11 5555-0100, email=ana.gomez@mail.com]
 ```
-
-## 🧭 Explicación paso a paso (record)
-
-1. `DatosContacto` reemplaza a una clase tradicional con campos `private final`,
-   constructor, *getters*, `equals`, `hashCode` y `toString` escritos a mano.
-2. Un `record` es **inmutable** por diseño: no tiene setters; para "cambiar" un
-   dato de contacto se crea una instancia nueva.
-3. `Cita`, usado en la sección de streams, también es un `record`: un objeto de
-   valor simple es un candidato natural para modelarse así.

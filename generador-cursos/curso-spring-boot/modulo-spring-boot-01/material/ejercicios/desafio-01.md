@@ -43,7 +43,7 @@ public class ControladorCitas {
 3. Explicá, en un párrafo, qué pasos de tu `main` automatizaría un
    `ApplicationContext` de Spring si estas mismas clases estuvieran anotadas
    (`@Component`/`@Service`), y en qué se parece ese automatismo al ciclo de vida
-   de un bean visto en el Ejemplo 05.
+   de un bean visto en el Ejemplo 10.
 
 ## 📏 Criterios de evaluación de la solución
 

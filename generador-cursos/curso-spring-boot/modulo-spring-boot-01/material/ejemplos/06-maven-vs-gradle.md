@@ -47,6 +47,31 @@ dependencies {
 }
 ```
 
+## 💻 Código — la aplicación que ambos construyen (`App.java`)
+
+Ni `pom.xml` ni `build.gradle` son código Java: son configuración de build. Lo
+que realmente se compila y ejecuta es esta clase, idéntica sin importar cuál de
+las dos herramientas se use:
+
+```java
+package com.medisalud;
+
+public class App {
+    public static void main(String[] args) {
+        System.out.println("MediSalud API arrancando...");
+        System.out.println("Construida con éxito, sin importar si el build fue con Maven o con Gradle.");
+    }
+}
+```
+
+```text
+# Con Maven:
+$ mvn compile exec:java -Dexec.mainClass=com.medisalud.App
+
+# Con Gradle (agregando el plugin 'application' y mainClass en build.gradle):
+$ ./gradlew run
+```
+
 ## 🔍 Análisis comparado
 
 | Elemento | Maven (`pom.xml`) | Gradle (`build.gradle`) |
@@ -74,7 +99,15 @@ dependencies {
 
 ## ✅ Resultado esperado
 
-Ambos proyectos, al ejecutarse (`mvn spring-boot:run` o `./gradlew bootRun`),
-descargan las mismas dependencias y producen una aplicación equivalente; la
-elección entre Maven y Gradle es una decisión de herramienta de equipo, no de
-diseño de la aplicación.
+Al ejecutar `App.main(...)` — sin importar si el proyecto se construyó con Maven
+o con Gradle, el resultado impreso en consola es exactamente el mismo:
+
+```text
+MediSalud API arrancando...
+Construida con éxito, sin importar si el build fue con Maven o con Gradle.
+```
+
+La elección entre Maven y Gradle es una decisión de herramienta de equipo, no de
+diseño de la aplicación: ambos terminan compilando y ejecutando el mismo
+`App.java`, con las mismas dependencias declaradas en `pom.xml` o
+`build.gradle`.

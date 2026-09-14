@@ -83,6 +83,13 @@ public class PrestamosController {
         return servicioPrestamos.prestar(isbn);
     }
 }
+
+@SpringBootApplication // (7) clase principal: arranca el contenedor y escanea los @Component de arriba
+public class BibliotecaApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BibliotecaApiApplication.class, args);
+    }
+}
 ```
 
 ## 🧭 Explicación paso a paso
@@ -100,6 +107,10 @@ public class PrestamosController {
    el Ejemplo 03: el framework llama al método, no el desarrollador.
 4. `@PathVariable` es una anotación adicional, a nivel de parámetro, que le indica
    a Spring de dónde extraer el valor `isbn` (de la propia URL).
+5. `BibliotecaApiApplication` es la clase principal: su `main` (`SpringApplication.run(...)`)
+   es lo único que el desarrollador ejecuta directamente; a partir de ahí, Spring
+   Boot escanea el paquete, registra los cuatro `@Component` de arriba como beans,
+   y queda esperando peticiones HTTP.
 
 ## ✅ Resultado esperado
 
