@@ -65,11 +65,58 @@ public class JavaModernoDemo {
                 .toList();
     }
 
+    // Forma tradicional: bucle + posible null, sin ninguna garantía en el tipo
+    static String buscarEspecialidadPorPacienteTradicional(List<Cita> citas, String nombrePaciente) {
+        for (Cita cita : citas) {
+            if (cita.paciente().equals(nombrePaciente)) {
+                return cita.especialidad();
+            }
+        }
+        return null; // riesgo: quien llama puede olvidarse de comprobarlo
+    }
+
+    // Forma con Optional: el tipo deja constancia de que el valor puede no existir
     static Optional<String> buscarEspecialidadPorPaciente(List<Cita> citas, String nombrePaciente) {
         return citas.stream()
                 .filter(cita -> cita.paciente().equals(nombrePaciente))
                 .map(Cita::especialidad)
                 .findFirst(); // puede no encontrar ninguna coincidencia
+    }
+
+    // Forma tradicional: clase escrita a mano, con todo lo que un record genera solo
+    static class DatosContactoTradicional {
+        private final String telefono;
+        private final String email;
+
+        DatosContactoTradicional(String telefono, String email) {
+            this.telefono = telefono;
+            this.email = email;
+        }
+
+        String getTelefono() {
+            return telefono;
+        }
+
+        String getEmail() {
+            return email;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof DatosContactoTradicional otro)) return false;
+            return telefono.equals(otro.telefono) && email.equals(otro.email);
+        }
+
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(telefono, email);
+        }
+
+        @Override
+        public String toString() {
+            return "DatosContactoTradicional{telefono='" + telefono + "', email='" + email + "'}";
+        }
     }
 
     public static void main(String[] args) {
@@ -80,21 +127,31 @@ public class JavaModernoDemo {
         System.out.println("Con streams: " + pacientesConfirmadosCardiologia(citas));
 
         System.out.println("--- Optional ---");
+        String especialidadTradicional = buscarEspecialidadPorPacienteTradicional(citas, "Luis Pérez");
+        System.out.println("Tradicional (puede ser null): " + especialidadTradicional);
+
         String especialidad = buscarEspecialidadPorPaciente(citas, "Luis Pérez")
                 .orElse("Sin citas registradas");
-        System.out.println("Especialidad de Luis Pérez: " + especialidad);
+        System.out.println("Con Optional: " + especialidad);
+
+        String especialidadTradicionalInexistente =
+                buscarEspecialidadPorPacienteTradicional(citas, "Paciente Inexistente");
+        System.out.println("Tradicional, paciente inexistente (null, sin avisar): " + especialidadTradicionalInexistente);
 
         try {
             buscarEspecialidadPorPaciente(citas, "Paciente Inexistente")
                     .orElseThrow(() -> new NoSuchElementException("No se encontró una cita para ese paciente"));
         } catch (NoSuchElementException e) {
-            System.out.println("Excepción esperada: " + e.getMessage());
+            System.out.println("Con Optional, paciente inexistente (excepción explícita): " + e.getMessage());
         }
 
         System.out.println("--- Records ---");
+        DatosContactoTradicional contactoTradicional =
+                new DatosContactoTradicional("+54 11 5555-0100", "ana.gomez@mail.com");
+        System.out.println("Tradicional: " + contactoTradicional);
+
         DatosContacto contacto = new DatosContacto("+54 11 5555-0100", "ana.gomez@mail.com");
-        System.out.println(contacto.telefono());
-        System.out.println(contacto);
+        System.out.println("Con record: " + contacto);
     }
 }
 ```
@@ -115,22 +172,30 @@ public class JavaModernoDemo {
 
 ### Optional
 
-5. `findFirst()` sobre un stream ya devuelve un `Optional<String>`: el propio
-   tipo deja constancia de que el resultado puede no existir.
-6. `orElse("Sin citas registradas")` da un valor por defecto cuando no hay
+5. `buscarEspecialidadPorPacienteTradicional` puede devolver `null`, y **nada en
+   su firma** avisa de eso: quien la llama tiene que acordarse, por su cuenta,
+   de comprobarlo antes de usar el resultado.
+6. `findFirst()` sobre un stream ya devuelve un `Optional<String>`: el propio
+   tipo deja constancia, a simple vista, de que el resultado puede no existir.
+7. `orElse("Sin citas registradas")` da un valor por defecto cuando no hay
    coincidencia, sin arriesgarse a un `NullPointerException`.
-7. `orElseThrow(...)` es la forma correcta de expresar "este valor es obligatorio
+8. `orElseThrow(...)` es la forma correcta de expresar "este valor es obligatorio
    en este punto; si falta, es un error de negocio": por eso el `main` lo captura
    con un `try/catch`, a propósito, para mostrar que la excepción ocurre cuando
-   corresponde y no antes.
+   corresponde y no antes — a diferencia de la versión tradicional, que
+   simplemente devuelve `null` en silencio.
 
 ### Records
 
-8. `DatosContacto` reemplaza a una clase tradicional con campos `private final`,
-   constructor, *getters*, `equals`, `hashCode` y `toString` escritos a mano.
-9. Un `record` es **inmutable** por diseño: no tiene setters; para "cambiar" un
-   dato de contacto se crea una instancia nueva.
-10. `Cita`, usado en la sección de streams, también es un `record`: un objeto de
+9. `DatosContactoTradicional` es la clase tradicional: campos `private final`,
+   constructor, *getters*, `equals`, `hashCode` y `toString`, todo escrito a
+   mano, línea por línea.
+10. `DatosContacto` (un `record`) genera automáticamente exactamente lo mismo
+    que `DatosContactoTradicional` escribe a mano: constructor, *getters*,
+    `equals`, `hashCode` y `toString`, en una sola línea de declaración.
+11. Un `record` es **inmutable** por diseño: no tiene setters; para "cambiar" un
+    dato de contacto se crea una instancia nueva.
+12. `Cita`, usado en la sección de streams, también es un `record`: un objeto de
     valor simple es un candidato natural para modelarse así.
 
 ## ✅ Resultado esperado
@@ -142,9 +207,11 @@ Al ejecutar `JavaModernoDemo.main(...)`:
 Imperativo: [Ana Gómez, Marta Ruiz]
 Con streams: [Ana Gómez, Marta Ruiz]
 --- Optional ---
-Especialidad de Luis Pérez: Pediatría
-Excepción esperada: No se encontró una cita para ese paciente
+Tradicional (puede ser null): Pediatría
+Con Optional: Pediatría
+Tradicional, paciente inexistente (null, sin avisar): null
+Con Optional, paciente inexistente (excepción explícita): No se encontró una cita para ese paciente
 --- Records ---
-+54 11 5555-0100
-DatosContacto[telefono=+54 11 5555-0100, email=ana.gomez@mail.com]
+Tradicional: DatosContactoTradicional{telefono='+54 11 5555-0100', email='ana.gomez@mail.com'}
+Con record: DatosContacto[telefono=+54 11 5555-0100, email=ana.gomez@mail.com]
 ```
