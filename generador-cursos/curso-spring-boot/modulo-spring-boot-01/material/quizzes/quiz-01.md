@@ -10,10 +10,10 @@ cuenta y después abrí "Ver respuesta" para comparar.
 **1. [Selección]** Un entrevistador te pregunta: "¿Cuál de las siguientes es una
 característica de un framework?"
 
-A. Nunca impone ninguna estructura al proyecto.
-B. Ofrece una estructura predefinida (por ejemplo, Inversión de Control o el patrón Modelo-Vista-Controlador) para reducir el código repetitivo y facilitar el desarrollo ágil.
-C. Solo sirve para hacer cálculos matemáticos.
-D. Debe reescribirse desde cero en cada proyecto nuevo.
+- **A.** Nunca impone ninguna estructura al proyecto.
+- **B.** Ofrece una estructura predefinida (por ejemplo, Inversión de Control o el patrón Modelo-Vista-Controlador) para reducir el código repetitivo y facilitar el desarrollo ágil.
+- **C.** Solo sirve para hacer cálculos matemáticos.
+- **D.** Debe reescribirse desde cero en cada proyecto nuevo.
 
 _RA: RA-10_
 
@@ -34,11 +34,11 @@ desarrollo ágil. Una librería, en cambio, no impone estructura.
 te pide: "Seleccioná **todas** las afirmaciones correctas sobre las librerías
 **dinámicas** (*shared libraries*)."
 
-A. Se cargan en tiempo de ejecución, no en tiempo de compilación.
-B. Permiten que varias aplicaciones compartan la misma copia cargada en memoria.
-C. Siempre aumentan el tamaño del ejecutable final porque se copian dentro de él.
-D. Pueden actualizarse sin necesidad de recompilar la aplicación que las usa.
-E. Son exclusivas del lenguaje Java.
+- **A.** Se cargan en tiempo de ejecución, no en tiempo de compilación.
+- **B.** Permiten que varias aplicaciones compartan la misma copia cargada en memoria.
+- **C.** Siempre aumentan el tamaño del ejecutable final porque se copian dentro de él.
+- **D.** Pueden actualizarse sin necesidad de recompilar la aplicación que las usa.
+- **E.** Son exclusivas del lenguaje Java.
 
 _RA: RA-11_
 
@@ -85,10 +85,10 @@ librería).
 **4. [Selección]** "Tengo una clase abstracta `Usuario` y una interfaz
 `Prestable`. ¿Cuál es la diferencia principal entre ambas?"
 
-A. No hay ninguna diferencia real; son intercambiables.
-B. Una clase abstracta puede compartir estado y comportamiento común entre subclases relacionadas; una interfaz solo declara qué puede hacer un tipo, sin relación de herencia entre las implementaciones.
-C. Las interfaces solo se usan en Spring; las clases abstractas solo en Java puro.
-D. Una interfaz siempre debe implementarse en una única clase.
+- **A.** No hay ninguna diferencia real; son intercambiables.
+- **B.** Una clase abstracta puede compartir estado y comportamiento común entre subclases relacionadas; una interfaz solo declara qué puede hacer un tipo, sin relación de herencia entre las implementaciones.
+- **C.** Las interfaces solo se usan en Spring; las clases abstractas solo en Java puro.
+- **D.** Una interfaz siempre debe implementarse en una única clase.
 
 _RA: RA-1_
 
@@ -133,11 +133,11 @@ propia versión del método; (c) el nombre correcto del principio (polimorfismo)
 usar streams y lambdas en vez de un bucle `for` tradicional? Seleccioná **todas**
 las que apliquen."
 
-A. Expresan la operación de forma declarativa (qué se quiere obtener, no cómo iterarlo).
-B. Evitan declarar una lista mutable intermedia para acumular resultados.
-C. Garantizan que el código se ejecute en paralelo automáticamente y siempre más rápido.
-D. Suelen ser más cortos y legibles para encadenar filtros y transformaciones.
-E. Eliminan por completo la necesidad de manejar cualquier tipo de excepción.
+- **A.** Expresan la operación de forma declarativa (qué se quiere obtener, no cómo iterarlo).
+- **B.** Evitan declarar una lista mutable intermedia para acumular resultados.
+- **C.** Garantizan que el código se ejecute en paralelo automáticamente y siempre más rápido.
+- **D.** Suelen ser más cortos y legibles para encadenar filtros y transformaciones.
+- **E.** Eliminan por completo la necesidad de manejar cualquier tipo de excepción.
 
 _RA: RA-2_
 
@@ -158,10 +158,10 @@ lanzan excepciones *checked* incluso complican un poco su manejo).
 **7. [Selección]** "¿Por qué un método debería devolver `Optional<Medico>` en vez
 de `Medico`?"
 
-A. No cambia nada; `Optional` es solo una forma más larga de escribir lo mismo.
-B. El tipo deja constancia de que el valor puede no existir, obligando a manejar ese caso explícitamente (`orElse`, `orElseThrow`) en vez de arriesgar un `NullPointerException`.
-C. El método se ejecuta más rápido.
-D. El método ya no puede lanzar excepciones.
+- **A.** No cambia nada; `Optional` es solo una forma más larga de escribir lo mismo.
+- **B.** El tipo deja constancia de que el valor puede no existir, obligando a manejar ese caso explícitamente (`orElse`, `orElseThrow`) en vez de arriesgar un `NullPointerException`.
+- **C.** El método se ejecuta más rápido.
+- **D.** El método ya no puede lanzar excepciones.
 
 _RA: RA-3_
 
@@ -204,11 +204,11 @@ automáticamente; (b) que es inmutable por diseño; (c) un caso de uso apropiado
 **9. [Selección múltiple]** "¿Cuáles de las siguientes afirmaciones sobre Maven y
 Gradle son correctas? Seleccioná **todas** las que apliquen."
 
-A. Maven usa un DSL de Groovy/Kotlin; Gradle usa XML declarativo.
-B. Maven tiene un ciclo de vida de fases fijo (`validate`, `compile`, `test`, `package`, …).
-C. Gradle permite tareas configurables y aprovecha caché incremental para builds más rápidos.
-D. Ambos pueden gestionar dependencias y construir un proyecto Spring Boot.
-E. Una dependencia con `scope test` en Maven equivale a `testImplementation` en Gradle.
+- **A.** Maven usa un DSL de Groovy/Kotlin; Gradle usa XML declarativo.
+- **B.** Maven tiene un ciclo de vida de fases fijo (`validate`, `compile`, `test`, `package`, …).
+- **C.** Gradle permite tareas configurables y aprovecha caché incremental para builds más rápidos.
+- **D.** Ambos pueden gestionar dependencias y construir un proyecto Spring Boot.
+- **E.** Una dependencia con `scope test` en Maven equivale a `testImplementation` en Gradle.
 
 _RA: RA-5_
 
@@ -253,10 +253,10 @@ temporal Spring (2003) → Spring Boot (2014).
 **11. [Selección]** "En un proyecto Spring Boot organizado por capas, ¿qué
 contiene el paquete `repository`?"
 
-A. Las clases que reciben peticiones HTTP.
-B. Las clases o interfaces responsables de acceder a los datos.
-C. La configuración de `application.properties`.
-D. Las pruebas automatizadas del proyecto.
+- **A.** Las clases que reciben peticiones HTTP.
+- **B.** Las clases o interfaces responsables de acceder a los datos.
+- **C.** La configuración de `application.properties`.
+- **D.** Las pruebas automatizadas del proyecto.
 
 _RA: RA-13_
 
@@ -288,10 +288,10 @@ public class ServicioPrestamos {
 
 No tiene ningún `@Autowired`. Seleccioná **todas** las afirmaciones correctas."
 
-A. Spring no podrá inyectar `RepositorioLibros` porque falta `@Autowired` explícito, y la aplicación fallará al arrancar.
-B. Spring usará automáticamente este único constructor para inyectar `RepositorioLibros`, sin necesitar `@Autowired`.
-C. `@Service` es una especialización de `@Component` que comunica que la clase contiene lógica de negocio.
-D. Si se agregara `@Autowired` sobre el constructor, seguiría funcionando igual: sería redundante, pero no incorrecto.
+- **A.** Spring no podrá inyectar `RepositorioLibros` porque falta `@Autowired` explícito, y la aplicación fallará al arrancar.
+- **B.** Spring usará automáticamente este único constructor para inyectar `RepositorioLibros`, sin necesitar `@Autowired`.
+- **C.** `@Service` es una especialización de `@Component` que comunica que la clase contiene lógica de negocio.
+- **D.** Si se agregara `@Autowired` sobre el constructor, seguiría funcionando igual: sería redundante, pero no incorrecto.
 
 _RA: RA-14_
 
@@ -335,10 +335,10 @@ Dependencias.
 (I) inicialización (`@PostConstruct`), (II) instanciación, (III) destrucción
 (`@PreDestroy`), (IV) inyección de dependencias."
 
-A. II, IV, I, III.
-B. I, II, III, IV.
-C. IV, II, I, III.
-D. II, I, IV, III.
+- **A.** II, IV, I, III.
+- **B.** I, II, III, IV.
+- **C.** IV, II, I, III.
+- **D.** II, I, IV, III.
 
 _RA: RA-7_
 
