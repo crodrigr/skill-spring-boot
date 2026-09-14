@@ -3,12 +3,21 @@
 ## 🌍 Contexto
 
 Spring y sus ejemplos posteriores (repositorios, servicios) asumen un estilo de
-código concreto: **streams** para describir operaciones sobre colecciones sin
-escribir el bucle que las recorre, **lambdas** para pasar comportamiento como
-argumento, **`Optional`** para representar explícitamente que un valor puede no
-existir, y **records** para modelar objetos de valor inmutables sin código
-repetitivo. Antes de usar Spring, conviene dominar estas cuatro herramientas
-comparándolas contra su equivalente "tradicional".
+código concreto, apoyado en cuatro herramientas de Java moderno:
+
+- **Streams**: describen una operación sobre una colección (filtrar,
+  transformar, agregar) sin escribir el bucle que la recorre.
+- **Lambdas**: son funciones anónimas y compactas que se pasan como argumento a
+  esas operaciones, en vez de escribir una clase aparte para cada una.
+- **`Optional`**: representa explícitamente, a nivel de tipo, que un valor
+  puede no existir, en vez de arriesgar un `NullPointerException` con un `null`
+  silencioso.
+- **Records**: son una forma compacta de declarar una clase inmutable que solo
+  transporta datos, sin escribir a mano constructor, *getters*, `equals`,
+  `hashCode` ni `toString`.
+
+Antes de usar Spring, conviene dominar estas cuatro herramientas comparándolas
+contra su equivalente "tradicional".
 
 **Qué busca demostrar este ejemplo**: que, para cada una de las cuatro
 herramientas, la versión moderna produce **el mismo resultado** que su
