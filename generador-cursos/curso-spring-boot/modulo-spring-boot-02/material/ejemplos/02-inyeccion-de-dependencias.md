@@ -22,7 +22,30 @@ negocio.
 Biblioteca Universitaria: `ServicioPrestamos`, que necesita un
 `RepositorioLibros` para funcionar.
 
-## 💻 Código — sin Inyección de Dependencias (acoplada)
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+En Java, cada clase o interfaz pública va en su propio archivo `.java`. Si
+abrieras este ejemplo como una carpeta en VS Code, el panel `EXPLORER` se
+vería así:
+
+```text
+📁 ejemplo-02-inyeccion-dependencias
+└── 📁 src
+    ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
+    ├── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
+    ├── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, Ejemplo 11)
+    ├── 📄 ServicioPrestamosAcoplado.java   (nuevo — versión con el problema)
+    ├── 📄 ServicioPrestamosConstructor.java (nuevo — inyección por constructor)
+    ├── 📄 ServicioPrestamosSetter.java     (nuevo — inyección por setter)
+    └── 📄 Main.java                        (nuevo — ▶️ clase con el main que se ejecuta)
+```
+
+Los primeros tres archivos ya los tenés de tu proyecto del Módulo 1 (Ejemplo
+11): se reutilizan tal cual, sin modificar una línea. Los cuatro archivos
+nuevos son los que se muestran a continuación, cada uno con el nombre exacto
+del archivo en el que iría.
+
+## 💻 Archivo: `ServicioPrestamosAcoplado.java`
 
 ```java
 public class ServicioPrestamosAcoplado {
@@ -46,7 +69,7 @@ modificar `ServicioPrestamosAcoplado`. Este es exactamente el problema que
 tendría una clase `Vehículo` que crea su propio `Motor` con `new`: queda
 acoplada a esa implementación concreta de motor.
 
-## 💻 Código — con Inyección de Dependencias por constructor
+## 💻 Archivo: `ServicioPrestamosConstructor.java`
 
 ```java
 public class ServicioPrestamosConstructor {
@@ -63,7 +86,7 @@ public class ServicioPrestamosConstructor {
 }
 ```
 
-## 💻 Código — con Inyección de Dependencias por propiedades (*setter*)
+## 💻 Archivo: `ServicioPrestamosSetter.java`
 
 ```java
 public class ServicioPrestamosSetter {
@@ -82,7 +105,7 @@ public class ServicioPrestamosSetter {
 
 ## 🗺️ Diagrama: acoplada vs. desacoplada
 
-### 🚧 Con acoplamiento
+### 🚧 Con acoplamiento (`ServicioPrestamosAcoplado.java`)
 
 ```mermaid
 classDiagram
@@ -92,9 +115,9 @@ classDiagram
 ```
 
 La flecha apunta a una **clase concreta**: no hay forma de cambiar el destino
-sin editar `ServicioPrestamosAcoplado`.
+sin editar `ServicioPrestamosAcoplado.java`.
 
-### 💡 Sin acoplamiento (con Inyección de Dependencias)
+### 💡 Sin acoplamiento (`ServicioPrestamosConstructor.java`)
 
 ```mermaid
 classDiagram
@@ -112,9 +135,9 @@ classDiagram
 La flecha apunta a la **interfaz**, no a una clase concreta: cualquiera de las
 dos implementaciones de abajo puede conectarse, elegida desde afuera —eso es
 lo que permite enchufar `repositorioDePrueba` en un test, sin tocar
-`ServicioPrestamosConstructor`.
+`ServicioPrestamosConstructor.java`.
 
-## 💻 Código — clase principal (`Main`): la diferencia se ve al testear
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 public class Main {
@@ -148,10 +171,11 @@ public class Main {
    dependencia: la **reciben**, ya sea en el constructor o mediante un método
    `set...`. En ambos casos, la clase depende de la interfaz
    `RepositorioLibros`, no de una implementación concreta.
-3. En `Main`, `repositorioDePrueba` es una implementación mínima (una lambda,
-   porque `RepositorioLibros` es una interfaz funcional) que siempre encuentra
-   el libro pedido: eso es exactamente lo que se necesita en un test, y solo
-   es posible porque ambas clases reciben la dependencia desde afuera.
+3. En `Main.java`, `repositorioDePrueba` es una implementación mínima (una
+   lambda, porque `RepositorioLibros` es una interfaz funcional) que siempre
+   encuentra el libro pedido: eso es exactamente lo que se necesita en un
+   test, y solo es posible porque ambas clases reciben la dependencia desde
+   afuera.
 4. La diferencia entre constructor y propiedades es **cuándo** se entrega la
    dependencia: por constructor, la clase nunca existe sin ella (no puede
    construirse a medias); por propiedades, la clase puede existir un instante
@@ -162,11 +186,14 @@ public class Main {
 | Beneficio | Cómo se ve en este ejemplo |
 |---|---|
 | Mejora la modularidad | `ServicioPrestamosConstructor` no necesita saber cómo se almacenan los libros por dentro. |
-| Reduce la complejidad | El código de `prestar(...)` es idéntico en las tres versiones; la complejidad de crear el repositorio correcto se resuelve una sola vez, en `Main`. |
+| Reduce la complejidad | El código de `prestar(...)` es idéntico en las tres versiones; la complejidad de crear el repositorio correcto se resuelve una sola vez, en `Main.java`. |
 | Aumenta la flexibilidad | El mismo `ServicioPrestamosConstructor` funciona con `repositorioReal` o con `repositorioDePrueba`, sin cambiar su código. |
 | Facilita las pruebas unitarias | `repositorioDePrueba` reemplaza al repositorio real sin tocar `ServicioPrestamosConstructor`, algo imposible con `ServicioPrestamosAcoplado`. |
 
 ## ✅ Resultado esperado
+
+En VS Code, al abrir `Main.java` aparece un botón **▶ Run** arriba del método
+`main`; al hacer clic, el panel `TERMINAL` muestra:
 
 ```text
 Con repositorio real: true
@@ -211,7 +238,7 @@ interfaz `RepositorioLibros`, no de una implementación concreta.
 
 **3. [Abierta]** Explicá con tus palabras por qué la Inyección de Dependencias
 "facilita las pruebas unitarias", usando el ejemplo de `repositorioDePrueba`
-de este `Main`.
+de este `Main.java`.
 
 <details>
 <summary>🔑 Ver respuesta modelo</summary>

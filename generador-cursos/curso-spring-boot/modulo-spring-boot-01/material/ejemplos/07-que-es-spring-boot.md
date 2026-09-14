@@ -69,7 +69,19 @@ public class WebConfig {
    (Tomcat, Jetty, WildFly) por separado, con la versión y el puerto correctos.
 ```
 
-## 💻 Código — Spring Boot (mismo resultado)
+## 💻 Spring Boot (mismo resultado): así se vería en VS Code
+
+```text
+📁 biblioteca-api
+└── 📁 src/main
+    ├── 📁 java/com/biblioteca/api
+    │   ├── 📄 BibliotecaApiApplication.java  (▶️ clase con el main que se ejecuta)
+    │   └── 📄 CatalogoController.java
+    └── 📁 resources
+        └── 📄 application.properties
+```
+
+### 💻 Archivo: `BibliotecaApiApplication.java`
 
 ```java
 @SpringBootApplication // agrupa @Configuration + autoconfiguración + escaneo de componentes
@@ -78,7 +90,11 @@ public class BibliotecaApiApplication {
         SpringApplication.run(BibliotecaApiApplication.class, args);
     }
 }
+```
 
+### 💻 Archivo: `CatalogoController.java`
+
+```java
 @RestController
 public class CatalogoController {
 
@@ -89,8 +105,10 @@ public class CatalogoController {
 }
 ```
 
+### 💻 Archivo: `application.properties`
+
 ```properties
-# application.properties — configuración mínima, con valores por defecto razonables
+# configuración mínima, con valores por defecto razonables
 server.port=8080
 ```
 

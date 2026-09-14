@@ -66,7 +66,28 @@ punteada): solo comparten un contrato, sin relación de herencia entre sí. Esa
 diferencia de línea en el diagrama es, exactamente, la diferencia conceptual
 entre herencia e interfaz.
 
-## 💻 Código — clases del dominio
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+En Java, cada clase o interfaz pública va en su propio archivo `.java` con su
+mismo nombre. Si abrieras este ejemplo como una carpeta en VS Code, el panel
+`EXPLORER` se vería así:
+
+```text
+📁 ejemplo-04-poo-aplicada
+└── 📁 src
+    ├── 📄 Usuario.java       (clase abstracta)
+    ├── 📄 Estudiante.java
+    ├── 📄 Docente.java
+    ├── 📄 Prestable.java     (interfaz)
+    ├── 📄 Libro.java
+    ├── 📄 RecursoDigital.java
+    └── 📄 Main.java          (▶️ clase con el main que se ejecuta)
+```
+
+Cada bloque de código de abajo está encabezado con el nombre exacto del
+archivo en el que iría.
+
+## 💻 Archivo: `Usuario.java`
 
 ```java
 // Clase base: comportamiento y datos comunes a todo usuario de la biblioteca
@@ -87,7 +108,11 @@ public abstract class Usuario {
     // Cada tipo de usuario define su propio límite de préstamos simultáneos
     public abstract int limitePrestamosSimultaneos();
 }
+```
 
+## 💻 Archivo: `Estudiante.java`
+
+```java
 public class Estudiante extends Usuario {
 
     public Estudiante(String nombre, String codigo) {
@@ -99,7 +124,11 @@ public class Estudiante extends Usuario {
         return 3;
     }
 }
+```
 
+## 💻 Archivo: `Docente.java`
+
+```java
 public class Docente extends Usuario {
 
     public Docente(String nombre, String codigo) {
@@ -111,13 +140,21 @@ public class Docente extends Usuario {
         return 10;
     }
 }
+```
 
+## 💻 Archivo: `Prestable.java`
+
+```java
 // Interfaz: qué puede hacer un recurso prestable, sin decir cómo lo calcula cada uno
 public interface Prestable {
     int calcularDiasDevolucion();
     String descripcion();
 }
+```
 
+## 💻 Archivo: `Libro.java`
+
+```java
 public class Libro implements Prestable {
 
     private final String titulo;
@@ -136,7 +173,11 @@ public class Libro implements Prestable {
         return "Libro: " + titulo;
     }
 }
+```
 
+## 💻 Archivo: `RecursoDigital.java`
+
+```java
 public class RecursoDigital implements Prestable {
 
     private final String titulo;
@@ -157,11 +198,7 @@ public class RecursoDigital implements Prestable {
 }
 ```
 
-## 💻 Código — clase principal (`Main`)
-
-Cada clase de arriba iría en su propio archivo `.java` en un proyecto real
-(`Usuario.java`, `Estudiante.java`, etc.); `Main` es el punto de entrada que las
-pone a todas en juego.
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 public class Main {
@@ -213,7 +250,8 @@ public class Main {
 
 ## ✅ Resultado esperado
 
-Al ejecutar `Main.main(...)`, la salida por consola es:
+En VS Code, al abrir `Main.java` aparece un botón **▶ Run** arriba del método
+`main`; al hacer clic, el panel `TERMINAL` muestra:
 
 ```text
 Ana Torres puede tener hasta 3 préstamos simultáneos.

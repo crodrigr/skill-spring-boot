@@ -48,26 +48,46 @@ clase dentro de la arquitectura por capas.
 | `@Autowired` | Constructor, setter o campo | Le indica a Spring qué dependencia inyectar (Ejemplo 11 la explica en profundidad). |
 | `@Configuration` | Clase de configuración | Marca una clase como fuente de definición de beans mediante métodos `@Bean`. |
 
-## 💻 Ejemplo aplicado
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+```text
+📁 biblioteca-api
+└── 📁 src
+    ├── 📄 ValidadorIsbn.java
+    ├── 📄 RepositorioLibrosEnMemoria.java
+    ├── 📄 ServicioPrestamos.java
+    ├── 📄 PrestamosController.java
+    └── 📄 BibliotecaApiApplication.java   (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `ValidadorIsbn.java`
 
 ```java
-@Component // (1) bean genérico administrado por el contenedor
+@Component // bean genérico administrado por el contenedor
 public class ValidadorIsbn {
     public boolean esValido(String isbn) { /* ... */ return true; }
 }
+```
 
-@Repository // (2) especialización de @Component para acceso a datos
+## 💻 Archivo: `RepositorioLibrosEnMemoria.java`
+
+```java
+@Repository // especialización de @Component para acceso a datos
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
     public Optional<Libro> buscarPorIsbn(String isbn) { /* ... */ return Optional.empty(); }
 }
+```
 
-@Service // (3) especialización de @Component para lógica de negocio
+## 💻 Archivo: `ServicioPrestamos.java`
+
+```java
+@Service // especialización de @Component para lógica de negocio
 public class ServicioPrestamos {
 
     private final RepositorioLibros repositorioLibros;
 
-    public ServicioPrestamos(RepositorioLibros repositorioLibros) { // (4) ver Ejemplo 11
+    public ServicioPrestamos(RepositorioLibros repositorioLibros) { // ver Ejemplo 11
         this.repositorioLibros = repositorioLibros;
     }
 
@@ -75,8 +95,12 @@ public class ServicioPrestamos {
         return repositorioLibros.buscarPorIsbn(isbn).isPresent();
     }
 }
+```
 
-@RestController // (5) expone endpoints HTTP
+## 💻 Archivo: `PrestamosController.java`
+
+```java
+@RestController // expone endpoints HTTP
 public class PrestamosController {
 
     private final ServicioPrestamos servicioPrestamos;
@@ -85,13 +109,17 @@ public class PrestamosController {
         this.servicioPrestamos = servicioPrestamos;
     }
 
-    @GetMapping("/prestamos/{isbn}") // (6) GET /prestamos/{isbn}
+    @GetMapping("/prestamos/{isbn}") // GET /prestamos/{isbn}
     public boolean prestar(@PathVariable String isbn) {
         return servicioPrestamos.prestar(isbn);
     }
 }
+```
 
-@SpringBootApplication // (7) clase principal: arranca el contenedor y escanea los @Component de arriba
+## 💻 Archivo: `BibliotecaApiApplication.java`
+
+```java
+@SpringBootApplication // clase principal: arranca el contenedor y escanea los @Component de arriba
 public class BibliotecaApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(BibliotecaApiApplication.class, args);

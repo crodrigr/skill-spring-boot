@@ -23,13 +23,36 @@ MediSalud/Biblioteca Universitaria: `Notificador`, `NotificadorSms` y
 `NotificadorEmail`, ya construidos en el Módulo 1 (Ejercicio Avanzado 01),
 ahora administrados por el contenedor IoC.
 
-## 💻 Código — Paso 1: una sola implementación, sin ambigüedad
+## 🌳 Árbol de archivos (estado final, como se vería en VS Code)
+
+```text
+📁 ejemplo-04-resolucion-dependencia-general
+└── 📁 src
+    ├── 📄 Notificador.java          (interfaz)
+    ├── 📄 NotificadorSms.java       (con @Qualifier al final del recorrido)
+    ├── 📄 NotificadorEmail.java     (aparece recién en el Paso 2)
+    ├── 📄 ServicioRecordatorios.java
+    ├── 📄 ConfiguracionApp.java     (igual que en el Ejemplo 06 del Módulo 1)
+    └── 📄 Main.java                 (▶️ clase con el main que se ejecuta)
+```
+
+Los tres pasos de abajo son la **evolución** de estos mismos archivos, no
+proyectos distintos: empezás con dos archivos (Paso 1), agregás un tercero
+(Paso 2), y modificás los tres para resolver la ambigüedad (Paso 3).
+
+## 💻 Paso 1: una sola implementación, sin ambigüedad
+
+### 📄 Archivo: `Notificador.java`
 
 ```java
 public interface Notificador {
     void enviar(String destinatario, String mensaje);
 }
+```
 
+### 📄 Archivo: `NotificadorSms.java` (versión inicial)
+
+```java
 @Component
 public class NotificadorSms implements Notificador {
     @Override
@@ -37,7 +60,11 @@ public class NotificadorSms implements Notificador {
         System.out.println("SMS a " + destinatario + ": " + mensaje);
     }
 }
+```
 
+### 📄 Archivo: `ServicioRecordatorios.java` (versión inicial)
+
+```java
 @Service
 public class ServicioRecordatorios {
 
@@ -57,7 +84,9 @@ Con **una sola** clase anotada `@Component` que implementa `Notificador`,
 Spring no tiene dudas: al arrancar, resuelve `ServicioRecordatorios` sin
 ningún error.
 
-## 🚧 Código — Paso 2: agregar una segunda implementación rompe la resolución automática
+## 🚧 Paso 2: agregar una segunda implementación rompe la resolución automática
+
+### 📄 Archivo nuevo: `NotificadorEmail.java`
 
 ```java
 @Component
@@ -69,8 +98,9 @@ public class NotificadorEmail implements Notificador {
 }
 ```
 
-Apenas `NotificadorEmail` también queda anotado `@Component`, arrancar la
-aplicación produce un error real (no un error inventado para el ejemplo):
+Apenas agregás este archivo (`NotificadorSms.java` y `ServicioRecordatorios.java`
+quedan igual que en el Paso 1), arrancar la aplicación produce un error real
+(no un error inventado para el ejemplo):
 
 ```text
 Error creating bean with name 'servicioRecordatorios': Unsatisfied dependency
@@ -79,7 +109,11 @@ expressed through constructor parameter 0: No qualifying bean of type
 notificadorSms, notificadorEmail
 ```
 
-## 💻 Código — Paso 3: resolver la ambigüedad con `@Qualifier`
+## 💻 Paso 3: resolver la ambigüedad con `@Qualifier`
+
+Ahora se modifican los tres archivos:
+
+### 📄 Archivo: `NotificadorSms.java` (modificado)
 
 ```java
 @Component
@@ -90,7 +124,11 @@ public class NotificadorSms implements Notificador {
         System.out.println("SMS a " + destinatario + ": " + mensaje);
     }
 }
+```
 
+### 📄 Archivo: `NotificadorEmail.java` (modificado)
+
+```java
 @Component
 @Qualifier("email")
 public class NotificadorEmail implements Notificador {
@@ -99,7 +137,11 @@ public class NotificadorEmail implements Notificador {
         System.out.println("Email a " + destinatario + ": " + mensaje);
     }
 }
+```
 
+### 📄 Archivo: `ServicioRecordatorios.java` (modificado, ▶️ se ejecuta desde acá)
+
+```java
 @Service
 public class ServicioRecordatorios {
 
@@ -111,6 +153,31 @@ public class ServicioRecordatorios {
 
     public void enviarRecordatorio(String destinatario, String mensaje) {
         notificador.enviar(destinatario, mensaje);
+    }
+}
+```
+
+### 📄 Archivo: `ConfiguracionApp.java`
+
+```java
+@Configuration
+@ComponentScan(basePackages = "com.medisalud")
+public class ConfiguracionApp {
+}
+```
+
+### 📄 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext contexto =
+                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+
+        ServicioRecordatorios servicioRecordatorios = contexto.getBean(ServicioRecordatorios.class);
+        servicioRecordatorios.enviarRecordatorio("+54 11 5555-0100", "Su cita es mañana.");
+
+        contexto.close();
     }
 }
 ```
@@ -157,12 +224,12 @@ resuelto sin dudas.
 
 ## ✅ Resultado esperado
 
-Sin `@Qualifier` (Paso 2), la aplicación **no arranca** y muestra el error de
-ambigüedad de arriba. Con `@Qualifier` (Paso 3), arranca sin errores y:
+Sin `@Qualifier` (Paso 2), `Main.java` **no llega a arrancar** el contenedor y
+muestra el error de ambigüedad de arriba. Con `@Qualifier` (Paso 3), al
+ejecutar `Main.java`:
 
 ```text
-ServicioRecordatorios.enviarRecordatorio("+54 11 5555-0100", "Su cita es mañana.")
-→ SMS a +54 11 5555-0100: Su cita es mañana.
+SMS a +54 11 5555-0100: Su cita es mañana.
 ```
 
 ## ❓ Preguntas de repaso

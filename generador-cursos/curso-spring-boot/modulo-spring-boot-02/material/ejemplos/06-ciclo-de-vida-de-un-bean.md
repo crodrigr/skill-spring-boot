@@ -19,7 +19,19 @@ mismo `ServicioCitas` del Módulo 1 con una dependencia real.
 MediSalud: `ServicioCitas`, ahora con una dependencia (`RepositorioPacientes`)
 que permite observar la fase de configuración.
 
-## 💻 Código
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+```text
+📁 ejemplo-06-ciclo-de-vida
+└── 📁 src
+    ├── 📄 RepositorioPacientes.java          (interfaz — del Ejemplo 01 de este módulo)
+    ├── 📄 RepositorioPacientesEnMemoria.java (modificada, con println en el constructor)
+    ├── 📄 ServicioCitas.java                 (extendida respecto del Módulo 1, Ejemplo 10)
+    ├── 📄 ConfiguracionApp.java
+    └── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `RepositorioPacientesEnMemoria.java`
 
 ```java
 @Repository
@@ -33,7 +45,11 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
         return Optional.of(new Paciente(codigo, "Paciente de ejemplo"));
     }
 }
+```
 
+## 💻 Archivo: `ServicioCitas.java`
+
+```java
 @Component
 public class ServicioCitas {
 
@@ -60,12 +76,20 @@ public class ServicioCitas {
         System.out.println("5) Destrucción: @PreDestroy — el contenedor libera el bean antes de apagarse");
     }
 }
+```
 
+## 💻 Archivo: `ConfiguracionApp.java`
+
+```java
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
 public class ConfiguracionApp {
 }
+```
 
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
+
+```java
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

@@ -21,7 +21,20 @@ Biblioteca Universitaria: una utilidad de formateo de fechas de vencimiento,
 que no encaja claramente en ninguna capa (no es lógica de negocio, ni acceso a
 datos, ni un controlador web).
 
-## 💻 Código
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+```text
+📁 ejemplo-07-uso-de-component
+└── 📁 src
+    ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
+    ├── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, con @Repository agregado)
+    ├── 📄 FormateadorFechaVencimiento.java (nuevo — @Component)
+    ├── 📄 ServicioPrestamos.java           (nuevo — @Service)
+    ├── 📄 ConfiguracionApp.java
+    └── 📄 Main.java                        (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `FormateadorFechaVencimiento.java`
 
 ```java
 @Component // registra el bean en el contenedor, sin ningún efecto adicional
@@ -31,7 +44,11 @@ public class FormateadorFechaVencimiento {
         return fecha.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 }
+```
 
+## 💻 Archivo: `ServicioPrestamos.java`
+
+```java
 @Service // especialización semántica de @Component: "esto es lógica de negocio"
 public class ServicioPrestamos {
 
@@ -47,6 +64,44 @@ public class ServicioPrestamos {
     public String prestarConFechaVencimiento(String isbn, LocalDate fechaVencimiento) {
         repositorioLibros.buscarPorIsbn(isbn).orElseThrow();
         return "Vence el " + formateadorFechaVencimiento.formatear(fechaVencimiento);
+    }
+}
+```
+
+## 💻 Archivo: `RepositorioLibrosEnMemoria.java` (con `@Repository` agregado para este ejemplo)
+
+```java
+@Repository
+public class RepositorioLibrosEnMemoria implements RepositorioLibros {
+    @Override
+    public Optional<Libro> buscarPorIsbn(String isbn) {
+        return Optional.of(new Libro(isbn, "Libro de ejemplo"));
+    }
+}
+```
+
+## 💻 Archivo: `ConfiguracionApp.java`
+
+```java
+@Configuration
+@ComponentScan(basePackages = "com.biblioteca")
+public class ConfiguracionApp {
+}
+```
+
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        ConfigurableApplicationContext contexto =
+                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+
+        ServicioPrestamos servicioPrestamos = contexto.getBean(ServicioPrestamos.class);
+        System.out.println(servicioPrestamos.prestarConFechaVencimiento(
+                "978-3-16-148410-0", LocalDate.of(2026, 10, 1)));
+
+        contexto.close();
     }
 }
 ```
@@ -85,9 +140,7 @@ que cada uno eligió para comunicar su responsabilidad.
 
 ## ✅ Resultado esperado
 
-```java
-servicioPrestamos.prestarConFechaVencimiento("978-3-16-148410-0", LocalDate.of(2026, 10, 1));
-```
+Al ejecutar `Main.java`:
 
 ```text
 Vence el 01/10/2026

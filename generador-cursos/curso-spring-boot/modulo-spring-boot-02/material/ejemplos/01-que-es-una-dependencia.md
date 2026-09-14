@@ -27,13 +27,31 @@ MediSalud: la cadena `ControladorCitas → ServicioCitas → RepositorioPaciente
 (más `ServicioNotificaciones`, de la que `ServicioCitas` también depende), ya
 construida en el Desafío 01 del Módulo 1.
 
-## 💻 Código
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+```text
+📁 ejemplo-01-que-es-una-dependencia
+└── 📁 src
+    ├── 📄 Paciente.java                      (record — del Módulo 1, reutilizado)
+    ├── 📄 RepositorioPacientes.java          (interfaz)
+    ├── 📄 RepositorioPacientesEnMemoria.java
+    ├── 📄 ServicioNotificaciones.java
+    ├── 📄 ServicioCitas.java
+    ├── 📄 ControladorCitas.java
+    └── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `RepositorioPacientes.java`
 
 ```java
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
+```
 
+## 💻 Archivo: `RepositorioPacientesEnMemoria.java`
+
+```java
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     private final Map<String, Paciente> pacientes = Map.of(
             "P-001", new Paciente("Ana Gómez", "P-001")
@@ -44,7 +62,11 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
         return Optional.ofNullable(pacientes.get(codigo));
     }
 }
+```
 
+## 💻 Archivo: `ServicioNotificaciones.java`
+
+```java
 public class ServicioNotificaciones {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -59,7 +81,11 @@ public class ServicioNotificaciones {
         System.out.println("Avisando a " + paciente.nombre() + " sobre su cita próxima.");
     }
 }
+```
 
+## 💻 Archivo: `ServicioCitas.java`
+
+```java
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -77,7 +103,11 @@ public class ServicioCitas {
         servicioNotificaciones.avisarCitaProxima(codigoPaciente);
     }
 }
+```
 
+## 💻 Archivo: `ControladorCitas.java`
+
+```java
 public class ControladorCitas {
 
     private final ServicioCitas servicioCitas;
@@ -90,7 +120,11 @@ public class ControladorCitas {
         servicioCitas.agendar(codigoPaciente);
     }
 }
+```
 
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
+
+```java
 public class Main {
     public static void main(String[] args) {
         RepositorioPacientes repositorioPacientes = new RepositorioPacientesEnMemoria();

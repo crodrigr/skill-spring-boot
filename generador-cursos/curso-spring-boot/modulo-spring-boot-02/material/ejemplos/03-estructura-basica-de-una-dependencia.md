@@ -32,6 +32,10 @@ un SMS.
 
 ## 🚧 Diseño A (con una dependencia circular — anti-patrón)
 
+Este diseño se muestra solo como código ilustrativo, **no** como un proyecto
+para armar en VS Code: es intencionalmente el ejemplo de lo que *no* hay que
+hacer, y ni siquiera llega a compilar con inyección por constructor.
+
 ```java
 public class ServicioCitas {
     private final ServicioHistorialMedico servicioHistorialMedico;
@@ -76,11 +80,32 @@ entrada por donde empezar a construir ninguna de las dos clases.
 
 ## 💻 Diseño B (sin dependencia circular, aplicando buenas prácticas)
 
+A diferencia del Diseño A, este sí es un proyecto completo y ejecutable. Así
+se vería su carpeta en VS Code:
+
+```text
+📁 ejemplo-03-diseno-b
+└── 📁 src
+    ├── 📄 Paciente.java                      (del Módulo 1, reutilizado)
+    ├── 📄 RepositorioPacientes.java          (interfaz — del Ejemplo 01 de este módulo)
+    ├── 📄 RepositorioPacientesEnMemoria.java (del Ejemplo 01 de este módulo)
+    ├── 📄 Notificador.java                   (interfaz — del Módulo 1, Ejercicio Avanzado 01)
+    ├── 📄 NotificadorSms.java                (del Módulo 1, Ejercicio Avanzado 01)
+    ├── 📄 ServicioCitas.java                 (nuevo, para este ejemplo)
+    └── 📄 Main.java                          (nuevo — ▶️ clase con el main que se ejecuta)
+```
+
+### 💻 Archivo: `Notificador.java`
+
 ```java
 public interface Notificador {
     void enviar(String destinatario, String mensaje);
 }
+```
 
+### 💻 Archivo: `ServicioCitas.java`
+
+```java
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes; // depende de una abstracción
@@ -94,6 +119,21 @@ public class ServicioCitas {
     public void agendar(String codigoPaciente) {
         Paciente paciente = repositorioPacientes.buscarPorCodigo(codigoPaciente).orElseThrow();
         notificador.enviar(paciente.nombre(), "Tu cita fue agendada.");
+    }
+}
+```
+
+### 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        RepositorioPacientes repositorioPacientes = new RepositorioPacientesEnMemoria();
+        Notificador notificador = new NotificadorSms();
+        ServicioCitas servicioCitas = new ServicioCitas(repositorioPacientes, notificador);
+
+        servicioCitas.agendar("P-001");
+        System.out.println("ServicioCitas ensamblado con RepositorioPacientes y Notificador: sin dependencias circulares.");
     }
 }
 ```
@@ -143,9 +183,10 @@ directa: un grafo con un ciclo cerrado vs. un grafo sin ciclos.
 
 El Diseño A ni siquiera se puede ensamblar con inyección por constructor (no
 hay un punto de partida: cada clase exige que la otra ya exista). El Diseño B
-se ensambla sin problemas:
+se ensambla sin problemas; al ejecutar `Main.java`:
 
 ```text
+SMS a Ana Gómez: Tu cita fue agendada.
 ServicioCitas ensamblado con RepositorioPacientes y Notificador: sin dependencias circulares.
 ```
 

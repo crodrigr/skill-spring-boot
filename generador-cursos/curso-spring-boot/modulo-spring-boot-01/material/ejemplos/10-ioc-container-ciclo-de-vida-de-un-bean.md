@@ -21,7 +21,17 @@ contenedor.
 MediSalud: un `ServicioCitas` administrado por el contenedor IoC, para observar en
 orden las fases de su ciclo de vida.
 
-## 💻 Código
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+```text
+📁 ejemplo-10-ciclo-de-vida
+└── 📁 src
+    ├── 📄 ServicioCitas.java
+    ├── 📄 ConfiguracionApp.java
+    └── 📄 DemoContenedorIoC.java   (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `ServicioCitas.java`
 
 ```java
 @Component
@@ -47,13 +57,19 @@ public class ServicioCitas {
 }
 ```
 
+## 💻 Archivo: `ConfiguracionApp.java`
+
 ```java
 // Clase de configuración: le dice al contenedor en qué paquete buscar @Component
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
 public class ConfiguracionApp {
 }
+```
 
+## 💻 Archivo: `DemoContenedorIoC.java`
+
+```java
 public class DemoContenedorIoC {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

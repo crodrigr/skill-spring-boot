@@ -33,7 +33,17 @@ características de un Java Bean.
 | **Con capacidad de generar eventos** | Puede notificar a otros componentes cuando cambia su estado. |
 | **Con capacidad de introspección** | Herramientas externas pueden examinar sus propiedades y métodos automáticamente. |
 
-## 💻 Código — sintaxis básica de un bean administrado por Spring
+## 🌳 Árbol de archivos (como se vería en VS Code)
+
+```text
+📁 ejemplo-05-que-es-un-java-bean
+└── 📁 src
+    ├── 📄 DatosContactoPaciente.java  (Java Bean clásico)
+    ├── 📄 ServicioContacto.java       (bean administrado por Spring)
+    └── 📄 Main.java                   (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `DatosContactoPaciente.java`
 
 ```java
 public class DatosContactoPaciente implements Serializable {
@@ -57,7 +67,11 @@ public class DatosContactoPaciente implements Serializable {
         this.email = email;
     }
 }
+```
 
+## 💻 Archivo: `ServicioContacto.java`
+
+```java
 @Component // convierte la instancia administrada por Spring en un bean del contenedor
 public class ServicioContacto {
 
@@ -66,6 +80,18 @@ public class ServicioContacto {
         datos.setTelefono(telefono);
         datos.setEmail(email);
         return datos;
+    }
+}
+```
+
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        ServicioContacto servicioContacto = new ServicioContacto();
+        DatosContactoPaciente contacto = servicioContacto.construirContacto("+54 11 5555-0100", "ana@mail.com");
+        System.out.println(contacto.getTelefono());
     }
 }
 ```
@@ -95,10 +121,7 @@ public class ServicioContacto {
 
 ## ✅ Resultado esperado
 
-```java
-DatosContactoPaciente contacto = servicioContacto.construirContacto("+54 11 5555-0100", "ana@mail.com");
-System.out.println(contacto.getTelefono());
-```
+Al ejecutar `Main.java`:
 
 ```text
 +54 11 5555-0100
