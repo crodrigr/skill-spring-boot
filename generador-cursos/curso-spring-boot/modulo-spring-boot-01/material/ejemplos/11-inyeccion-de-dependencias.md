@@ -142,6 +142,34 @@ public class ServicioPrestamosCampo {
 }
 ```
 
+## 🗺️ Diagrama: mismo destino, tres caminos distintos
+
+```mermaid
+classDiagram
+    class RepositorioLibros {
+        <<interface>>
+        +buscarPorIsbn(String) Optional
+    }
+    class ServicioPrestamosConstructor {
+        -RepositorioLibros repositorioLibros
+        +ServicioPrestamosConstructor(RepositorioLibros)
+    }
+    class ServicioPrestamosSetter {
+        -RepositorioLibros repositorioLibros
+        +setRepositorioLibros(RepositorioLibros)
+    }
+    class ServicioPrestamosCampo {
+        -RepositorioLibros repositorioLibros
+    }
+    ServicioPrestamosConstructor --> RepositorioLibros : por constructor
+    ServicioPrestamosSetter --> RepositorioLibros : por setter
+    ServicioPrestamosCampo --> RepositorioLibros : por campo (reflexión)
+```
+
+Las tres clases apuntan al mismo tipo (`RepositorioLibros`); lo único que
+cambia, marcado en cada flecha, es **cómo** llega esa dependencia a cada una.
+Eso es justo lo que la tabla siguiente compara en detalle.
+
 ## 🔍 Análisis comparado
 
 | Forma | Ventaja | Desventaja |

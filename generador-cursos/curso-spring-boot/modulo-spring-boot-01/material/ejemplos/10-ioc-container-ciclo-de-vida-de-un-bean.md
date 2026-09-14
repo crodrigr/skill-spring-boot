@@ -67,6 +67,21 @@ public class DemoContenedorIoC {
 }
 ```
 
+## 🗺️ Diagrama: las cuatro fases, en orden
+
+```mermaid
+stateDiagram-v2
+    [*] --> Instanciación: el contenedor llama al constructor
+    Instanciación --> Inicialización: @PostConstruct
+    Inicialización --> Uso: el bean queda disponible
+    Uso --> Destrucción: contexto.close()
+    Destrucción --> [*]
+```
+
+Cada flecha representa un evento que el **contenedor** dispara, no el código
+del estudiante: nadie llama explícitamente a `inicializar()` ni a
+`liberar()` — Spring los invoca al cruzar cada fase.
+
 ## 🧭 Explicación paso a paso
 
 1. `ConfiguracionApp`, anotada `@Configuration` y `@ComponentScan`, le indica al

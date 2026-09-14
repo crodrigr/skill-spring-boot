@@ -99,6 +99,24 @@ public class BibliotecaApiApplication {
 }
 ```
 
+## 🗺️ Diagrama: qué anotación tiene cada bean, y cómo se conectan
+
+```mermaid
+flowchart TB
+    App["BibliotecaApiApplication\n@SpringBootApplication"] -.->|"escanea el paquete"| PC & SP & RL & VI
+
+    PC["PrestamosController\n@RestController"] --> SP["ServicioPrestamos\n@Service"]
+    SP --> RL["RepositorioLibrosEnMemoria\n@Repository"]
+    VI["ValidadorIsbn\n@Component"]
+```
+
+`ValidadorIsbn` queda aislado en el diagrama a propósito: es un `@Component`
+genérico que ningún otro bean de este ejemplo usa todavía, mientras que
+`PrestamosController → ServicioPrestamos → RepositorioLibrosEnMemoria` forma
+la cadena real que atiende una petición HTTP. La flecha punteada desde
+`BibliotecaApiApplication` no es una dependencia: representa el escaneo que
+descubre y registra a los otros cuatro como beans.
+
 ## 🧭 Explicación paso a paso
 
 1. `@Component`, `@Service` y `@Repository` hacen exactamente lo mismo a nivel

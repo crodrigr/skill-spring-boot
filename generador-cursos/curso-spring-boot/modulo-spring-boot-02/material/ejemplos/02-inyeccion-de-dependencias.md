@@ -80,6 +80,34 @@ public class ServicioPrestamosSetter {
 }
 ```
 
+## 🗺️ Diagrama: acoplada vs. desacoplada
+
+```mermaid
+classDiagram
+    class ServicioPrestamosAcoplado
+    class RepositorioLibrosEnMemoria
+    ServicioPrestamosAcoplado --> RepositorioLibrosEnMemoria : crea con new (acoplada)
+```
+
+```mermaid
+classDiagram
+    class ServicioPrestamosConstructor
+    class RepositorioLibros {
+        <<interface>>
+    }
+    class RepositorioLibrosEnMemoria
+    class repositorioDePrueba["repositorioDePrueba (lambda)"]
+    ServicioPrestamosConstructor --> RepositorioLibros : recibe, no crea
+    RepositorioLibros <|.. RepositorioLibrosEnMemoria
+    RepositorioLibros <|.. repositorioDePrueba
+```
+
+En el primer diagrama, la flecha apunta a una **clase concreta**: no hay
+forma de cambiar el destino sin editar `ServicioPrestamosAcoplado`. En el
+segundo, la flecha apunta a la **interfaz**: cualquiera de las dos
+implementaciones de abajo puede conectarse, elegida desde afuera —eso es lo
+que permite enchufar `repositorioDePrueba` en un test.
+
 ## 💻 Código — clase principal (`Main`): la diferencia se ve al testear
 
 ```java

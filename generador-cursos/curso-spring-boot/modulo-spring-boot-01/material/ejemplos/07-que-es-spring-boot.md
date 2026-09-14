@@ -103,6 +103,28 @@ server.port=8080
 | Instalar y configurar un servidor externo (Tomcat/Jetty) | **Servidor embebido**: la aplicación se ejecuta con `java -jar`, sin instalar nada aparte |
 | Elegir a mano versiones de Spring MVC, Jackson, el servidor, etc. compatibles entre sí | **Starter** (`spring-boot-starter-web`): agrupa dependencias ya probadas como compatibles entre sí |
 
+## 🗺️ Diagrama: los mismos cuatro pasos, antes y después
+
+```mermaid
+flowchart LR
+    subgraph Clasico["Spring clásico"]
+        direction TB
+        A1["Escribir WebConfig con @Bean"] --> A2["Registrar DispatcherServlet en web.xml"]
+        A2 --> A3["Instalar y configurar Tomcat aparte"]
+        A3 --> A4["Empaquetar y desplegar .war"]
+    end
+    subgraph Boot["Spring Boot"]
+        direction TB
+        B1["@SpringBootApplication + main()"] --> B2["Autoconfiguración detecta el starter-web"]
+        B2 --> B3["Servidor embebido arranca solo"]
+        B3 --> B4["java -jar biblioteca-api.jar"]
+    end
+```
+
+Los cuatro pasos manuales de la izquierda se resuelven, de a uno, con las
+características de la derecha: cada característica de Spring Boot que se
+explica a continuación es la respuesta a uno de esos pasos.
+
 ## 🧠 Las seis características principales de Spring Boot
 
 ### 1. Configuración automática

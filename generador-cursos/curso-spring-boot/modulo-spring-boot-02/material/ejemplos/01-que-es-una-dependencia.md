@@ -103,6 +103,25 @@ public class Main {
 }
 ```
 
+## 🗺️ Diagrama: el grafo completo de dependencias
+
+```mermaid
+flowchart LR
+    CC["ControladorCitas"] -->|"directa"| SC["ServicioCitas"]
+    SC -->|"directa"| RP["RepositorioPacientes"]
+    SC -->|"directa"| SN["ServicioNotificaciones"]
+    SN -->|"directa"| RP
+    CC -.->|"transitiva"| RP
+    CC -.->|"transitiva"| SN
+```
+
+Las líneas sólidas son las dependencias que aparecen explícitamente en algún
+constructor; las líneas punteadas no existen en ningún código — son las que
+se "heredan" al seguir las líneas sólidas de punta a punta. `ControladorCitas`
+nunca escribe `RepositorioPacientes` en ningún lado, pero el camino sólido
+`ControladorCitas → ServicioCitas → RepositorioPacientes` es exactamente la
+dependencia transitiva.
+
 ## 🔍 Análisis: quién depende de quién
 
 | Relación | Tipo | Por qué |

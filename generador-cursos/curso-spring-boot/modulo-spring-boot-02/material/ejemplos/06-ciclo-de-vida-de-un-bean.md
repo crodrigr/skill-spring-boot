@@ -79,6 +79,23 @@ public class Main {
 }
 ```
 
+## 🗺️ Diagrama: las cinco fases (con la configuración separada)
+
+```mermaid
+stateDiagram-v2
+    [*] --> Instanciación: constructor de ServicioCitas
+    Instanciación --> Configuración: RepositorioPacientes ya inyectado
+    Configuración --> Inicialización: @PostConstruct
+    Inicialización --> Uso: bean listo
+    Uso --> Destrucción: contexto.close()
+    Destrucción --> [*]
+```
+
+Comparado con el ciclo de vida del Módulo 1 (Ejemplo 10), acá aparece un
+estado nuevo entre instanciación e inicialización: **Configuración**. En el
+Módulo 1 no se podía dibujar por separado porque `ServicioCitas` no tenía
+ninguna dependencia que inyectar.
+
 ## 🧭 Explicación paso a paso
 
 1. El contenedor primero resuelve `RepositorioPacientes`, porque

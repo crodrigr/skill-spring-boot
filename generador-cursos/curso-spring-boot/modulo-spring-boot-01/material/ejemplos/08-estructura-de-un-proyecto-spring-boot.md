@@ -39,6 +39,22 @@ biblioteca-api/
                 └── ServicioPrestamosTest.java
 ```
 
+## 🗺️ Diagrama: la arquitectura por capas
+
+```mermaid
+flowchart LR
+    Cliente["Cliente HTTP"] --> Controller["controller/\nCatalogoController"]
+    Controller --> Service["service/\nServicioPrestamos"]
+    Service --> Repository["repository/\nRepositorioLibros"]
+    Repository --> Model["model/\nLibro"]
+```
+
+Cada flecha va en un solo sentido: `controller` conoce a `service`, `service`
+conoce a `repository`, y `repository` produce objetos `model`. Ninguna capa
+"de más abajo" conoce a las de arriba: `RepositorioLibros` no sabe que existe
+`CatalogoController`. Esa dirección única es la que evita que un cambio en
+`controller/` obligue a tocar `repository/`.
+
 ## 💻 Código — la clase principal (`BibliotecaApiApplication.java`)
 
 ```java

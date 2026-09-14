@@ -73,6 +73,31 @@ propósito. Ejecutarlo requiere que Spring Boot arranque el contenedor (Ejemplo
 07) y reciba una petición HTTP real; el desarrollador nunca escribe
 `catalogoController.buscar("...")` en ningún `main`.
 
+## 🗺️ Diagrama: los dos flujos, lado a lado
+
+```mermaid
+flowchart LR
+    subgraph Libreria["Librería (ValidadorIsbn)"]
+        direction LR
+        M1["main()"] -->|"llama cuando quiere"| V["ValidadorIsbn.esValido(...)"]
+        V -->|"devuelve"| M1
+    end
+
+    subgraph Framework["Framework (Spring Boot)"]
+        direction LR
+        C["Cliente HTTP"] -->|"GET /catalogo/isbn"| SB["Spring Boot"]
+        SB -->|"invoca"| CC["CatalogoController.buscar(...)"]
+        CC -->|"devuelve"| SB
+        SB -->|"200 OK"| C
+    end
+```
+
+La flecha que **entra** a la lógica del desarrollador nace en lugares
+distintos: en la librería, nace en el propio `main()`; en el framework, nace
+afuera (el cliente HTTP), pasando primero por Spring Boot. Ese único detalle
+—de dónde viene la flecha que activa el código— es la diferencia completa
+entre ambos.
+
 ## 🧭 Explicación paso a paso
 
 1. En `QuienLlamaAQuienDemo`, el propio `main` decide, línea por línea, cuándo se

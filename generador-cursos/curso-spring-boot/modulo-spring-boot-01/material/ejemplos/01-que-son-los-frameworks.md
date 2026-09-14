@@ -101,6 +101,36 @@ el `main` de la aplicación (`SpringApplication.run(...)`, que se ve completo en
 el Ejemplo 07) arranca Spring Boot, y es Spring Boot quien invoca
 `citasDeHoy()` automáticamente cuando llega una petición `GET /citas/hoy` real.
 
+## 🗺️ Diagrama: quién llama a quién
+
+```mermaid
+sequenceDiagram
+    participant Main as main()
+    participant Dispatcher as manejarPeticion()
+
+    Note over Main,Dispatcher: Sin framework: el desarrollador escribe y llama al enrutador
+    Main->>Dispatcher: manejarPeticion("/citas/hoy")
+    Dispatcher-->>Main: devuelve el resultado
+```
+
+```mermaid
+sequenceDiagram
+    participant Cliente as Cliente HTTP
+    participant SpringBoot as Spring Boot (framework)
+    participant Controller as CitasController
+
+    Note over Cliente,Controller: Con framework: Spring Boot invoca el código del desarrollador
+    Cliente->>SpringBoot: GET /citas/hoy
+    SpringBoot->>Controller: invoca citasDeHoy()
+    Controller-->>SpringBoot: devuelve la lista
+    SpringBoot-->>Cliente: 200 OK + JSON
+```
+
+En el primer diagrama, `main()` decide cuándo llamar al enrutador: el control
+es del desarrollador. En el segundo, nadie en el código del desarrollador
+llama a `citasDeHoy()`: es Spring Boot quien lo invoca al recibir la petición
+— la inversión de control, vista como flujo de llamadas.
+
 ## 🧭 Explicación paso a paso
 
 1. En `SinFrameworkDemo`, el propio `main` arma el mapa de rutas y decide a mano

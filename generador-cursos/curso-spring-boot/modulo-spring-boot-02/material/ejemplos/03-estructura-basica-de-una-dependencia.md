@@ -65,6 +65,15 @@ construirse sin que el otro ya exista. Esto es una **dependencia circular**, y
 ni siquiera compila con inyección por constructor (no hay forma de construir
 el primero sin el segundo, ni viceversa).
 
+```mermaid
+flowchart LR
+    SC["ServicioCitas"] --> SHM["ServicioHistorialMedico"]
+    SHM --> SC
+```
+
+El ciclo cerrado del diagrama **es** el problema: no hay ningún punto de
+entrada por donde empezar a construir ninguna de las dos clases.
+
 ## 💻 Diseño B (sin dependencia circular, aplicando buenas prácticas)
 
 ```java
@@ -94,6 +103,16 @@ una responsabilidad separada que se resuelve en otra capa (por ejemplo, un
 evento que `ServicioCitas` publica, sin llamar directamente a nada que
 dependa de él). El resultado: ninguna dependencia circular, y `ServicioCitas`
 solo depende de dos abstracciones (`RepositorioPacientes`, `Notificador`).
+
+```mermaid
+flowchart LR
+    SC["ServicioCitas"] --> RP["RepositorioPacientes"]
+    SC --> N["Notificador"]
+```
+
+Sin ciclos: todas las flechas salen de `ServicioCitas` y ninguna vuelve a
+entrar. Comparado con el diagrama del Diseño A, la diferencia visual es
+directa: un grafo con un ciclo cerrado vs. un grafo sin ciclos.
 
 ## 🧭 Explicación paso a paso
 

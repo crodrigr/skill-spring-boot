@@ -22,6 +22,50 @@ Biblioteca Universitaria: modelamos usuarios (`Estudiante`, `Docente`) que hered
 de una clase común `Usuario`, y recursos que se pueden prestar (`Libro`,
 `RecursoDigital`) implementando una interfaz común `Prestable`.
 
+## 🗺️ Diagrama: las dos jerarquías
+
+```mermaid
+classDiagram
+    class Usuario {
+        <<abstract>>
+        -String nombre
+        -String codigo
+        +getNombre() String
+        +limitePrestamosSimultaneos()* int
+    }
+    class Estudiante {
+        +limitePrestamosSimultaneos() int
+    }
+    class Docente {
+        +limitePrestamosSimultaneos() int
+    }
+    Usuario <|-- Estudiante : hereda
+    Usuario <|-- Docente : hereda
+
+    class Prestable {
+        <<interface>>
+        +calcularDiasDevolucion() int
+        +descripcion() String
+    }
+    class Libro {
+        +calcularDiasDevolucion() int
+        +descripcion() String
+    }
+    class RecursoDigital {
+        +calcularDiasDevolucion() int
+        +descripcion() String
+    }
+    Prestable <|.. Libro : implementa
+    Prestable <|.. RecursoDigital : implementa
+```
+
+`Usuario` conecta a `Estudiante` y `Docente` con una flecha de **herencia**
+(línea sólida): comparten estado y comportamiento. `Prestable` conecta a
+`Libro` y `RecursoDigital` con una flecha de **implementación** (línea
+punteada): solo comparten un contrato, sin relación de herencia entre sí. Esa
+diferencia de línea en el diagrama es, exactamente, la diferencia conceptual
+entre herencia e interfaz.
+
 ## 💻 Código — clases del dominio
 
 ```java

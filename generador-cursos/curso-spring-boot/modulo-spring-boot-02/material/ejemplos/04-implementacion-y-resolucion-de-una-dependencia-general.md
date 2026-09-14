@@ -115,6 +115,27 @@ public class ServicioRecordatorios {
 }
 ```
 
+## 🗺️ Diagrama: dos implementaciones, una resolución explícita
+
+```mermaid
+classDiagram
+    class Notificador {
+        <<interface>>
+    }
+    class NotificadorSms
+    class NotificadorEmail
+    class ServicioRecordatorios
+
+    Notificador <|.. NotificadorSms : @Qualifier("sms")
+    Notificador <|.. NotificadorEmail : @Qualifier("email")
+    ServicioRecordatorios ..> NotificadorSms : @Qualifier("sms") en el constructor
+```
+
+Sin la etiqueta `@Qualifier("sms")` en el constructor de
+`ServicioRecordatorios`, la flecha de abajo tendría dos destinos posibles
+—exactamente la ambigüedad del Paso 2—; con la etiqueta, el destino queda
+resuelto sin dudas.
+
 ## 🧭 Explicación paso a paso
 
 1. Con una sola implementación de `Notificador`, Spring resuelve

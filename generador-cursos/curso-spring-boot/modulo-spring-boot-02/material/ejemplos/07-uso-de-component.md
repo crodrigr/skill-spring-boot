@@ -51,6 +51,19 @@ public class ServicioPrestamos {
 }
 ```
 
+## 🗺️ Diagrama: `@Component` conectado igual que cualquier otro bean
+
+```mermaid
+flowchart TB
+    SP["ServicioPrestamos\n@Service"] --> RL["RepositorioLibros\n@Repository"]
+    SP --> FFV["FormateadorFechaVencimiento\n@Component"]
+```
+
+Las dos flechas que salen de `ServicioPrestamos` se dibujan exactamente
+igual: para Spring, inyectar un `@Repository` o un `@Component` es el mismo
+mecanismo técnico. Lo único que distingue a los tres recuadros es la etiqueta
+que cada uno eligió para comunicar su responsabilidad.
+
 ## 🧭 Explicación paso a paso
 
 1. `FormateadorFechaVencimiento` no tiene ninguna razón de negocio, de acceso
