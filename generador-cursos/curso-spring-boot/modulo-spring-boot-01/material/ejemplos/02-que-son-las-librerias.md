@@ -93,3 +93,51 @@ Validación con la 'librería' ValidadorIsbn:
 true
 false
 ```
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** Una librería **estática**...
+
+- **A.** Se carga en tiempo de ejecución, no en compilación.
+- **B.** Se copia dentro del ejecutable final en el momento de compilar.
+- **C.** Nunca puede usarse en un proyecto Java.
+- **D.** Siempre reduce el tamaño del ejecutable final.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. Esa es justamente la definición de librería estática;
+la A describe a una librería dinámica.
+
+</details>
+
+**2. [Selección múltiple]** Sobre `ValidadorIsbn` en este ejemplo, seleccioná
+**todas** las afirmaciones correctas.
+
+- **A.** Es `ValidadorIsbn` quien decide cuándo se ejecuta el código de `main`.
+- **B.** Es `main` quien decide cuándo llamar a `ValidadorIsbn.esValido(...)`.
+- **C.** `ValidadorIsbn` no impone ninguna estructura al resto del programa.
+- **D.** `ValidadorIsbn` administra el ciclo de vida de los objetos de la
+  aplicación.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: B, C**. La A y la D describen a un framework, no a una
+librería: una librería no controla el flujo ni administra ciclos de vida.
+
+</details>
+
+**3. [Abierta]** Más allá de que produzcan el mismo resultado, ¿qué diferencia
+concreta existe entre `esIsbnValidoManual` y usar `ValidadorIsbn.esValido(...)`?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: `esIsbnValidoManual` es lógica propia del proyecto: si otro
+proyecto de la biblioteca necesitara la misma validación, tendría que copiarla y
+mantenerla por separado. `ValidadorIsbn.esValido(...)` representa código ya
+escrito y probado por otros, reutilizable desde cualquier proyecto que lo agregue
+como dependencia, sin tener que reescribir ni mantener esa lógica.
+
+</details>

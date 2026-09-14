@@ -125,3 +125,52 @@ La elección entre Maven y Gradle es una decisión de herramienta de equipo, no 
 diseño de la aplicación: ambos terminan compilando y ejecutando el mismo
 `App.java`, con las mismas dependencias declaradas en `pom.xml` o
 `build.gradle`.
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Qué formato usa Gradle para declarar la configuración de
+build?
+
+- **A.** XML declarativo.
+- **B.** Un DSL de Groovy o Kotlin.
+- **C.** JSON.
+- **D.** YAML.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. XML declarativo es Maven; Gradle usa un DSL de
+programación (Groovy o Kotlin).
+
+</details>
+
+**2. [Selección múltiple]** Seleccioná **todas** las afirmaciones correctas
+sobre Maven y Gradle.
+
+- **A.** Maven tiene un ciclo de vida de fases fijo (`validate`, `compile`,
+  `test`, `package`, …).
+- **B.** Gradle no puede construir proyectos Spring Boot.
+- **C.** Ambos pueden compilar y ejecutar la misma clase `App.java`.
+- **D.** Un `scope test` en Maven equivale a `testImplementation` en Gradle.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: A, C, D**. La B es falsa: Gradle es tan capaz como Maven
+de construir un proyecto Spring Boot.
+
+</details>
+
+**3. [Abierta]** ¿Por qué la elección entre Maven y Gradle no cambia en nada el
+comportamiento de `App.java`?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Porque ni `pom.xml` ni `build.gradle` son código Java: son
+solo configuración de build (qué dependencias descargar, cómo compilar y
+empaquetar). El código que realmente se ejecuta —`App.java`— es idéntico en
+ambos casos; ninguna de las dos herramientas modifica ni reemplaza esa clase, solo
+la compilan y la empaquetan de formas distintas.
+
+</details>

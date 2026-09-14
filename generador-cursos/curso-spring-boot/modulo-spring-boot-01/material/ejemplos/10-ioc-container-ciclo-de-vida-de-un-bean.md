@@ -106,3 +106,55 @@ El estudiante nunca instancia `ServicioCitas` con `new`: **pide** una instancia 
 `ApplicationContext` (`contexto.getBean(...)`), o —más habitual en una aplicación
 real— simplemente declara que otro bean lo necesita como dependencia, y el
 contenedor resuelve toda esta secuencia por detrás.
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿En qué fase del ciclo de vida de un bean se ejecuta el
+método anotado `@PostConstruct`?
+
+- **A.** Instanciación.
+- **B.** Inicialización.
+- **C.** Uso.
+- **D.** Destrucción.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. `@PostConstruct` se ejecuta una sola vez, cuando el
+bean ya está construido e inyectado: es la fase de inicialización.
+
+</details>
+
+**2. [Selección múltiple]** Sobre `ApplicationContext` en este ejemplo,
+seleccioná **todas** las afirmaciones correctas.
+
+- **A.** El código cliente llama a `new ServicioCitas()` directamente.
+- **B.** `contexto.getBean(ServicioCitas.class)` pide una instancia ya
+  administrada por el contenedor.
+- **C.** `contexto.close()` dispara la ejecución de `@PreDestroy`.
+- **D.** `ConfiguracionApp` le indica al contenedor en qué paquete buscar
+  componentes.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: B, C, D**. La A es falsa: el código de
+`DemoContenedorIoC` nunca escribe `new ServicioCitas()`.
+
+</details>
+
+**3. [Abierta]** Ordená y explicá, con tus palabras, las cuatro fases del ciclo
+de vida de `ServicioCitas` que se ven reflejadas en la salida de este ejemplo.
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Primero, **instanciación**: el contenedor llama al
+constructor de `ServicioCitas`. Después, **inicialización**: se ejecuta
+`inicializar()` (anotado `@PostConstruct`), una sola vez, con el bean ya listo.
+Luego, **uso**: mientras la aplicación corre, se puede llamar a `agendar(...)`
+las veces que haga falta, sobre la misma instancia. Por último,
+**destrucción**: al cerrar el contexto, el contenedor ejecuta `liberar()`
+(anotado `@PreDestroy`) para dar oportunidad de liberar recursos.
+
+</details>

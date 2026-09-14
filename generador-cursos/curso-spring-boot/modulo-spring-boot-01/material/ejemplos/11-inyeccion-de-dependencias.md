@@ -231,3 +231,56 @@ ISBN inexistente por constructor -> false
 Las tres clases, con el mismo `RepositorioLibros`, devuelven el mismo resultado de
 negocio; la elección entre las tres no cambia **qué** responden, solo qué tan
 fácil es armarlas fuera de un contenedor Spring, como acaba de hacer `Main.java`.
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Cuál es la forma de inyección recomendada por Spring para
+una dependencia obligatoria?
+
+- **A.** Por campo.
+- **B.** Por constructor.
+- **C.** Por setter.
+- **D.** Cualquiera; las tres son igual de recomendadas.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. Por constructor es explícita, permite `final` y es la
+más fácil de instanciar en un test sin contenedor.
+
+</details>
+
+**2. [Selección múltiple]** Sobre `ServicioPrestamosCampo` en este ejemplo,
+seleccioná **todas** las afirmaciones correctas.
+
+- **A.** Puede instanciarse en `Main` con una sola línea, sin reflexión.
+- **B.** Necesita `java.lang.reflect.Field` para asignar `repositorioLibros`
+  desde `Main`.
+- **C.** Tiene un constructor que recibe `RepositorioLibros`.
+- **D.** Sus anotaciones (`@Service`, `@Autowired`) no producen ningún efecto en
+  este ejemplo, porque `Main` nunca arranca un `ApplicationContext`.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: B, D**. La A es falsa: por eso hace falta reflexión. La
+C es falsa: `ServicioPrestamosCampo` no declara ningún constructor propio.
+
+</details>
+
+**3. [Abierta]** ¿Por qué no es una contradicción que las tres clases tengan
+`@Service`/`@Autowired` y, aun así, `Main.java` las instancie con `new` (y
+reflexión), sin ningún contenedor Spring?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Porque una anotación es solo metadata: no ejecuta nada por
+sí sola, solo tiene efecto si algo la lee — normalmente, el contenedor de Spring
+al arrancar. Como en este ejemplo nunca se arranca un `ApplicationContext`, esas
+anotaciones quedan compiladas pero completamente ignoradas, y el código se
+comporta igual que si no las tuviera. Por eso la misma clase anotada funciona
+tanto administrada por Spring (en una aplicación real) como instanciada a mano
+(en `Main.java`, o en un test unitario).
+
+</details>

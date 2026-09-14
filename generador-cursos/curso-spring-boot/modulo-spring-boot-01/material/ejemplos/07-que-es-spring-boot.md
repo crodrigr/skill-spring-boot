@@ -177,3 +177,52 @@ empaqueta con seis características que eliminan configuración manual repetitiv
 —autoconfiguración, servidor embebido, inicio rápido, aptitud para microservicios,
 starters y actuadores— para que el equipo de desarrollo se concentre en la lógica
 de negocio.
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Por qué nace Spring Boot en 2014?
+
+- **A.** Para reemplazar completamente a Spring con un framework nuevo.
+- **B.** Para resolver la configuración que el propio Spring había acumulado
+  con el tiempo.
+- **C.** Porque Spring dejó de mantenerse.
+- **D.** Para eliminar la necesidad de escribir código Java.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. Spring (2003) resolvió la complejidad de J2EE, pero
+su propia configuración creció con el tiempo; Spring Boot (2014) automatiza esa
+configuración, sin reemplazar los conceptos de Spring.
+
+</details>
+
+**2. [Selección múltiple]** Seleccioná **todas** las que son características
+reales de Spring Boot.
+
+- **A.** Configuración automática.
+- **B.** Exige instalar Tomcat por separado antes de arrancar.
+- **C.** Servidor embebido.
+- **D.** *Starters* que agrupan dependencias compatibles entre sí.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: A, C, D**. La B es falsa: el servidor viene embebido,
+por eso no hace falta instalar Tomcat aparte.
+
+</details>
+
+**3. [Abierta]** Comparando el bloque "Spring clásico" con el de "Spring Boot"
+de este ejemplo, ¿qué tres pasos manuales desaparecen?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Desaparecen (1) declarar cada bean web a mano en una clase
+`@Configuration` como `WebConfig`, (2) registrar el `DispatcherServlet` en un
+`web.xml`, y (3) instalar y configurar un servidor externo (Tomcat/Jetty) por
+separado. Spring Boot los reemplaza con autoconfiguración, un starter web, y un
+servidor embebido, respectivamente.
+
+</details>

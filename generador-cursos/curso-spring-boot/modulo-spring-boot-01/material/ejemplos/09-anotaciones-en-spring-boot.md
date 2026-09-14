@@ -133,3 +133,53 @@ Ninguna de estas anotaciones ejecuta código por sí misma en el momento en que
 Java compila la clase: son leídas por Spring Boot al arrancar la aplicación, que
 decide qué hacer según cada anotación. Por eso son "metadatos": describen el
 código, y es el framework quien actúa en consecuencia.
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Qué anotación combina `@Controller` (bean web) y
+`@ResponseBody` (serializar la respuesta) automáticamente?
+
+- **A.** `@Service`.
+- **B.** `@Component`.
+- **C.** `@RestController`.
+- **D.** `@Configuration`.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: C**. `@RestController` es exactamente esa combinación,
+pensada para exponer una API.
+
+</details>
+
+**2. [Selección múltiple]** Sobre `@Autowired` en este ejemplo, seleccioná
+**todas** las afirmaciones correctas.
+
+- **A.** Es obligatorio agregarlo si la clase tiene un único constructor.
+- **B.** Le indica a Spring qué dependencia inyectar.
+- **C.** Puede usarse sobre un constructor, un setter o un campo.
+- **D.** Nunca puede aparecer junto a `@Service` en la misma clase.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: B, C**. La A es falsa (desde Spring 4.3 es opcional con
+un único constructor); la D es falsa: `ServicioPrestamos` de este mismo ejemplo
+tiene `@Service` y podría llevar `@Autowired`.
+
+</details>
+
+**3. [Abierta]** ¿Por qué se dice que una anotación es un "metadato" y no
+código que se ejecuta?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Porque escribir `@Service` sobre una clase no hace que
+pase nada en el momento de compilar ni de cargar esa clase: es solo información
+adicional adjunta al código. Esa información recién produce un efecto cuando
+algo la **lee e interpreta** — en este caso, Spring Boot al escanear el paquete
+al arrancar la aplicación, que decide entonces registrar esa clase como bean,
+mapear una ruta, etc.
+
+</details>

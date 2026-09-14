@@ -131,3 +131,57 @@ GET http://localhost:8080/citas/hoy
 → 200 OK
 → [{"paciente":"Ana Gómez","especialidad":"Cardiología"}, {"paciente":"Luis Pérez","especialidad":"Pediatría"}]
 ```
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Cuál de las siguientes **no** es una característica de un
+framework?
+
+- **A.** Escalabilidad.
+- **B.** Inversión de Control.
+- **C.** Garantiza que el programa se ejecute más rápido.
+- **D.** Minimizar código repetitivo.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: C**. Un framework no garantiza velocidad de ejecución; sus
+características son estructurales (escalabilidad, IoC, MVC, minimizar
+repetición, bases auto-gestionadas), no de rendimiento.
+
+</details>
+
+**2. [Selección múltiple]** Sobre `SinFrameworkDemo`, seleccioná **todas** las
+afirmaciones correctas.
+
+- **A.** El propio `main` decide, a través de `manejarPeticion`, qué código
+  ejecutar para cada ruta.
+- **B.** `manejarPeticion` funciona como un enrutador escrito a mano.
+- **C.** En la versión con Spring Boot, el framework invoca `citasDeHoy()` sin
+  que el desarrollador lo llame explícitamente en un `main`.
+- **D.** Un framework nunca podría resolver el mismo problema que
+  `SinFrameworkDemo`.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: A, B, C**. La D es falsa: Spring Boot resuelve
+exactamente el mismo problema, solo que invirtiendo quién llama a quién.
+
+</details>
+
+**3. [Abierta]** Con tus propias palabras, explicá qué significa que "un
+framework invierte el control", usando como referencia la diferencia entre
+`SinFrameworkDemo` y `CitasController`.
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: En `SinFrameworkDemo`, el propio programa decide, dentro
+de su `main`, cuándo y qué método ejecutar para cada ruta. En `CitasController`,
+el desarrollador no llama a `citasDeHoy()` en ningún lado: escribe el método y
+lo anota, y es Spring Boot quien decide cuándo invocarlo (al llegar una petición
+HTTP a esa ruta). El control sobre "cuándo se ejecuta mi código" pasó del
+desarrollador al framework — eso es la inversión de control.
+
+</details>

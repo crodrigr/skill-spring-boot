@@ -224,3 +224,55 @@ Con Optional, paciente inexistente (excepción explícita): No se encontró una 
 Tradicional: DatosContactoTradicional{telefono='+54 11 5555-0100', email='ana.gomez@mail.com'}
 Con record: DatosContacto[telefono=+54 11 5555-0100, email=ana.gomez@mail.com]
 ```
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Qué gana un método que devuelve `Optional<String>` en vez de
+`String`?
+
+- **A.** Se ejecuta más rápido que su versión sin `Optional`.
+- **B.** El tipo deja constancia de que el valor puede no existir.
+- **C.** Ya no puede lanzar ninguna excepción.
+- **D.** El código resultante es necesariamente más corto.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. `Optional` no cambia el rendimiento ni impide
+excepciones; su valor es hacer explícita, a nivel de tipo, la posibilidad de
+ausencia.
+
+</details>
+
+**2. [Selección múltiple]** Sobre `pacientesConfirmadosCardiologia` (la versión
+con streams), seleccioná **todas** las afirmaciones correctas.
+
+- **A.** Evita declarar una lista mutable intermedia.
+- **B.** Garantiza que el filtrado se ejecute en paralelo.
+- **C.** Permite encadenar `filter` y `map` de forma declarativa.
+- **D.** `Cita::paciente` es una forma más corta de escribir una lambda que solo
+  invoca un método existente.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: A, C, D**. La B es falsa: `.stream()` es secuencial por
+defecto; el paralelismo requeriría `.parallelStream()` explícitamente.
+
+</details>
+
+**3. [Abierta]** Comparando `DatosContactoTradicional` con el `record
+DatosContacto`, ¿qué escribió a mano la clase tradicional que el record generó
+automáticamente?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: `DatosContactoTradicional` escribe a mano los campos
+`private final`, el constructor, los *getters* (`getTelefono`, `getEmail`), y
+sobreescribe `equals`, `hashCode` y `toString`. El `record DatosContacto`
+obtiene exactamente esas mismas piezas (constructor, *getters* con el nombre del
+campo, `equals`, `hashCode`, `toString`) solo con declarar
+`record DatosContacto(String telefono, String email) {}`.
+
+</details>

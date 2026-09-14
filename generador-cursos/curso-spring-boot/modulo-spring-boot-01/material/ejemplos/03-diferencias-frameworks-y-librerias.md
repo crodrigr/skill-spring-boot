@@ -110,3 +110,54 @@ Spring Boot es un framework porque organiza la aplicación completa e invierte e
 control; una librería de validación, de conversión de JSON o de manejo de fechas
 sigue siendo una librería aunque se use **dentro** de un proyecto Spring Boot: la
 distinción depende de su rol, no del proyecto en el que aparece.
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Qué determina, según este ejemplo, si una herramienta es un
+framework o una librería?
+
+- **A.** Su tamaño en líneas de código.
+- **B.** Quién controla el flujo de ejecución.
+- **C.** Si el código tiene anotaciones.
+- **D.** El nombre del paquete donde vive.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. El criterio decisivo es la Inversión de Control:
+quién llama a quién, no el tamaño, las anotaciones ni el nombre del paquete.
+
+</details>
+
+**2. [Selección múltiple]** Sobre `CatalogoController.buscar(...)` en este
+ejemplo, seleccioná **todas** las afirmaciones correctas.
+
+- **A.** El desarrollador lo invoca explícitamente desde un `main`.
+- **B.** Spring Boot lo invoca al recibir una petición HTTP `GET`.
+- **C.** Es un ejemplo de Inversión de Control.
+- **D.** Tiene el mismo tipo de control que `ValidadorIsbn.esValido(...)`.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: B, C**. La A es falsa (a propósito, no hay `main` que lo
+llame); la D es falsa: `ValidadorIsbn` la llama el desarrollador, `buscar(...)`
+lo llama el framework — es el contraste central del ejemplo.
+
+</details>
+
+**3. [Abierta]** Una utilidad que formatea fechas se agrega como dependencia
+dentro de un proyecto Spring Boot. ¿Por qué sigue siendo una librería, y no pasa
+a ser parte del framework?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Porque la distinción depende del rol que cumple, no de en
+qué proyecto se usa. Esa utilidad de fechas sigue siendo invocada explícitamente
+por el desarrollador (`FormateadorFecha.formatear(...)`), en el punto exacto
+donde se necesita, y no impone ninguna estructura al resto del proyecto ni
+decide cuándo se ejecuta el código del desarrollador. Que conviva dentro de un
+proyecto Spring Boot no cambia quién controla el flujo cuando se la usa.
+
+</details>

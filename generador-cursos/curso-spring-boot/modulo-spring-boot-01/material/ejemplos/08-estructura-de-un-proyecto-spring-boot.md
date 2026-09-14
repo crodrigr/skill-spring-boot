@@ -117,3 +117,56 @@ Esta estructura por capas es la que los ejemplos y ejercicios de los módulos
 siguientes del curso asumen como punto de partida: controlador → servicio →
 repositorio → modelo, la misma separación de responsabilidades que promueve el
 patrón MVC mencionado en el Ejemplo 01.
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Qué contiene, por convención, el paquete `service`?
+
+- **A.** Las clases que reciben peticiones HTTP.
+- **B.** La lógica de negocio de la aplicación.
+- **C.** La configuración de `application.properties`.
+- **D.** Las entidades del dominio.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. `controller` recibe peticiones, `repository` accede a
+datos y `model` representa entidades; `service` es donde vive la regla de
+negocio.
+
+</details>
+
+**2. [Selección múltiple]** Seleccioná **todas** las afirmaciones correctas
+sobre la estructura de un proyecto Spring Boot.
+
+- **A.** `src/test/java` refleja la misma estructura de paquetes que
+  `src/main/java`.
+- **B.** `BibliotecaApiApplication.java` suele ubicarse en el paquete raíz.
+- **C.** Spring Boot exige, por especificación del lenguaje, usar los nombres
+  `controller`/`service`/`repository`.
+- **D.** Si falta `application.properties`, la aplicación igual arranca con
+  valores por defecto.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: A, B, D**. La C es falsa: esos nombres son una
+convención de la comunidad Spring, no una exigencia del compilador de Java.
+
+</details>
+
+**3. [Abierta]** ¿Por qué se dice que la separación en `controller/`,
+`service/` y `repository/` es una convención y no una obligación del
+compilador?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Porque el compilador de Java no exige ningún nombre de
+paquete en particular: compilaría igual si todas las clases estuvieran en un
+único paquete. La separación por capas es una convención adoptada por la
+comunidad Spring para organizar responsabilidades (recibir peticiones, aplicar
+reglas de negocio, acceder a datos) de forma predecible entre proyectos, no una
+regla del lenguaje.
+
+</details>

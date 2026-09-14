@@ -186,3 +186,60 @@ jerarquía `Prestable` (interfaz + polimorfismo sobre `calcularDiasDevolucion()`
 Son dos aplicaciones distintas del mismo principio: el código que usa el objeto
 (`Main`) no necesita conocer su tipo concreto, solo el tipo declarado
 (`Usuario` o `Prestable`).
+
+## ❓ Preguntas de repaso
+
+**1. [Selección]** ¿Cuándo conviene modelar una relación con una interfaz en vez
+de con herencia?
+
+- **A.** Cuando los tipos "son un" tipo más general y comparten estado, como
+  `Usuario`.
+- **B.** Cuando los tipos "pueden hacer" algo en común, sin relación de
+  herencia entre sí, como `Prestable`.
+- **C.** Nunca; en Java moderno la herencia siempre reemplaza a las interfaces.
+- **D.** Solo dentro de proyectos que usan Spring.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuesta correcta: B**. La interfaz `Prestable` conecta a `Libro` y
+`RecursoDigital`, que no comparten ningún ancestro común más allá de `Object`;
+la relación es "puede hacer", no "es un".
+
+</details>
+
+**2. [Selección múltiple]** Sobre el `Main` de este ejemplo, seleccioná
+**todas** las afirmaciones correctas.
+
+- **A.** `estudiante` y `docente` se declaran con el tipo `Usuario`, no con su
+  tipo concreto.
+- **B.** El bucle sobre `List<Prestable>` usa `instanceof` para distinguir
+  `Libro` de `RecursoDigital`.
+- **C.** Cada elemento de `List<Prestable>` ejecuta su propia versión de
+  `calcularDiasDevolucion()`.
+- **D.** `Estudiante` y `Docente` duplican los campos `nombre` y `codigo`.
+
+<details>
+<summary>🔑 Ver respuesta</summary>
+
+**Respuestas correctas: A, C**. La B es falsa: el bucle no usa `instanceof`, esa
+es justamente la ventaja del polimorfismo. La D es falsa: esos campos viven una
+sola vez, en `Usuario`.
+
+</details>
+
+**3. [Abierta]** Si `Prestable` no existiera y `Libro`/`RecursoDigital` no
+tuvieran ninguna interfaz en común, ¿qué habría que cambiar en el bucle de
+`Main` para seguir imprimiendo la descripción y los días de devolución de
+ambos?
+
+<details>
+<summary>🔑 Ver respuesta modelo</summary>
+
+**Respuesta modelo**: Sin una interfaz común, `Main` no podría declarar
+`List<Prestable>`; habría que usar listas separadas (una de `Libro`, otra de
+`RecursoDigital`) o una lista de `Object` con `instanceof` y *casts* para
+distinguir cada tipo antes de llamar al método correspondiente — perdiendo
+exactamente la ventaja de tratar ambos tipos de forma uniforme.
+
+</details>
