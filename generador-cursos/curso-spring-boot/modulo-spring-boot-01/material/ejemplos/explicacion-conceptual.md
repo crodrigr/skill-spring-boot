@@ -1,5 +1,44 @@
 # 📚 Explicación conceptual — Módulo 1
 
+## 🧠 Concepto: ¿Qué son los frameworks?
+
+Un framework es un entorno de desarrollo que da una estructura predefinida para
+construir aplicaciones profesionales, escalables, dinámicas y mantenibles.
+Incluye librerías, herramientas y utilidades pensadas para reducir el esfuerzo
+repetitivo, con el objetivo de facilitar el **desarrollo ágil de software**,
+especialmente en aplicaciones complejas que gestionan grandes volúmenes de datos
+e integraciones (como MediSalud, que combina citas, historias clínicas y
+facturación). Sus características principales son: escalabilidad, Inversión de
+Control (IoC), organización según el patrón Modelo-Vista-Controlador (MVC),
+minimización de código repetitivo, y gestión integrada de aspectos transversales
+como seguridad o acceso a datos. Los frameworks surgieron para evitar que cada
+proyecto resolviera, una y otra vez y de forma distinta, los mismos problemas de
+base de una aplicación empresarial.
+
+## 🧠 Concepto: ¿Qué son las librerías?
+
+Una librería es un conjunto de funciones y procedimientos reutilizables que
+resuelven una necesidad puntual (por ejemplo, validar un formato de ISBN), sin
+imponer ninguna estructura al resto del programa: el desarrollador la integra
+libremente, donde y cuando la necesita. Existen librerías **estáticas** (su
+código se copia dentro del ejecutable al compilar) y **dinámicas** (se cargan en
+tiempo de ejecución, lo que permite compartir memoria entre aplicaciones y
+actualizarlas sin recompilar todo el programa). En Java, una dependencia
+declarada en Maven o Gradle se distribuye como un `.jar` y se comporta,
+conceptualmente, como una librería dinámica.
+
+## 🧠 Concepto: Frameworks vs. librerías
+
+La diferencia clave es **quién controla el flujo de ejecución**. Con una
+librería, el desarrollador decide cuándo llamarla: tiene el control. Con un
+framework, el control se invierte —es el framework quien llama al código del
+desarrollador cuando corresponde (al recibir una petición HTTP, al inyectar una
+dependencia)—, lo cual es precisamente la Inversión de Control. Un framework
+también suele abarcar la aplicación completa e imponer una estructura, mientras
+que una librería resuelve una necesidad puntual y acotada. Ambos pueden convivir
+en el mismo proyecto: Spring Boot (framework) organiza toda la aplicación, y una
+librería de validación o de manejo de fechas se usa puntualmente dentro de ella.
+
 ## 🧠 Concepto: POO aplicada
 
 Una clase describe la estructura y el comportamiento común de un conjunto de
@@ -7,10 +46,10 @@ objetos; una interfaz describe **qué puede hacer** un objeto sin decir cómo lo
 La herencia reutiliza comportamiento común entre clases relacionadas (una
 `Estudiante` y un `Docente` son ambos un `Usuario`), y el polimorfismo permite
 tratar objetos de tipos distintos de forma uniforme, ejecutando en cada caso la
-versión de un método que corresponde a su tipo real. En Spring, este vocabulario no
-es teórico: el contenedor administra objetos (beans) definidos como clases, y con
-frecuencia programa contra interfaces (por ejemplo, un repositorio) para poder
-cambiar la implementación sin tocar el código que la usa.
+versión de un método que corresponde a su tipo real. En Spring, este vocabulario
+no es teórico: el contenedor administra objetos (beans) definidos como clases, y
+con frecuencia programa contra interfaces (por ejemplo, un repositorio) para
+poder cambiar la implementación sin tocar el código que la usa.
 
 ## 🧠 Concepto: Java moderno (streams, lambdas, Optional, records)
 
@@ -36,18 +75,50 @@ proyecto Spring Boot puede generarse con cualquiera de los dos; la elección no
 cambia los conceptos de Spring, solo la forma de declarar dependencias y de
 ejecutar tareas.
 
-## 🧠 Concepto: Ecosistema Spring vs Spring Boot
+## 🧠 Concepto: ¿Qué es Spring Boot? Historia y características
 
-Spring (el "Spring clásico") es un conjunto de módulos que resuelven problemas de
-una aplicación empresarial (inyección de dependencias, acceso a datos, web, etc.),
-pero requiere configurar a mano cada pieza: qué beans existen, qué versiones de
-dependencias son compatibles entre sí, y cómo desplegar la aplicación en un
-servidor. **Spring Boot** no reemplaza a Spring: lo empaqueta con **autoconfiguración**
-(detecta qué hay en el classpath y configura beans razonables por defecto),
-**starters** (dependencias agrupadas y compatibles entre sí, por ejemplo
-`spring-boot-starter-web`) y un **servidor embebido** (la aplicación se ejecuta con
-`java -jar`, sin instalar un servidor aparte). El resultado es el mismo Spring, con
-mucho menos código de configuración manual.
+Spring Boot es un framework que simplifica la creación, configuración y
+despliegue de aplicaciones Java empresariales, priorizando la convención sobre la
+configuración. Nació en 2014, después de que Spring (2003) resolviera el problema
+original de la complejidad empresarial en Java, pero generara con el tiempo su
+propio problema: una configuración cada vez más extensa a medida que los
+proyectos crecían. Spring Boot no reemplaza a Spring: lo empaqueta con seis
+características que eliminan configuración manual repetitiva: **configuración
+automática** (autoconfigura según las dependencias presentes), **incrustación de
+servidor** (Tomcat, Jetty o Undertow embebidos, sin instalar nada aparte),
+**inicio rápido** (una anotación y un método `main` alcanzan para tener una
+aplicación funcional), aptitud para **arquitecturas de microservicios**
+(servicios independientes, desplegables y escalables por separado), **gestión de
+dependencias mediante *starters*** (paquetes de dependencias ya verificadas como
+compatibles entre sí) y **monitorización con actuadores** (endpoints de
+administración y salud del sistema, listos para usar).
+
+## 🧠 Concepto: Estructura general de un proyecto Spring Boot
+
+Aunque Spring Boot no impone una única estructura, existe una convención
+ampliamente adoptada: un archivo de build (`pom.xml` o `build.gradle`) en la
+raíz, una clase principal anotada `@SpringBootApplication` con el método `main`,
+y el código organizado en paquetes por capa —`controller` (recibe peticiones
+HTTP), `service` (lógica de negocio), `repository` (acceso a datos) y `model`
+(entidades del dominio)— dentro de `src/main/java`, más la configuración en
+`src/main/resources/application.properties` y las pruebas en `src/test/java`
+reflejando el mismo paquete que el código que prueban. Esta separación en capas
+es una aplicación concreta del patrón MVC mencionado al hablar de frameworks, y
+es la base sobre la que se construyen los módulos siguientes del curso.
+
+## 🧠 Concepto: Anotaciones en Spring Boot
+
+Una anotación es un metadato que se agrega al código fuente sin afectar
+directamente su ejecución: describe la clase o el método para que una
+herramienta —en este caso, Spring Boot— decida qué hacer con ella. Las
+anotaciones son el mecanismo principal con el que Spring Boot define componentes
+(`@Component`, `@Service`, `@Repository`), expone una API
+(`@RestController`, `@GetMapping`), configura la aplicación (`@Configuration`,
+`@Bean`) y gestiona la inyección de dependencias (`@Autowired`), evitando los
+archivos de configuración extensos que exigía Spring en sus orígenes. Su uso
+reduce el código repetitivo, mejora la legibilidad (el propósito de una clase se
+entiende con solo ver sus anotaciones) y habilita una integración automática con
+el resto del ecosistema Spring.
 
 ## 🧠 Concepto: IoC Container (ApplicationContext y ciclo de vida de un bean)
 

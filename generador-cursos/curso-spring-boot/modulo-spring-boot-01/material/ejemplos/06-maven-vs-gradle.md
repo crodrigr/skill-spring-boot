@@ -1,4 +1,4 @@
-# 💡 Ejemplo 03 — Maven vs Gradle
+# 💡 Ejemplo 06 — Maven vs Gradle
 
 ## 🏥 Caso de estudio
 

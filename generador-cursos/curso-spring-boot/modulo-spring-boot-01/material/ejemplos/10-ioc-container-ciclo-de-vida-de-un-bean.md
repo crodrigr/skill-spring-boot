@@ -1,4 +1,4 @@
-# 💡 Ejemplo 05 — IoC Container: ApplicationContext y ciclo de vida de un bean
+# 💡 Ejemplo 10 — IoC Container: ApplicationContext y ciclo de vida de un bean
 
 ## 🏥 Caso de estudio
 

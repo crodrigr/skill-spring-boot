@@ -90,6 +90,43 @@ dependencies {
 **Verificación**: se revisa que la traducción use `testImplementation` (no
 `implementation`) para la dependencia con `<scope>test</scope>`.
 
+## 🟢 Básico 04 — ¿Framework o librería?
+
+**Respuesta esperada**:
+
+1. **Framework**: exige una estructura (controladores, servicios, repositorios) y
+   es la herramienta la que invoca al código del desarrollador cuando llega una
+   petición HTTP (Inversión de Control).
+2. **Librería**: resuelve una necesidad puntual (formatear una fecha) y es el
+   desarrollador quien decide cuándo llamarla; no impone ninguna estructura.
+3. **Framework**: administra el ciclo de vida completo de los objetos (creación,
+   inyección de dependencias, destrucción), invirtiendo el control sobre cuándo y
+   cómo se crean esos objetos.
+4. **Librería**: convierte JSON de forma puntual, invocada explícitamente por el
+   desarrollador en el punto exacto donde se necesita.
+
+**Explicación**: el criterio decisivo en los cuatro casos es quién controla el
+flujo de ejecución: si la herramienta llama al código del desarrollador
+(framework) o si el código del desarrollador llama a la herramienta (librería).
+
+**Verificación**: se revisa que la justificación de cada caso mencione
+explícitamente el control del flujo, no una descripción genérica de "es grande" o
+"es pequeña".
+
+## 🟢 Básico 05 — Ubicar clases en la estructura por capas
+
+**Respuesta esperada**:
+
+| Clase | Paquete | Justificación |
+|---|---|---|
+| `Libro` | `model` | Representa una entidad del dominio; no tiene lógica de negocio ni acceso a datos. |
+| `CatalogoController` | `controller` | Recibe peticiones HTTP del catálogo. |
+| `RepositorioLibros` | `repository` | Responsable de consultar los datos de los libros. |
+| `ServicioPrestamos` | `service` | Contiene la regla de negocio de si un usuario puede llevarse un libro. |
+
+**Verificación**: se revisa que cada justificación describa la responsabilidad de
+la clase (qué hace), no solo repita su nombre.
+
 ## 🟡 Intermedio 01 — Refactorizar `ServicioNotificaciones`
 
 **Solución propuesta**:
@@ -173,6 +210,57 @@ constructor, y que `servicioDescuentos` no sea `final` ni esté en el constructo
 
 **Verificación**: se revisa que el orden sea exactamente ese y que cada evento se
 asocie a la fase correcta del ciclo de vida.
+
+## 🟡 Intermedio 04 — Anotar correctamente una mini-aplicación de MediSalud
+
+**Solución propuesta**:
+
+```java
+@Repository
+public class RepositorioPacientes {
+    public Optional<Paciente> buscarPorCodigo(String codigo) { /* ... */ return Optional.empty(); }
+}
+
+@Service
+public class ServicioCitas {
+
+    private final RepositorioPacientes repositorioPacientes;
+
+    public ServicioCitas(RepositorioPacientes repositorioPacientes) {
+        this.repositorioPacientes = repositorioPacientes;
+    }
+
+    public boolean tienePacienteRegistrado(String codigo) {
+        return repositorioPacientes.buscarPorCodigo(codigo).isPresent();
+    }
+}
+
+@RestController
+public class CitasController {
+
+    private final ServicioCitas servicioCitas;
+
+    public CitasController(ServicioCitas servicioCitas) {
+        this.servicioCitas = servicioCitas;
+    }
+
+    @GetMapping("/pacientes/{codigo}/verificar")
+    public boolean verificar(@PathVariable String codigo) {
+        return servicioCitas.tienePacienteRegistrado(codigo);
+    }
+}
+```
+
+**Sobre `@Autowired`**: no hace falta agregarlo en ningún constructor. Las tres
+clases tienen un único constructor, y desde Spring 4.3 el framework lo usa
+automáticamente para inyectar las dependencias sin necesidad de la anotación
+explícita (Ejemplo 09).
+
+**Verificación**: se revisa que `RepositorioPacientes` use `@Repository` (no
+`@Component` ni `@Service`), que `ServicioCitas` use `@Service`, que
+`CitasController` use `@RestController` con `@GetMapping` y `@PathVariable`
+correctamente aplicados, y que la respuesta explique por qué no hace falta
+`@Autowired`.
 
 ## 🔴 Avanzado 01 — Combinar polimorfismo con Inyección de Dependencias
 

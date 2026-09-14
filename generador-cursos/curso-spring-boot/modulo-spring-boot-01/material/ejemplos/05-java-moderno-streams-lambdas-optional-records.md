@@ -1,4 +1,4 @@
-# 💡 Ejemplo 02 — Java moderno: streams, lambdas, Optional y records
+# 💡 Ejemplo 05 — Java moderno: streams, lambdas, Optional y records
 
 ## 🏥 Caso de estudio
 

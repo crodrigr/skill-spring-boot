@@ -1,4 +1,4 @@
-# 💡 Ejemplo 01 — POO aplicada: clases, interfaces, herencia, polimorfismo
+# 💡 Ejemplo 04 — POO aplicada: clases, interfaces, herencia, polimorfismo
 
 ## 🏥📚 Caso de estudio
 

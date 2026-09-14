@@ -1,6 +1,42 @@
 # ❓ Quiz 01 — Fundamentos de Java y Ecosistema Spring
 
-**1. [Selección múltiple]** ¿Cuál es la diferencia principal entre una clase
+**1. [Selección múltiple]** ¿Cuál de las siguientes es una característica de un
+framework?
+
+A. Nunca impone ninguna estructura al proyecto.
+B. Ofrece una estructura predefinida (por ejemplo, Inversión de Control o el patrón Modelo-Vista-Controlador) para reducir el código repetitivo y facilitar el desarrollo ágil.
+C. Solo sirve para hacer cálculos matemáticos.
+D. Debe reescribirse desde cero en cada proyecto nuevo.
+
+_RA: RA-10_
+
+---
+
+**2. [Identificación]** Una librería **dinámica** (*shared library*), a diferencia
+de una librería estática, ¿qué hace?
+
+A. Se copia dentro del ejecutable en el momento de compilar.
+B. Se carga en tiempo de ejecución, lo que permite compartir memoria entre aplicaciones y actualizarla sin recompilar todo el programa.
+C. No puede usarse en proyectos Java.
+D. Siempre aumenta el tamaño del ejecutable final.
+
+_RA: RA-11_
+
+---
+
+**3. [Selección múltiple]** ¿Cuál es la diferencia clave entre un framework y una
+librería?
+
+A. Las librerías siempre ocupan más espacio en disco que los frameworks.
+B. Con una librería, el desarrollador decide cuándo llamarla; con un framework, es el framework quien llama al código del desarrollador (Inversión de Control).
+C. Los frameworks no pueden usar ninguna librería en su interior.
+D. No hay ninguna diferencia real entre ambos conceptos.
+
+_RA: RA-12_
+
+---
+
+**4. [Selección múltiple]** ¿Cuál es la diferencia principal entre una clase
 abstracta como `Usuario` y una interfaz como `Prestable`?
 
 A. No hay ninguna diferencia real; son intercambiables.
@@ -12,7 +48,7 @@ _RA: RA-1_
 
 ---
 
-**2. [Identificación]** Dada una lista de `Prestable` (`Libro`, `RecursoDigital`) y
+**5. [Identificación]** Dada una lista de `Prestable` (`Libro`, `RecursoDigital`) y
 un bucle que llama a `recurso.calcularDiasDevolucion()` en cada elemento, ¿qué
 principio de POO permite que ese mismo código funcione para ambos tipos sin usar
 `instanceof`?
@@ -26,7 +62,7 @@ _RA: RA-1_
 
 ---
 
-**3. [Selección múltiple]** ¿Qué logra reescribir un bucle `for` que filtra y
+**6. [Selección múltiple]** ¿Qué logra reescribir un bucle `for` que filtra y
 transforma una lista usando `stream().filter(...).map(...)`?
 
 A. Ejecuta el código más rápido siempre, sin excepción.
@@ -38,7 +74,7 @@ _RA: RA-2_
 
 ---
 
-**4. [Identificación]** Un método devuelve `Optional<Medico>` en vez de
+**7. [Identificación]** Un método devuelve `Optional<Medico>` en vez de
 `Medico`. ¿Qué gana el código que lo consume?
 
 A. Nada distinto; `Optional` es solo una forma más larga de escribir lo mismo.
@@ -50,7 +86,19 @@ _RA: RA-3_
 
 ---
 
-**5. [Selección múltiple]** ¿Cuál de estas afirmaciones describe correctamente la
+**8. [Identificación]** ¿Qué obtiene automáticamente una clase declarada como
+`record` en Java?
+
+A. Nada distinto de una clase normal; es solo una forma más corta de escribir lo mismo.
+B. Constructor, *getters*, `equals`, `hashCode` y `toString` generados automáticamente, con inmutabilidad por diseño.
+C. La posibilidad de heredar de varias clases a la vez.
+D. Un método `main` generado automáticamente.
+
+_RA: RA-4_
+
+---
+
+**9. [Selección múltiple]** ¿Cuál de estas afirmaciones describe correctamente la
 diferencia entre Maven y Gradle?
 
 A. Gradle es una versión más nueva de Maven que hace exactamente lo mismo, sin ninguna diferencia real.
@@ -62,7 +110,7 @@ _RA: RA-5_
 
 ---
 
-**6. [Selección múltiple]** ¿Qué resuelve principalmente Spring Boot respecto de
+**10. [Selección múltiple]** ¿Qué resuelve principalmente Spring Boot respecto de
 Spring "clásico"?
 
 A. Reemplaza los conceptos de Spring (IoC, DI, beans) por otros nuevos e incompatibles.
@@ -74,7 +122,31 @@ _RA: RA-6_
 
 ---
 
-**7. [Identificación]** ¿Qué es un "bean" en el contexto del contenedor IoC de
+**11. [Identificación]** En la convención de un proyecto Spring Boot organizado
+por capas, ¿qué contiene el paquete `repository`?
+
+A. Las clases que reciben peticiones HTTP.
+B. Las clases o interfaces responsables de acceder a los datos.
+C. La configuración de `application.properties`.
+D. Las pruebas automatizadas del proyecto.
+
+_RA: RA-13_
+
+---
+
+**12. [Identificación]** ¿Qué logra anotar una clase con `@RestController` y un
+método con `@GetMapping("/catalogo")`?
+
+A. Nada, hasta que se escriba código adicional para registrar la ruta manualmente.
+B. Que Spring Boot invoque ese método automáticamente cuando llegue una petición HTTP `GET` a `/catalogo`, devolviendo el resultado serializado en la respuesta.
+C. Que el método se ejecute una sola vez, apenas arranca la aplicación.
+D. Que la clase se convierta en una librería reutilizable en otros proyectos.
+
+_RA: RA-14_
+
+---
+
+**13. [Identificación]** ¿Qué es un "bean" en el contexto del contenedor IoC de
 Spring?
 
 A. Cualquier variable local declarada dentro de un método.
@@ -86,7 +158,7 @@ _RA: RA-7_
 
 ---
 
-**8. [Identificación]** Ordená correctamente las fases del ciclo de vida de un
+**14. [Identificación]** Ordená correctamente las fases del ciclo de vida de un
 bean: (I) inicialización (`@PostConstruct`), (II) instanciación, (III)
 destrucción (`@PreDestroy`), (IV) inyección de dependencias.
 
@@ -99,7 +171,7 @@ _RA: RA-7_
 
 ---
 
-**9. [Selección múltiple]** ¿Por qué se prefiere la Inyección de Dependencias por
+**15. [Selección múltiple]** ¿Por qué se prefiere la Inyección de Dependencias por
 constructor frente a la inyección por campo para una dependencia obligatoria?
 
 A. Porque por campo es imposible de escribir en Java.
@@ -111,7 +183,7 @@ _RA: RA-8_
 
 ---
 
-**10. [Identificación]** Una clase crea sus dependencias así:
+**16. [Identificación]** Una clase crea sus dependencias así:
 `private ClienteEmail clienteEmail = new ClienteEmailSmtp();` dentro de su cuerpo.
 ¿Qué problema concreto genera esto para escribir un test unitario de esa clase?
 

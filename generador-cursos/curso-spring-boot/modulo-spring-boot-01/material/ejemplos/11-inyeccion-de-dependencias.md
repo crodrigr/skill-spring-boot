@@ -1,4 +1,4 @@
-# 💡 Ejemplo 06 — Inyección de Dependencias: constructor, setter y campo
+# 💡 Ejemplo 11 — Inyección de Dependencias: constructor, setter y campo
 
 ## 📚 Caso de estudio
 
