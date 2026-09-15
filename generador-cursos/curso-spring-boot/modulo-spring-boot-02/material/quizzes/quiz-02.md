@@ -55,10 +55,14 @@ _RA: RA-2_
 
 ---
 
-**3. [Selección múltiple]** "Tenés dos clases anotadas `@Component` que
-implementan la misma interfaz `Notificador`, y una tercera clase que la recibe
-por constructor sin ninguna anotación adicional. Seleccioná **todas** las
-afirmaciones correctas."
+**3. [Selección múltiple]** En este escenario:
+
+- Tenés dos clases anotadas `@Component` que implementan la misma interfaz
+  `Notificador`.
+- Una tercera clase recibe `Notificador` por constructor, sin ninguna
+  anotación adicional.
+
+**Pregunta**: Seleccioná **todas** las afirmaciones correctas.
 
 - **A.** La aplicación arranca sin problemas; Spring inyecta la primera que encuentra.
 - **B.** La aplicación falla al arrancar con un error de "no qualifying bean".
@@ -76,9 +80,11 @@ ambigüedad sin necesidad de eliminar ninguna implementación.
 
 </details>
 
-**4. [Abierta]** "Contame qué error concreto verías al arrancar una aplicación
-Spring si tenés dos `@Component` implementando la misma interfaz y ningún
-`@Qualifier`, y cómo lo solucionarías."
+**4. [Abierta]** Tenés dos `@Component` que implementan la misma interfaz, y
+ningún `@Qualifier`.
+
+**Pregunta**: ¿Qué error concreto verías al arrancar la aplicación Spring, y
+cómo lo solucionarías?
 
 _RA: RA-3, RA-9_
 
@@ -215,9 +221,15 @@ pero distintos.
 
 ---
 
-**11. [Selección]** Ordená correctamente las fases del ciclo de vida de un
-bean: (I) inicialización, (II) instanciación, (III) configuración, (IV) uso,
-(V) destrucción.
+**11. [Selección]** Un bean pasa por estas cinco fases, en algún orden:
+
+- (I) inicialización.
+- (II) instanciación.
+- (III) configuración.
+- (IV) uso.
+- (V) destrucción.
+
+**Pregunta**: ¿Cuál es el orden correcto?
 
 - **A.** II, III, I, IV, V.
 - **B.** II, I, III, IV, V.
@@ -234,11 +246,13 @@ _RA: RA-11_
 
 </details>
 
-**12. [Abierta]** "En una entrevista te muestran una clase sin ninguna
-anotación de Spring y te preguntan: ¿qué anotarías para que el contenedor la
-registre como bean, sin que encaje en ninguna capa de negocio, datos o web
-específica? ¿Y qué pasaría si igual le agregás `@Service` en vez de esa
-anotación?"
+**12. [Abierta]** En una entrevista te muestran una clase:
+
+- No tiene ninguna anotación de Spring.
+- No encaja en ninguna capa de negocio, datos o web específica.
+
+**Pregunta**: ¿Qué anotarías para que el contenedor la registre como bean? ¿Y
+qué pasaría si igual le agregás `@Service` en vez de esa anotación?
 
 _RA: RA-12_
 

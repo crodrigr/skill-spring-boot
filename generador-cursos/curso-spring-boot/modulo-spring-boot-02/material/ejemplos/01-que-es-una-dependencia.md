@@ -219,9 +219,13 @@ decidir cuál usar: eso se ve en detalle, con un ejemplo completo, en el bloque
 
 ## ❓ Preguntas de repaso
 
-**1. [Selección]** `A` usa un método de `B`, y `B` usa un método de `C`. `A`
-nunca menciona a `C` en su código. ¿Qué tipo de dependencia tiene `A` respecto
-de `C`?
+**1. [Selección]** En este escenario:
+
+- `A` usa un método de `B`.
+- `B` usa un método de `C`.
+- `A` **nunca** menciona a `C` en su código.
+
+**Pregunta**: ¿Qué tipo de dependencia tiene `A` respecto de `C`?
 
 - **A.** Directa.
 - **B.** Transitiva.

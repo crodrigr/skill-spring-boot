@@ -82,8 +82,12 @@ librería).
 
 ---
 
-**4. [Selección]** "Tengo una clase abstracta `Usuario` y una interfaz
-`Prestable`. ¿Cuál es la diferencia principal entre ambas?"
+**4. [Selección]** En una entrevista te muestran esto:
+
+- Una clase abstracta `Usuario`.
+- Una interfaz `Prestable`.
+
+**Pregunta**: ¿Cuál es la diferencia principal entre ambas?
 
 - **A.** No hay ninguna diferencia real; son intercambiables.
 - **B.** Una clase abstracta puede compartir estado y comportamiento común entre subclases relacionadas; una interfaz solo declara qué puede hacer un tipo, sin relación de herencia entre las implementaciones.
@@ -105,10 +109,14 @@ relación de herencia entre quienes la implementan.
 
 ---
 
-**5. [Abierta]** "Tenés una lista de objetos `Prestable` que en realidad son
-`Libro` y `RecursoDigital`. Te piden escribir un método que sume los días de
-devolución de todos, **sin usar `instanceof` ni *casts***. ¿Cómo lo resolverías y
-qué principio de POO estás aplicando?"
+**5. [Abierta]** Te plantean este problema:
+
+- Tenés una lista de objetos `Prestable`, que en realidad son `Libro` y
+  `RecursoDigital`.
+- Te piden escribir un método que sume los días de devolución de todos.
+- **Restricción**: sin usar `instanceof` ni *casts*.
+
+**Pregunta**: ¿Cómo lo resolverías, y qué principio de POO estás aplicando?
 
 _RA: RA-1_
 
@@ -224,8 +232,15 @@ Groovy/Kotlin).
 
 ---
 
-**10. [Abierta]** "Contame qué es Spring Boot, de dónde viene, y qué problema
-resuelve respecto a Spring 'clásico'. Mencioná al menos tres características."
+**10. [Abierta]** En una entrevista te piden que le cuentes sobre Spring Boot.
+Tu respuesta debería cubrir:
+
+- Qué es Spring Boot.
+- De dónde viene (su historia).
+- Qué problema resuelve respecto a Spring "clásico".
+- Al menos tres de sus características.
+
+**Pregunta**: Contáselo.
 
 _RA: RA-6_
 
@@ -331,9 +346,14 @@ Dependencias.
 
 ---
 
-**14. [Selección]** "Ordená correctamente las fases del ciclo de vida de un bean:
-(I) inicialización (`@PostConstruct`), (II) instanciación, (III) destrucción
-(`@PreDestroy`), (IV) inyección de dependencias."
+**14. [Selección]** Un bean pasa por estas cuatro fases, en algún orden:
+
+- (I) inicialización (`@PostConstruct`).
+- (II) instanciación.
+- (III) destrucción (`@PreDestroy`).
+- (IV) inyección de dependencias.
+
+**Pregunta**: ¿Cuál es el orden correcto?
 
 - **A.** II, IV, I, III.
 - **B.** I, II, III, IV.
