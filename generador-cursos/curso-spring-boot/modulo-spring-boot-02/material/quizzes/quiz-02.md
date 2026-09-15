@@ -7,9 +7,15 @@ cuenta y después abrí "Ver respuesta" para comparar.
 
 ---
 
-**1. [Abierta]** "Tenés tres clases: `A` usa un método de `B`, y `B` usa un
-método de `C`. `A` nunca menciona a `C` en su código. Contame qué tipo de
-dependencia tiene `A` respecto de `B`, y cuál respecto de `C`."
+**1. [Abierta]** En una entrevista técnica te plantean esta situación:
+
+- Tenés tres clases: `A`, `B` y `C`.
+- `A` usa un método de `B`.
+- `B` usa un método de `C`.
+- `A` **nunca** menciona a `C` en su código.
+
+**Pregunta**: ¿Qué tipo de dependencia tiene `A` respecto de `B`? ¿Y respecto
+de `C`?
 
 _RA: RA-1_
 
