@@ -10,9 +10,79 @@ contenedor IoC lo resuelva.
 
 ## 💻 Código o contexto de partida
 
-Partís de las mismas cuatro clases del Desafío 01 del Módulo 1 (podés
-copiarlas de `curso-spring-boot/modulo-spring-boot-01/material/ejercicios/desafio-01.md`
-o de su solución), y agregás una quinta:
+Partís de las mismas cuatro clases del Desafío 01 del Módulo 1, ya
+completamente implementadas (tal como quedaron en el Ejemplo 01 de este
+módulo), y agregás una quinta:
+
+<details>
+<summary>📄 Ver código completo de <code>Paciente.java</code>, <code>RepositorioPacientes.java</code>, <code>RepositorioPacientesEnMemoria.java</code>, <code>ServicioNotificaciones.java</code>, <code>ServicioCitas.java</code> y <code>ControladorCitas.java</code> (reutilizados del Ejemplo 01 de este módulo, resolución del Desafío 01 del Módulo 1)</summary>
+
+```java
+public record Paciente(String codigo, String nombre) {}
+
+public interface RepositorioPacientes {
+    Optional<Paciente> buscarPorCodigo(String codigo);
+}
+
+public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
+    private final Map<String, Paciente> pacientes = Map.of(
+            "P-001", new Paciente("P-001", "Ana Gómez")
+    );
+
+    @Override
+    public Optional<Paciente> buscarPorCodigo(String codigo) {
+        return Optional.ofNullable(pacientes.get(codigo));
+    }
+}
+
+public class ServicioNotificaciones {
+
+    private final RepositorioPacientes repositorioPacientes;
+
+    public ServicioNotificaciones(RepositorioPacientes repositorioPacientes) {
+        this.repositorioPacientes = repositorioPacientes;
+    }
+
+    public void avisarCitaProxima(String codigoPaciente) {
+        Paciente paciente = repositorioPacientes.buscarPorCodigo(codigoPaciente)
+                .orElseThrow();
+        System.out.println("Avisando a " + paciente.nombre() + " sobre su cita próxima.");
+    }
+}
+
+public class ServicioCitas {
+
+    private final RepositorioPacientes repositorioPacientes;
+    private final ServicioNotificaciones servicioNotificaciones;
+
+    public ServicioCitas(RepositorioPacientes repositorioPacientes,
+                          ServicioNotificaciones servicioNotificaciones) {
+        this.repositorioPacientes = repositorioPacientes;
+        this.servicioNotificaciones = servicioNotificaciones;
+    }
+
+    public void agendar(String codigoPaciente) {
+        repositorioPacientes.buscarPorCodigo(codigoPaciente).orElseThrow();
+        System.out.println("Cita agendada para " + codigoPaciente);
+        servicioNotificaciones.avisarCitaProxima(codigoPaciente);
+    }
+}
+
+public class ControladorCitas {
+
+    private final ServicioCitas servicioCitas;
+
+    public ControladorCitas(ServicioCitas servicioCitas) {
+        this.servicioCitas = servicioCitas;
+    }
+
+    public void manejarSolicitudAgendar(String codigoPaciente) {
+        servicioCitas.agendar(codigoPaciente);
+    }
+}
+```
+
+</details>
 
 ```java
 public class ServicioResumenCitas {

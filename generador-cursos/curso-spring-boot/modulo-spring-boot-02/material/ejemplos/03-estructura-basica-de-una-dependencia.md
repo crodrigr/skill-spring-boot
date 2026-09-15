@@ -95,6 +95,51 @@ se vería su carpeta en VS Code:
     └── 📄 Main.java                          (nuevo — ▶️ clase con el main que se ejecuta)
 ```
 
+<details>
+<summary>📄 Ver código completo de <code>Paciente.java</code>, <code>RepositorioPacientes.java</code> y <code>RepositorioPacientesEnMemoria.java</code> (reutilizados del Ejemplo 01 de este módulo) y de <code>NotificadorSms.java</code> (reutilizado del Módulo 1, Ejercicio Avanzado 01)</summary>
+
+### 💻 Archivo: `Paciente.java`
+
+```java
+public record Paciente(String codigo, String nombre) {}
+```
+
+### 💻 Archivo: `RepositorioPacientes.java`
+
+```java
+public interface RepositorioPacientes {
+    Optional<Paciente> buscarPorCodigo(String codigo);
+}
+```
+
+### 💻 Archivo: `RepositorioPacientesEnMemoria.java`
+
+```java
+public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
+    private final Map<String, Paciente> pacientes = Map.of(
+            "P-001", new Paciente("P-001", "Ana Gómez")
+    );
+
+    @Override
+    public Optional<Paciente> buscarPorCodigo(String codigo) {
+        return Optional.ofNullable(pacientes.get(codigo));
+    }
+}
+```
+
+### 💻 Archivo: `NotificadorSms.java`
+
+```java
+public class NotificadorSms implements Notificador {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("SMS a " + destinatario + ": " + mensaje);
+    }
+}
+```
+
+</details>
+
 ### 💻 Archivo: `Notificador.java`
 
 ```java

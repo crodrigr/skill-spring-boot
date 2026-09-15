@@ -24,11 +24,26 @@ que permite observar la fase de configuración.
 ```text
 📁 ejemplo-06-ciclo-de-vida
 └── 📁 src
+    ├── 📄 Paciente.java                      (record — del Módulo 1, reutilizado)
     ├── 📄 RepositorioPacientes.java          (interfaz — del Ejemplo 01 de este módulo)
     ├── 📄 RepositorioPacientesEnMemoria.java (modificada, con println en el constructor)
     ├── 📄 ServicioCitas.java                 (extendida respecto del Módulo 1, Ejemplo 10)
     ├── 📄 ConfiguracionApp.java
     └── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `Paciente.java`
+
+```java
+public record Paciente(String codigo, String nombre) {}
+```
+
+## 💻 Archivo: `RepositorioPacientes.java` (interfaz — del Ejemplo 01 de este módulo)
+
+```java
+public interface RepositorioPacientes {
+    Optional<Paciente> buscarPorCodigo(String codigo);
+}
 ```
 
 ## 💻 Archivo: `RepositorioPacientesEnMemoria.java`

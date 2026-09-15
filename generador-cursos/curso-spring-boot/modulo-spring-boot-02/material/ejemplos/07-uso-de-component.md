@@ -27,11 +27,26 @@ datos, ni un controlador web).
 📁 ejemplo-07-uso-de-component
 └── 📁 src
     ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
+    ├── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
     ├── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, con @Repository agregado)
     ├── 📄 FormateadorFechaVencimiento.java (nuevo — @Component)
     ├── 📄 ServicioPrestamos.java           (nuevo — @Service)
     ├── 📄 ConfiguracionApp.java
     └── 📄 Main.java                        (▶️ clase con el main que se ejecuta)
+```
+
+## 💻 Archivo: `RepositorioLibros.java` (interfaz — del Módulo 1, Ejemplo 11)
+
+```java
+public interface RepositorioLibros {
+    Optional<Libro> buscarPorIsbn(String isbn);
+}
+```
+
+## 💻 Archivo: `Libro.java` (record — del Módulo 1, Ejemplo 11)
+
+```java
+public record Libro(String isbn, String titulo) {}
 ```
 
 ## 💻 Archivo: `FormateadorFechaVencimiento.java`

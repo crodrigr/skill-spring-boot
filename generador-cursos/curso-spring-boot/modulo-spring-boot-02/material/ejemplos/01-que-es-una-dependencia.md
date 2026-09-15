@@ -41,6 +41,12 @@ construida en el Desafío 01 del Módulo 1.
     └── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
 ```
 
+## 💻 Archivo: `Paciente.java` (record — del Módulo 1, reutilizado)
+
+```java
+public record Paciente(String codigo, String nombre) {}
+```
+
 ## 💻 Archivo: `RepositorioPacientes.java`
 
 ```java
@@ -54,7 +60,7 @@ public interface RepositorioPacientes {
 ```java
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     private final Map<String, Paciente> pacientes = Map.of(
-            "P-001", new Paciente("Ana Gómez", "P-001")
+            "P-001", new Paciente("P-001", "Ana Gómez")
     );
 
     @Override

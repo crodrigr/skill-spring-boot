@@ -40,10 +40,46 @@ vería así:
     └── 📄 Main.java                        (nuevo — ▶️ clase con el main que se ejecuta)
 ```
 
-Los primeros tres archivos ya los tenés de tu proyecto del Módulo 1 (Ejemplo
-11): se reutilizan tal cual, sin modificar una línea. Los cuatro archivos
-nuevos son los que se muestran a continuación, cada uno con el nombre exacto
-del archivo en el que iría.
+Los primeros tres archivos se reutilizan tal cual del Módulo 1 (Ejemplo 11),
+sin modificar una línea; se repiten completos abajo para que este ejemplo sea
+autocontenido, aunque no hayas resuelto ese ejercicio antes. Los cuatro
+archivos nuevos son los que se muestran a continuación, cada uno con el
+nombre exacto del archivo en el que iría.
+
+<details>
+<summary>📄 Ver código completo de <code>RepositorioLibros.java</code>, <code>Libro.java</code> y <code>RepositorioLibrosEnMemoria.java</code> (reutilizados del Módulo 1, Ejemplo 11)</summary>
+
+## 💻 Archivo: `RepositorioLibros.java`
+
+```java
+public interface RepositorioLibros {
+    Optional<Libro> buscarPorIsbn(String isbn);
+}
+```
+
+## 💻 Archivo: `Libro.java`
+
+```java
+public record Libro(String isbn, String titulo) {}
+```
+
+## 💻 Archivo: `RepositorioLibrosEnMemoria.java`
+
+```java
+public class RepositorioLibrosEnMemoria implements RepositorioLibros {
+
+    private final List<Libro> libros = List.of(
+            new Libro("978-3-16-148410-0", "Estructuras de Datos")
+    );
+
+    @Override
+    public Optional<Libro> buscarPorIsbn(String isbn) {
+        return libros.stream().filter(libro -> libro.isbn().equals(isbn)).findFirst();
+    }
+}
+```
+
+</details>
 
 ## 💻 Archivo: `ServicioPrestamosAcoplado.java`
 
