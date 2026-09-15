@@ -38,12 +38,13 @@ características de un Java Bean.
 ```text
 📁 ejemplo-05-que-es-un-java-bean
 └── 📁 src
-    ├── 📄 DatosContactoPaciente.java  (Java Bean clásico)
+    ├── 📄 DatosContactoPaciente.java  (Java Bean clásico — Java puro, sin Spring)
     ├── 📄 ServicioContacto.java       (bean administrado por Spring)
+    ├── 📄 ConfiguracionApp.java
     └── 📄 Main.java                   (▶️ clase con el main que se ejecuta)
 ```
 
-## 💻 Archivo: `DatosContactoPaciente.java`
+## 💻 Archivo: `DatosContactoPaciente.java` (Java puro, sin Spring)
 
 ```java
 public class DatosContactoPaciente implements Serializable {
@@ -69,10 +70,10 @@ public class DatosContactoPaciente implements Serializable {
 }
 ```
 
-## 💻 Archivo: `ServicioContacto.java`
+## 💻 Archivo: `ServicioContacto.java` (bean administrado por Spring)
 
 ```java
-@Component // convierte la instancia administrada por Spring en un bean del contenedor
+@Component // registra esta clase como bean en el contenedor de Spring
 public class ServicioContacto {
 
     public DatosContactoPaciente construirContacto(String telefono, String email) {
@@ -84,14 +85,28 @@ public class ServicioContacto {
 }
 ```
 
+## 💻 Archivo: `ConfiguracionApp.java`
+
+```java
+@Configuration
+@ComponentScan(basePackages = "com.medisalud")
+public class ConfiguracionApp {
+}
+```
+
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 public class Main {
     public static void main(String[] args) {
-        ServicioContacto servicioContacto = new ServicioContacto();
+        ConfigurableApplicationContext contexto =
+                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+
+        ServicioContacto servicioContacto = contexto.getBean(ServicioContacto.class);
         DatosContactoPaciente contacto = servicioContacto.construirContacto("+54 11 5555-0100", "ana@mail.com");
         System.out.println(contacto.getTelefono());
+
+        contexto.close();
     }
 }
 ```
@@ -101,12 +116,16 @@ public class Main {
 1. `DatosContactoPaciente` cumple las características de un Java Bean
    "clásico" (en el sentido original de la especificación JavaBeans): tiene
    propiedades privadas (`telefono`, `email`) expuestas mediante
-   *getters*/*setters*, e implementa `Serializable`.
+   *getters*/*setters*, e implementa `Serializable`. No tiene ninguna
+   anotación de Spring, y `Main.java` nunca la pide al contenedor: la crea
+   directamente con `new` dentro de `construirContacto(...)`.
 2. `ServicioContacto`, en cambio, es un **bean administrado por Spring**
-   (gracias a `@Component`): el contenedor lo crea y lo entrega a quien lo
-   necesite, pero no tiene propiedades de lectura/escritura como
-   `DatosContactoPaciente` — su responsabilidad es otra (construir el objeto
-   de contacto).
+   (gracias a `@Component`): en `Main.java` se arranca un
+   `AnnotationConfigApplicationContext` real, y `ServicioContacto` se obtiene
+   con `contexto.getBean(...)`, en vez de crearse con `new`. El contenedor lo
+   crea y lo entrega a quien lo necesite, pero no tiene propiedades de
+   lectura/escritura como `DatosContactoPaciente` — su responsabilidad es
+   otra (construir el objeto de contacto).
 3. Esto muestra que "Java Bean" y "bean administrado por Spring" son
    conceptos relacionados, pero no idénticos: cualquier clase puede ser un
    bean administrado por Spring (con `@Component` u otra anotación), tenga o
