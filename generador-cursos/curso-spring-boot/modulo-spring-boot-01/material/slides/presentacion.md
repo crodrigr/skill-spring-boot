@@ -1,4 +1,4 @@
-# 📘 Módulo 1 — Fundamentos de Java y Ecosistema Spring
+# 📘 Módulo 1 — Introducción a Spring Boot
 
 Spring Boot para Aplicaciones Empresariales
 

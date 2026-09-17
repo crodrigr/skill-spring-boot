@@ -1,4 +1,4 @@
-# 🔑 Clave del Quiz 01 — Fundamentos de Java y Ecosistema Spring
+# 🔑 Clave del Quiz 01 — Introducción a Spring Boot
 
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
 subsección "Soluciones" de `specs/modulo-spring-boot-01.md`).

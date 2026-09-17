@@ -1,4 +1,4 @@
-# ❓ Quiz 01 — Fundamentos de Java y Ecosistema Spring (formato entrevista técnica)
+# ❓ Quiz 01 — Introducción a Spring Boot (formato entrevista técnica)
 
 Este quiz simula las preguntas que podrías recibir en una entrevista técnica para
 un puesto de desarrollador Java/Spring Boot junior. Cada pregunta indica su tipo
