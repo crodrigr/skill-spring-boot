@@ -1,7 +1,7 @@
 # 🔑 Solución — Taller 01 (Diagnóstico de dependencias y `@Qualifier`)
 
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
-subsección "Soluciones" de `specs/modulo-spring-02.md`).
+subsección "Soluciones" de `specs/02-manejo-de-dependencias-y-java-beans.md`).
 
 ## 🌳 Árbol de archivos (entregable final)
 

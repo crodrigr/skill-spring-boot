@@ -1,7 +1,7 @@
 # 🔑 Clave del Quiz 01 — Introducción a Spring Boot
 
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
-subsección "Soluciones" de `specs/modulo-spring-01.md`).
+subsección "Soluciones" de `specs/01-introduccion-a-spring-boot.md`).
 
 Desde esta iteración, `quizzes/quiz-01.md` (formato entrevista técnica) ya incluye
 la respuesta de cada ítem oculta en un bloque `<details>` colapsado, pensada como
