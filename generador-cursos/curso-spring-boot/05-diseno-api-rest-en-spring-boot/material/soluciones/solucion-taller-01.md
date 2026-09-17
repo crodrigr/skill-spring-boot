@@ -9,17 +9,31 @@
 📁 taller-01-api-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java
-    │   ├── 📄 RepositorioPacientes.java
-    │   ├── 📄 ServicioPacientes.java
-    │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 entity
+    │   │   └── 📄 Paciente.java
+    │   ├── 📁 repository
+    │   │   └── 📄 RepositorioPacientes.java
+    │   ├── 📁 service
+    │   │   └── 📄 ServicioPacientes.java
+    │   └── 📁 controller
+    │       └── 📄 ControladorPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
-## 📄 Archivo: `Paciente.java`
+**Nota sobre paquetes**: este Taller reorganiza en paquetes por capa
+(`entity`, `repository`, `service`, `controller`) la misma arquitectura
+ya explicada en el Ejemplo 03 (Controller → Service → Repository →
+Database). Cada clase declara su `package` y solo importa explícitamente
+las clases del proyecto que vienen de otro paquete; las clases de
+Spring/Java (`@Service`, `Optional`, etc.) se omiten por brevedad, igual
+que en el resto del curso.
+
+## 📄 Archivo: `Paciente.java` (`com.medisalud.entity`)
 
 ```java
+package com.medisalud.entity;
+
 @Entity
 public class Paciente {
 
@@ -47,17 +61,26 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java`
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.repository`)
 
 ```java
+package com.medisalud.repository;
+
+import com.medisalud.entity.Paciente;
+
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java`
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.service`)
 
 ```java
+package com.medisalud.service;
+
+import com.medisalud.entity.Paciente;
+import com.medisalud.repository.RepositorioPacientes;
+
 @Service
 public class ServicioPacientes {
 
@@ -97,9 +120,14 @@ public class ServicioPacientes {
 }
 ```
 
-## 📄 Archivo: `ControladorPacientes.java`
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controller`)
 
 ```java
+package com.medisalud.controller;
+
+import com.medisalud.entity.Paciente;
+import com.medisalud.service.ServicioPacientes;
+
 @RestController
 @RequestMapping("/pacientes")
 public class ControladorPacientes {

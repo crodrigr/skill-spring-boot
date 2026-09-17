@@ -10,10 +10,14 @@
 ├── 📄 pom.xml
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java
-    │   ├── 📄 RepositorioPacientes.java
-    │   ├── 📄 ServicioPacientes.java
-    │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 entity
+    │   │   └── 📄 Paciente.java
+    │   ├── 📁 repository
+    │   │   └── 📄 RepositorioPacientes.java
+    │   ├── 📁 service
+    │   │   └── 📄 ServicioPacientes.java
+    │   └── 📁 controller
+    │       └── 📄 ControladorPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
@@ -28,9 +32,11 @@
 </dependency>
 ```
 
-## 📄 Archivo: `Paciente.java` (Módulo 5, sin cambios)
+## 📄 Archivo: `Paciente.java` (`com.medisalud.entity`, Módulo 5, sin cambios)
 
 ```java
+package com.medisalud.entity;
+
 @Entity
 public class Paciente {
 
@@ -58,17 +64,26 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java` (Módulo 5, sin cambios)
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.repository`, Módulo 5, sin cambios)
 
 ```java
+package com.medisalud.repository;
+
+import com.medisalud.entity.Paciente;
+
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java` (Módulo 5, sin cambios)
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.service`, Módulo 5, sin cambios)
 
 ```java
+package com.medisalud.service;
+
+import com.medisalud.entity.Paciente;
+import com.medisalud.repository.RepositorioPacientes;
+
 @Service
 public class ServicioPacientes {
 
@@ -108,9 +123,14 @@ public class ServicioPacientes {
 }
 ```
 
-## 📄 Archivo: `ControladorPacientes.java` (Módulo 5, sin cambios)
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controller`, Módulo 5, sin cambios)
 
 ```java
+package com.medisalud.controller;
+
+import com.medisalud.entity.Paciente;
+import com.medisalud.service.ServicioPacientes;
+
 @RestController
 @RequestMapping("/pacientes")
 public class ControladorPacientes {
@@ -169,6 +189,11 @@ springdoc.swagger-ui.enabled=true
 springdoc.swagger-ui.path=/doc/swagger-ui.html
 springdoc.packages-to-scan=com.medisalud
 ```
+
+**Nota**: `springdoc.packages-to-scan=com.medisalud` alcanza para
+documentar `ControladorPacientes`, aunque viva en el subpaquete
+`com.medisalud.controller` — springdoc escanea recursivamente todos los
+subpaquetes del paquete indicado.
 
 ## 🌐 Documentación final visible en Swagger UI
 

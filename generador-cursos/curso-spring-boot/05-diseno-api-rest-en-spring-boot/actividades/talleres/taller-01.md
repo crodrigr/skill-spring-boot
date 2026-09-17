@@ -13,19 +13,33 @@ contra H2 (Módulo 3/4). Le falta exponerla como API REST, siguiendo
 exactamente el mismo patrón que `ServicioLibros`/`ControladorLibros`
 (Ejemplos 05-07 de este módulo), pero aplicado a `Paciente`.
 
+Este Taller es, además, el primero del curso en organizar sus clases en
+paquetes separados por capa (`entity`, `repository`, `service`,
+`controller`), llevando a la práctica la arquitectura del Ejemplo 03
+(Controller → Service → Repository → Database) directamente a la
+estructura de carpetas del proyecto — no solo como un concepto, sino como
+paquetes Java reales. De acá en adelante, todo el material del curso
+sigue esta misma organización.
+
 ## 🪜 Pasos
 
-1. **Crear la clase de servicio**: escribí `ServicioPacientes`
-   (`@Service`), inyectando `RepositorioPacientes` por constructor, con
-   los cinco métodos de negocio (`listarTodos`, `buscarPorId`, `crear`,
-   `actualizar`, `eliminar`) siguiendo el mismo patrón de `ServicioLibros`.
-2. **Crear el controlador REST**: escribí `ControladorPacientes`
-   (`@RestController`, `@RequestMapping("/pacientes")`), inyectando
-   `ServicioPacientes`, con los cinco endpoints CRUD: `GET /pacientes`,
-   `GET /pacientes/{id}`, `POST /pacientes`, `PUT /pacientes/{id}` y
-   `DELETE /pacientes/{id}`, devolviendo el código de estado correcto en
-   cada caso (`200`, `201`, `404`).
-3. **Probar en Insomnia**: documentá, para cada uno de los cinco
+1. **Reorganizar en paquetes por capa**: movés `Paciente` (Módulo 3/4) al
+   paquete `com.medisalud.entity`, y `RepositorioPacientes` al paquete
+   `com.medisalud.repository` — ningún código de esas dos clases cambia,
+   solo su ubicación y su línea `package`.
+2. **Crear la clase de servicio**: escribí `ServicioPacientes`
+   (`@Service`) en el paquete `com.medisalud.service`, inyectando
+   `RepositorioPacientes` por constructor, con los cinco métodos de
+   negocio (`listarTodos`, `buscarPorId`, `crear`, `actualizar`,
+   `eliminar`) siguiendo el mismo patrón de `ServicioLibros`.
+3. **Crear el controlador REST**: escribí `ControladorPacientes`
+   (`@RestController`, `@RequestMapping("/pacientes")`) en el paquete
+   `com.medisalud.controller`, inyectando `ServicioPacientes`, con los
+   cinco endpoints CRUD: `GET /pacientes`, `GET /pacientes/{id}`, `POST
+   /pacientes`, `PUT /pacientes/{id}` y `DELETE /pacientes/{id}`,
+   devolviendo el código de estado correcto en cada caso (`200`, `201`,
+   `404`).
+4. **Probar en Insomnia**: documentá, para cada uno de los cinco
    endpoints, la solicitud y la respuesta obtenida (método, URL, cuerpo
    si aplica, código de estado, cuerpo de la respuesta), incluyendo al
    menos un caso de error `404` (por ejemplo, buscar un paciente después
@@ -33,10 +47,17 @@ exactamente el mismo patrón que `ServicioLibros`/`ControladorLibros`
 
 ## 💡 Ejemplo resuelto (parcial)
 
-Así se ve el método `actualizar` de `ServicioPacientes`, para que uses el
-mismo estilo en el resto del entregable:
+Así se ve el encabezado y el método `actualizar` de `ServicioPacientes`,
+para que uses el mismo estilo en el resto del entregable:
 
 ```java
+package com.medisalud.service;
+
+import com.medisalud.entity.Paciente;
+import com.medisalud.repository.RepositorioPacientes;
+
+// ...
+
 public Optional<Paciente> actualizar(Long id, Paciente datos) {
     return repositorioPacientes.findById(id)
             .map(paciente -> {
@@ -45,6 +66,12 @@ public Optional<Paciente> actualizar(Long id, Paciente datos) {
             });
 }
 ```
+
+**Nota sobre paquetes**: cada clase declara su propio `package` según la
+capa a la que pertenece, y solo importa explícitamente las clases del
+proyecto que vienen de **otro** paquete (por ejemplo, `Paciente` desde
+`service`); las clases de Spring/Java (`@Service`, `Optional`, etc.) se
+omiten de estos fragmentos por brevedad, igual que en el resto del curso.
 
 **Nota**: `Paciente` necesita un método `setNombre(String nombre)` que el
 Módulo 3/4 no le agregó (nunca hizo falta actualizarla); agregalo vos como
@@ -61,10 +88,14 @@ resolverlo primero por tu cuenta.
 📁 taller-01-api-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java
-    │   ├── 📄 RepositorioPacientes.java
-    │   ├── 📄 ServicioPacientes.java
-    │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 entity
+    │   │   └── 📄 Paciente.java
+    │   ├── 📁 repository
+    │   │   └── 📄 RepositorioPacientes.java
+    │   ├── 📁 service
+    │   │   └── 📄 ServicioPacientes.java
+    │   └── 📁 controller
+    │       └── 📄 ControladorPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
@@ -82,6 +113,11 @@ resolverlo primero por tu cuenta.
 
 ## 📏 Criterios de evaluación
 
+- `Paciente`, `RepositorioPacientes`, `ServicioPacientes` y
+  `ControladorPacientes` viven cada una en su paquete correspondiente
+  (`entity`, `repository`, `service`, `controller`), con la línea
+  `package` correcta y los `import` necesarios hacia las clases de otro
+  paquete del proyecto.
 - `ServicioPacientes` y `ControladorPacientes` siguen exactamente el
   mismo patrón de capas que `ServicioLibros`/`ControladorLibros`.
 - Los cinco endpoints devuelven el código de estado correcto en cada

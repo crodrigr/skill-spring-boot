@@ -23,7 +23,10 @@ y la configuración de springdoc-openapi.
    `springdoc.api-docs.enabled=true`, `springdoc.swagger-ui.enabled=true`,
    `springdoc.swagger-ui.path=/doc/swagger-ui.html` y
    `springdoc.packages-to-scan=com.medisalud`, siguiendo el mismo patrón
-   del Ejemplo 05.
+   del Ejemplo 05. Alcanza con apuntar al paquete raíz `com.medisalud`,
+   aunque `ControladorPacientes` viva en el subpaquete
+   `com.medisalud.controller`: springdoc escanea recursivamente todos los
+   subpaquetes.
 3. **Verificar en Swagger UI**: accedé a
    `http://localhost:8080/doc/swagger-ui.html` y confirmá que los cinco
    endpoints de `ControladorPacientes` (`GET /pacientes`, `GET
@@ -55,10 +58,14 @@ intentá resolverlo primero por tu cuenta.
 📁 taller-01-documentacion-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java
-    │   ├── 📄 RepositorioPacientes.java
-    │   ├── 📄 ServicioPacientes.java
-    │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 entity
+    │   │   └── 📄 Paciente.java
+    │   ├── 📁 repository
+    │   │   └── 📄 RepositorioPacientes.java
+    │   ├── 📁 service
+    │   │   └── 📄 ServicioPacientes.java
+    │   └── 📁 controller
+    │       └── 📄 ControladorPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
