@@ -1,7 +1,7 @@
 # 🔑 Solución — Taller 01 (Modelar MediSalud e identificar acoplamientos)
 
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
-subsección "Soluciones" de `specs/modulo-spring-boot-01.md`).
+subsección "Soluciones" de `specs/modulo-spring-01.md`).
 
 En Java, cada clase o interfaz pública vive en su propio archivo `.java` con su
 mismo nombre. Por eso esta solución se entrega como un pequeño proyecto de

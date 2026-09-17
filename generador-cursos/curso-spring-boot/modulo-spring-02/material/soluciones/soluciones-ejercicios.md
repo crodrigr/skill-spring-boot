@@ -1,7 +1,7 @@
 # 🔑 Soluciones — Ejercicios Módulo 2
 
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
-subsección "Soluciones" de `specs/modulo-spring-boot-02.md`).
+subsección "Soluciones" de `specs/modulo-spring-02.md`).
 
 ## 🟢 Básico 01 — Clasificar dependencias directas y transitivas
 

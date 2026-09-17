@@ -1,7 +1,7 @@
 # 🔑 Clave del Quiz 02 — Manejo de Dependencias y Java Beans
 
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
-subsección "Soluciones" de `specs/modulo-spring-boot-02.md`).
+subsección "Soluciones" de `specs/modulo-spring-02.md`).
 
 Desde esta iteración, `quizzes/quiz-02.md` (formato entrevista técnica) ya
 incluye la respuesta de cada ítem oculta en un bloque `<details>` colapsado.

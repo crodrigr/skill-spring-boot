@@ -1,7 +1,7 @@
 # 🔑 Soluciones — Ejercicios Módulo 1
 
 Material docente. No enlazar desde archivos de audiencia estudiante (salvo la
-subsección "Soluciones" de `specs/modulo-spring-boot-01.md`).
+subsección "Soluciones" de `specs/modulo-spring-01.md`).
 
 ## 🟢 Básico 01 — Modelar Biblioteca Universitaria con POO
 
