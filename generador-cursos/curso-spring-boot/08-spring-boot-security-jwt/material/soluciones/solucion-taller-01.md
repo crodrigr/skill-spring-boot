@@ -21,8 +21,8 @@
     │   │   ├── 📄 PacienteNoEncontradoException.java
     │   │   └── 📄 ManejadorGlobalDeExcepciones.java
     │   └── 📁 security
-    │       ├── 📁 entity/📄 Credencial.java
-    │       ├── 📁 repository/📄 RepositorioCredenciales.java
+    │       ├── 📁 entity/📄 Usuario.java
+    │       ├── 📁 repository/📄 RepositorioUsuarios.java
     │       ├── 📁 service/📄 ServicioDetallesUsuario.java
     │       ├── 📁 config/📄 ConfiguracionSeguridad.java
     │       ├── 📁 jwt/📄 UtilJwt.java
@@ -203,13 +203,13 @@ public class ManejadorGlobalDeExcepciones {
 
 </details>
 
-## 📄 Archivo: `Credencial.java` (`com.medisalud.security.entity`, nueva)
+## 📄 Archivo: `Usuario.java` (`com.medisalud.security.entity`, nueva)
 
 ```java
 package com.medisalud.security.entity;
 
 @Entity
-public class Credencial {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -222,10 +222,10 @@ public class Credencial {
 
     private String rol;
 
-    protected Credencial() {
+    protected Usuario() {
     }
 
-    public Credencial(String nombreUsuario, String contrasena, String rol) {
+    public Usuario(String nombreUsuario, String contrasena, String rol) {
         this.nombreUsuario = nombreUsuario;
         this.contrasena = contrasena;
         this.rol = rol;
@@ -238,15 +238,15 @@ public class Credencial {
 }
 ```
 
-## 📄 Archivo: `RepositorioCredenciales.java` (`com.medisalud.security.repository`, nueva)
+## 📄 Archivo: `RepositorioUsuarios.java` (`com.medisalud.security.repository`, nueva)
 
 ```java
 package com.medisalud.security.repository;
 
-import com.medisalud.security.entity.Credencial;
+import com.medisalud.security.entity.Usuario;
 
-public interface RepositorioCredenciales extends JpaRepository<Credencial, Long> {
-    Optional<Credencial> findByNombreUsuario(String nombreUsuario);
+public interface RepositorioUsuarios extends JpaRepository<Usuario, Long> {
+    Optional<Usuario> findByNombreUsuario(String nombreUsuario);
 }
 ```
 
@@ -255,27 +255,27 @@ public interface RepositorioCredenciales extends JpaRepository<Credencial, Long>
 ```java
 package com.medisalud.security.service;
 
-import com.medisalud.security.entity.Credencial;
-import com.medisalud.security.repository.RepositorioCredenciales;
+import com.medisalud.security.entity.Usuario;
+import com.medisalud.security.repository.RepositorioUsuarios;
 
 @Service
 public class ServicioDetallesUsuario implements UserDetailsService {
 
-    private final RepositorioCredenciales repositorioCredenciales;
+    private final RepositorioUsuarios repositorioUsuarios;
 
-    public ServicioDetallesUsuario(RepositorioCredenciales repositorioCredenciales) {
-        this.repositorioCredenciales = repositorioCredenciales;
+    public ServicioDetallesUsuario(RepositorioUsuarios repositorioUsuarios) {
+        this.repositorioUsuarios = repositorioUsuarios;
     }
 
     @Override
     public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
-        Credencial credencial = repositorioCredenciales.findByNombreUsuario(nombreUsuario)
+        Usuario usuario = repositorioUsuarios.findByNombreUsuario(nombreUsuario)
                 .orElseThrow(() -> new UsernameNotFoundException("No existe la cuenta " + nombreUsuario));
 
         return User.builder()
-                .username(credencial.getNombreUsuario())
-                .password(credencial.getContrasena())
-                .authorities(credencial.getRol())
+                .username(usuario.getNombreUsuario())
+                .password(usuario.getContrasena())
+                .authorities(usuario.getRol())
                 .build();
     }
 }

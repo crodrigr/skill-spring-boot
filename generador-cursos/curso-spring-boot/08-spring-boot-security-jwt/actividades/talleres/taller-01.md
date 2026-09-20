@@ -22,12 +22,12 @@ les agrega una capa de seguridad nueva, en el paquete
    `spring-boot-starter-security` al `pom.xml` del proyecto, ejecutalo, y
    confirmá con Insomnia que `GET /pacientes` ahora exige autenticación
    (usuario `user` + contraseña autogenerada en consola).
-2. **Crear `Credencial` y `RepositorioCredenciales`**
+2. **Crear `Usuario` y `RepositorioUsuarios`**
    (`com.medisalud.security.entity`/`com.medisalud.security.repository`):
    una entidad con `nombreUsuario`, `contrasena` (codificada) y `rol`, y
    su repositorio con `findByNombreUsuario`.
 3. **Crear `ServicioDetallesUsuario`** (`com.medisalud.security.service`,
-   implementa `UserDetailsService`), que busca la `Credencial` por
+   implementa `UserDetailsService`), que busca el `Usuario` por
    nombre de usuario y construye el `UserDetails` correspondiente.
 4. **Configurar `ConfiguracionSeguridad`** (`com.medisalud.security.config`)
    como `SessionCreationPolicy.STATELESS`, permitiendo `/auth/login` sin
@@ -55,7 +55,7 @@ les agrega una capa de seguridad nueva, en el paquete
 package com.medisalud.security.entity;
 
 @Entity
-public class Credencial {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,10 +68,10 @@ public class Credencial {
 
     private String rol;
 
-    protected Credencial() {
+    protected Usuario() {
     }
 
-    public Credencial(String nombreUsuario, String contrasena, String rol) {
+    public Usuario(String nombreUsuario, String contrasena, String rol) {
         this.nombreUsuario = nombreUsuario;
         this.contrasena = contrasena;
         this.rol = rol;
@@ -84,7 +84,7 @@ public class Credencial {
 }
 ```
 
-(El resto de las clases —`RepositorioCredenciales`,
+(El resto de las clases —`RepositorioUsuarios`,
 `ServicioDetallesUsuario`, `ConfiguracionSeguridad`, `UtilJwt`,
 `FiltroAutenticacionJwt`, `ControladorAutenticacion`— seguís el mismo
 patrón mostrado en el [Ejemplo 08](../../material/ejemplos/08-autenticacion-stateless-con-jwt.md),
@@ -104,8 +104,8 @@ adaptado al paquete `com.medisalud.security`.)
     │   │   ├── 📄 PacienteNoEncontradoException.java (sin cambios)
     │   │   └── 📄 ManejadorGlobalDeExcepciones.java (sin cambios)
     │   └── 📁 security/
-    │       ├── 📁 entity/Credencial.java
-    │       ├── 📁 repository/RepositorioCredenciales.java
+    │       ├── 📁 entity/Usuario.java
+    │       ├── 📁 repository/RepositorioUsuarios.java
     │       ├── 📁 service/ServicioDetallesUsuario.java
     │       ├── 📁 config/ConfiguracionSeguridad.java
     │       ├── 📁 jwt/UtilJwt.java

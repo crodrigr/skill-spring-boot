@@ -5,7 +5,7 @@
 MediSalud necesita el mismo tratamiento en su API de `Cita` (Desafío del
 Módulo 5/7) — un controlador distinto del usado en el Taller. Integrá
 Spring Security con JWT sobre `ControladorCitas` por tu cuenta: creá
-`Credencial`, `RepositorioCredenciales`, `ServicioDetallesUsuario`,
+`Usuario`, `RepositorioUsuarios`, `ServicioDetallesUsuario`,
 `ConfiguracionSeguridad`, `UtilJwt`, `FiltroAutenticacionJwt` y
 `ControladorAutenticacion`, sin ningún scaffold provisto (a diferencia
 del Taller, donde sí se guían los pasos), verificando el resultado con
@@ -150,10 +150,10 @@ public class ControladorCitas {
 }
 ```
 
-1. Creá `Credencial` (entidad con `nombreUsuario`, `contrasena`
-   codificada y `rol`) y `RepositorioCredenciales`.
+1. Creá `Usuario` (entidad con `nombreUsuario`, `contrasena`
+   codificada y `rol`) y `RepositorioUsuarios`.
 2. Creá `ServicioDetallesUsuario` (`UserDetailsService`) respaldado por
-   `RepositorioCredenciales`.
+   `RepositorioUsuarios`.
 3. Creá `ControladorAutenticacion` (`POST /auth/login`) que emita un JWT
    usando un `UtilJwt` propio.
 4. Creá `FiltroAutenticacionJwt` que valide el JWT en cada solicitud.

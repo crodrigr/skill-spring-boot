@@ -202,7 +202,7 @@ si no coinciden, lanza una excepción que este método captura devolviendo
 ## Desafío 01 — Spring Security y JWT sobre la API de citas
 
 La solución sigue exactamente el mismo patrón del
-[Taller 01](solucion-taller-01.md) (`Credencial`, `RepositorioCredenciales`,
+[Taller 01](solucion-taller-01.md) (`Usuario`, `RepositorioUsuarios`,
 `ServicioDetallesUsuario`, `UtilJwt`, `FiltroAutenticacionJwt`,
 `ControladorAutenticacion`, `ConfiguracionSeguridad`), aplicado al
 proyecto de `Cita`/`ServicioCitas`/`ControladorCitas` en vez de
