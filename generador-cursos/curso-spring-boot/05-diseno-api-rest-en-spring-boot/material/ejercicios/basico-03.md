@@ -3,8 +3,10 @@
 ## 🧩 Problema
 
 Para cada uno de los siguientes fragmentos de código, identificá a qué
-capa de la arquitectura (`Controller`, `Service` o `Repository`)
-pertenece, y explicá en una oración cuál sería su responsabilidad ahí.
+capa de la arquitectura MVC (`controllers`, `services` o `persistences`)
+pertenece, indicá en qué paquete debería vivir (por ejemplo,
+`com.biblioteca.services`) y explicá en una oración cuál sería su
+responsabilidad ahí.
 
 ## 💻 Código o contexto de partida
 
@@ -41,15 +43,18 @@ cuál nunca debería llamar directamente?
 
 ## 📏 Criterios de evaluación de la solución
 
-- Fragmento 1: capa `Repository`; responsable del acceso a datos
-  (`JpaRepository` ya trae las operaciones básicas).
-- Fragmento 2: capa `Controller`; responsable de manejar la solicitud y
-  respuesta HTTP sobre la ruta `/autores`.
-- Fragmento 3: capa `Service`; responsable de la lógica de negocio,
-  delegando en el repositorio.
+- Fragmento 1: capa `persistences` (subpaquete `repositories`, paquete
+  `com.biblioteca.persistences.repositories`); responsable del acceso a
+  datos (`JpaRepository` ya trae las operaciones básicas).
+- Fragmento 2: capa `controllers` (`com.biblioteca.controllers`);
+  responsable de manejar la solicitud y respuesta HTTP sobre la ruta
+  `/autores`.
+- Fragmento 3: capa `services` (`com.biblioteca.services`); responsable de
+  la lógica de negocio, delegando en el repositorio.
 - Pregunta adicional: `ControladorAutores` debería llamar a
   `ServicioAutores` (nunca directamente a `RepositorioAutores`), para
-  respetar que cada capa solo se comunica con la de abajo.
+  respetar que cada capa solo se comunica con la de abajo
+  (`controllers` → `services` → `persistences`).
 
 ## 🚧 Restricciones
 

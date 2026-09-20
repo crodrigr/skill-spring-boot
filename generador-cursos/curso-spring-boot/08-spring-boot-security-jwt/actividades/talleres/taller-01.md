@@ -10,11 +10,30 @@ emite un JWT validado por un filtro propio en cada solicitud.
 
 Este Taller parte de la solución del Taller 01 del Módulo 7
 (`ControladorPacientes`/`ServicioPacientes`, ya con `PacienteNoEncontradoException`
-y `ManejadorGlobalDeExcepciones` aplicados, en los paquetes
-`com.medisalud.entity`/`repository`/`service`/`controller`/`exception`).
+y `ManejadorGlobalDeExcepciones` aplicados, en sus paquetes MVC `com.medisalud.controllers`, `com.medisalud.services`
+y `com.medisalud.persistences` —con `entities` y `repositories`—, más el
+paquete transversal `com.medisalud.exception`).
 Ninguna de esas clases cambia su comportamiento en este Taller: solo se
-les agrega una capa de seguridad nueva, en el paquete
+les agrega una funcionalidad nueva de seguridad, en el paquete
 `com.medisalud.security`.
+
+## 🏗️ Capas MVC del paquete `security`
+
+La seguridad no rompe la arquitectura del proyecto: respeta las mismas tres
+capas, replicadas dentro de `com.medisalud.security`, y suma dos paquetes
+transversales propios de Spring Security.
+
+| Capa / paquete | Paquete | Clase en este taller |
+|---|---|---|
+| **Controller** | `com.medisalud.security.controllers` | `ControladorAutenticacion` (`POST /auth/login`) |
+| **Service** | `com.medisalud.security.services` | `ServicioDetallesUsuario` |
+| **Persistence** | `com.medisalud.security.persistences.entities` / `.repositories` | `Usuario` / `RepositorioUsuarios` |
+| Transversal | `com.medisalud.security.config` | `ConfiguracionSeguridad` |
+| Transversal | `com.medisalud.security.jwt` | `UtilJwt`, `FiltroAutenticacionJwt` |
+
+Regla de dependencia: `controllers` → `services` → `persistences`.
+`ControladorAutenticacion` no accede a `RepositorioUsuarios` directamente:
+lo hace a través de `AuthenticationManager` y `ServicioDetallesUsuario`.
 
 ## 🪜 Pasos
 
@@ -23,17 +42,17 @@ les agrega una capa de seguridad nueva, en el paquete
    confirmá con Insomnia que `GET /pacientes` ahora exige autenticación
    (usuario `user` + contraseña autogenerada en consola).
 2. **Crear `Usuario` y `RepositorioUsuarios`**
-   (`com.medisalud.security.entity`/`com.medisalud.security.repository`):
+   (`com.medisalud.security.persistences.entities`/`com.medisalud.security.persistences.repositories`):
    una entidad con `nombreUsuario`, `contrasena` (codificada) y `rol`, y
    su repositorio con `findByNombreUsuario`.
-3. **Crear `ServicioDetallesUsuario`** (`com.medisalud.security.service`,
+3. **Crear `ServicioDetallesUsuario`** (`com.medisalud.security.services`,
    implementa `UserDetailsService`), que busca el `Usuario` por
    nombre de usuario y construye el `UserDetails` correspondiente.
 4. **Configurar `ConfiguracionSeguridad`** (`com.medisalud.security.config`)
    como `SessionCreationPolicy.STATELESS`, permitiendo `/auth/login` sin
    autenticación previa y exigiendo autenticación para el resto —
    **desactivando Basic Auth** en favor de JWT.
-5. **Implementar `ControladorAutenticacion`** (`com.medisalud.security.controller`,
+5. **Implementar `ControladorAutenticacion`** (`com.medisalud.security.controllers`,
    `POST /auth/login`) que verifica las credenciales con el
    `AuthenticationManager` y devuelve un JWT (`UtilJwt.generarToken`,
    `com.medisalud.security.jwt`).
@@ -52,7 +71,7 @@ les agrega una capa de seguridad nueva, en el paquete
 ## 💡 Ejemplo resuelto (parcial)
 
 ```java
-package com.medisalud.security.entity;
+package com.medisalud.security.persistences.entities;
 
 @Entity
 public class Usuario {
@@ -96,21 +115,23 @@ adaptado al paquete `com.medisalud.security`.)
 📁 taller-01-security-jwt-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 entity/Paciente.java (sin cambios)
-    │   ├── 📁 repository/RepositorioPacientes.java (sin cambios)
-    │   ├── 📁 service/ServicioPacientes.java (sin cambios)
-    │   ├── 📁 controller/ControladorPacientes.java (sin cambios)
+    │   ├── 📁 controllers/ControladorPacientes.java (sin cambios)
+    │   ├── 📁 services/ServicioPacientes.java (sin cambios)
+    │   ├── 📁 persistences/
+    │   │   ├── 📁 entities/Paciente.java (sin cambios)
+    │   │   └── 📁 repositories/RepositorioPacientes.java (sin cambios)
     │   ├── 📁 exception/
     │   │   ├── 📄 PacienteNoEncontradoException.java (sin cambios)
     │   │   └── 📄 ManejadorGlobalDeExcepciones.java (sin cambios)
     │   └── 📁 security/
-    │       ├── 📁 entity/Usuario.java
-    │       ├── 📁 repository/RepositorioUsuarios.java
-    │       ├── 📁 service/ServicioDetallesUsuario.java
+    │       ├── 📁 controllers/ControladorAutenticacion.java
+    │       ├── 📁 services/ServicioDetallesUsuario.java
+    │       ├── 📁 persistences/
+    │       │   ├── 📁 entities/Usuario.java
+    │       │   └── 📁 repositories/RepositorioUsuarios.java
     │       ├── 📁 config/ConfiguracionSeguridad.java
     │       ├── 📁 jwt/UtilJwt.java
-    │       ├── 📁 jwt/FiltroAutenticacionJwt.java
-    │       └── 📁 controller/ControladorAutenticacion.java
+    │       └── 📁 jwt/FiltroAutenticacionJwt.java
     └── 📁 resources/application.properties (sin cambios)
 ```
 
@@ -125,6 +146,10 @@ Respuesta exacta.
 
 - `Paciente`, `ServicioPacientes` y `ControladorPacientes` no cambiaron
   ninguna línea de su lógica de negocio (FR-015).
+- Las clases nuevas de `security` viven en el paquete de su capa MVC
+  (`controllers`, `services`, `persistences`) o en un paquete transversal
+  (`config`, `jwt`), y ningún controlador accede a un repositorio
+  directamente.
 - Las 5 pruebas de Insomnia del Paso 7 están documentadas con su
   respuesta exacta.
 - La clave secreta de JWT usada incluye la advertencia de que es solo

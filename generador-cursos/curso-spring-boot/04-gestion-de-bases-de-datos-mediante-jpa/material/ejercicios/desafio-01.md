@@ -21,11 +21,18 @@ No se provee ningún scaffold: diseñá vos las entidades y su repositorio,
 siguiendo el mismo criterio aplicado en el Taller (una relación padre-hijas
 con `cascade`/`orphanRemoval`) pero sobre este par nuevo.
 
+**Capas MVC**: las entidades van en
+`com.biblioteca.persistences.entities`, el repositorio en
+`com.biblioteca.persistences.repositories` y `Main` en el paquete raíz
+`com.biblioteca`. Todavía no existen `services` ni `controllers`
+(Módulo 5).
+
 1. Diseñá `OrdenCompra` (con al menos `id` y `fecha`) y
    `DetalleOrdenCompra` (con al menos `id`, `isbn`, `cantidad`, y una
    relación `@ManyToOne` hacia `OrdenCompra`), con la relación
    `OrdenCompra`→`DetalleOrdenCompra` usando `cascade` y `orphanRemoval`.
-2. Creá `RepositorioOrdenesCompra`, extendiendo `JpaRepository`.
+2. Creá `RepositorioOrdenesCompra`, extendiendo `JpaRepository`, en
+   `com.biblioteca.persistences.repositories`.
 3. Escribí un `Main` que, sobre H2 en memoria:
    - **Cree** una `OrdenCompra` con al menos dos `DetalleOrdenCompra`, en
      una sola llamada a `save(...)` (aprovechando `cascade`).
@@ -45,6 +52,8 @@ con `cascade`/`orphanRemoval`) pero sobre este par nuevo.
 - El `Main` ejecuta, en este orden, las cuatro operaciones: crear (con
   cascade), leer, actualizar una cantidad, y eliminar una línea (con
   orphanRemoval), verificando el estado tras cada una.
+- Las entidades y el repositorio viven en los paquetes de la capa
+  `persistences` (`entities` y `repositories`), con su línea `package`.
 - El proyecto ejecuta sin excepciones contra H2 en memoria.
 
 ## 🚧 Restricciones

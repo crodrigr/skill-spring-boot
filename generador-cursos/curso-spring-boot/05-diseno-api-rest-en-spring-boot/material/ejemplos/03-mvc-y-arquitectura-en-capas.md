@@ -45,6 +45,24 @@ flowchart LR
 | `Repository` | Acceso a datos: leer/escribir en la base de datos | `interface ... extends JpaRepository` |
 | `Database` | Persistencia real de los datos | H2 en memoria |
 
+## 🗂️ Cómo se organiza en paquetes
+
+Las capas no son solo un concepto: en cada proyecto del curso se
+convierten en paquetes Java con nombre fijo, para que cualquiera que abra
+el proyecto sepa dónde está cada clase.
+
+| Capa MVC | Paquete | Qué contiene |
+|---|---|---|
+| `controllers` | `com.medisalud.controllers` | Clases `@RestController` |
+| `services` | `com.medisalud.services` | Clases `@Service` (lógica de negocio) |
+| `persistences` | `com.medisalud.persistences.entities` y `com.medisalud.persistences.repositories` | Entidades `@Entity` e interfaces `JpaRepository` (acceso a datos) |
+
+La clase `@SpringBootApplication` vive en el paquete raíz
+(`com.medisalud`), por encima de las tres capas, para que Spring Boot
+encuentre todo lo que está en los subpaquetes. Los paquetes `exception`,
+`config` y `jwt` que aparecen más adelante en el curso no son capas: son
+transversales.
+
 **Regla clave**: cada capa solo se comunica con la de abajo. El
 `Controller` nunca accede directamente al `Repository`, saltándose el
 `Service` — aunque "funcione" en un caso simple, rompe la separación de

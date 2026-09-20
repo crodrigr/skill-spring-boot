@@ -9,14 +9,15 @@
 📁 taller-01-manejo-de-excepciones-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 entity
-    │   │   └── 📄 Paciente.java
-    │   ├── 📁 repository
-    │   │   └── 📄 RepositorioPacientes.java
-    │   ├── 📁 service
-    │   │   └── 📄 ServicioPacientes.java
-    │   ├── 📁 controller
+    │   ├── 📁 controllers
     │   │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 services
+    │   │   └── 📄 ServicioPacientes.java
+    │   ├── 📁 persistences
+    │   │   ├── 📁 entities
+    │   │   │   └── 📄 Paciente.java
+    │   │   └── 📁 repositories
+    │   │       └── 📄 RepositorioPacientes.java
     │   └── 📁 exception
     │       ├── 📄 PacienteNoEncontradoException.java
     │       └── 📄 ManejadorGlobalDeExcepciones.java
@@ -24,10 +25,15 @@
         └── 📄 application.properties
 ```
 
-## 📄 Archivo: `Paciente.java` (`com.medisalud.entity`, Módulo 5, sin cambios)
+**Capas MVC**: `controllers` → `services` → `persistences`
+(`entities` + `repositories`). `exception` es un paquete transversal: la
+excepción se lanza desde `services` y el `@ControllerAdvice` la traduce a
+HTTP para `controllers`.
+
+## 📄 Archivo: `Paciente.java` (`com.medisalud.persistences.entities`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.entity;
+package com.medisalud.persistences.entities;
 
 @Entity
 public class Paciente {
@@ -56,12 +62,12 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.repository`, Módulo 5, sin cambios)
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistences.repositories`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.repository;
+package com.medisalud.persistences.repositories;
 
-import com.medisalud.entity.Paciente;
+import com.medisalud.persistences.entities.Paciente;
 
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
@@ -82,14 +88,14 @@ public class PacienteNoEncontradoException extends RuntimeException {
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.service`, modificada)
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.services`, modificada)
 
 ```java
-package com.medisalud.service;
+package com.medisalud.services;
 
-import com.medisalud.entity.Paciente;
+import com.medisalud.persistences.entities.Paciente;
 import com.medisalud.exception.PacienteNoEncontradoException;
-import com.medisalud.repository.RepositorioPacientes;
+import com.medisalud.persistences.repositories.RepositorioPacientes;
 
 @Service
 public class ServicioPacientes {
@@ -132,13 +138,13 @@ public class ServicioPacientes {
 ya no verifican por su cuenta (`Optional.map`/`existsById`): reutilizan
 `buscarPorId`, que ya lanza si corresponde.
 
-## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controller`, modificada)
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controllers`, modificada)
 
 ```java
-package com.medisalud.controller;
+package com.medisalud.controllers;
 
-import com.medisalud.entity.Paciente;
-import com.medisalud.service.ServicioPacientes;
+import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.services.ServicioPacientes;
 
 @RestController
 @RequestMapping("/pacientes")

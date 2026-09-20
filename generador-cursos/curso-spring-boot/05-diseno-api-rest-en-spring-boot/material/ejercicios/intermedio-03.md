@@ -8,8 +8,9 @@ CRUD REST agregando crear, actualizar y eliminar.
 ## 💻 Código o contexto de partida
 
 ```java
-// ControladorAutores.java ya existe (Intermedio 02), con los endpoints
-// GET /autores y GET /autores/{id}.
+// ControladorAutores.java — capa controllers (com.biblioteca.controllers)
+// ya existe (Intermedio 02), con los endpoints GET /autores y
+// GET /autores/{id}.
 ```
 
 1. Agregá `POST /autores` (crear), devolviendo `201` con el autor creado.
@@ -27,6 +28,8 @@ CRUD REST agregando crear, actualizar y eliminar.
   corresponda.
 - Ningún endpoint devuelve `200` con cuerpo vacío cuando el recurso no
   existe.
+- Los tres endpoints nuevos delegan siempre en `ServicioAutores`; el
+  controlador no accede a `RepositorioAutores`.
 
 ## 🚧 Restricciones
 

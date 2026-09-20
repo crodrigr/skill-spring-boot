@@ -17,7 +17,7 @@ usuario `user` y la contraseña autogenerada que aparece en la consola.
 <details>
 <summary>📄 Ver código completo de <code>Autor.java</code>, <code>RepositorioAutores.java</code>, <code>AutorNoEncontradoException.java</code>, <code>ServicioAutores.java</code>, <code>ControladorAutores.java</code> y <code>ManejadorGlobalDeExcepciones.java</code> (reutilizados de los Módulos 5 y 7)</summary>
 
-## 💻 Archivo: `Autor.java`
+## 💻 Archivo: `Autor.java` (`com.biblioteca.persistences.entities`)
 
 ```java
 @Entity
@@ -46,14 +46,14 @@ public class Autor {
 }
 ```
 
-## 💻 Archivo: `RepositorioAutores.java`
+## 💻 Archivo: `RepositorioAutores.java` (`com.biblioteca.persistences.repositories`)
 
 ```java
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
 
-## 💻 Archivo: `AutorNoEncontradoException.java`
+## 💻 Archivo: `AutorNoEncontradoException.java` (`com.biblioteca.exception`, paquete transversal)
 
 ```java
 @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -65,7 +65,7 @@ public class AutorNoEncontradoException extends RuntimeException {
 }
 ```
 
-## 💻 Archivo: `ServicioAutores.java`
+## 💻 Archivo: `ServicioAutores.java` (`com.biblioteca.services`)
 
 ```java
 @Service
@@ -108,7 +108,7 @@ public class ServicioAutores {
 }
 ```
 
-## 💻 Archivo: `ControladorAutores.java`
+## 💻 Archivo: `ControladorAutores.java` (`com.biblioteca.controllers`)
 
 ```java
 @RestController
@@ -152,7 +152,7 @@ public class ControladorAutores {
 }
 ```
 
-## 💻 Archivo: `ManejadorGlobalDeExcepciones.java`
+## 💻 Archivo: `ManejadorGlobalDeExcepciones.java` (`com.biblioteca.exception`, paquete transversal)
 
 ```java
 @ControllerAdvice
@@ -184,6 +184,9 @@ public class ManejadorGlobalDeExcepciones {
   Basic Auth (usuario `user` + contraseña de consola), aceptada.
 - No confunde la contraseña autogenerada con una contraseña fija: cada
   reinicio del proyecto genera una nueva.
+- Reconoce que las capas MVC del proyecto (`controllers`, `services`,
+  `persistences`) no cambian: Spring Security se agrega como una
+  preocupación transversal, sin tocar ninguna de esas clases.
 
 ## 🚧 Restricciones
 

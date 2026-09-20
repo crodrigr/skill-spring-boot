@@ -9,6 +9,7 @@ un libro que no existe, Insomnia me muestra `200 OK` con el cuerpo
 ## 💻 Código o contexto de partida
 
 ```java
+// ControladorLibros.java — capa controllers (com.biblioteca.controllers)
 @GetMapping("/{id}")
 public Libro buscarPorId(@PathVariable Long id) {
     return servicioLibros.buscarPorId(id).orElse(null);

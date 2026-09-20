@@ -35,7 +35,9 @@ spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.jpa.hibernate.ddl-auto=update
 ```
 
-`Main.java`:
+`Main.java` (paquete raíz `com.biblioteca`), junto con los paquetes vacíos
+`com.biblioteca.persistences.entities` y
+`com.biblioteca.persistences.repositories` (capa `persistences`):
 
 ```java
 @SpringBootApplication
@@ -103,6 +105,7 @@ dato que no pertenece a ninguna de las dos entidades por separado?
 **Solución propuesta**:
 
 ```java
+// com.biblioteca.persistences.entities.Usuario
 @Entity
 public class Usuario {
 
@@ -133,6 +136,7 @@ public class Usuario {
 ```
 
 ```java
+// Dentro de Main.run(...) — com.biblioteca.Main, paquete raíz
 Usuario usuario = new Usuario("Renata Ibáñez");
 Libro libro = repositorioLibros.save(new Libro("978-1-59327-584-6", "Cracking the Coding Interview"));
 usuario.agregarPrestamo(new Prestamo(LocalDate.now(), usuario, libro));
@@ -163,9 +167,12 @@ colección y la elimina de la base de datos.
 
 ## 🟡 Intermedio 03 — Implementar un CRUD parcial
 
-**Solución propuesta**:
+**Solución propuesta** (`Autor` y `RepositorioAutores` en la capa
+`persistences`; `Main` en el paquete raíz `com.biblioteca`, usando el
+repositorio directamente porque todavía no existe una capa `services`):
 
 ```java
+// com.biblioteca.Main
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
@@ -224,9 +231,13 @@ spring.datasource.url=jdbc:h2:mem:biblioteca;DB_CLOSE_DELAY=-1
 
 ## 🏆 Desafío 01 — Órdenes de compra de Biblioteca Universitaria
 
-**Solución propuesta**:
+**Solución propuesta** (entidades en
+`com.biblioteca.persistences.entities`, repositorio en
+`com.biblioteca.persistences.repositories`, `Main` en el paquete raíz
+`com.biblioteca`):
 
 ```java
+// com.biblioteca.persistences.entities.OrdenCompra
 @Entity
 public class OrdenCompra {
 
@@ -260,6 +271,7 @@ public class OrdenCompra {
 ```
 
 ```java
+// com.biblioteca.persistences.entities.DetalleOrdenCompra
 @Entity
 public class DetalleOrdenCompra {
 
@@ -291,11 +303,13 @@ public class DetalleOrdenCompra {
 ```
 
 ```java
+// com.biblioteca.persistences.repositories.RepositorioOrdenesCompra
 public interface RepositorioOrdenesCompra extends JpaRepository<OrdenCompra, Long> {
 }
 ```
 
 ```java
+// com.biblioteca.Main
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

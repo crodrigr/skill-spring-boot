@@ -9,19 +9,28 @@
 📁 taller-01-facturacion
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java
-    │   ├── 📄 RepositorioPacientes.java
-    │   ├── 📄 Factura.java
-    │   ├── 📄 DetalleFactura.java
-    │   ├── 📄 RepositorioFacturas.java
-    │   └── 📄 Main.java
+    │   ├── 📄 Main.java
+    │   └── 📁 persistences
+    │       ├── 📁 entities
+    │       │   ├── 📄 Paciente.java
+    │       │   ├── 📄 Factura.java
+    │       │   └── 📄 DetalleFactura.java
+    │       └── 📁 repositories
+    │           ├── 📄 RepositorioPacientes.java
+    │           └── 📄 RepositorioFacturas.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
-## 📄 Archivo: `Paciente.java`
+**Capas MVC**: en este módulo solo existe la capa `persistences`
+(`entities` + `repositories`). `Main` es el punto de entrada de prueba, en
+el paquete raíz; las capas `services` y `controllers` llegan en el Módulo 5.
+
+## 📄 Archivo: `Paciente.java` (`com.medisalud.persistences.entities`)
 
 ```java
+package com.medisalud.persistences.entities;
+
 @Entity
 public class Paciente {
 
@@ -48,17 +57,23 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java`
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistences.repositories`)
 
 ```java
+package com.medisalud.persistences.repositories;
+
+import com.medisalud.persistences.entities.Paciente;
+
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 ```
 
-## 📄 Archivo: `Factura.java`
+## 📄 Archivo: `Factura.java` (`com.medisalud.persistences.entities`)
 
 ```java
+package com.medisalud.persistences.entities;
+
 @Entity
 public class Factura {
 
@@ -94,9 +109,11 @@ public class Factura {
 }
 ```
 
-## 📄 Archivo: `DetalleFactura.java`
+## 📄 Archivo: `DetalleFactura.java` (`com.medisalud.persistences.entities`)
 
 ```java
+package com.medisalud.persistences.entities;
+
 @Entity
 public class DetalleFactura {
 
@@ -128,16 +145,28 @@ public class DetalleFactura {
 }
 ```
 
-## 📄 Archivo: `RepositorioFacturas.java`
+## 📄 Archivo: `RepositorioFacturas.java` (`com.medisalud.persistences.repositories`)
 
 ```java
+package com.medisalud.persistences.repositories;
+
+import com.medisalud.persistences.entities.Factura;
+
 public interface RepositorioFacturas extends JpaRepository<Factura, Long> {
 }
 ```
 
-## 📄 Archivo: `Main.java`
+## 📄 Archivo: `Main.java` (`com.medisalud`, paquete raíz)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.persistences.entities.DetalleFactura;
+import com.medisalud.persistences.entities.Factura;
+import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.persistences.repositories.RepositorioFacturas;
+import com.medisalud.persistences.repositories.RepositorioPacientes;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

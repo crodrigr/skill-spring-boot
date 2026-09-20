@@ -9,19 +9,27 @@
 📁 taller-01-libro-etiqueta
 └── 📁 src/main
     ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java
-    │   ├── 📄 Etiqueta.java
-    │   ├── 📄 RepositorioLibros.java
-    │   └── 📄 RepositorioEtiquetas.java
-    ├── 📁 java
-    │   └── 📄 Main.java
+    │   ├── 📄 Main.java
+    │   └── 📁 persistences
+    │       ├── 📁 entities
+    │       │   ├── 📄 Libro.java
+    │       │   └── 📄 Etiqueta.java
+    │       └── 📁 repositories
+    │           ├── 📄 RepositorioLibros.java
+    │           └── 📄 RepositorioEtiquetas.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
-## 📄 Archivo: `Libro.java`
+**Capas MVC**: en este módulo solo existe la capa `persistences`
+(`entities` + `repositories`). `Main` es el punto de entrada de prueba, en
+el paquete raíz; las capas `services` y `controllers` llegan en el Módulo 5.
+
+## 📄 Archivo: `Libro.java` (`com.biblioteca.persistences.entities`)
 
 ```java
+package com.biblioteca.persistences.entities;
+
 @Entity
 public class Libro {
 
@@ -65,9 +73,11 @@ public class Libro {
 etiqueta un libro (no al revés); es una elección razonable, no la única
 correcta.
 
-## 📄 Archivo: `Etiqueta.java`
+## 📄 Archivo: `Etiqueta.java` (`com.biblioteca.persistences.entities`)
 
 ```java
+package com.biblioteca.persistences.entities;
+
 @Entity
 public class Etiqueta {
 
@@ -92,25 +102,40 @@ public class Etiqueta {
 }
 ```
 
-## 📄 Archivo: `RepositorioLibros.java`
+## 📄 Archivo: `RepositorioLibros.java` (`com.biblioteca.persistences.repositories`)
 
 ```java
+package com.biblioteca.persistences.repositories;
+
+import com.biblioteca.persistences.entities.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
 ```
 
-## 📄 Archivo: `RepositorioEtiquetas.java`
+## 📄 Archivo: `RepositorioEtiquetas.java` (`com.biblioteca.persistences.repositories`)
 
 ```java
+package com.biblioteca.persistences.repositories;
+
+import com.biblioteca.persistences.entities.Etiqueta;
+
 public interface RepositorioEtiquetas extends JpaRepository<Etiqueta, Long> {
     Optional<Etiqueta> findByNombre(String nombre);
 }
 ```
 
-## 📄 Archivo: `Main.java`
+## 📄 Archivo: `Main.java` (`com.biblioteca`, paquete raíz)
 
 ```java
+package com.biblioteca;
+
+import com.biblioteca.persistences.entities.Etiqueta;
+import com.biblioteca.persistences.entities.Libro;
+import com.biblioteca.persistences.repositories.RepositorioEtiquetas;
+import com.biblioteca.persistences.repositories.RepositorioLibros;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

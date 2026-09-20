@@ -16,7 +16,8 @@ en Swagger UI.
 ## 💻 Código o contexto de partida
 
 ```java
-// Paciente.java (Módulo 5, con @JsonIgnore ya aplicado — reutilizada tal cual)
+// Paciente.java — capa persistences (com.medisalud.persistences.entities)
+// (Módulo 5, con @JsonIgnore ya aplicado — reutilizada tal cual)
 @Entity
 public class Paciente {
 
@@ -49,7 +50,8 @@ public class Paciente {
 ```
 
 ```java
-// ControladorCitas.java (Módulo 5, reutilizada tal cual)
+// ControladorCitas.java — capa controllers (com.medisalud.controllers)
+// (Módulo 5, reutilizada tal cual)
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {
@@ -92,6 +94,12 @@ public class ControladorCitas {
     }
 }
 ```
+
+**Capas del proyecto (MVC)**: `ControladorCitas` vive en
+`com.medisalud.controllers`, `ServicioCitas` en `com.medisalud.services`, y
+`Paciente`, `Cita` y `RepositorioCitas` en `com.medisalud.persistences`
+(`entities` y `repositories`). Ninguna de esas clases se mueve ni se
+modifica en este desafío.
 
 1. Agregá `springdoc-openapi-starter-webmvc-ui` al `pom.xml` de este
    proyecto.

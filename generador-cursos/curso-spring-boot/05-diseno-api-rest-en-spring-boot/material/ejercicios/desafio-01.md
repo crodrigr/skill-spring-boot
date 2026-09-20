@@ -21,7 +21,8 @@ mismo, siguiendo el mismo patrón usado en `ServicioLibros`/
 `ControladorPacientes`), pero aplicado a `Cita`.
 
 ```java
-// Paciente.java (Módulo 3, reutilizada tal cual)
+// Paciente.java — capa persistences (com.medisalud.persistences.entities)
+// (Módulo 3, reutilizada tal cual)
 @Entity
 public class Paciente {
 
@@ -90,7 +91,8 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java (Módulo 3, reutilizada tal cual)
+// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+// (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
@@ -98,11 +100,12 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 1. Resolvé primero el problema de recursión infinita: agregá
    `@JsonIgnore` en el lado apropiado de la relación `Paciente`↔`Cita`
    (pista: el mismo lado que en el Ejercicio Avanzado 02).
-2. Creá `ServicioCitas` (`@Service`) con los cinco métodos de negocio
-   (`listarTodos`, `buscarPorId`, `crear`, `actualizar`, `eliminar`).
+2. Creá `ServicioCitas` (`@Service`) en `com.medisalud.services`, con los
+   cinco métodos de negocio (`listarTodos`, `buscarPorId`, `crear`,
+   `actualizar`, `eliminar`).
 3. Creá `ControladorCitas` (`@RestController`, `@RequestMapping("/citas")`)
-   con los cinco endpoints CRUD, devolviendo el código de estado correcto
-   en cada caso.
+   en `com.medisalud.controllers`, con los cinco endpoints CRUD,
+   devolviendo el código de estado correcto en cada caso.
 4. Probá los cinco endpoints en Insomnia, incluyendo al menos un caso de
    error (`404`), y verificá que la respuesta JSON de una `Cita` incluye
    los datos de su `Paciente` sin entrar en recursión infinita.
@@ -113,7 +116,10 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
   `GET /citas/{id}` responde con el `Paciente` incluido, sin error de
   serialización.
 - `ServicioCitas` y `ControladorCitas` siguen el mismo patrón de capas
-  que `ServicioLibros`/`ControladorLibros` y que el Taller.
+  que `ServicioLibros`/`ControladorLibros` y que el Taller: cada clase
+  vive en el paquete de su capa MVC (`services` y `controllers`) y
+  `ControladorCitas` depende solo de `ServicioCitas`, nunca de
+  `RepositorioCitas`.
 - Los cinco endpoints devuelven el código de estado correcto, incluido
   `404` cuando el recurso no existe.
 - Las pruebas en Insomnia están documentadas para los cinco endpoints,

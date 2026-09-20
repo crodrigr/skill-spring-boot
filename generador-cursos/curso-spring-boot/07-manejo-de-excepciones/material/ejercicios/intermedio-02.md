@@ -10,11 +10,12 @@ Boot. Te piden personalizar ese cuerpo, igual que se hizo con
 ## 💻 Código o contexto de partida
 
 ```java
-// AutorNoEncontradoException.java ya existe (Intermedio 01)
+// AutorNoEncontradoException.java (com.biblioteca.exception) ya existe (Intermedio 01)
 ```
 
 ```java
-// ControladorAutores.java (con buscarPorId ya modificado en Intermedio 01)
+// ControladorAutores.java — capa controllers (com.biblioteca.controllers)
+// (con buscarPorId ya modificado en Intermedio 01)
 @RestController
 @RequestMapping("/autores")
 public class ControladorAutores {

@@ -17,6 +17,7 @@ completamente mapeados en el Ejemplo 08:
 <summary>📄 Ver código completo de <code>Paciente.java</code>, <code>Cita.java</code>, <code>HistoriaClinica.java</code>, <code>RepositorioPacientes.java</code> y <code>RepositorioCitas.java</code> (reutilizados del Ejemplo 08)</summary>
 
 ```java
+// com.medisalud.persistences.entities.Paciente
 @Entity
 public class Paciente {
 
@@ -54,6 +55,7 @@ public class Paciente {
     }
 }
 
+// com.medisalud.persistences.entities.Cita
 @Entity
 public class Cita {
 
@@ -85,6 +87,7 @@ public class Cita {
     // TODO (este Desafío): agregar la relación con Medico
 }
 
+// com.medisalud.persistences.entities.HistoriaClinica
 @Entity
 public class HistoriaClinica {
 
@@ -104,10 +107,12 @@ public class HistoriaClinica {
     public String getAntecedentes() { return antecedentes; }
 }
 
+// com.medisalud.persistences.repositories.RepositorioPacientes
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 
+// com.medisalud.persistences.repositories.RepositorioCitas
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
@@ -116,12 +121,20 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 
 ## 🎯 Tu tarea
 
+**Capas MVC**: las entidades (`Paciente`, `Cita`, `HistoriaClinica` y la
+nueva `Medico`) van en `com.medisalud.persistences.entities`; los
+repositorios (incluido `RepositorioMedicos`) en
+`com.medisalud.persistences.repositories`; y `Main`, en el paquete raíz
+`com.medisalud`. Todavía no existen `services` ni `controllers` (Módulo 5).
+
 1. Creá la entidad `Medico` (id, `nombre`), con el lado inverso de la
-   relación con `Cita` (`@OneToMany(mappedBy = "medico")`).
+   relación con `Cita` (`@OneToMany(mappedBy = "medico")`), en
+   `com.medisalud.persistences.entities`.
 2. Agregá a `Cita` el campo `medico` con `@ManyToOne` y
    `@JoinColumn(name = "medico_id")`.
 3. Creá `RepositorioMedicos extends JpaRepository<Medico, Long>`, con un
-   método derivado `findByNombre(String nombre)`.
+   método derivado `findByNombre(String nombre)`, en
+   `com.medisalud.persistences.repositories`.
 4. Escribí un `Main` (`@SpringBootApplication` + `CommandLineRunner`) que:
    - Guarde un `Paciente` con su `HistoriaClinica`.
    - Guarde un `Medico`.
@@ -135,6 +148,9 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
   contra H2.
 - `Cita` es el lado propietario de la nueva relación (tiene `medico_id`);
   `Medico` es el lado inverso (`mappedBy`).
+- `Medico` y `RepositorioMedicos` están en los paquetes de la capa
+  `persistences` (`entities` y `repositories`), y los `import` entre
+  paquetes son correctos.
 - El `Main` verifica correctamente que el médico recargado tiene dos citas
   asociadas, sin lanzar ningún error de sesión cerrada (pensá si necesitás
   `@Transactional`, y dónde).

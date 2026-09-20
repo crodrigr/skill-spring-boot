@@ -39,20 +39,27 @@ correctamente formada, es `5xx`.
 
 **Solución propuesta**:
 
-- Fragmento 1 (`RepositorioAutores`): capa `Repository` — acceso a datos.
-- Fragmento 2 (`ControladorAutores`): capa `Controller` — maneja HTTP
-  sobre `/autores`.
-- Fragmento 3 (`ServicioAutores`): capa `Service` — lógica de negocio,
-  delega en `RepositorioAutores`.
+| Fragmento | Clase | Capa MVC | Paquete | Responsabilidad |
+|---|---|---|---|---|
+| 1 | `RepositorioAutores` | `persistences` | `com.biblioteca.persistences.repositories` | Acceso a datos |
+| 2 | `ControladorAutores` | `controllers` | `com.biblioteca.controllers` | Maneja HTTP sobre `/autores` |
+| 3 | `ServicioAutores` | `services` | `com.biblioteca.services` | Lógica de negocio; delega en `RepositorioAutores` |
+
 - Pregunta adicional: `ControladorAutores` debe llamar a `ServicioAutores`;
   nunca debe llamar directamente a `RepositorioAutores`, para no saltarse
-  la capa de lógica de negocio.
+  la capa de lógica de negocio (`controllers` → `services` →
+  `persistences`).
 
 ## 🟡 Intermedio 01 — Crear una clase de servicio
 
 **Solución propuesta**:
 
 ```java
+package com.biblioteca.services;
+
+import com.biblioteca.persistences.entities.Autor;
+import com.biblioteca.persistences.repositories.RepositorioAutores;
+
 @Service
 public class ServicioAutores {
 
@@ -100,6 +107,11 @@ public class ServicioAutores {
 **Solución propuesta**:
 
 ```java
+package com.biblioteca.controllers;
+
+import com.biblioteca.persistences.entities.Autor;
+import com.biblioteca.services.ServicioAutores;
+
 @RestController
 @RequestMapping("/autores")
 public class ControladorAutores {
@@ -126,7 +138,8 @@ public class ControladorAutores {
 
 ## 🟡 Intermedio 03 — Crear los endpoints `POST`, `PUT`, `DELETE` de un controlador
 
-**Solución propuesta** (métodos agregados a `ControladorAutores`):
+**Solución propuesta** (métodos agregados a `ControladorAutores`, en
+`com.biblioteca.controllers`; siguen delegando solo en `ServicioAutores`):
 
 ```java
     @PostMapping
@@ -156,6 +169,7 @@ public class ControladorAutores {
 importar si `buscarPorId` encontró algo o no. Corrección:
 
 ```java
+// ControladorLibros.java — com.biblioteca.controllers
 @GetMapping("/{id}")
 public ResponseEntity<Libro> buscarPorId(@PathVariable Long id) {
     return servicioLibros.buscarPorId(id)
@@ -178,6 +192,7 @@ debe responder `404 Not Found`, no `200` con cuerpo `null`.
 2. Corrección: agregar `@JsonIgnore` sobre `Paciente.citas`.
 
 ```java
+// Paciente.java — com.medisalud.persistences.entities
 @OneToMany(mappedBy = "paciente")
 @JsonIgnore
 private List<Cita> citas = new ArrayList<>();
@@ -189,9 +204,10 @@ expusiera) ya no incluiría la lista de `citas` en su respuesta.
 
 ## 🏆 Desafío 01 — API REST de citas para MediSalud
 
-**Solución propuesta**:
+**Solución propuesta** (cada clase en el paquete de su capa MVC):
 
 ```java
+// com.medisalud.persistences.entities.Paciente
 @Entity
 public class Paciente {
 
@@ -224,6 +240,7 @@ public class Paciente {
 ```
 
 ```java
+// com.medisalud.services.ServicioCitas
 @Service
 public class ServicioCitas {
 
@@ -265,6 +282,7 @@ public class ServicioCitas {
 ```
 
 ```java
+// com.medisalud.controllers.ControladorCitas
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {

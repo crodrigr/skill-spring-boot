@@ -25,11 +25,11 @@
 
 **Solución propuesta**:
 
-1. `Repository` — la pérdida de conexión a H2 es un problema de acceso a
+1. `persistences` (repositorio) — la pérdida de conexión a H2 es un problema de acceso a
    datos.
-2. `Service` — rechazar un isbn duplicado es una regla de negocio, no un
+2. `services` — rechazar un isbn duplicado es una regla de negocio, no un
    problema de infraestructura ni de HTTP.
-3. `Controller` — falta un parámetro de la propia solicitud HTTP, antes
+3. `controllers` — falta un parámetro de la propia solicitud HTTP, antes
    de que se ejecute cualquier lógica de negocio.
 
 ## 🟡 Intermedio 01 — Crear una excepción personalizada con `@ResponseStatus`
@@ -37,6 +37,7 @@
 **Solución propuesta**:
 
 ```java
+// com.biblioteca.exception.AutorNoEncontradoException (paquete transversal)
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class AutorNoEncontradoException extends RuntimeException {
 
@@ -47,6 +48,7 @@ public class AutorNoEncontradoException extends RuntimeException {
 ```
 
 ```java
+// com.biblioteca.services.ServicioAutores — la excepción se lanza en la capa services
 public Autor buscarPorId(Long id) {
     return repositorioAutores.findById(id)
             .orElseThrow(() -> new AutorNoEncontradoException(id));
@@ -54,6 +56,7 @@ public Autor buscarPorId(Long id) {
 ```
 
 ```java
+// com.biblioteca.controllers.ControladorAutores
 @GetMapping("/{id}")
 public Autor buscarPorId(@PathVariable Long id) {
     return servicioAutores.buscarPorId(id);
@@ -85,6 +88,7 @@ public ResponseEntity<Map<String, String>> manejarAutorNoEncontrado(AutorNoEncon
 **Solución propuesta**:
 
 ```java
+// com.biblioteca.exception.ManejadorGlobalDeExcepciones
 @ControllerAdvice
 public class ManejadorGlobalDeExcepciones {
 
@@ -133,6 +137,7 @@ responder `404` con el cuerpo `{"error": "..."}"`, sin que
    significado HTTP):
 
 ```java
+// com.pedidos.exception.PedidoInvalidoException (paquete transversal)
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class PedidoInvalidoException extends RuntimeException {
 
@@ -150,6 +155,7 @@ debe responder `400 Bad Request`, no `500`.
 **Solución propuesta**:
 
 ```java
+// com.medisalud.exception.CitaNoEncontradaException (paquete transversal)
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class CitaNoEncontradaException extends RuntimeException {
 
@@ -160,6 +166,7 @@ public class CitaNoEncontradaException extends RuntimeException {
 ```
 
 ```java
+// com.medisalud.services.ServicioCitas — lanza la excepción (capa services)
 @Service
 public class ServicioCitas {
 
@@ -202,6 +209,7 @@ public class ServicioCitas {
 reutilizan `buscarPorId` en vez de verificar por su cuenta.
 
 ```java
+// com.medisalud.controllers.ControladorCitas
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {
@@ -246,6 +254,7 @@ public class ControladorCitas {
 sin ningún `ResponseEntity` de error.
 
 ```java
+// com.medisalud.exception.ManejadorGlobalDeExcepciones
 @ControllerAdvice
 public class ManejadorGlobalDeExcepciones {
 

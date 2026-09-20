@@ -10,14 +10,15 @@
 ├── 📄 pom.xml
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 entity
-    │   │   └── 📄 Paciente.java
-    │   ├── 📁 repository
-    │   │   └── 📄 RepositorioPacientes.java
-    │   ├── 📁 service
+    │   ├── 📁 controllers
+    │   │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 services
     │   │   └── 📄 ServicioPacientes.java
-    │   └── 📁 controller
-    │       └── 📄 ControladorPacientes.java
+    │   └── 📁 persistences
+    │       ├── 📁 entities
+    │       │   └── 📄 Paciente.java
+    │       └── 📁 repositories
+    │           └── 📄 RepositorioPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
@@ -32,10 +33,10 @@
 </dependency>
 ```
 
-## 📄 Archivo: `Paciente.java` (`com.medisalud.entity`, Módulo 5, sin cambios)
+## 📄 Archivo: `Paciente.java` (`com.medisalud.persistences.entities`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.entity;
+package com.medisalud.persistences.entities;
 
 @Entity
 public class Paciente {
@@ -64,25 +65,25 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.repository`, Módulo 5, sin cambios)
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistences.repositories`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.repository;
+package com.medisalud.persistences.repositories;
 
-import com.medisalud.entity.Paciente;
+import com.medisalud.persistences.entities.Paciente;
 
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.service`, Módulo 5, sin cambios)
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.services`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.service;
+package com.medisalud.services;
 
-import com.medisalud.entity.Paciente;
-import com.medisalud.repository.RepositorioPacientes;
+import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.persistences.repositories.RepositorioPacientes;
 
 @Service
 public class ServicioPacientes {
@@ -123,13 +124,13 @@ public class ServicioPacientes {
 }
 ```
 
-## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controller`, Módulo 5, sin cambios)
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controllers`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.controller;
+package com.medisalud.controllers;
 
-import com.medisalud.entity.Paciente;
-import com.medisalud.service.ServicioPacientes;
+import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.services.ServicioPacientes;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -192,7 +193,7 @@ springdoc.packages-to-scan=com.medisalud
 
 **Nota**: `springdoc.packages-to-scan=com.medisalud` alcanza para
 documentar `ControladorPacientes`, aunque viva en el subpaquete
-`com.medisalud.controller` — springdoc escanea recursivamente todos los
+`com.medisalud.controllers` — springdoc escanea recursivamente todos los
 subpaquetes del paquete indicado.
 
 ## 🌐 Documentación final visible en Swagger UI

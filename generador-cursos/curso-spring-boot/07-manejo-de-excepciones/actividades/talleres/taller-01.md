@@ -10,10 +10,18 @@ con `@ResponseStatus`, centralizada en un `@ControllerAdvice`.
 
 MediSalud ya tiene `ControladorPacientes`/`ServicioPacientes` funcionando
 (Taller del Módulo 5, con su estructura de paquetes MVC:
-`com.medisalud.entity`/`repository`/`service`/`controller`). Le falta lo
-mismo que se aplicó a `Libro` en los Ejemplos 03-06 de este módulo:
-reemplazar `Optional`/`ResponseEntity.notFound()` por una excepción
-personalizada y un manejador global.
+`com.medisalud.controllers`, `com.medisalud.services` y
+`com.medisalud.persistences` con sus subpaquetes `entities` y
+`repositories`). Le falta lo mismo que se aplicó a `Libro` en los
+Ejemplos 03-06 de este módulo: reemplazar `Optional`/
+`ResponseEntity.notFound()` por una excepción personalizada y un
+manejador global.
+
+Las tres capas MVC (`controllers`, `services`, `persistences`) no cambian
+de lugar. El paquete `exception` es **transversal**: no es una capa nueva,
+agrupa las clases de error que el `Service` lanza y que el manejador
+global (`@ControllerAdvice`) traduce a una respuesta HTTP para la capa
+`controllers`.
 
 ## 🪜 Pasos
 
@@ -27,6 +35,8 @@ personalizada y un manejador global.
    `Optional`; actualizá `actualizar` y `eliminar` para reutilizar
    `buscarPorId`; quitá de `ControladorPacientes.buscarPorId` el
    `ResponseEntity.notFound()` manual.
+   La excepción se lanza desde la capa `services` (es donde se conoce la
+   regla de negocio) y nunca desde `controllers`.
 3. **Centralizar el manejo**: creá `ManejadorGlobalDeExcepciones`
    (`@ControllerAdvice`) en `com.medisalud.exception`, con un
    `@ExceptionHandler(PacienteNoEncontradoException.class)` que devuelva
@@ -64,14 +74,15 @@ resolverlo primero por tu cuenta.
 📁 taller-01-manejo-de-excepciones-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 entity
-    │   │   └── 📄 Paciente.java
-    │   ├── 📁 repository
-    │   │   └── 📄 RepositorioPacientes.java
-    │   ├── 📁 service
-    │   │   └── 📄 ServicioPacientes.java
-    │   ├── 📁 controller
+    │   ├── 📁 controllers
     │   │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 services
+    │   │   └── 📄 ServicioPacientes.java
+    │   ├── 📁 persistences
+    │   │   ├── 📁 entities
+    │   │   │   └── 📄 Paciente.java
+    │   │   └── 📁 repositories
+    │   │       └── 📄 RepositorioPacientes.java
     │   └── 📁 exception
     │       ├── 📄 PacienteNoEncontradoException.java
     │       └── 📄 ManejadorGlobalDeExcepciones.java
@@ -88,6 +99,9 @@ resolverlo primero por tu cuenta.
   defecto de Spring Boot.
 - `ControladorPacientes` no debe conservar ningún `ResponseEntity` de
   error construido a mano, ni ningún `@ExceptionHandler` propio.
+- La estructura de capas del Módulo 5 se mantiene: `ControladorPacientes`
+  solo depende de `ServicioPacientes`, y `ServicioPacientes` solo de
+  `RepositorioPacientes`.
 
 ## 📏 Criterios de evaluación
 

@@ -9,30 +9,40 @@
 📁 taller-01-api-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 entity
-    │   │   └── 📄 Paciente.java
-    │   ├── 📁 repository
-    │   │   └── 📄 RepositorioPacientes.java
-    │   ├── 📁 service
+    │   ├── 📁 controllers
+    │   │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 services
     │   │   └── 📄 ServicioPacientes.java
-    │   └── 📁 controller
-    │       └── 📄 ControladorPacientes.java
+    │   └── 📁 persistences
+    │       ├── 📁 entities
+    │       │   └── 📄 Paciente.java
+    │       └── 📁 repositories
+    │           └── 📄 RepositorioPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
-**Nota sobre paquetes**: este Taller reorganiza en paquetes por capa
-(`entity`, `repository`, `service`, `controller`) la misma arquitectura
-ya explicada en el Ejemplo 03 (Controller → Service → Repository →
-Database). Cada clase declara su `package` y solo importa explícitamente
-las clases del proyecto que vienen de otro paquete; las clases de
-Spring/Java (`@Service`, `Optional`, etc.) se omiten por brevedad, igual
-que en el resto del curso.
+**Nota sobre paquetes**: este Taller reorganiza en paquetes por capa MVC
+(`controllers`, `services` y `persistences`, esta última con
+`entities` y `repositories`) la misma arquitectura ya explicada en el
+Ejemplo 03 (Controller → Service → Repository → Database). Cada clase
+declara su `package` y solo importa explícitamente las clases del proyecto
+que vienen de otro paquete; las clases de Spring/Java (`@Service`,
+`Optional`, etc.) se omiten por brevedad, igual que en el resto del curso.
 
-## 📄 Archivo: `Paciente.java` (`com.medisalud.entity`)
+| Capa MVC | Paquete | Clase |
+|---|---|---|
+| Controller | `com.medisalud.controllers` | `ControladorPacientes` |
+| Service | `com.medisalud.services` | `ServicioPacientes` |
+| Persistence | `com.medisalud.persistences.entities` / `com.medisalud.persistences.repositories` | `Paciente` / `RepositorioPacientes` |
+
+Dirección de las dependencias: `ControladorPacientes` → `ServicioPacientes`
+→ `RepositorioPacientes`. El controlador nunca inyecta el repositorio.
+
+## 📄 Archivo: `Paciente.java` (`com.medisalud.persistences.entities`)
 
 ```java
-package com.medisalud.entity;
+package com.medisalud.persistences.entities;
 
 @Entity
 public class Paciente {
@@ -61,25 +71,25 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.repository`)
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistences.repositories`)
 
 ```java
-package com.medisalud.repository;
+package com.medisalud.persistences.repositories;
 
-import com.medisalud.entity.Paciente;
+import com.medisalud.persistences.entities.Paciente;
 
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.service`)
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.services`)
 
 ```java
-package com.medisalud.service;
+package com.medisalud.services;
 
-import com.medisalud.entity.Paciente;
-import com.medisalud.repository.RepositorioPacientes;
+import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.persistences.repositories.RepositorioPacientes;
 
 @Service
 public class ServicioPacientes {
@@ -120,13 +130,13 @@ public class ServicioPacientes {
 }
 ```
 
-## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controller`)
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controllers`)
 
 ```java
-package com.medisalud.controller;
+package com.medisalud.controllers;
 
-import com.medisalud.entity.Paciente;
-import com.medisalud.service.ServicioPacientes;
+import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.services.ServicioPacientes;
 
 @RestController
 @RequestMapping("/pacientes")

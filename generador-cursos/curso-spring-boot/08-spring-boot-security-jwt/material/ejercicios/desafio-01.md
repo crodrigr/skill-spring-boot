@@ -20,7 +20,8 @@ manejo global ya aplicados). Ninguna de estas clases debe cambiar su
 comportamiento en este Desafío.
 
 ```java
-// Cita.java (Módulo 3, sin cambios)
+// Cita.java — capa persistences (com.medisalud.persistences.entities)
+// (Módulo 3, sin cambios)
 @Entity
 public class Cita {
 
@@ -55,13 +56,15 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java (Módulo 3, sin cambios)
+// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+// (Módulo 3, sin cambios)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
-// CitaNoEncontradaException.java (Módulo 7, sin cambios)
+// CitaNoEncontradaException.java — paquete transversal (com.medisalud.exception)
+// (Módulo 7, sin cambios)
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class CitaNoEncontradaException extends RuntimeException {
 
@@ -72,7 +75,8 @@ public class CitaNoEncontradaException extends RuntimeException {
 ```
 
 ```java
-// ServicioCitas.java (Módulo 7, sin cambios)
+// ServicioCitas.java — capa services (com.medisalud.services)
+// (Módulo 7, sin cambios)
 @Service
 public class ServicioCitas {
 
@@ -110,7 +114,8 @@ public class ServicioCitas {
 ```
 
 ```java
-// ControladorCitas.java (Módulo 7, sin cambios)
+// ControladorCitas.java — capa controllers (com.medisalud.controllers)
+// (Módulo 7, sin cambios)
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {
@@ -150,6 +155,18 @@ public class ControladorCitas {
 }
 ```
 
+**Ubicación de las clases nuevas (mismas capas MVC, dentro de
+`com.medisalud.security`)**:
+
+| Clase | Paquete |
+|---|---|
+| `Usuario` | `com.medisalud.security.persistences.entities` |
+| `RepositorioUsuarios` | `com.medisalud.security.persistences.repositories` |
+| `ServicioDetallesUsuario` | `com.medisalud.security.services` |
+| `ControladorAutenticacion` | `com.medisalud.security.controllers` |
+| `UtilJwt`, `FiltroAutenticacionJwt` | `com.medisalud.security.jwt` (transversal) |
+| `ConfiguracionSeguridad` | `com.medisalud.security.config` (transversal) |
+
 1. Creá `Usuario` (entidad con `nombreUsuario`, `contrasena`
    codificada y `rol`) y `RepositorioUsuarios`.
 2. Creá `ServicioDetallesUsuario` (`UserDetailsService`) respaldado por
@@ -175,6 +192,9 @@ public class ControladorCitas {
   token.
 - `FiltroAutenticacionJwt` no consulta `RepositorioCitas` ni ninguna
   entidad de dominio.
+- Cada clase nueva vive en el paquete de su capa MVC (o en un paquete
+  transversal) según la tabla de ubicación, y `ControladorAutenticacion`
+  no accede a `RepositorioUsuarios` directamente.
 
 ## 🚧 Restricciones
 

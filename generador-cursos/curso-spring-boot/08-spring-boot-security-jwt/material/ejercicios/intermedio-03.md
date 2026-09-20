@@ -8,7 +8,8 @@ El proyecto de `ControladorAutores` (Intermedio 01) ya tiene
 como código de partida), pero todavía no existe ningún endpoint de
 login.
 
-**Pregunta**: implementá `ControladorAutenticacion`, con un endpoint
+**Pregunta**: implementá `ControladorAutenticacion` (capa `controllers`,
+paquete `com.biblioteca.security.controllers`), con un endpoint
 `POST /auth/login` que reciba `nombreUsuario` y `contrasena`, los
 verifique usando el `AuthenticationManager`, y devuelva un JWT generado
 con `UtilJwt.generarToken` si son válidos.
@@ -18,7 +19,7 @@ con `UtilJwt.generarToken` si son válidos.
 <details>
 <summary>📄 Ver código completo de <code>Credencial.java</code>, <code>RepositorioCredenciales.java</code>, <code>ServicioDetallesUsuario.java</code> y <code>UtilJwt.java</code> (ya dados, no crear de nuevo)</summary>
 
-## 💻 Archivo: `Credencial.java`
+## 💻 Archivo: `Credencial.java` (`com.biblioteca.security.persistences.entities`)
 
 ```java
 @Entity
@@ -51,7 +52,7 @@ public class Credencial {
 }
 ```
 
-## 💻 Archivo: `RepositorioCredenciales.java`
+## 💻 Archivo: `RepositorioCredenciales.java` (`com.biblioteca.security.persistences.repositories`)
 
 ```java
 public interface RepositorioCredenciales extends JpaRepository<Credencial, Long> {
@@ -59,7 +60,7 @@ public interface RepositorioCredenciales extends JpaRepository<Credencial, Long>
 }
 ```
 
-## 💻 Archivo: `ServicioDetallesUsuario.java`
+## 💻 Archivo: `ServicioDetallesUsuario.java` (`com.biblioteca.security.services`)
 
 ```java
 @Service
@@ -85,7 +86,7 @@ public class ServicioDetallesUsuario implements UserDetailsService {
 }
 ```
 
-## 💻 Archivo: `UtilJwt.java`
+## 💻 Archivo: `UtilJwt.java` (`com.biblioteca.security.jwt`, paquete transversal)
 
 ```java
 @Component
@@ -136,6 +137,9 @@ public class UtilJwt {
   incluye el JWT generado por `UtilJwt.generarToken`.
 - No crea ningún endpoint que devuelva la contraseña de la `Credencial`
   en texto plano.
+- `ControladorAutenticacion` vive en `com.biblioteca.security.controllers`
+  y no accede a `RepositorioCredenciales` directamente: la verificación
+  pasa por `AuthenticationManager` y `ServicioDetallesUsuario`.
 
 ## 🚧 Restricciones
 

@@ -9,6 +9,7 @@ en la base de datos. ¿Qué me falta?".
 ## 💻 Código o contexto de partida
 
 ```java
+// Capa persistences: com.medisalud.persistences.entities
 @Entity
 public class Paciente {
 

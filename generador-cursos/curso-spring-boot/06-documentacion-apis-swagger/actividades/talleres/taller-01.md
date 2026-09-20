@@ -25,7 +25,7 @@ y la configuración de springdoc-openapi.
    `springdoc.packages-to-scan=com.medisalud`, siguiendo el mismo patrón
    del Ejemplo 05. Alcanza con apuntar al paquete raíz `com.medisalud`,
    aunque `ControladorPacientes` viva en el subpaquete
-   `com.medisalud.controller`: springdoc escanea recursivamente todos los
+   `com.medisalud.controllers`: springdoc escanea recursivamente todos los
    subpaquetes.
 3. **Verificar en Swagger UI**: accedé a
    `http://localhost:8080/doc/swagger-ui.html` y confirmá que los cinco
@@ -58,19 +58,21 @@ intentá resolverlo primero por tu cuenta.
 📁 taller-01-documentacion-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 entity
-    │   │   └── 📄 Paciente.java
-    │   ├── 📁 repository
-    │   │   └── 📄 RepositorioPacientes.java
-    │   ├── 📁 service
+    │   ├── 📁 controllers
+    │   │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 services
     │   │   └── 📄 ServicioPacientes.java
-    │   └── 📁 controller
-    │       └── 📄 ControladorPacientes.java
+    │   └── 📁 persistences
+    │       ├── 📁 entities
+    │       │   └── 📄 Paciente.java
+    │       └── 📁 repositories
+    │           └── 📄 RepositorioPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
-(Las cuatro clases Java quedan exactamente igual que en el Módulo 5; el
+(Las cuatro clases Java quedan exactamente igual que en el Módulo 5, cada
+una en su capa MVC —`controllers`, `services` y `persistences`—; el
 `pom.xml` y `application.properties` son los únicos archivos que
 cambian.)
 

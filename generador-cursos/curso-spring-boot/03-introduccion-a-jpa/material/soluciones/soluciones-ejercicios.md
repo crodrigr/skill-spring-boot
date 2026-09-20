@@ -50,9 +50,13 @@ primero (una por aplicación, en la práctica), y de ella se obtienen los
 
 ## 🟡 Intermedio 01 — Convertir `RepositorioLibros` en un repositorio de Spring Data JPA
 
-**Solución propuesta**:
+**Solución propuesta** (capa `persistences`: entidades en
+`com.biblioteca.persistences.entities`, repositorios en
+`com.biblioteca.persistences.repositories`; `Main` en el paquete raíz
+`com.biblioteca`):
 
 ```java
+// com.biblioteca.persistences.entities.Libro
 @Entity
 public class Libro {
 
@@ -78,10 +82,12 @@ public class Libro {
     public String getTitulo() { return titulo; }
 }
 
+// com.biblioteca.persistences.repositories.RepositorioLibros
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
 
+// com.biblioteca.Main (paquete raíz; todavía no existe capa services)
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
@@ -124,6 +130,7 @@ las entidades.
 **Solución propuesta**:
 
 ```java
+// com.biblioteca.persistences.entities.Categoria
 @Entity
 public class Categoria {
 
@@ -146,6 +153,7 @@ public class Categoria {
     }
 }
 
+// com.biblioteca.persistences.repositories.RepositorioCategorias
 public interface RepositorioCategorias extends JpaRepository<Categoria, Long> {
 }
 ```
@@ -155,6 +163,7 @@ public interface RepositorioCategorias extends JpaRepository<Categoria, Long> {
 **Solución propuesta**:
 
 ```java
+// com.medisalud.persistences.entities.Medico
 @Entity
 public class Medico {
 
@@ -178,7 +187,7 @@ public class Medico {
     public List<Cita> getCitas() { return citas; }
 }
 
-// En Cita.java, se agrega:
+// En com.medisalud.persistences.entities.Cita, se agrega:
 @ManyToOne
 @JoinColumn(name = "medico_id")
 private Medico medico;
@@ -194,6 +203,7 @@ en `Cita`.
 **Solución propuesta (Opción A, `@OneToOne`)**:
 
 ```java
+// com.biblioteca.persistences.entities.Libro
 @Entity
 public class Libro {
     @Id
@@ -222,6 +232,7 @@ public class Libro {
     }
 }
 
+// com.biblioteca.persistences.entities.FichaTecnica
 @Entity
 public class FichaTecnica {
     @Id
@@ -254,6 +265,7 @@ las dos clases (`Estudiante` o `Curso`) declara `@ManyToMany` con
 **Solución propuesta**:
 
 ```java
+// com.medisalud.persistences.entities.Medico
 @Entity
 public class Medico {
 
@@ -277,16 +289,18 @@ public class Medico {
     public List<Cita> getCitas() { return citas; }
 }
 
-// Cita.java se extiende con:
+// com.medisalud.persistences.entities.Cita se extiende con:
 @ManyToOne
 @JoinColumn(name = "medico_id")
 private Medico medico;
 // + constructor y getter actualizados para recibir/exponer medico
 
+// com.medisalud.persistences.repositories.RepositorioMedicos
 public interface RepositorioMedicos extends JpaRepository<Medico, Long> {
     Optional<Medico> findByNombre(String nombre);
 }
 
+// com.medisalud.Main (paquete raíz; todavía no existe capa services)
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

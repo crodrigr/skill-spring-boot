@@ -11,9 +11,11 @@ implementación manual en memoria y pase a persistir sobre H2, igual que
 ```java
 // Libro.java — todavía es el record del Módulo 1; convertilo en @Entity
 // como se hizo con Paciente en el Ejemplo 01.
+// Capa persistences: com.biblioteca.persistences.entities
 public record Libro(String isbn, String titulo) {}
 
 // RepositorioLibros.java — todavía tiene su propio método, sin Spring Data JPA
+// Capa persistences: com.biblioteca.persistences.repositories
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
@@ -23,6 +25,12 @@ public interface RepositorioLibros {
 application.properties del proyecto (igual que en el Ejemplo 07, ya
 configurado contra H2 en memoria — no hace falta tocarlo).
 ```
+
+**Capas MVC**: en este módulo solo existe la capa `persistences`. `Libro`
+va en `com.biblioteca.persistences.entities`, `RepositorioLibros` en
+`com.biblioteca.persistences.repositories` y `Main` en el paquete raíz
+`com.biblioteca`. Las capas `services` y `controllers` llegan en el Módulo
+5.
 
 1. Convertí `Libro` en una entidad JPA (`@Entity`, `@Id`,
    `@GeneratedValue`, `@Column(unique = true)` sobre `isbn`), siguiendo el
@@ -39,6 +47,8 @@ configurado contra H2 en memoria — no hace falta tocarlo).
   argumentos y *getters*.
 - `RepositorioLibros` extiende `JpaRepository<Libro, Long>` y no declara
   ninguna implementación propia para `findByIsbn`.
+- `Libro` y `RepositorioLibros` están en los paquetes de la capa
+  `persistences` (`entities` y `repositories`), con su línea `package`.
 - El `Main` ejecuta sin excepciones y el título encontrado coincide con el
   guardado.
 

@@ -16,7 +16,7 @@ ninguna de las cuales aparece en los ejemplos del módulo (elegí una):
 ## 💻 Código o contexto de partida
 
 ```java
-// Opción A
+// Opción A — capa persistences: com.biblioteca.persistences.entities
 public class Libro { /* ya existe, con id, isbn, titulo */ }
 
 public class FichaTecnica {
@@ -27,7 +27,7 @@ public class FichaTecnica {
 ```
 
 ```java
-// Opción B
+// Opción B — capa persistences: com.biblioteca.persistences.entities
 public class Estudiante {
     private Long id;
     private String nombre;
@@ -42,7 +42,8 @@ public class Curso {
 Elegí una opción, convertí las clases involucradas en entidades JPA
 completas (`@Entity`, `@Id`, `@GeneratedValue`, constructor sin argumentos),
 y agregá la relación elegida, decidiendo explícitamente cuál es el lado
-propietario.
+propietario. Las entidades van en el paquete
+`com.biblioteca.persistences.entities` (capa `persistences`).
 
 ## 📏 Criterios de evaluación de la solución
 

@@ -9,36 +9,52 @@
 📁 taller-01-security-jwt-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 entity
-    │   │   └── 📄 Paciente.java
-    │   ├── 📁 repository
-    │   │   └── 📄 RepositorioPacientes.java
-    │   ├── 📁 service
-    │   │   └── 📄 ServicioPacientes.java
-    │   ├── 📁 controller
+    │   ├── 📁 controllers
     │   │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 services
+    │   │   └── 📄 ServicioPacientes.java
+    │   ├── 📁 persistences
+    │   │   ├── 📁 entities
+    │   │   │   └── 📄 Paciente.java
+    │   │   └── 📁 repositories
+    │   │       └── 📄 RepositorioPacientes.java
     │   ├── 📁 exception
     │   │   ├── 📄 PacienteNoEncontradoException.java
     │   │   └── 📄 ManejadorGlobalDeExcepciones.java
     │   └── 📁 security
-    │       ├── 📁 entity/📄 Usuario.java
-    │       ├── 📁 repository/📄 RepositorioUsuarios.java
-    │       ├── 📁 service/📄 ServicioDetallesUsuario.java
-    │       ├── 📁 config/📄 ConfiguracionSeguridad.java
-    │       ├── 📁 jwt/📄 UtilJwt.java
-    │       ├── 📁 jwt/📄 FiltroAutenticacionJwt.java
-    │       └── 📁 controller/📄 ControladorAutenticacion.java
+    │       ├── 📁 controllers
+    │       │   └── 📄 ControladorAutenticacion.java
+    │       ├── 📁 services
+    │       │   └── 📄 ServicioDetallesUsuario.java
+    │       ├── 📁 persistences
+    │       │   ├── 📁 entities
+    │       │   │   └── 📄 Usuario.java
+    │       │   └── 📁 repositories
+    │       │       └── 📄 RepositorioUsuarios.java
+    │       ├── 📁 config
+    │       │   └── 📄 ConfiguracionSeguridad.java
+    │       └── 📁 jwt
+    │           ├── 📄 UtilJwt.java
+    │           └── 📄 FiltroAutenticacionJwt.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
+**Capas MVC**: tanto el paquete raíz `com.medisalud` como
+`com.medisalud.security` respetan `controllers` → `services` →
+`persistences` (`entities` + `repositories`). `exception`, `config` y
+`jwt` son paquetes transversales, no capas. Ningún controlador inyecta un
+repositorio: `ControladorPacientes` usa `ServicioPacientes`, y
+`ControladorAutenticacion` usa `AuthenticationManager` y
+`ServicioDetallesUsuario`.
+
 <details>
 <summary>📄 Ver código completo de <code>Paciente.java</code>, <code>RepositorioPacientes.java</code>, <code>PacienteNoEncontradoException.java</code>, <code>ServicioPacientes.java</code>, <code>ControladorPacientes.java</code> y <code>ManejadorGlobalDeExcepciones.java</code> (reutilizados del Módulo 7, sin cambios)</summary>
 
-## 📄 Archivo: `Paciente.java` (`com.medisalud.entity`, sin cambios)
+## 📄 Archivo: `Paciente.java` (`com.medisalud.persistences.entities`, sin cambios)
 
 ```java
-package com.medisalud.entity;
+package com.medisalud.persistences.entities;
 
 @Entity
 public class Paciente {
@@ -67,12 +83,12 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.repository`, sin cambios)
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistences.repositories`, sin cambios)
 
 ```java
-package com.medisalud.repository;
+package com.medisalud.persistences.repositories;
 
-import com.medisalud.entity.Paciente;
+import com.medisalud.persistences.entities.Paciente;
 
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
@@ -93,14 +109,14 @@ public class PacienteNoEncontradoException extends RuntimeException {
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.service`, sin cambios)
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.services`, sin cambios)
 
 ```java
-package com.medisalud.service;
+package com.medisalud.services;
 
-import com.medisalud.entity.Paciente;
+import com.medisalud.persistences.entities.Paciente;
 import com.medisalud.exception.PacienteNoEncontradoException;
-import com.medisalud.repository.RepositorioPacientes;
+import com.medisalud.persistences.repositories.RepositorioPacientes;
 
 @Service
 public class ServicioPacientes {
@@ -137,13 +153,13 @@ public class ServicioPacientes {
 }
 ```
 
-## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controller`, sin cambios)
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controllers`, sin cambios)
 
 ```java
-package com.medisalud.controller;
+package com.medisalud.controllers;
 
-import com.medisalud.entity.Paciente;
-import com.medisalud.service.ServicioPacientes;
+import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.services.ServicioPacientes;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -203,10 +219,10 @@ public class ManejadorGlobalDeExcepciones {
 
 </details>
 
-## 📄 Archivo: `Usuario.java` (`com.medisalud.security.entity`, nueva)
+## 📄 Archivo: `Usuario.java` (`com.medisalud.security.persistences.entities`, nueva)
 
 ```java
-package com.medisalud.security.entity;
+package com.medisalud.security.persistences.entities;
 
 @Entity
 public class Usuario {
@@ -238,25 +254,25 @@ public class Usuario {
 }
 ```
 
-## 📄 Archivo: `RepositorioUsuarios.java` (`com.medisalud.security.repository`, nueva)
+## 📄 Archivo: `RepositorioUsuarios.java` (`com.medisalud.security.persistences.repositories`, nueva)
 
 ```java
-package com.medisalud.security.repository;
+package com.medisalud.security.persistences.repositories;
 
-import com.medisalud.security.entity.Usuario;
+import com.medisalud.security.persistences.entities.Usuario;
 
 public interface RepositorioUsuarios extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByNombreUsuario(String nombreUsuario);
 }
 ```
 
-## 📄 Archivo: `ServicioDetallesUsuario.java` (`com.medisalud.security.service`, nueva)
+## 📄 Archivo: `ServicioDetallesUsuario.java` (`com.medisalud.security.services`, nueva)
 
 ```java
-package com.medisalud.security.service;
+package com.medisalud.security.services;
 
-import com.medisalud.security.entity.Usuario;
-import com.medisalud.security.repository.RepositorioUsuarios;
+import com.medisalud.security.persistences.entities.Usuario;
+import com.medisalud.security.persistences.repositories.RepositorioUsuarios;
 
 @Service
 public class ServicioDetallesUsuario implements UserDetailsService {
@@ -330,7 +346,7 @@ public class UtilJwt {
 ```java
 package com.medisalud.security.jwt;
 
-import com.medisalud.security.service.ServicioDetallesUsuario;
+import com.medisalud.security.services.ServicioDetallesUsuario;
 
 @Component
 public class FiltroAutenticacionJwt extends OncePerRequestFilter {
@@ -364,13 +380,13 @@ public class FiltroAutenticacionJwt extends OncePerRequestFilter {
 }
 ```
 
-## 📄 Archivo: `ControladorAutenticacion.java` (`com.medisalud.security.controller`, nueva)
+## 📄 Archivo: `ControladorAutenticacion.java` (`com.medisalud.security.controllers`, nueva)
 
 ```java
-package com.medisalud.security.controller;
+package com.medisalud.security.controllers;
 
 import com.medisalud.security.jwt.UtilJwt;
-import com.medisalud.security.service.ServicioDetallesUsuario;
+import com.medisalud.security.services.ServicioDetallesUsuario;
 
 @RestController
 @RequestMapping("/auth")

@@ -9,6 +9,7 @@ nombre de sus `Autor` (Módulo 3), pero **no** necesita eliminarlos todavía
 ## 💻 Código o contexto de partida
 
 ```java
+// Capa persistences: com.biblioteca.persistences.entities
 @Entity
 public class Autor {
 
@@ -32,11 +33,13 @@ public class Autor {
 ```
 
 ```java
+// Capa persistences: com.biblioteca.persistences.repositories
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
 
-1. Escribí un `Main` que:
+1. Escribí un `Main` (paquete raíz `com.biblioteca`; todavía no hay capa
+   `services`, así que usa `RepositorioAutores` directamente) que:
    - **Cree** un `Autor` con `save(...)`.
    - **Lea** ese mismo `Autor` con `findById(...)`.
    - **Actualice** su `nombre` y lo guarde de nuevo con `save(...)`.

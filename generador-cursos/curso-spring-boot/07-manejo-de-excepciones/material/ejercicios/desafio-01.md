@@ -12,7 +12,8 @@ al Módulo 5 (igual que en los Ejemplos y en el Taller).
 ## 💻 Código o contexto de partida
 
 ```java
-// Cita.java (Módulo 3, reutilizada tal cual)
+// Cita.java — capa persistences (com.medisalud.persistences.entities)
+// (Módulo 3, reutilizada tal cual)
 @Entity
 public class Cita {
 
@@ -47,13 +48,15 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java (Módulo 3, reutilizada tal cual)
+// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+// (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
-// ServicioCitas.java (Módulo 5, con buscarPorId todavía devolviendo Optional)
+// ServicioCitas.java — capa services (com.medisalud.services)
+// (Módulo 5, con buscarPorId todavía devolviendo Optional)
 @Service
 public class ServicioCitas {
 
@@ -95,7 +98,8 @@ public class ServicioCitas {
 ```
 
 ```java
-// ControladorCitas.java (Módulo 5, con manejo manual de errores)
+// ControladorCitas.java — capa controllers (com.medisalud.controllers)
+// (Módulo 5, con manejo manual de errores)
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {
@@ -139,7 +143,8 @@ public class ControladorCitas {
 }
 ```
 
-1. Creá `CitaNoEncontradaException` (`@ResponseStatus(HttpStatus.NOT_FOUND)`).
+1. Creá `CitaNoEncontradaException` (`@ResponseStatus(HttpStatus.NOT_FOUND)`)
+   en el paquete transversal `com.medisalud.exception`.
 2. Modificá `ServicioCitas.buscarPorId` para que devuelva `Cita`
    directamente y lance la excepción; actualizá `actualizar` y
    `eliminar` para reutilizarlo. **Documentá explícitamente**, en tu
@@ -148,8 +153,8 @@ public class ControladorCitas {
    en el Taller.
 3. Quitá de `ControladorCitas` cualquier `ResponseEntity.notFound()`
    manual.
-4. Creá un `@ControllerAdvice` que centralice el manejo de
-   `CitaNoEncontradaException`, devolviendo `{"error": "<mensaje>"}"` con
+4. Creá un `@ControllerAdvice` (también en `com.medisalud.exception`) que
+   centralice el manejo de `CitaNoEncontradaException`, devolviendo `{"error": "<mensaje>"}"` con
    `404`.
 5. Sin caso de duplicado: `Cita` no tiene un campo único natural (a
    diferencia de `Libro.isbn` o `Paciente.codigo`) sobre el cual definir

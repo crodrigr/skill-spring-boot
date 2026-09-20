@@ -20,7 +20,8 @@ com.fasterxml.jackson.databind.JsonMappingException: Infinite recursion (StackOv
 ## 💻 Código o contexto de partida
 
 ```java
-// Paciente.java (Módulo 3, reutilizada tal cual)
+// Paciente.java — capa persistences (com.medisalud.persistences.entities)
+// (Módulo 3, reutilizada tal cual)
 @Entity
 public class Paciente {
 
@@ -60,7 +61,8 @@ public class Paciente {
 ```
 
 ```java
-// Cita.java (Módulo 3, reutilizada; se agrega getId(), que el Módulo 3
+// Cita.java — capa persistences (com.medisalud.persistences.entities)
+// (Módulo 3, reutilizada; se agrega getId(), que el Módulo 3
 // no necesitaba porque nunca se expuso vía REST)
 @Entity
 public class Cita {
@@ -94,13 +96,15 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java (Módulo 3, reutilizada tal cual)
+// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+// (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
-// ServicioCitas.java (nueva, mismo patrón que ServicioLibros)
+// ServicioCitas.java — capa services (com.medisalud.services)
+// (nueva, mismo patrón que ServicioLibros)
 @Service
 public class ServicioCitas {
 
@@ -117,6 +121,7 @@ public class ServicioCitas {
 ```
 
 ```java
+// ControladorCitas.java — capa controllers (com.medisalud.controllers)
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {

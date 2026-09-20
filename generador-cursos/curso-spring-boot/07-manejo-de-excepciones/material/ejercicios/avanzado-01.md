@@ -10,7 +10,7 @@ en una única clase `@ControllerAdvice`.
 ## 💻 Código o contexto de partida
 
 ```java
-// Dentro de ControladorLibros:
+// Dentro de ControladorLibros (capa controllers):
 @ExceptionHandler(LibroNoEncontradoException.class)
 public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
     Map<String, String> cuerpo = new HashMap<>();
@@ -20,7 +20,7 @@ public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncon
 ```
 
 ```java
-// Dentro de ControladorAutores:
+// Dentro de ControladorAutores (capa controllers):
 @ExceptionHandler(AutorNoEncontradoException.class)
 public ResponseEntity<Map<String, String>> manejarAutorNoEncontrado(AutorNoEncontradoException ex) {
     Map<String, String> cuerpo = new HashMap<>();
@@ -30,7 +30,8 @@ public ResponseEntity<Map<String, String>> manejarAutorNoEncontrado(AutorNoEncon
 ```
 
 1. Creá una clase `ManejadorGlobalDeExcepciones` (`@ControllerAdvice`)
-   que incluya ambos métodos.
+   en el paquete transversal `com.biblioteca.exception` que incluya ambos
+   métodos.
 2. Quitá los dos métodos `@ExceptionHandler` de `ControladorLibros` y
    `ControladorAutores`.
 

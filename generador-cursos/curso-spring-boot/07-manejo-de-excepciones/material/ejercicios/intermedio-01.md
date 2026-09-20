@@ -11,7 +11,8 @@ Ejemplo 03.
 ## 💻 Código o contexto de partida
 
 ```java
-// Autor.java (Módulo 3, reutilizada)
+// Autor.java — capa persistences (com.biblioteca.persistences.entities)
+// (Módulo 3, reutilizada)
 @Entity
 public class Autor {
 
@@ -39,12 +40,14 @@ public class Autor {
 ```
 
 ```java
+// RepositorioAutores.java — capa persistences (com.biblioteca.persistences.repositories)
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
 
 ```java
-// ServicioAutores.java (Módulo 5, reutilizada)
+// ServicioAutores.java — capa services (com.biblioteca.services)
+// (Módulo 5, reutilizada)
 @Service
 public class ServicioAutores {
 
@@ -85,7 +88,8 @@ public class ServicioAutores {
 ```
 
 ```java
-// ControladorAutores.java (Módulo 5, reutilizada)
+// ControladorAutores.java — capa controllers (com.biblioteca.controllers)
+// (Módulo 5, reutilizada)
 @RestController
 @RequestMapping("/autores")
 public class ControladorAutores {
@@ -129,11 +133,12 @@ public class ControladorAutores {
 }
 ```
 
-1. Creá `AutorNoEncontradoException` (`@ResponseStatus(HttpStatus.NOT_FOUND)`),
-   siguiendo el mismo patrón de `LibroNoEncontradoException` (Ejemplo
-   03).
-2. Modificá `ServicioAutores.buscarPorId` para que devuelva `Autor`
-   directamente y lance la excepción en vez de `Optional`.
+1. Creá `AutorNoEncontradoException` (`@ResponseStatus(HttpStatus.NOT_FOUND)`)
+   en el paquete transversal `com.biblioteca.exception`, siguiendo el
+   mismo patrón de `LibroNoEncontradoException` (Ejemplo 03).
+2. Modificá `ServicioAutores.buscarPorId` (capa `services`) para que
+   devuelva `Autor` directamente y lance la excepción en vez de
+   `Optional`.
 3. Modificá `ControladorAutores.buscarPorId` para que ya no construya
    `ResponseEntity.notFound()`.
 
@@ -145,6 +150,8 @@ public class ControladorAutores {
   usa `orElseThrow(...)`.
 - `ControladorAutores.buscarPorId` devuelve `Autor` directamente, sin
   ningún `ResponseEntity` construido a mano.
+- La excepción se lanza en `ServicioAutores` (capa `services`), no en
+  `ControladorAutores`.
 
 ## 🚧 Restricciones
 

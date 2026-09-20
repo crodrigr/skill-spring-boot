@@ -74,6 +74,7 @@ eyJhbGciOiJIUzI1NiJ9 . eyJzdWIiOiJhbmEiLCJyb2wiOiJVU0VSIiwiZXhwIjoxOTk5OTk5OTk5f
 ## Intermedio 03 — Implementar el endpoint de login que emite un JWT
 
 ```java
+// com.biblioteca.security.controllers.ControladorAutenticacion — capa controllers
 @RestController
 @RequestMapping("/auth")
 public class ControladorAutenticacion {
@@ -110,6 +111,7 @@ public class ControladorAutenticacion {
 ## Avanzado 01 — Implementar el filtro de validación de JWT
 
 ```java
+// com.biblioteca.security.jwt.FiltroAutenticacionJwt — paquete transversal
 @Component
 public class FiltroAutenticacionJwt extends OncePerRequestFilter {
 
@@ -142,7 +144,8 @@ public class FiltroAutenticacionJwt extends OncePerRequestFilter {
 }
 ```
 
-`ConfiguracionSeguridad` (fragmento agregado):
+`ConfiguracionSeguridad` (fragmento agregado, en
+`com.biblioteca.security.config`):
 
 ```java
 @Bean
@@ -208,6 +211,21 @@ La solución sigue exactamente el mismo patrón del
 proyecto de `Cita`/`ServicioCitas`/`ControladorCitas` en vez de
 `Paciente`/`ServicioPacientes`/`ControladorPacientes`. `Cita`,
 `ServicioCitas` y `ControladorCitas` no cambian ninguna línea.
+
+Ubicación de las clases nuevas (las mismas capas MVC, dentro de
+`com.medisalud.security`):
+
+| Clase | Paquete |
+|---|---|
+| `Usuario` | `com.medisalud.security.persistences.entities` |
+| `RepositorioUsuarios` | `com.medisalud.security.persistences.repositories` |
+| `ServicioDetallesUsuario` | `com.medisalud.security.services` |
+| `ControladorAutenticacion` | `com.medisalud.security.controllers` |
+| `UtilJwt`, `FiltroAutenticacionJwt` | `com.medisalud.security.jwt` (transversal) |
+| `ConfiguracionSeguridad` | `com.medisalud.security.config` (transversal) |
+
+Las clases del dominio siguen en `com.medisalud.controllers`,
+`com.medisalud.services` y `com.medisalud.persistences`, sin cambios.
 
 Pruebas en Insomnia:
 

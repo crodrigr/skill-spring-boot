@@ -10,6 +10,7 @@ piden simplificarlo con `cascade`.
 ## 💻 Código o contexto de partida
 
 ```java
+// Capa persistences: com.biblioteca.persistences.entities
 @Entity
 public class Usuario {
 
@@ -34,15 +35,16 @@ public class Usuario {
 ```
 
 ```java
-// Prestamo.java ya existe (Ejemplo 04), con id, fechaPrestamo, usuario y libro.
+// Prestamo.java (com.biblioteca.persistences.entities) ya existe (Ejemplo 04),
+// con id, fechaPrestamo, usuario y libro.
 ```
 
 1. Agregá a `Usuario` un campo `prestamos` con
    `@OneToMany(mappedBy = "usuario", cascade = CascadeType.PERSIST)`.
-2. Escribí un `Main` que cree un `Usuario` con un `Prestamo` ya asignado en
-   su colección, y lo guarde con una sola llamada a
-   `RepositorioUsuarios.save(...)`, verificando que el préstamo también
-   quedó guardado.
+2. Escribí un `Main` (paquete raíz `com.biblioteca`) que cree un
+   `Usuario` con un `Prestamo` ya asignado en su colección, y lo guarde
+   con una sola llamada a `RepositorioUsuarios.save(...)`, verificando que
+   el préstamo también quedó guardado.
 
 ## 📏 Criterios de evaluación de la solución
 
