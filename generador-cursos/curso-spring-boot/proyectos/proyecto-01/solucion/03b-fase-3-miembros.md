@@ -7,6 +7,92 @@
 Registrar miembros (junto con su usuario), suspenderlos y consultarlos; calcular su
 **consumo mensual** de horas (RF-10); y buscar **salas disponibles** en un horario (RF-03).
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   └── 📄 ConfiguracionBeans.java
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorDisponibilidad.java                  ◀ 🆕 nuevo
+│   │   ├── 📄 ControladorEquipamientos.java
+│   │   ├── 📄 ControladorMiembros.java                        ◀ 🆕 nuevo
+│   │   ├── 📄 ControladorPlanes.java
+│   │   ├── 📄 ControladorSalas.java
+│   │   ├── 📄 ControladorSedes.java
+│   │   └── 📄 ControladorServiciosAdicionales.java
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java
+│   │   ├── 📄 ResumenConsumo.java
+│   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   ├── 📄 SolicitudEquipamiento.java
+│   │   ├── 📄 SolicitudMiembro.java
+│   │   ├── 📄 SolicitudPlan.java
+│   │   ├── 📄 SolicitudReserva.java
+│   │   ├── 📄 SolicitudSala.java
+│   │   ├── 📄 SolicitudSede.java
+│   │   └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 RecursoNoEncontradoException.java
+│   │   ├── 📄 ReglaNegocioException.java
+│   │   └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java
+│   │   │   ├── 📄 Equipamiento.java
+│   │   │   ├── 📄 EstadoMiembro.java
+│   │   │   ├── 📄 EstadoReserva.java
+│   │   │   ├── 📄 Miembro.java
+│   │   │   ├── 📄 PlanMembresia.java
+│   │   │   ├── 📄 Reserva.java
+│   │   │   ├── 📄 Sala.java
+│   │   │   ├── 📄 Sede.java
+│   │   │   ├── 📄 ServicioAdicional.java
+│   │   │   └── 📄 TipoSala.java
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java
+│   │       ├── 📄 RepositorioMiembros.java
+│   │       ├── 📄 RepositorioPlanes.java
+│   │       ├── 📄 RepositorioReservas.java
+│   │       ├── 📄 RepositorioSalas.java
+│   │       ├── 📄 RepositorioSedes.java
+│   │       └── 📄 RepositorioServiciosAdicionales.java
+│   ├── 📁 security  (autenticación y autorización)
+│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │       ├── 📁 entities  (Usuario y Rol)
+│   │       │   ├── 📄 Rol.java
+│   │       │   └── 📄 Usuario.java
+│   │       └── 📁 repositories  (RepositorioUsuarios)
+│   │           └── 📄 RepositorioUsuarios.java
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 ServicioConsumo.java                            ◀ 🆕 nuevo
+│       ├── 📄 ServicioDisponibilidad.java                     ◀ 🆕 nuevo
+│       ├── 📄 ServicioEquipamientos.java
+│       ├── 📄 ServicioMiembros.java                           ◀ 🆕 nuevo
+│       ├── 📄 ServicioPlanes.java
+│       ├── 📄 ServicioSalas.java
+│       ├── 📄 ServicioSedes.java
+│       ├── 📄 ServicioServiciosAdicionales.java
+│       └── 📄 Validaciones.java
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties
+    └── 📄 data.sql
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 5 archivos nuevos.
+
 ## 🪜 Paso a paso
 
 ### Paso 3.8 — `ServicioMiembros`

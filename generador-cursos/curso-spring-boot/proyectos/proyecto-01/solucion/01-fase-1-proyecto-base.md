@@ -28,6 +28,30 @@ java -version
 mvn -version
 ```
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore                                        ◀ 🆕 nuevo
+├── 📄 docker-compose.yml                                ◀ 🆕 nuevo
+├── 📄 pom.xml                                           ◀ 🆕 nuevo
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java                                     ◀ 🆕 nuevo
+│   └── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│       └── 📄 ConfiguracionBeans.java                   ◀ 🆕 nuevo
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties                     ◀ 🆕 nuevo
+    ├── 📄 application-mysql.properties                  ◀ 🆕 nuevo
+    ├── 📄 application-postgres.properties               ◀ 🆕 nuevo
+    └── 📄 application.properties                        ◀ 🆕 nuevo
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 9 archivos nuevos.
+
 ## 🪜 Paso a paso
 
 ### Paso 1.1 — Crear el proyecto

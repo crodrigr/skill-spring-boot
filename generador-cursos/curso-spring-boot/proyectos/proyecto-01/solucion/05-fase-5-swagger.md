@@ -20,6 +20,99 @@ probarlos desde el navegador.
 - Con **anotaciones** (`@Tag`, `@Operation`, `@Schema`) enriquecés lo generado: nombres,
   descripciones y ejemplos.
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml                                                 ◀ ✏️ se modifica
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java
+│   │   ├── 📄 ConfiguracionBeans.java
+│   │   └── 📄 ConfiguracionOpenApi.java                       ◀ 🆕 nuevo
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorDisponibilidad.java                  ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorEquipamientos.java                   ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorMiembros.java                        ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorPlanes.java                          ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorReservas.java                        ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorSalas.java                           ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorSedes.java                           ◀ ✏️ se modifica
+│   │   └── 📄 ControladorServiciosAdicionales.java            ◀ ✏️ se modifica
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java                               ◀ ✏️ se modifica
+│   │   ├── 📄 ResumenConsumo.java
+│   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   ├── 📄 SolicitudEquipamiento.java
+│   │   ├── 📄 SolicitudMiembro.java                           ◀ ✏️ se modifica
+│   │   ├── 📄 SolicitudPlan.java
+│   │   ├── 📄 SolicitudReserva.java                           ◀ ✏️ se modifica
+│   │   ├── 📄 SolicitudSala.java
+│   │   ├── 📄 SolicitudSede.java
+│   │   └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 ManejadorGlobalDeExcepciones.java
+│   │   ├── 📄 RecursoNoEncontradoException.java
+│   │   ├── 📄 ReglaNegocioException.java
+│   │   ├── 📄 RespuestaError.java                             ◀ ✏️ se modifica
+│   │   └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java
+│   │   │   ├── 📄 Equipamiento.java
+│   │   │   ├── 📄 EstadoMiembro.java
+│   │   │   ├── 📄 EstadoReserva.java
+│   │   │   ├── 📄 Miembro.java
+│   │   │   ├── 📄 PlanMembresia.java
+│   │   │   ├── 📄 Reserva.java
+│   │   │   ├── 📄 Sala.java
+│   │   │   ├── 📄 Sede.java
+│   │   │   ├── 📄 ServicioAdicional.java
+│   │   │   └── 📄 TipoSala.java
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java
+│   │       ├── 📄 RepositorioMiembros.java
+│   │       ├── 📄 RepositorioPlanes.java
+│   │       ├── 📄 RepositorioReservas.java
+│   │       ├── 📄 RepositorioSalas.java
+│   │       ├── 📄 RepositorioSedes.java
+│   │       └── 📄 RepositorioServiciosAdicionales.java
+│   ├── 📁 security  (autenticación y autorización)
+│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │       ├── 📁 entities  (Usuario y Rol)
+│   │       │   ├── 📄 Rol.java
+│   │       │   └── 📄 Usuario.java
+│   │       └── 📁 repositories  (RepositorioUsuarios)
+│   │           └── 📄 RepositorioUsuarios.java
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 CalculadoraCostoReserva.java
+│       ├── 📄 ServicioConsumo.java
+│       ├── 📄 ServicioDisponibilidad.java
+│       ├── 📄 ServicioEquipamientos.java
+│       ├── 📄 ServicioMiembros.java
+│       ├── 📄 ServicioPlanes.java
+│       ├── 📄 ServicioReservas.java
+│       ├── 📄 ServicioSalas.java
+│       ├── 📄 ServicioSedes.java
+│       ├── 📄 ServicioServiciosAdicionales.java
+│       └── 📄 Validaciones.java
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    └── 📄 data.sql
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 1 archivo nuevo y 14 archivos modificados.
+
 ## 🪜 Paso a paso
 
 ### Paso 5.1 — Dependencia

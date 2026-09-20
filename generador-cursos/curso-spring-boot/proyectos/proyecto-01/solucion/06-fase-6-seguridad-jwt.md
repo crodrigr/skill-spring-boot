@@ -48,6 +48,114 @@ con una clave secreta que solo conoce el servidor: si alguien altera el contenid
 ejemplo, cambiar `ROLE_MIEMBRO` por `ROLE_ADMIN`), la firma deja de coincidir y el token se
 rechaza. **El contenido no está cifrado**, solo firmado: nunca pongas datos sensibles.
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml                                                 ◀ ✏️ se modifica
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java
+│   │   ├── 📄 ConfiguracionBeans.java
+│   │   └── 📄 ConfiguracionOpenApi.java
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorDisponibilidad.java
+│   │   ├── 📄 ControladorEquipamientos.java
+│   │   ├── 📄 ControladorMiembros.java                        ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorPlanes.java
+│   │   ├── 📄 ControladorReservas.java                        ◀ ✏️ se modifica
+│   │   ├── 📄 ControladorSalas.java
+│   │   ├── 📄 ControladorSedes.java
+│   │   └── 📄 ControladorServiciosAdicionales.java
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java
+│   │   ├── 📄 RespuestaLogin.java                             ◀ 🆕 nuevo
+│   │   ├── 📄 ResumenConsumo.java
+│   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   ├── 📄 SolicitudEquipamiento.java
+│   │   ├── 📄 SolicitudLogin.java                             ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudMiembro.java
+│   │   ├── 📄 SolicitudPlan.java
+│   │   ├── 📄 SolicitudReserva.java
+│   │   ├── 📄 SolicitudSala.java
+│   │   ├── 📄 SolicitudSede.java
+│   │   └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 ManejadorGlobalDeExcepciones.java               ◀ ✏️ se modifica
+│   │   ├── 📄 RecursoNoEncontradoException.java
+│   │   ├── 📄 ReglaNegocioException.java
+│   │   ├── 📄 RespuestaError.java
+│   │   └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java
+│   │   │   ├── 📄 Equipamiento.java
+│   │   │   ├── 📄 EstadoMiembro.java
+│   │   │   ├── 📄 EstadoReserva.java
+│   │   │   ├── 📄 Miembro.java
+│   │   │   ├── 📄 PlanMembresia.java
+│   │   │   ├── 📄 Reserva.java
+│   │   │   ├── 📄 Sala.java
+│   │   │   ├── 📄 Sede.java
+│   │   │   ├── 📄 ServicioAdicional.java
+│   │   │   └── 📄 TipoSala.java
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java
+│   │       ├── 📄 RepositorioMiembros.java                    ◀ ✏️ se modifica
+│   │       ├── 📄 RepositorioPlanes.java
+│   │       ├── 📄 RepositorioReservas.java                    ◀ ✏️ se modifica
+│   │       ├── 📄 RepositorioSalas.java
+│   │       ├── 📄 RepositorioSedes.java
+│   │       └── 📄 RepositorioServiciosAdicionales.java
+│   ├── 📁 security  (autenticación y autorización)
+│   │   ├── 📁 config  (reglas de seguridad)
+│   │   │   ├── 📄 ConfiguracionSeguridad.java                 ◀ 🆕 nuevo
+│   │   │   ├── 📄 ManejadorAccesoDenegado.java                ◀ 🆕 nuevo
+│   │   │   ├── 📄 Permisos.java                               ◀ 🆕 nuevo
+│   │   │   └── 📄 PuntoEntradaJwt.java                        ◀ 🆕 nuevo
+│   │   ├── 📁 controllers  (login)
+│   │   │   └── 📄 ControladorAutenticacion.java               ◀ 🆕 nuevo
+│   │   ├── 📁 jwt  (tokens y filtro)
+│   │   │   ├── 📄 FiltroAutenticacionJwt.java                 ◀ 🆕 nuevo
+│   │   │   └── 📄 UtilJwt.java                                ◀ 🆕 nuevo
+│   │   ├── 📁 persistences  (capa Persistence de seguridad)
+│   │   │   ├── 📁 entities  (Usuario y Rol)
+│   │   │   │   ├── 📄 Rol.java
+│   │   │   │   └── 📄 Usuario.java
+│   │   │   └── 📁 repositories  (RepositorioUsuarios)
+│   │   │       └── 📄 RepositorioUsuarios.java
+│   │   └── 📁 services  (usuarios y permisos)
+│   │       ├── 📄 ServicioAutorizacion.java                   ◀ 🆕 nuevo
+│   │       └── 📄 ServicioDetallesUsuario.java                ◀ 🆕 nuevo
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 CalculadoraCostoReserva.java
+│       ├── 📄 ServicioConsumo.java
+│       ├── 📄 ServicioDisponibilidad.java
+│       ├── 📄 ServicioEquipamientos.java
+│       ├── 📄 ServicioMiembros.java
+│       ├── 📄 ServicioPlanes.java
+│       ├── 📄 ServicioReservas.java
+│       ├── 📄 ServicioSalas.java
+│       ├── 📄 ServicioSedes.java
+│       ├── 📄 ServicioServiciosAdicionales.java
+│       └── 📄 Validaciones.java
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    └── 📄 data.sql
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 11 archivos nuevos y 7 archivos modificados.
+
 ## 🪜 Paso a paso
 
 ### Paso 6.1 — Dependencias

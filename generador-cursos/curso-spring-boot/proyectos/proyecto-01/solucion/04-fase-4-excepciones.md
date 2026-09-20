@@ -25,6 +25,98 @@ De los tres mecanismos del Módulo 07 elegimos el más adecuado para este caso:
 | `@ExceptionHandler` dentro de un controlador | Solo ese controlador | ❌ Habría que repetirlo en cada uno |
 | **`@ControllerAdvice`** | **Todos los controladores** | ✅ Un único lugar, un único formato |
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java
+│   │   └── 📄 ConfiguracionBeans.java
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorDisponibilidad.java
+│   │   ├── 📄 ControladorEquipamientos.java
+│   │   ├── 📄 ControladorMiembros.java
+│   │   ├── 📄 ControladorPlanes.java
+│   │   ├── 📄 ControladorReservas.java
+│   │   ├── 📄 ControladorSalas.java
+│   │   ├── 📄 ControladorSedes.java
+│   │   └── 📄 ControladorServiciosAdicionales.java
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java
+│   │   ├── 📄 ResumenConsumo.java
+│   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   ├── 📄 SolicitudEquipamiento.java
+│   │   ├── 📄 SolicitudMiembro.java
+│   │   ├── 📄 SolicitudPlan.java
+│   │   ├── 📄 SolicitudReserva.java
+│   │   ├── 📄 SolicitudSala.java
+│   │   ├── 📄 SolicitudSede.java
+│   │   └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 ManejadorGlobalDeExcepciones.java               ◀ 🆕 nuevo
+│   │   ├── 📄 RecursoNoEncontradoException.java
+│   │   ├── 📄 ReglaNegocioException.java
+│   │   ├── 📄 RespuestaError.java                             ◀ 🆕 nuevo
+│   │   └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java
+│   │   │   ├── 📄 Equipamiento.java
+│   │   │   ├── 📄 EstadoMiembro.java
+│   │   │   ├── 📄 EstadoReserva.java
+│   │   │   ├── 📄 Miembro.java
+│   │   │   ├── 📄 PlanMembresia.java
+│   │   │   ├── 📄 Reserva.java
+│   │   │   ├── 📄 Sala.java
+│   │   │   ├── 📄 Sede.java
+│   │   │   ├── 📄 ServicioAdicional.java
+│   │   │   └── 📄 TipoSala.java
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java
+│   │       ├── 📄 RepositorioMiembros.java
+│   │       ├── 📄 RepositorioPlanes.java
+│   │       ├── 📄 RepositorioReservas.java
+│   │       ├── 📄 RepositorioSalas.java
+│   │       ├── 📄 RepositorioSedes.java
+│   │       └── 📄 RepositorioServiciosAdicionales.java
+│   ├── 📁 security  (autenticación y autorización)
+│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │       ├── 📁 entities  (Usuario y Rol)
+│   │       │   ├── 📄 Rol.java
+│   │       │   └── 📄 Usuario.java
+│   │       └── 📁 repositories  (RepositorioUsuarios)
+│   │           └── 📄 RepositorioUsuarios.java
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 CalculadoraCostoReserva.java
+│       ├── 📄 ServicioConsumo.java
+│       ├── 📄 ServicioDisponibilidad.java
+│       ├── 📄 ServicioEquipamientos.java
+│       ├── 📄 ServicioMiembros.java
+│       ├── 📄 ServicioPlanes.java
+│       ├── 📄 ServicioReservas.java
+│       ├── 📄 ServicioSalas.java
+│       ├── 📄 ServicioSedes.java
+│       ├── 📄 ServicioServiciosAdicionales.java
+│       └── 📄 Validaciones.java
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties
+    └── 📄 data.sql
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 2 archivos nuevos.
+
 ## 🪜 Paso a paso
 
 ### Paso 4.1 — El cuerpo estándar de error: `RespuestaError`

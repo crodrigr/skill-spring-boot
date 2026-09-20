@@ -16,6 +16,59 @@ terminar verás las tablas creadas por Hibernate y los datos en la base.
 > etc.). Tu IDE marcará errores en rojo hasta que hayas creado **todas**. Es normal:
 > creá todas las entidades y recién entonces compilá (checkpoint del paso 2.2).
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   └── 📄 ConfiguracionBeans.java
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java                         ◀ 🆕 nuevo
+│   │   │   ├── 📄 Equipamiento.java                           ◀ 🆕 nuevo
+│   │   │   ├── 📄 EstadoMiembro.java                          ◀ 🆕 nuevo
+│   │   │   ├── 📄 EstadoReserva.java                          ◀ 🆕 nuevo
+│   │   │   ├── 📄 Miembro.java                                ◀ 🆕 nuevo
+│   │   │   ├── 📄 PlanMembresia.java                          ◀ 🆕 nuevo
+│   │   │   ├── 📄 Reserva.java                                ◀ 🆕 nuevo
+│   │   │   ├── 📄 Sala.java                                   ◀ 🆕 nuevo
+│   │   │   ├── 📄 Sede.java                                   ◀ 🆕 nuevo
+│   │   │   ├── 📄 ServicioAdicional.java                      ◀ 🆕 nuevo
+│   │   │   └── 📄 TipoSala.java                               ◀ 🆕 nuevo
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java               ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioMiembros.java                    ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioPlanes.java                      ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioReservas.java                    ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioSalas.java                       ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioSedes.java                       ◀ 🆕 nuevo
+│   │       └── 📄 RepositorioServiciosAdicionales.java        ◀ 🆕 nuevo
+│   └── 📁 security  (autenticación y autorización)
+│       └── 📁 persistences  (capa Persistence de seguridad)
+│           ├── 📁 entities  (Usuario y Rol)
+│           │   ├── 📄 Rol.java                                ◀ 🆕 nuevo
+│           │   └── 📄 Usuario.java                            ◀ 🆕 nuevo
+│           └── 📁 repositories  (RepositorioUsuarios)
+│               └── 📄 RepositorioUsuarios.java                ◀ 🆕 nuevo
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    └── 📄 data.sql                                            ◀ 🆕 nuevo
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 22 archivos nuevos y 1 archivo modificado.
+
 ## 🪜 Paso a paso
 
 ### Paso 2.1 — Enumeraciones

@@ -10,6 +10,116 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 
 > Esta fase no agrega código Java: **verifica** el sistema que construiste.
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml
+├── 📄 README.md                                               ◀ 🆕 nuevo
+├── 📁 docs  (documentación del proyecto)
+│   ├── 📄 analisis.md
+│   └── 📄 insomnia-coworkhub.json                             ◀ 🆕 nuevo
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java
+│   │   ├── 📄 ConfiguracionBeans.java
+│   │   └── 📄 ConfiguracionOpenApi.java
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorDisponibilidad.java
+│   │   ├── 📄 ControladorEquipamientos.java
+│   │   ├── 📄 ControladorMiembros.java
+│   │   ├── 📄 ControladorPlanes.java
+│   │   ├── 📄 ControladorReservas.java
+│   │   ├── 📄 ControladorSalas.java
+│   │   ├── 📄 ControladorSedes.java
+│   │   └── 📄 ControladorServiciosAdicionales.java
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java
+│   │   ├── 📄 RespuestaLogin.java
+│   │   ├── 📄 ResumenConsumo.java
+│   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   ├── 📄 SolicitudEquipamiento.java
+│   │   ├── 📄 SolicitudLogin.java
+│   │   ├── 📄 SolicitudMiembro.java
+│   │   ├── 📄 SolicitudPlan.java
+│   │   ├── 📄 SolicitudReserva.java
+│   │   ├── 📄 SolicitudSala.java
+│   │   ├── 📄 SolicitudSede.java
+│   │   └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 ManejadorGlobalDeExcepciones.java
+│   │   ├── 📄 RecursoNoEncontradoException.java
+│   │   ├── 📄 ReglaNegocioException.java
+│   │   ├── 📄 RespuestaError.java
+│   │   └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java
+│   │   │   ├── 📄 Equipamiento.java
+│   │   │   ├── 📄 EstadoMiembro.java
+│   │   │   ├── 📄 EstadoReserva.java
+│   │   │   ├── 📄 Miembro.java
+│   │   │   ├── 📄 PlanMembresia.java
+│   │   │   ├── 📄 Reserva.java
+│   │   │   ├── 📄 Sala.java
+│   │   │   ├── 📄 Sede.java
+│   │   │   ├── 📄 ServicioAdicional.java
+│   │   │   └── 📄 TipoSala.java
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java
+│   │       ├── 📄 RepositorioMiembros.java
+│   │       ├── 📄 RepositorioPlanes.java
+│   │       ├── 📄 RepositorioReservas.java
+│   │       ├── 📄 RepositorioSalas.java
+│   │       ├── 📄 RepositorioSedes.java
+│   │       └── 📄 RepositorioServiciosAdicionales.java
+│   ├── 📁 security  (autenticación y autorización)
+│   │   ├── 📁 config  (reglas de seguridad)
+│   │   │   ├── 📄 ConfiguracionSeguridad.java
+│   │   │   ├── 📄 ManejadorAccesoDenegado.java
+│   │   │   ├── 📄 Permisos.java
+│   │   │   └── 📄 PuntoEntradaJwt.java
+│   │   ├── 📁 controllers  (login)
+│   │   │   └── 📄 ControladorAutenticacion.java
+│   │   ├── 📁 jwt  (tokens y filtro)
+│   │   │   ├── 📄 FiltroAutenticacionJwt.java
+│   │   │   └── 📄 UtilJwt.java
+│   │   ├── 📁 persistences  (capa Persistence de seguridad)
+│   │   │   ├── 📁 entities  (Usuario y Rol)
+│   │   │   │   ├── 📄 Rol.java
+│   │   │   │   └── 📄 Usuario.java
+│   │   │   └── 📁 repositories  (RepositorioUsuarios)
+│   │   │       └── 📄 RepositorioUsuarios.java
+│   │   └── 📁 services  (usuarios y permisos)
+│   │       ├── 📄 ServicioAutorizacion.java
+│   │       └── 📄 ServicioDetallesUsuario.java
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 CalculadoraCostoReserva.java
+│       ├── 📄 ServicioConsumo.java
+│       ├── 📄 ServicioDisponibilidad.java
+│       ├── 📄 ServicioEquipamientos.java
+│       ├── 📄 ServicioMiembros.java
+│       ├── 📄 ServicioPlanes.java
+│       ├── 📄 ServicioReservas.java
+│       ├── 📄 ServicioSalas.java
+│       ├── 📄 ServicioSedes.java
+│       ├── 📄 ServicioServiciosAdicionales.java
+│       └── 📄 Validaciones.java
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    └── 📄 data.sql
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 2 archivos nuevos y 1 archivo modificado.
+
 ## 🪜 Paso a paso
 
 ### Paso 7.1 — Preparar el entorno de pruebas
@@ -355,7 +465,8 @@ com.coworkhub
 Análisis, diagrama entidad-relación, matriz de trazabilidad y supuestos: `docs/analisis.md`.
 ````
 
-Guardá también tu documento de análisis (Fase 0) en `docs/analisis.md`.
+Verificá además que tu documento de análisis (Fase 0) esté en `docs/analisis.md`, y guardá ahí
+mismo la colección exportada de Insomnia (`docs/insomnia-coworkhub.json`).
 
 ### Paso 7.5 — Historial de commits (entregable 2)
 

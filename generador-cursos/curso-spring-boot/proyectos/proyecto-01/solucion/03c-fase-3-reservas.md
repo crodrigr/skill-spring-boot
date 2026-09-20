@@ -8,6 +8,96 @@ Implementar el corazón del sistema: **crear, consultar, modificar y cancelar re
 aplicando las reglas RN-01 a RN-10, con costos calculados por un bean propio, y cargar 15
 reservas de ejemplo. Es la parte más larga del proyecto: avanzá de a un paso.
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java                       ◀ 🆕 nuevo
+│   │   └── 📄 ConfiguracionBeans.java
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorDisponibilidad.java
+│   │   ├── 📄 ControladorEquipamientos.java
+│   │   ├── 📄 ControladorMiembros.java
+│   │   ├── 📄 ControladorPlanes.java
+│   │   ├── 📄 ControladorReservas.java                        ◀ 🆕 nuevo
+│   │   ├── 📄 ControladorSalas.java
+│   │   ├── 📄 ControladorSedes.java
+│   │   └── 📄 ControladorServiciosAdicionales.java
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java
+│   │   ├── 📄 ResumenConsumo.java
+│   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   ├── 📄 SolicitudEquipamiento.java
+│   │   ├── 📄 SolicitudMiembro.java
+│   │   ├── 📄 SolicitudPlan.java
+│   │   ├── 📄 SolicitudReserva.java
+│   │   ├── 📄 SolicitudSala.java
+│   │   ├── 📄 SolicitudSede.java
+│   │   └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 RecursoNoEncontradoException.java
+│   │   ├── 📄 ReglaNegocioException.java
+│   │   └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java
+│   │   │   ├── 📄 Equipamiento.java
+│   │   │   ├── 📄 EstadoMiembro.java
+│   │   │   ├── 📄 EstadoReserva.java
+│   │   │   ├── 📄 Miembro.java
+│   │   │   ├── 📄 PlanMembresia.java
+│   │   │   ├── 📄 Reserva.java
+│   │   │   ├── 📄 Sala.java
+│   │   │   ├── 📄 Sede.java
+│   │   │   ├── 📄 ServicioAdicional.java
+│   │   │   └── 📄 TipoSala.java
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java
+│   │       ├── 📄 RepositorioMiembros.java
+│   │       ├── 📄 RepositorioPlanes.java
+│   │       ├── 📄 RepositorioReservas.java
+│   │       ├── 📄 RepositorioSalas.java
+│   │       ├── 📄 RepositorioSedes.java
+│   │       └── 📄 RepositorioServiciosAdicionales.java
+│   ├── 📁 security  (autenticación y autorización)
+│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │       ├── 📁 entities  (Usuario y Rol)
+│   │       │   ├── 📄 Rol.java
+│   │       │   └── 📄 Usuario.java
+│   │       └── 📁 repositories  (RepositorioUsuarios)
+│   │           └── 📄 RepositorioUsuarios.java
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 CalculadoraCostoReserva.java                    ◀ 🆕 nuevo
+│       ├── 📄 ServicioConsumo.java
+│       ├── 📄 ServicioDisponibilidad.java
+│       ├── 📄 ServicioEquipamientos.java
+│       ├── 📄 ServicioMiembros.java
+│       ├── 📄 ServicioPlanes.java
+│       ├── 📄 ServicioReservas.java                           ◀ 🆕 nuevo
+│       ├── 📄 ServicioSalas.java
+│       ├── 📄 ServicioSedes.java
+│       ├── 📄 ServicioServiciosAdicionales.java
+│       └── 📄 Validaciones.java
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    └── 📄 data.sql
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 4 archivos nuevos y 1 archivo modificado.
+
 ## 🪜 Paso a paso
 
 ### Paso 3.13 — `CalculadoraCostoReserva` (RN-07 y RN-08)

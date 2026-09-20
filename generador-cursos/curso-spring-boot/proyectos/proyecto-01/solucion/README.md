@@ -38,7 +38,8 @@ Hacé **un commit al terminar cada fase** (cada documento sugiere el mensaje).
 
 ## 🧰 Cómo usar estas páginas
 
-1. **Leé el objetivo** de la fase y la sección "Qué vas a lograr".
+1. **Leé el objetivo** de la fase y mirá el **árbol de archivos**: los marcados con 🆕 se crean y los
+   marcados con ✏️ se modifican en esa fase.
 2. **Seguí los pasos en orden.** Cada bloque de código indica arriba su **ruta exacta**
    (`📄 src/main/java/...`): creá el archivo ahí. Si dice *(fragmento)*, no reemplaces el
    archivo entero: agregá o cambiá solo esas líneas, donde se indica.
@@ -86,6 +87,117 @@ Hacé **un commit al terminar cada fase** (cada documento sugiere el mensaje).
 | [06-fase-6-seguridad-jwt.md](06-fase-6-seguridad-jwt.md) | `dto/SolicitudLogin.java` · `dto/RespuestaLogin.java` · `security/jwt/UtilJwt.java` · `security/services/ServicioDetallesUsuario.java` · `security/services/ServicioAutorizacion.java` · `security/jwt/FiltroAutenticacionJwt.java` · `security/config/PuntoEntradaJwt.java` · `security/config/ManejadorAccesoDenegado.java` · `security/config/Permisos.java` · `security/config/ConfiguracionSeguridad.java` · `security/controllers/ControladorAutenticacion.java` |
 
 **Total: 78 archivos.**
+
+## 🌲 El proyecto completo
+
+Así queda el proyecto al terminar la Fase 7. Al comienzo de **cada fase** encontrarás este mismo
+árbol tal como debe estar *hasta ese punto*, con los archivos de la fase marcados.
+
+```text
+📁 coworkhub
+├── 📄 .gitignore                                              [fase 1]
+├── 📄 docker-compose.yml                                      [fase 1]
+├── 📄 pom.xml                                                 [fase 1]
+├── 📄 README.md                                               [fase 7]
+├── 📁 docs  (documentación del proyecto)
+│   ├── 📄 analisis.md                                         [fase 0]
+│   └── 📄 insomnia-coworkhub.json                             [fase 7]
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java                                           [fase 1]
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java                       [fase 3c]
+│   │   ├── 📄 ConfiguracionBeans.java                         [fase 1]
+│   │   └── 📄 ConfiguracionOpenApi.java                       [fase 5]
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorDisponibilidad.java                  [fase 3b]
+│   │   ├── 📄 ControladorEquipamientos.java                   [fase 3a]
+│   │   ├── 📄 ControladorMiembros.java                        [fase 3b]
+│   │   ├── 📄 ControladorPlanes.java                          [fase 3a]
+│   │   ├── 📄 ControladorReservas.java                        [fase 3c]
+│   │   ├── 📄 ControladorSalas.java                           [fase 3a]
+│   │   ├── 📄 ControladorSedes.java                           [fase 3a]
+│   │   └── 📄 ControladorServiciosAdicionales.java            [fase 3a]
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java                               [fase 3a]
+│   │   ├── 📄 RespuestaLogin.java                             [fase 6]
+│   │   ├── 📄 ResumenConsumo.java                             [fase 3a]
+│   │   ├── 📄 SolicitudActualizarMiembro.java                 [fase 3a]
+│   │   ├── 📄 SolicitudEquipamiento.java                      [fase 3a]
+│   │   ├── 📄 SolicitudLogin.java                             [fase 6]
+│   │   ├── 📄 SolicitudMiembro.java                           [fase 3a]
+│   │   ├── 📄 SolicitudPlan.java                              [fase 3a]
+│   │   ├── 📄 SolicitudReserva.java                           [fase 3a]
+│   │   ├── 📄 SolicitudSala.java                              [fase 3a]
+│   │   ├── 📄 SolicitudSede.java                              [fase 3a]
+│   │   └── 📄 SolicitudServicioAdicional.java                 [fase 3a]
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 ManejadorGlobalDeExcepciones.java               [fase 4]
+│   │   ├── 📄 RecursoNoEncontradoException.java               [fase 3a]
+│   │   ├── 📄 ReglaNegocioException.java                      [fase 3a]
+│   │   ├── 📄 RespuestaError.java                             [fase 4]
+│   │   └── 📄 SolicitudInvalidaException.java                 [fase 3a]
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java                         [fase 2]
+│   │   │   ├── 📄 Equipamiento.java                           [fase 2]
+│   │   │   ├── 📄 EstadoMiembro.java                          [fase 2]
+│   │   │   ├── 📄 EstadoReserva.java                          [fase 2]
+│   │   │   ├── 📄 Miembro.java                                [fase 2]
+│   │   │   ├── 📄 PlanMembresia.java                          [fase 2]
+│   │   │   ├── 📄 Reserva.java                                [fase 2]
+│   │   │   ├── 📄 Sala.java                                   [fase 2]
+│   │   │   ├── 📄 Sede.java                                   [fase 2]
+│   │   │   ├── 📄 ServicioAdicional.java                      [fase 2]
+│   │   │   └── 📄 TipoSala.java                               [fase 2]
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java               [fase 2]
+│   │       ├── 📄 RepositorioMiembros.java                    [fase 2]
+│   │       ├── 📄 RepositorioPlanes.java                      [fase 2]
+│   │       ├── 📄 RepositorioReservas.java                    [fase 2]
+│   │       ├── 📄 RepositorioSalas.java                       [fase 2]
+│   │       ├── 📄 RepositorioSedes.java                       [fase 2]
+│   │       └── 📄 RepositorioServiciosAdicionales.java        [fase 2]
+│   ├── 📁 security  (autenticación y autorización)
+│   │   ├── 📁 config  (reglas de seguridad)
+│   │   │   ├── 📄 ConfiguracionSeguridad.java                 [fase 6]
+│   │   │   ├── 📄 ManejadorAccesoDenegado.java                [fase 6]
+│   │   │   ├── 📄 Permisos.java                               [fase 6]
+│   │   │   └── 📄 PuntoEntradaJwt.java                        [fase 6]
+│   │   ├── 📁 controllers  (login)
+│   │   │   └── 📄 ControladorAutenticacion.java               [fase 6]
+│   │   ├── 📁 jwt  (tokens y filtro)
+│   │   │   ├── 📄 FiltroAutenticacionJwt.java                 [fase 6]
+│   │   │   └── 📄 UtilJwt.java                                [fase 6]
+│   │   ├── 📁 persistences  (capa Persistence de seguridad)
+│   │   │   ├── 📁 entities  (Usuario y Rol)
+│   │   │   │   ├── 📄 Rol.java                                [fase 2]
+│   │   │   │   └── 📄 Usuario.java                            [fase 2]
+│   │   │   └── 📁 repositories  (RepositorioUsuarios)
+│   │   │       └── 📄 RepositorioUsuarios.java                [fase 2]
+│   │   └── 📁 services  (usuarios y permisos)
+│   │       ├── 📄 ServicioAutorizacion.java                   [fase 6]
+│   │       └── 📄 ServicioDetallesUsuario.java                [fase 6]
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 CalculadoraCostoReserva.java                    [fase 3c]
+│       ├── 📄 ServicioConsumo.java                            [fase 3b]
+│       ├── 📄 ServicioDisponibilidad.java                     [fase 3b]
+│       ├── 📄 ServicioEquipamientos.java                      [fase 3a]
+│       ├── 📄 ServicioMiembros.java                           [fase 3b]
+│       ├── 📄 ServicioPlanes.java                             [fase 3a]
+│       ├── 📄 ServicioReservas.java                           [fase 3c]
+│       ├── 📄 ServicioSalas.java                              [fase 3a]
+│       ├── 📄 ServicioSedes.java                              [fase 3a]
+│       ├── 📄 ServicioServiciosAdicionales.java               [fase 3a]
+│       └── 📄 Validaciones.java                               [fase 3a]
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties                           [fase 1]
+    ├── 📄 application-mysql.properties                        [fase 1]
+    ├── 📄 application-postgres.properties                     [fase 1]
+    ├── 📄 application.properties                              [fase 1]
+    └── 📄 data.sql                                            [fase 2]
+```
+
+Entre corchetes, la fase en la que se crea cada archivo (`0` = análisis, `3a`, `3b` y `3c` = partes de la Fase 3).
 
 ## 🏗️ Vista de la arquitectura final
 

@@ -10,6 +10,20 @@
 
 Producir, **sin escribir código**, el documento que te permita implementar el sistema
 sin volver a preguntar nada. Las seis secciones que pide el enunciado están abajo.
+Guardá tu documento como `docs/analisis.md` dentro de la carpeta del proyecto (la creás en la
+[Fase 1](01-fase-1-proyecto-base.md)); es el entregable 1.
+
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+└── 📁 docs  (documentación del proyecto)
+    └── 📄 analisis.md                      ◀ 🆕 nuevo
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 1 archivo nuevo.
 
 ## 1. Actores y casos de uso
 

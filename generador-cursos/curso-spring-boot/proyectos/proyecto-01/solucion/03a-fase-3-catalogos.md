@@ -17,6 +17,87 @@ que puedas verificar tu avance sin esperar al final:
 | [3b](03b-fase-3-miembros.md) | Miembros, consumo mensual y disponibilidad |
 | [3c](03c-fase-3-reservas.md) | Calculadora de costos, reservas y datos de ejemplo |
 
+## 🌳 Archivos de esta fase
+
+```text
+📁 coworkhub
+├── 📄 .gitignore
+├── 📄 docker-compose.yml
+├── 📄 pom.xml
+├── 📁 docs  (documentación del proyecto)
+│   └── 📄 analisis.md
+├── 📁 src/main/java/com/coworkhub
+│   ├── 📄 Main.java
+│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   │   └── 📄 ConfiguracionBeans.java
+│   ├── 📁 controllers  (capa Controller, HTTP)
+│   │   ├── 📄 ControladorEquipamientos.java                   ◀ 🆕 nuevo
+│   │   ├── 📄 ControladorPlanes.java                          ◀ 🆕 nuevo
+│   │   ├── 📄 ControladorSalas.java                           ◀ 🆕 nuevo
+│   │   ├── 📄 ControladorSedes.java                           ◀ 🆕 nuevo
+│   │   └── 📄 ControladorServiciosAdicionales.java            ◀ 🆕 nuevo
+│   ├── 📁 dto  (solicitudes y respuestas, en records)
+│   │   ├── 📄 ItemServicio.java                               ◀ 🆕 nuevo
+│   │   ├── 📄 ResumenConsumo.java                             ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudActualizarMiembro.java                 ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudEquipamiento.java                      ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudMiembro.java                           ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudPlan.java                              ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudReserva.java                           ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudSala.java                              ◀ 🆕 nuevo
+│   │   ├── 📄 SolicitudSede.java                              ◀ 🆕 nuevo
+│   │   └── 📄 SolicitudServicioAdicional.java                 ◀ 🆕 nuevo
+│   ├── 📁 exception  (excepciones y manejador global)
+│   │   ├── 📄 RecursoNoEncontradoException.java               ◀ 🆕 nuevo
+│   │   ├── 📄 ReglaNegocioException.java                      ◀ 🆕 nuevo
+│   │   └── 📄 SolicitudInvalidaException.java                 ◀ 🆕 nuevo
+│   ├── 📁 persistences  (capa Persistence)
+│   │   ├── 📁 entities  (clases @Entity)
+│   │   │   ├── 📄 DetalleReserva.java
+│   │   │   ├── 📄 Equipamiento.java
+│   │   │   ├── 📄 EstadoMiembro.java
+│   │   │   ├── 📄 EstadoReserva.java
+│   │   │   ├── 📄 Miembro.java
+│   │   │   ├── 📄 PlanMembresia.java
+│   │   │   ├── 📄 Reserva.java
+│   │   │   ├── 📄 Sala.java
+│   │   │   ├── 📄 Sede.java
+│   │   │   ├── 📄 ServicioAdicional.java
+│   │   │   └── 📄 TipoSala.java
+│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │       ├── 📄 RepositorioEquipamientos.java
+│   │       ├── 📄 RepositorioMiembros.java
+│   │       ├── 📄 RepositorioPlanes.java
+│   │       ├── 📄 RepositorioReservas.java
+│   │       ├── 📄 RepositorioSalas.java
+│   │       ├── 📄 RepositorioSedes.java
+│   │       └── 📄 RepositorioServiciosAdicionales.java
+│   ├── 📁 security  (autenticación y autorización)
+│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │       ├── 📁 entities  (Usuario y Rol)
+│   │       │   ├── 📄 Rol.java
+│   │       │   └── 📄 Usuario.java
+│   │       └── 📁 repositories  (RepositorioUsuarios)
+│   │           └── 📄 RepositorioUsuarios.java
+│   └── 📁 services  (capa Service, reglas de negocio)
+│       ├── 📄 ServicioEquipamientos.java                      ◀ 🆕 nuevo
+│       ├── 📄 ServicioPlanes.java                             ◀ 🆕 nuevo
+│       ├── 📄 ServicioSalas.java                              ◀ 🆕 nuevo
+│       ├── 📄 ServicioSedes.java                              ◀ 🆕 nuevo
+│       ├── 📄 ServicioServiciosAdicionales.java               ◀ 🆕 nuevo
+│       └── 📄 Validaciones.java                               ◀ 🆕 nuevo
+└── 📁 src/main/resources
+    ├── 📄 application-h2.properties
+    ├── 📄 application-mysql.properties
+    ├── 📄 application-postgres.properties
+    ├── 📄 application.properties
+    └── 📄 data.sql
+```
+
+🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
+
+**En esta fase**: 24 archivos nuevos.
+
 ## 🪜 Paso a paso
 
 ### Paso 3.1 — Excepciones de dominio
