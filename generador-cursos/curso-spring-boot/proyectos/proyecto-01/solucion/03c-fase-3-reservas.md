@@ -119,6 +119,7 @@ import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.coworkhub.dto.ItemServicio;
@@ -199,7 +200,10 @@ public class ServicioReservas {
 
     // ---------------------------------------------------------------- crear (RF-04)
 
-    @Transactional
+    // READ_COMMITTED: cada consulta ve lo ya confirmado por otras transacciones. Es imprescindible
+    // con el bloqueo de la sala (ver abajo): MySQL usa por defecto REPEATABLE READ, y con ese nivel
+    // esta transacción no vería la reserva que otra acaba de confirmar mientras esperaba el bloqueo.
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Reserva crear(SolicitudReserva solicitud) {
         requerido(solicitud, "cuerpo de la solicitud");
         Long miembroId = requerido(solicitud.miembroId(), "miembroId");
@@ -464,6 +468,26 @@ transacción **espera** a que termine la primera. Cuando por fin obtiene la sala
 verificación de solapamiento ya "ve" la reserva de la primera y responde `409`. El
 resultado: entre solicitudes simultáneas para el mismo horario, **solo una gana**.
 
+**Un detalle que cambia según la base de datos: el nivel de aislamiento.** El bloqueo solo
+funciona si, al obtenerlo, la segunda transacción **ve lo que la primera acaba de
+confirmar**. Eso depende del *nivel de aislamiento* de la transacción: H2 y PostgreSQL usan
+por defecto `READ COMMITTED` (cada consulta ve lo ya confirmado), pero **MySQL usa
+`REPEATABLE READ`**, donde la transacción trabaja sobre una "fotografía" de los datos tomada
+en su primera lectura, y no ve los cambios confirmados después. Por eso `crear` fija el
+nivel explícitamente:
+
+**📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`** (fragmento)
+
+```java
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Reserva crear(SolicitudReserva solicitud) {
+```
+
+Esto **no es teórico**: probamos el proyecto sin esa línea sobre MySQL y, de 6 solicitudes
+simultáneas a la misma sala y horario, **4 respondieron `201`** (cuatro reservas superpuestas).
+Con H2 y PostgreSQL el problema no aparece, así que solo lo descubrís si probás con más de
+un motor. Con la línea, las tres bases dan exactamente un `201`.
+
 **3. RN-02 en detalle.** Todo se mide en segundos para evitar errores de redondeo:
 
 **📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`** (fragmento)
@@ -631,11 +655,18 @@ public class ControladorReservas {
 
 ### Paso 3.16 — Reservas de ejemplo (`CargadorReservasDemo`)
 
-Carga 15 reservas en distintos estados (RNF-09). **No usa `ServicioReservas`**: las
-reservas `COMPLETADA` están en el pasado y el servicio las rechazaría por RN-03. Las
-guarda directamente con los repositorios, pero calcula sus costos con la **misma**
-`CalculadoraCostoReserva`, así los números son consistentes. Corre después de
-`CargadorCatalogos` (`@Order(2)`).
+Carga 15 reservas en distintos estados (RNF-09). Los catálogos (salas, miembros,
+servicios…) ya los cargó `data.sql` en la Fase 2; esta clase corre **después** (un
+`CommandLineRunner` se ejecuta al terminar de arrancar la aplicación, cuando el script
+ya se ejecutó).
+
+¿Por qué las reservas **no** van también en el script SQL? Por dos razones: sus fechas
+son relativas a "hoy" **según el `Clock` de la aplicación** (que puede estar congelado
+para las pruebas, y el SQL no lo conoce), y sus costos los calcula la misma
+`CalculadoraCostoReserva` que usa el servicio, así los números son consistentes.
+
+**No usa `ServicioReservas`**: las reservas `COMPLETADA` están en el pasado y el servicio
+las rechazaría por RN-03. Las guarda directamente con los repositorios.
 
 Las fechas son relativas a "hoy" (`LocalDate.now(reloj)`); "hoy" es la fecha del `Clock`.
 Los identificadores que se generan son estos (los usarás en las pruebas):
@@ -672,7 +703,6 @@ import java.time.YearMonth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -688,10 +718,12 @@ import com.coworkhub.persistences.repositories.RepositorioSalas;
 import com.coworkhub.persistences.repositories.RepositorioServiciosAdicionales;
 import com.coworkhub.services.CalculadoraCostoReserva;
 
-// Reservas de ejemplo en distintos estados (RNF-09). Se guardan directamente con los repositorios
-// —sin pasar por ServicioReservas— porque algunas están en el pasado, y el servicio lo rechazaría (RN-03).
+// Reservas de ejemplo en distintos estados (RNF-09). Los catálogos (salas, miembros, servicios...) ya
+// los cargó data.sql. Estas reservas no van en el script SQL porque sus fechas son relativas a "hoy"
+// según el Clock de la aplicación, y sus costos los calcula CalculadoraCostoReserva.
+// Se guardan directamente con los repositorios —sin pasar por ServicioReservas— porque algunas están en el
+// pasado, y el servicio lo rechazaría (RN-03).
 @Component
-@Order(2)
 public class CargadorReservasDemo implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(CargadorReservasDemo.class);

@@ -220,14 +220,14 @@ El enunciado deja varios puntos abiertos. Estos son los que resolvió esta soluc
 | S-10 | Alta de personal | Los usuarios `ADMIN` y `RECEPCION` vienen de los datos semilla. Gestionarlos por API queda fuera de alcance. |
 | S-11 | ¿Exponer entidades o DTOs? | Las respuestas de lectura devuelven las entidades (como en el Módulo 5), con `@JsonIgnore` en los lados inversos y en `Miembro.usuario`. Las **solicitudes** y el resumen de consumo usan `record`s en el paquete transversal `dto`, para que el cliente no pueda enviar campos como `id`, `estado` o costos. |
 | S-12 | Formato de fechas | ISO-8601 sin zona (`2030-06-04T16:00:00`), en la zona horaria del servidor. |
-| S-13 | Dos solicitudes simultáneas (RN-01) | Al crear una reserva se **bloquea la fila de la sala** (`PESSIMISTIC_WRITE`) hasta terminar la transacción. |
+| S-13 | Dos solicitudes simultáneas (RN-01) | Al crear una reserva se **bloquea la fila de la sala** (`PESSIMISTIC_WRITE`) hasta terminar la transacción, y la transacción usa aislamiento `READ_COMMITTED` para que, tras esperar el bloqueo, vea lo que confirmó la otra (MySQL usa `REPEATABLE READ` por defecto y sin esto falla). |
 | S-14 | Datos mal formados vs. reglas violadas | Falta un campo o tiene un formato inválido → `400`. Se viola una regla de negocio o hay un duplicado → `409`. |
 | S-15 | Sala desactivada | Deja de aparecer en la disponibilidad y no se puede reservar. Sus reservas existentes no se tocan. |
 | S-16 | Miembro suspendido | Conserva sus reservas; no puede crear nuevas (RN-05). |
 | S-17 | Contraseñas | Mínimo 6 caracteres, guardadas con BCrypt. |
 | S-18 | Código de respuesta de `DELETE` | `200` sin cuerpo (RNF-06 solo prevé `200` y `201` para éxito). |
 | S-19 | Horario de la sede | Se compara la hora del día: `inicio ≥ horaApertura` y `fin ≤ horaCierre`. |
-| S-20 | Persistencia | H2 en memoria: al reiniciar se pierde todo y los datos semilla se recargan. |
+| S-20 | Persistencia | El proyecto funciona con **tres bases** elegidas por perfil de Spring: `h2` (por defecto, en memoria), `mysql` y `postgres`. En H2 al reiniciar se pierde todo; en MySQL y PostgreSQL las tablas se recrean en cada arranque (`ddl-auto=create`) para que los datos iniciales no se dupliquen. Se puede conservar los datos arrancando con `ddl-auto=update` y `spring.sql.init.mode=never`. |
 
 ## 6. Fuera de alcance
 
@@ -244,8 +244,10 @@ El enunciado deja varios puntos abiertos. Estos son los que resolvió esta soluc
 | Capas | `controllers` → `services` → `persistences` | RNF-02: cada capa solo conoce a la de abajo |
 | Errores | Excepciones propias (`RecursoNoEncontradoException`, `ReglaNegocioException`, `SolicitudInvalidaException`) + un `@ControllerAdvice` | Los servicios no conocen HTTP; el manejador es el único que traduce a códigos |
 | Costos | Bean `CalculadoraCostoReserva` | RNF-03: las fórmulas viven en un solo lugar y no tocan la base de datos |
-| Datos semilla | Dos `CommandLineRunner` ordenados (`@Order`): catálogos, y luego reservas | Las reservas del pasado no pueden pasar por `ServicioReservas` (RN-03) |
+| Datos iniciales | Catálogos con un script `data.sql`; reservas de ejemplo con un `CommandLineRunner` | Los catálogos son datos estáticos y quedan más legibles en SQL. Las reservas del pasado no pueden pasar por `ServicioReservas` (RN-03), y sus fechas y costos dependen del `Clock` y de la calculadora |
 | Autorización | URL para catálogos + `@PreAuthorize` con expresiones para dueño/rol | Lo que depende de *quién es el dueño del recurso* no se puede decidir solo por URL |
 | N+1 | `@EntityGraph` en las consultas que devuelven listas | RNF-08 |
+| Base de datos | Perfiles de Spring (`h2`, `mysql`, `postgres`) con la conexión configurable por variables de entorno; `docker-compose.yml` opcional | Poder ver el sistema sobre H2 sin instalar nada, o sobre un motor real. El código no cambia entre motores: solo la conexión |
+| Aislamiento | `READ_COMMITTED` en la creación de reservas | El bloqueo de la sala solo protege si la transacción ve lo confirmado por otras; ver S-13 |
 
 **Siguiente →** [Fase 1 — Proyecto base](01-fase-1-proyecto-base.md)

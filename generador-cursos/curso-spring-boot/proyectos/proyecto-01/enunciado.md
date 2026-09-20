@@ -108,7 +108,7 @@ Antes de programar, entregá un documento de análisis con:
 
 | Código | Categoría | Requisito |
 |---|---|---|
-| **RNF-01** | Tecnología | Java 17, Spring Boot 3.x, Maven, Spring Data JPA y H2 en memoria. Debe ejecutarse solo con `mvn spring-boot:run`. |
+| **RNF-01** | Tecnología | Java 17, Spring Boot 3.x, Maven, Spring Data JPA y H2 en memoria. Debe ejecutarse solo con `mvn spring-boot:run`, sin instalar nada más. |
 | **RNF-02** | Arquitectura | Arquitectura MVC por capas, con los paquetes `controllers`, `services` y `persistences` (`entities`, `repositories`). `exception`, `config` y `jwt` son paquetes transversales. El controlador solo depende del servicio, y el servicio solo del repositorio. |
 | **RNF-03** | Diseño | Toda la lógica de negocio vive en `services`. La inyección de dependencias es por constructor. El cálculo de costos es un bean propio (`@Component`) inyectado en el servicio de reservas. |
 | **RNF-04** | Consistencia | Las operaciones que escriben más de una entidad (crear o cancelar una reserva) son transaccionales. Una falla no deja datos a medias. |
@@ -116,7 +116,7 @@ Antes de programar, entregá un documento de análisis con:
 | **RNF-06** | Códigos HTTP | `200` y `201` para éxito, `400` para solicitud mal formada o datos inválidos, `401` sin autenticación, `403` sin permiso, `404` recurso inexistente, `409` violación de regla de negocio o duplicado. |
 | **RNF-07** | Seguridad | Autenticación stateless con JWT y contraseñas codificadas con BCrypt. El token expira a los 60 min. La clave de firma se lee de `application.properties`, con la advertencia de que es solo educativa. |
 | **RNF-08** | Rendimiento | Las colecciones usan `fetch = LAZY`. Los listados no provocan consultas repetidas por cada fila (problema N+1). Justificá en el análisis cualquier excepción. |
-| **RNF-09** | Datos de prueba | Al arrancar, un `CommandLineRunner` carga al menos 2 sedes, 6 salas, 3 planes, 5 miembros, 3 usuarios (uno por rol) y 15 reservas en distintos estados. |
+| **RNF-09** | Datos de prueba | Al arrancar se cargan, al menos, 2 sedes, 6 salas, 3 planes, 5 miembros, 3 usuarios (uno por rol) y 15 reservas en distintos estados. Se recomienda un script SQL (`data.sql`) para los catálogos; las contraseñas de los usuarios se guardan codificadas. |
 | **RNF-10** | Mantenibilidad | Nombres en español y coherentes con el resto del curso. Sin código duplicado entre servicios. Cada clase tiene una sola responsabilidad. |
 | **RNF-11** | Documentación | El `README.md` explica cómo ejecutar el proyecto, qué usuarios de prueba existen y dónde está Swagger UI. |
 
@@ -192,6 +192,7 @@ El detalle de cada criterio, con niveles de desempeño, está en la [Rúbrica](r
 - Reservas recurrentes (por ejemplo, todos los martes durante un mes).
 - Lista de espera cuando una sala está ocupada.
 - Reporte de ocupación por sala y por sede.
+- Que el proyecto funcione también con **MySQL** y **PostgreSQL**, eligiendo la base con un perfil de Spring (`h2`, `mysql`, `postgres`). Probá tus escenarios, en especial las solicitudes simultáneas, con más de un motor: pueden comportarse distinto.
 
 ## 💡 Pistas para empezar
 

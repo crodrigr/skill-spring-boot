@@ -1,12 +1,12 @@
-# 🗄️ Fase 2 — Modelo de datos: entidades, relaciones y datos semilla
+# 🗄️ Fase 2 — Modelo de datos: entidades, relaciones y datos iniciales (SQL)
 
 **Navegación**: [Índice](README.md) · ← [Fase 1 — Proyecto base](01-fase-1-proyecto-base.md) · Siguiente → [Fase 3a — Catálogos](03a-fase-3-catalogos.md)
 
 ## 🎯 Qué vas a lograr
 
 Convertir el modelo de dominio de la [Fase 0](00-analisis.md) en entidades JPA con sus
-relaciones, crear los repositorios y cargar datos de ejemplo al arrancar. Al terminar
-verás las tablas creadas por Hibernate y los datos en la base.
+relaciones, crear los repositorios y cargar los datos iniciales con un **script SQL** al arrancar. Al
+terminar verás las tablas creadas por Hibernate y los datos en la base.
 
 **Módulos que se aplican**: 03 (Introducción a JPA) y 04 (Gestión de bases de datos con JPA):
 `@Entity`, `@OneToOne`, `@OneToMany`/`@ManyToOne`, `@ManyToMany`, `cascade`,
@@ -1083,17 +1083,65 @@ public interface RepositorioUsuarios extends JpaRepository<Usuario, Long> {
 }
 ```
 
-### Paso 2.4 — Datos semilla de catálogos
+### Paso 2.4 — Datos iniciales con un script SQL (`data.sql`)
 
-Un `CommandLineRunner` se ejecuta **una vez, justo después de arrancar** la aplicación.
-Este carga sedes, equipamiento, salas, servicios adicionales, planes, usuarios y miembros
-(RNF-09). Puntos a notar:
+Los catálogos (sedes, salas, planes, miembros…) son **datos**, no lógica. Por eso los
+cargamos con un **script SQL**, no con código Java (RNF-09). Spring Boot ejecuta
+automáticamente el archivo `src/main/resources/data.sql` cada vez que arranca.
 
-- `@Order(1)`: garantiza que corra **antes** del cargador de reservas (`@Order(2)`) que
-  crearás en la fase siguiente.
-- `if (repositorioSedes.count() > 0) return;`: si ya hay datos, no los duplica.
-- `@Transactional`: todo el alta se hace en una sola transacción.
-- Los usuarios de prueba (contraseñas codificadas con el `PasswordEncoder` de la Fase 1):
+**¿Por qué un script y no una clase Java?** Se lee de un vistazo (es una tabla de datos, no
+un programa), se edita sin tocar el código y separa los datos de la lógica. Es además lo
+habitual en proyectos reales, donde estos datos suelen venir de scripts (o de herramientas
+de migración como Flyway o Liquibase).
+
+#### Configuración: que el script corra *después* de crear las tablas
+
+Por defecto Spring Boot ejecuta `data.sql` **antes** de que Hibernate cree las tablas a
+partir de tus entidades, y el script fallaría con `Table "SEDE" not found`. Estas tres
+propiedades lo corrigen. Agregalas a `application.properties`, **justo debajo de
+`spring.jpa.open-in-view=true`**:
+
+**📄 `src/main/resources/application.properties`** (fragmento)
+
+```properties
+# Datos iniciales: Hibernate crea las tablas y DESPUÉS Spring ejecuta src/main/resources/data.sql
+spring.jpa.defer-datasource-initialization=true
+spring.sql.init.mode=always
+spring.sql.init.encoding=UTF-8
+```
+
+| Propiedad | Para qué |
+|---|---|
+| `spring.jpa.defer-datasource-initialization` | Posterga la ejecución de `data.sql` hasta que Hibernate haya creado las tablas |
+| `spring.sql.init.mode=always` | Ejecuta el script siempre (con una base embebida como H2 ya es el comportamiento por defecto; lo dejamos explícito) |
+| `spring.sql.init.encoding=UTF-8` | Lee el script en UTF-8, para que `Bogotá`, `Pacífico` o `Impresión` no se corrompan según el sistema operativo |
+
+#### El script
+
+Cómo está escrito, para que puedas modificarlo o ampliarlo:
+
+- **Los nombres de tabla y de columna son los que genera Hibernate** a partir de tus
+  entidades, en `snake_case`: `Sede.horaApertura` → `hora_apertura`; `Sala.sede` →
+  columna `sede_id`; `Miembro.usuario` → `usuario_id`. Si un `INSERT` falla con `Column
+  "x" not found`, comparalo con las sentencias `create table` que muestra el checkpoint 2b.
+- **No se escriben los `id`**: la base los genera (`IDENTITY`). Por eso las claves foráneas
+  se resuelven con **subconsultas por nombre**, por ejemplo
+  `(SELECT id FROM sede WHERE nombre = 'Sede Centro')`, y el script no depende de qué
+  número le tocó a cada fila.
+- **El orden importa**: primero lo que no depende de nada (sedes, equipamiento, planes,
+  servicios, usuarios) y después lo que apunta a eso (salas, miembros).
+- **La tabla intermedia** `sala_equipamiento` se llena con `INSERT ... SELECT`, que
+  combina cada sala con sus equipamientos.
+- **Las contraseñas están codificadas con BCrypt**: el script guarda el *hash*
+  (`$2a$10$...`), nunca la contraseña en texto plano. Cada hash incluye una "sal"
+  aleatoria, por eso dos hashes de la misma contraseña son distintos y ninguno se puede
+  revertir; `BCryptPasswordEncoder.matches(...)` sabe verificarlos. Si quisieras otra
+  contraseña, generá su hash (por ejemplo, imprimiendo `passwordEncoder.encode("tuClave")`
+  una vez al arrancar) y reemplazalo en el script.
+- Hay una sala **inactiva** (`Escritorio B1`) y un miembro **suspendido** (Sofía León) a
+  propósito, para probar RN-04 y RN-05 más adelante.
+
+Los usuarios de prueba y lo que carga el script:
 
 | Usuario | Contraseña | Rol | Miembro asociado |
 |---|---|---|---|
@@ -1102,165 +1150,157 @@ Este carga sedes, equipamiento, salas, servicios adicionales, planes, usuarios y
 | `ana` | `ana123` | `MIEMBRO` | Ana Torres (plan Profesional) |
 | `luis` | `luis123` | `MIEMBRO` | Luis Gómez (plan Básico) |
 
-- Hay una sala **inactiva** (`Escritorio B1`) y un miembro **suspendido** (Sofía León)
-  a propósito, para probar RN-04 y RN-05 más adelante.
+| Tabla | Filas | Detalle |
+|---|---|---|
+| `sede` | 2 | Sede Centro (07:00–22:00, Bogotá) y Sede Norte (08:00–20:00, Medellín) |
+| `equipamiento` | 4 | Proyector, Pizarra, Videoconferencia, Aire acondicionado |
+| `sala` | 7 | 4 en Sede Centro y 3 en Sede Norte; `Escritorio B1` inactiva |
+| `sala_equipamiento` | 10 | Qué equipamiento tiene cada sala |
+| `servicio_adicional` | 3 | Catering (25), Impresión (5), Soporte técnico (40) |
+| `plan_membresia` | 4 | Flex (0 h), Básico (10 h), Profesional (40 h), Corporativo (120 h) |
+| `usuario` | 4 | Los de la tabla de arriba |
+| `miembro` | 5 | Ana, Luis, Marta, Carlos y Sofía (suspendida) |
 
-**📄 `src/main/java/com/coworkhub/config/CargadorCatalogos.java`**
+**📄 `src/main/resources/data.sql`**
 
-```java
-package com.coworkhub.config;
+```sql
+-- Datos iniciales de catálogos (RNF-09).
+-- Spring Boot ejecuta este script al arrancar, DESPUÉS de que Hibernate crea las tablas
+-- (ver spring.jpa.defer-datasource-initialization en application.properties).
+-- Las claves foráneas se resuelven con subconsultas por nombre, para no depender de los ids.
 
-import java.math.BigDecimal;
-import java.time.LocalTime;
-import java.util.List;
+-- ============================================================ Sedes
+INSERT INTO sede (nombre, ciudad, direccion, hora_apertura, hora_cierre) VALUES
+    ('Sede Centro', 'Bogotá',   'Carrera 7 # 32-16', '07:00:00', '22:00:00'),
+    ('Sede Norte',  'Medellín', 'Calle 10 # 43-20',  '08:00:00', '20:00:00');
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+-- ============================================================ Equipamiento
+INSERT INTO equipamiento (nombre) VALUES
+    ('Proyector'),
+    ('Pizarra'),
+    ('Videoconferencia'),
+    ('Aire acondicionado');
 
-import com.coworkhub.persistences.entities.Equipamiento;
-import com.coworkhub.persistences.entities.EstadoMiembro;
-import com.coworkhub.persistences.entities.Miembro;
-import com.coworkhub.persistences.entities.PlanMembresia;
-import com.coworkhub.persistences.entities.Sala;
-import com.coworkhub.persistences.entities.Sede;
-import com.coworkhub.persistences.entities.ServicioAdicional;
-import com.coworkhub.persistences.entities.TipoSala;
-import com.coworkhub.persistences.repositories.RepositorioEquipamientos;
-import com.coworkhub.persistences.repositories.RepositorioMiembros;
-import com.coworkhub.persistences.repositories.RepositorioPlanes;
-import com.coworkhub.persistences.repositories.RepositorioSalas;
-import com.coworkhub.persistences.repositories.RepositorioSedes;
-import com.coworkhub.persistences.repositories.RepositorioServiciosAdicionales;
-import com.coworkhub.security.persistences.entities.Rol;
-import com.coworkhub.security.persistences.entities.Usuario;
-import com.coworkhub.security.persistences.repositories.RepositorioUsuarios;
+-- ============================================================ Salas
+-- Escritorio B1 está inactiva a propósito, para probar RN-04.
+INSERT INTO sala (nombre, tipo, capacidad, tarifa_por_hora, activa, sede_id) VALUES
+    ('Sala Andes',    'SALA_REUNION',    8,  30.00, TRUE,  (SELECT id FROM sede WHERE nombre = 'Sede Centro')),
+    ('Sala Caribe',   'SALA_REUNION',    4,  20.00, TRUE,  (SELECT id FROM sede WHERE nombre = 'Sede Centro')),
+    ('Oficina 101',   'OFICINA_PRIVADA', 3,  15.00, TRUE,  (SELECT id FROM sede WHERE nombre = 'Sede Centro')),
+    ('Escritorio A1', 'ESCRITORIO',      1,   5.00, TRUE,  (SELECT id FROM sede WHERE nombre = 'Sede Centro')),
+    ('Sala Pacífico', 'SALA_REUNION',    12, 40.00, TRUE,  (SELECT id FROM sede WHERE nombre = 'Sede Norte')),
+    ('Oficina 201',   'OFICINA_PRIVADA', 4,  18.00, TRUE,  (SELECT id FROM sede WHERE nombre = 'Sede Norte')),
+    ('Escritorio B1', 'ESCRITORIO',      1,   5.00, FALSE, (SELECT id FROM sede WHERE nombre = 'Sede Norte'));
 
-// Datos semilla de catálogos (RNF-09). Se ejecuta primero (@Order(1)); las reservas
-// de ejemplo las carga otra clase, después, cuando existan los servicios de negocio.
-@Component
-@Order(1)
-public class CargadorCatalogos implements CommandLineRunner {
+-- Equipamiento de cada sala (tabla intermedia de la relación muchos a muchos)
+INSERT INTO sala_equipamiento (sala_id, equipamiento_id)
+    SELECT s.id, e.id FROM sala s, equipamiento e
+    WHERE s.nombre = 'Sala Andes' AND e.nombre IN ('Proyector', 'Pizarra', 'Videoconferencia');
+INSERT INTO sala_equipamiento (sala_id, equipamiento_id)
+    SELECT s.id, e.id FROM sala s, equipamiento e
+    WHERE s.nombre = 'Sala Caribe' AND e.nombre = 'Pizarra';
+INSERT INTO sala_equipamiento (sala_id, equipamiento_id)
+    SELECT s.id, e.id FROM sala s, equipamiento e
+    WHERE s.nombre = 'Oficina 101' AND e.nombre = 'Aire acondicionado';
+INSERT INTO sala_equipamiento (sala_id, equipamiento_id)
+    SELECT s.id, e.id FROM sala s, equipamiento e
+    WHERE s.nombre = 'Sala Pacífico' AND e.nombre IN ('Proyector', 'Pizarra', 'Videoconferencia', 'Aire acondicionado');
+INSERT INTO sala_equipamiento (sala_id, equipamiento_id)
+    SELECT s.id, e.id FROM sala s, equipamiento e
+    WHERE s.nombre = 'Oficina 201' AND e.nombre = 'Pizarra';
 
-    private static final Logger log = LoggerFactory.getLogger(CargadorCatalogos.class);
+-- ============================================================ Servicios adicionales
+INSERT INTO servicio_adicional (nombre, precio_unitario) VALUES
+    ('Catering',        25.00),
+    ('Impresión',        5.00),
+    ('Soporte técnico', 40.00);
 
-    private final RepositorioSedes repositorioSedes;
-    private final RepositorioSalas repositorioSalas;
-    private final RepositorioEquipamientos repositorioEquipamientos;
-    private final RepositorioServiciosAdicionales repositorioServiciosAdicionales;
-    private final RepositorioPlanes repositorioPlanes;
-    private final RepositorioMiembros repositorioMiembros;
-    private final RepositorioUsuarios repositorioUsuarios;
-    private final PasswordEncoder passwordEncoder;
+-- ============================================================ Planes de membresía
+-- nombre, horas incluidas al mes, % de descuento en horas excedentes, máximo de reservas activas
+INSERT INTO plan_membresia (nombre, horas_incluidas_mes, descuento_excedente, max_reservas_activas) VALUES
+    ('Flex',         0,  0, 2),
+    ('Básico',      10, 10, 3),
+    ('Profesional', 40, 20, 5),
+    ('Corporativo', 120, 30, 10);
 
-    public CargadorCatalogos(RepositorioSedes repositorioSedes,
-                             RepositorioSalas repositorioSalas,
-                             RepositorioEquipamientos repositorioEquipamientos,
-                             RepositorioServiciosAdicionales repositorioServiciosAdicionales,
-                             RepositorioPlanes repositorioPlanes,
-                             RepositorioMiembros repositorioMiembros,
-                             RepositorioUsuarios repositorioUsuarios,
-                             PasswordEncoder passwordEncoder) {
-        this.repositorioSedes = repositorioSedes;
-        this.repositorioSalas = repositorioSalas;
-        this.repositorioEquipamientos = repositorioEquipamientos;
-        this.repositorioServiciosAdicionales = repositorioServiciosAdicionales;
-        this.repositorioPlanes = repositorioPlanes;
-        this.repositorioMiembros = repositorioMiembros;
-        this.repositorioUsuarios = repositorioUsuarios;
-        this.passwordEncoder = passwordEncoder;
-    }
+-- ============================================================ Usuarios
+-- Las contraseñas están codificadas con BCrypt (nunca en texto plano):
+--   admin123 · recep123 · ana123 · luis123
+INSERT INTO usuario (nombre_usuario, contrasena, rol) VALUES
+    ('admin',     '$2a$10$39hh5RkT67Qi1SIf.dAnR.WiiX5RzSm9YweaAveBaa9vAOlR1mm/C', 'ADMIN'),
+    ('recepcion', '$2a$10$MDhaCnzClH1kMKofpB.FauB/PKiKhl5ijGPL883MHJ5s/5Eq9X2PK', 'RECEPCION'),
+    ('ana',       '$2a$10$Oa2oRCfTWRe0X9Lxd1yU3er.aYHdSYRqKSuqXUs07sOYcJzS7hZlu', 'MIEMBRO'),
+    ('luis',      '$2a$10$A.WYqrDC1F7hlx66LOB10e096ni/0MVq/oEdUak35V8aXUXgf9y22', 'MIEMBRO');
 
-    @Override
-    @Transactional
-    public void run(String... args) {
-        if (repositorioSedes.count() > 0) {
-            return;
-        }
-
-        // Sedes
-        Sede centro = repositorioSedes.save(
-                new Sede("Sede Centro", "Bogotá", "Carrera 7 # 32-16", LocalTime.of(7, 0), LocalTime.of(22, 0)));
-        Sede norte = repositorioSedes.save(
-                new Sede("Sede Norte", "Medellín", "Calle 10 # 43-20", LocalTime.of(8, 0), LocalTime.of(20, 0)));
-
-        // Equipamiento
-        Equipamiento proyector = repositorioEquipamientos.save(new Equipamiento("Proyector"));
-        Equipamiento pizarra = repositorioEquipamientos.save(new Equipamiento("Pizarra"));
-        Equipamiento videoconferencia = repositorioEquipamientos.save(new Equipamiento("Videoconferencia"));
-        Equipamiento aire = repositorioEquipamientos.save(new Equipamiento("Aire acondicionado"));
-
-        // Salas (la última está inactiva a propósito, para probar RN-04)
-        crearSala("Sala Andes", TipoSala.SALA_REUNION, 8, "30.00", true, centro, proyector, pizarra, videoconferencia);
-        crearSala("Sala Caribe", TipoSala.SALA_REUNION, 4, "20.00", true, centro, pizarra);
-        crearSala("Oficina 101", TipoSala.OFICINA_PRIVADA, 3, "15.00", true, centro, aire);
-        crearSala("Escritorio A1", TipoSala.ESCRITORIO, 1, "5.00", true, centro);
-        crearSala("Sala Pacífico", TipoSala.SALA_REUNION, 12, "40.00", true, norte,
-                proyector, pizarra, videoconferencia, aire);
-        crearSala("Oficina 201", TipoSala.OFICINA_PRIVADA, 4, "18.00", true, norte, pizarra);
-        crearSala("Escritorio B1", TipoSala.ESCRITORIO, 1, "5.00", false, norte);
-
-        // Servicios adicionales
-        repositorioServiciosAdicionales.save(new ServicioAdicional("Catering", new BigDecimal("25.00")));
-        repositorioServiciosAdicionales.save(new ServicioAdicional("Impresión", new BigDecimal("5.00")));
-        repositorioServiciosAdicionales.save(new ServicioAdicional("Soporte técnico", new BigDecimal("40.00")));
-
-        // Planes: nombre, horas incluidas al mes, % de descuento en excedentes, máximo de reservas activas
-        PlanMembresia flex = repositorioPlanes.save(new PlanMembresia("Flex", 0, 0, 2));
-        PlanMembresia basico = repositorioPlanes.save(new PlanMembresia("Básico", 10, 10, 3));
-        PlanMembresia profesional = repositorioPlanes.save(new PlanMembresia("Profesional", 40, 20, 5));
-        PlanMembresia corporativo = repositorioPlanes.save(new PlanMembresia("Corporativo", 120, 30, 10));
-
-        // Personal (sin miembro asociado)
-        repositorioUsuarios.save(new Usuario("admin", passwordEncoder.encode("admin123"), Rol.ADMIN));
-        repositorioUsuarios.save(new Usuario("recepcion", passwordEncoder.encode("recep123"), Rol.RECEPCION));
-
-        // Miembros (Ana y Luis tienen usuario para poder iniciar sesión)
-        crearMiembro("1010101", "Ana Torres", "ana@coworkhub.test", profesional, "ana", "ana123");
-        crearMiembro("2020202", "Luis Gómez", "luis@coworkhub.test", basico, "luis", "luis123");
-        crearMiembro("3030303", "Marta Ríos", "marta@coworkhub.test", flex, null, null);
-        crearMiembro("4040404", "Carlos Peña", "carlos@coworkhub.test", corporativo, null, null);
-        Miembro sofia = crearMiembro("5050505", "Sofía León", "sofia@coworkhub.test", basico, null, null);
-        sofia.setEstado(EstadoMiembro.SUSPENDIDO);
-        repositorioMiembros.save(sofia);
-
-        log.info("Catálogos cargados: {} sedes, {} salas, {} planes, {} miembros, {} usuarios",
-                repositorioSedes.count(), repositorioSalas.count(), repositorioPlanes.count(),
-                repositorioMiembros.count(), repositorioUsuarios.count());
-    }
-
-    private void crearSala(String nombre, TipoSala tipo, int capacidad, String tarifa, boolean activa,
-                           Sede sede, Equipamiento... equipamientos) {
-        Sala sala = new Sala(nombre, tipo, capacidad, new BigDecimal(tarifa), activa, sede);
-        sala.getEquipamientos().addAll(List.of(equipamientos));
-        repositorioSalas.save(sala);
-    }
-
-    private Miembro crearMiembro(String documento, String nombre, String email, PlanMembresia plan,
-                                 String nombreUsuario, String contrasena) {
-        Miembro miembro = new Miembro(documento, nombre, email, plan);
-        if (nombreUsuario != null) {
-            miembro.setUsuario(new Usuario(nombreUsuario, passwordEncoder.encode(contrasena), Rol.MIEMBRO));
-        }
-        return repositorioMiembros.save(miembro);
-    }
-}
+-- ============================================================ Miembros
+-- Ana y Luis tienen usuario (pueden iniciar sesión). Sofía está suspendida a propósito, para probar RN-05.
+INSERT INTO miembro (documento, nombre, email, estado, plan_id, usuario_id) VALUES
+    ('1010101', 'Ana Torres',  'ana@coworkhub.test',    'ACTIVO',
+        (SELECT id FROM plan_membresia WHERE nombre = 'Profesional'),
+        (SELECT id FROM usuario WHERE nombre_usuario = 'ana')),
+    ('2020202', 'Luis Gómez',  'luis@coworkhub.test',   'ACTIVO',
+        (SELECT id FROM plan_membresia WHERE nombre = 'Básico'),
+        (SELECT id FROM usuario WHERE nombre_usuario = 'luis')),
+    ('3030303', 'Marta Ríos',  'marta@coworkhub.test',  'ACTIVO',
+        (SELECT id FROM plan_membresia WHERE nombre = 'Flex'), NULL),
+    ('4040404', 'Carlos Peña', 'carlos@coworkhub.test', 'ACTIVO',
+        (SELECT id FROM plan_membresia WHERE nombre = 'Corporativo'), NULL),
+    ('5050505', 'Sofía León',  'sofia@coworkhub.test',  'SUSPENDIDO',
+        (SELECT id FROM plan_membresia WHERE nombre = 'Básico'), NULL);
 ```
+
+> ℹ️ **Las reservas de ejemplo no van en este script.** Sus fechas son relativas a "hoy"
+> (según el `Clock` de la aplicación) y sus costos los calcula la calculadora de la
+> Fase 3c, así que se cargan con una clase Java ahí. El script solo contiene datos que no
+> cambian con el tiempo.
+
+#### El script funciona igual en H2, MySQL y PostgreSQL
+
+Está escrito con SQL estándar (inserciones de varias filas, subconsultas, `INSERT ... SELECT`),
+sin nada específico de un motor. Los mismos datos se cargan en las tres bases sin cambios
+(lo verificamos contra H2, MySQL 8.4 y PostgreSQL 16).
+
+#### ¿Y si la base conserva los datos? (MySQL y PostgreSQL)
+
+`data.sql` se ejecuta **en cada arranque**. En H2 en memoria no hay problema: la base nace
+vacía cada vez. En una base que guarda los datos en disco, un segundo arranque intentaría
+insertar de nuevo las mismas filas. Por eso los perfiles `mysql` y `postgres` usan
+`spring.jpa.hibernate.ddl-auto=create`: **borran y recrean las tablas en cada arranque**, así
+que el script siempre parte de una base vacía. La consecuencia es que **esos datos no
+sobreviven a un reinicio** (para desarrollo es lo cómodo: siempre el mismo punto de partida).
+
+Si querés que **sí sobrevivan** —por ejemplo, para probar con datos que vas creando—,
+arrancá **la primera vez** con el perfil tal cual (carga los datos) y **desde la segunda**
+desactivá el script y el borrado:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=postgres \
+  -Dspring-boot.run.arguments="--spring.jpa.hibernate.ddl-auto=update --spring.sql.init.mode=never"
+```
+
+- `ddl-auto=update`: Hibernate crea o ajusta las tablas **sin borrarlas**.
+- `sql.init.mode=never`: no ejecuta `data.sql`.
+
+> ⚠️ Si usás `ddl-auto=update` **sin** `sql.init.mode=never`, el segundo arranque falla:
+> `data.sql` intenta insertar filas que ya existen y la base rechaza los duplicados
+> (`Failed to execute SQL script statement`), dejando además cargada solo una parte.
+> Si te pasa, borrá los datos (`docker compose --profile postgres down -v`) o arrancá una
+> vez con `ddl-auto=create`.
+
+Las reservas de ejemplo (Fase 3c) no se duplican en ningún caso: su cargador no hace nada si
+ya existen reservas.
 
 ## ✅ Checkpoint 2b — tablas y datos
 
-1. Agregá **temporalmente** esta línea a `application.properties` para que Hibernate
-   muestre las sentencias SQL que ejecuta:
+1. **Las tablas.** Agregá **temporalmente** esta línea a `application.properties` para que
+   Hibernate muestre las sentencias SQL que ejecuta:
 
    ```properties
    spring.jpa.show-sql=true
    ```
 
-   Ejecutá `mvn spring-boot:run`. Debés ver **10 sentencias `create table`** (una por
+   Ejecutá `mvn spring-boot:run` (con el perfil de tu base: `h2` por defecto, o
+   `-Dspring-boot.run.profiles=mysql` / `postgres`). Debés ver **10 sentencias `create table`** (una por
    cada una de las 9 entidades, más `sala_equipamiento`, la tabla intermedia de la
    relación N↔N), por ejemplo:
 
@@ -1268,35 +1308,48 @@ public class CargadorCatalogos implements CommandLineRunner {
    Hibernate: create table sala_equipamiento (sala_id bigint not null, equipamiento_id bigint not null, primary key (...))
    ```
 
-   Después, los `insert` de los datos semilla y esta línea del cargador:
+   Y la aplicación debe arrancar sin errores (`Started Main in ...`). Si el script fallara,
+   la aplicación **no arranca** (ver la tabla de problemas de abajo). Quitá
+   `spring.jpa.show-sql` cuando termines: llena la consola de mensajes.
 
-   ```text
-   Catálogos cargados: 2 sedes, 7 salas, 4 planes, 5 miembros, 4 usuarios
+2. **Los datos.** Ejecutá la siguiente consulta, que cuenta las filas de cada tabla. **Cómo
+   ejecutarla depende de tu base**:
+
+   - **H2**: agregá **temporalmente** `spring.h2.console.enabled=true` a
+     `application.properties`, reiniciá, abrí <http://localhost:8080/h2-console> y conectate
+     con JDBC URL `jdbc:h2:mem:coworkhub`, usuario `sa` y contraseña vacía.
+     ⚠️ **Quitá esa línea antes de la Fase 6**: la consola no debe quedar habilitada en un
+     proyecto protegido.
+   - **MySQL** o **PostgreSQL**: usá cualquier cliente, o la terminal (ver el paso 1.7):
+     `docker exec -it coworkhub-mysql mysql --default-character-set=utf8mb4 -ucoworkhub -pcoworkhub coworkhub`
+     o `docker exec -it coworkhub-postgres psql -U coworkhub coworkhub`.
+
+   ```sql
+   SELECT (SELECT COUNT(*) FROM sede) AS sedes,
+          (SELECT COUNT(*) FROM sala) AS salas,
+          (SELECT COUNT(*) FROM equipamiento) AS equipamientos,
+          (SELECT COUNT(*) FROM sala_equipamiento) AS equipamiento_por_sala,
+          (SELECT COUNT(*) FROM servicio_adicional) AS servicios,
+          (SELECT COUNT(*) FROM plan_membresia) AS planes,
+          (SELECT COUNT(*) FROM usuario) AS usuarios,
+          (SELECT COUNT(*) FROM miembro) AS miembros;
    ```
 
-   Quitá `spring.jpa.show-sql` cuando termines: llena la consola de mensajes.
+   Debe devolver una fila con: `2, 7, 4, 10, 3, 4, 4, 5` (en las tres bases).
 
-2. **Mirar la base (opcional, muy recomendable).** Agregá **temporalmente** esta línea a
-   `application.properties`:
+   Probá también:
 
-   ```properties
-   spring.h2.console.enabled=true
+   ```sql
+   SELECT m.nombre, m.estado, p.nombre AS plan, u.nombre_usuario, u.rol
+   FROM miembro m
+   JOIN plan_membresia p ON p.id = m.plan_id
+   LEFT JOIN usuario u ON u.id = m.usuario_id;
    ```
 
-   Reiniciá, abrí <http://localhost:8080/h2-console>, y conectate con:
-
-   | Campo | Valor |
-   |---|---|
-   | JDBC URL | `jdbc:h2:mem:coworkhub` |
-   | User Name | `sa` |
-   | Password | *(vacía)* |
-
-   Probá: `SELECT * FROM SALA;`, `SELECT * FROM SALA_EQUIPAMIENTO;` y
-   `SELECT id, nombre_usuario, rol FROM USUARIO;`. Verificá que la contraseña **no** está
-   en texto plano (empieza con `$2a$`).
-
-   > ⚠️ **Quitá esa línea antes de la Fase 6.** La consola de H2 no debe quedar
-   > habilitada en un proyecto protegido.
+   y verificá que Ana y Luis tienen usuario, que los otros tres miembros tienen
+   `NULL` en esas columnas, y que Sofía figura `SUSPENDIDO`. Con
+   `SELECT nombre_usuario, contrasena FROM usuario;` comprobá que ninguna contraseña está
+   en texto plano (todas empiezan con `$2a$`).
 
 3. Confirmá en `SALA` que existe la columna `sede_id`, en `MIEMBRO` las columnas
    `plan_id` y `usuario_id`, y que **no** existe ninguna columna en `SEDE` que apunte a
@@ -1308,12 +1361,19 @@ public class CargadorCatalogos implements CommandLineRunner {
 | `Could not determine recommended JdbcType` | Un campo `enum` sin `@Enumerated` o un tipo no soportado |
 | `Repeated column in mapping` | Dos campos apuntan a la misma columna (por ejemplo, olvidaste `mappedBy` en el lado inverso) |
 | `PropertyReferenceException: No property 'x' found` | El nombre de un método derivado no coincide con un atributo (`findByUsuarioNombreUsuario` exige `Miembro.usuario.nombreUsuario`) |
+| `Failed to execute SQL script statement #1 ... Table "SEDE" not found` | Falta `spring.jpa.defer-datasource-initialization=true`: el script corre antes de que existan las tablas |
+| `Column "X" not found` en un `INSERT` | El nombre de columna no coincide con el que generó Hibernate (usá `snake_case`: `hora_apertura`, no `horaApertura`) |
+| `NULL not allowed for column "X"` | Al `INSERT` le falta una columna obligatoria (`nullable = false` en la entidad) |
+| Letras rotas (`BogotÃ¡`) | Falta `spring.sql.init.encoding=UTF-8` o el archivo no está guardado como UTF-8 |
+| MySQL o PostgreSQL: el segundo arranque falla con `Failed to execute SQL script statement` | Se usó `ddl-auto=update` sin `spring.sql.init.mode=never`, y `data.sql` reinserta filas existentes | Ver "¿Y si la base conserva los datos?", en el paso 2.4 |
+| MySQL: en la terminal se ven `Pac�fico` o `Bogot�` | Es el cliente `mysql` de la terminal, no la base | Conectate con `--default-character-set=utf8mb4`; la aplicación y la base están bien |
+| `Value too long for column "CONTRASENA"` / no se puede iniciar sesión luego | El hash BCrypt se copió incompleto (mide 60 caracteres) |
 
 ### Paso 2.5 — Commit
 
 ```bash
 git add .
-git commit -m "fase 2: modelo de datos, repositorios y datos semilla"
+git commit -m "fase 2: modelo de datos, repositorios y datos iniciales"
 ```
 
 **Siguiente →** [Fase 3a — Catálogos](03a-fase-3-catalogos.md)

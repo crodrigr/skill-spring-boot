@@ -21,9 +21,13 @@ congela (Fase 1). En `application.properties`:
 coworkhub.reloj.fijo=2030-06-03T08:00:00
 ```
 
-Con eso, "hoy" es el **lunes 2030-06-03 a las 08:00**. Como la base es H2 **en memoria**,
-**reiniciá la aplicación antes de recorrer los escenarios** para partir de los datos
-semilla (las reservas nuevas empezarán en el id `16`).
+Con eso, "hoy" es el **lunes 2030-06-03 a las 08:00**. **Reiniciá la aplicación antes de
+recorrer los escenarios** para partir de los datos semilla (las reservas nuevas empezarán en
+el id `16`): con H2 la base nace vacía en cada arranque, y con los perfiles `mysql` y
+`postgres` se recrea (`ddl-auto=create`).
+
+Los escenarios dan **el mismo resultado con las tres bases** (H2, MySQL y PostgreSQL). Un buen
+ejercicio final es repetirlos cambiando de perfil (paso 1.6).
 
 En una terminal, definí estas funciones de ayuda (Linux/macOS/Git Bash):
 
@@ -226,7 +230,8 @@ done; wait
 ```
 
 **Esperado**: exactamente **una** respuesta `201` y cinco `409`, sin importar el orden. Si
-obtenés más de un `201`, falta el bloqueo de la sala (`buscarParaReservar`, Fase 2 y 3c).
+obtenés más de un `201`, falta el bloqueo de la sala (`buscarParaReservar`, Fase 2 y 3c) o el
+nivel de aislamiento `READ_COMMITTED` de `crear` (imprescindible en MySQL; ver la Fase 3c).
 
 ### Paso 7.3 — La colección de Insomnia (entregable 3)
 
@@ -272,8 +277,8 @@ aplica una política de cancelación y protege la API con JWT y roles.
 
 ## Tecnologías
 
-Java 17 · Spring Boot 3.3 · Spring Data JPA · H2 (en memoria) · Spring Security + JWT ·
-springdoc-openapi (Swagger UI) · Maven
+Java 17 · Spring Boot 3.3 · Spring Data JPA · H2 (por defecto), MySQL o PostgreSQL ·
+Spring Security + JWT · springdoc-openapi (Swagger UI) · Maven
 
 ## Cómo ejecutarlo
 
@@ -283,9 +288,24 @@ Requisitos: JDK 17 o superior y Maven 3.6.3 o superior.
 mvn spring-boot:run
 ```
 
-La aplicación queda en <http://localhost:8080>. La base es H2 **en memoria**: al reiniciar
-se pierden los datos y se recargan los datos de ejemplo (2 sedes, 7 salas, 4 planes,
-5 miembros y 15 reservas).
+La aplicación queda en <http://localhost:8080>. Por defecto usa H2 **en memoria**: no hay que
+instalar nada, y al reiniciar se pierden los datos y se recargan los de ejemplo (2 sedes,
+7 salas, 4 planes, 5 miembros y 15 reservas).
+
+## Bases de datos
+
+| Base | Perfil | Cómo ejecutarla |
+|---|---|---|
+| H2 (por defecto) | `h2` | `mvn spring-boot:run` |
+| MySQL 8 | `mysql` | `docker compose --profile mysql up -d` y luego `mvn spring-boot:run -Dspring-boot.run.profiles=mysql` |
+| PostgreSQL 14+ | `postgres` | `docker compose --profile postgres up -d` y luego `mvn spring-boot:run -Dspring-boot.run.profiles=postgres` |
+
+Los datos de conexión (host, puerto, base, usuario y contraseña) se pueden cambiar con
+variables de entorno: `COWORKHUB_DB_HOST`, `COWORKHUB_DB_PORT`, `COWORKHUB_DB_NOMBRE`,
+`COWORKHUB_DB_USUARIO` y `COWORKHUB_DB_CONTRASENA`. Con MySQL y PostgreSQL las tablas se
+recrean en cada arranque; para conservar los datos, arrancá a partir de la segunda vez con
+`--spring.jpa.hibernate.ddl-auto=update --spring.sql.init.mode=never`.
+
 
 ## Documentación de la API (Swagger UI)
 
@@ -382,6 +402,8 @@ Antes de entregar, recorré la [Rúbrica](../rubrica.md), en particular su
 | `409` `RN-06` al reservar | El miembro ya alcanzó el límite de reservas activas de su plan | Cancelá una, o usá otro miembro |
 | `500` con `ERROR_INTERNO` | Error inesperado | Mirá la consola: el detalle completo está en el log |
 | `LazyInitializationException` | Falta `spring.jpa.open-in-view=true`, o una colección `LAZY` se usa fuera de la transacción | Revisá `application.properties` |
+| No conecta con MySQL o PostgreSQL | La base no está levantada, el puerto está ocupado o las credenciales no coinciden | Tabla de problemas del [Checkpoint 1](01-fase-1-proyecto-base.md#-checkpoint-1--el-proyecto-arranca) |
+| Con MySQL, la prueba de solicitudes simultáneas da más de un `201` | Falta `isolation = READ_COMMITTED` en `ServicioReservas.crear` | Ver la [Fase 3c](03c-fase-3-reservas.md) |
 
 ## 🏁 Fin del recorrido
 
