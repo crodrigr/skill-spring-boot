@@ -12,9 +12,9 @@ además cuándo nace y cuándo muere cada una de esas instancias (los **beans**)
 **Qué busca demostrar este ejemplo**: que el ciclo de vida de un bean no es una
 lista abstracta de fases, sino algo que se puede **ver ejecutarse en orden**: el
 propio `ServicioCitas` imprime un mensaje en cada fase (instanciación,
-inicialización, uso, destrucción), y `DemoContenedorIoC` deja en evidencia que
-el desarrollador nunca escribe `new ServicioCitas()` — solo se lo pide al
-contenedor.
+inicialización, uso, destrucción), y `Main` —una aplicación Spring Boot— deja en
+evidencia que el desarrollador nunca escribe `new ServicioCitas()`: solo se lo
+pide al contenedor que Spring Boot crea al arrancar.
 
 ## 🏥 Caso de estudio
 
@@ -28,13 +28,14 @@ orden las fases de su ciclo de vida.
 ```text
 📁 ejemplo-10-ciclo-de-vida
 └── 📁 src/com/medisalud
-    ├── 📄 DemoContenedorIoC.java      (▶️ clase con el main que se ejecuta)
-    ├── 📁 negocio                     (capa de negocio)
-    │   └── 📁 service
-    │       └── 📄 ServicioCitas.java
-    └── 📁 config
-        └── 📄 ConfiguracionApp.java
+    ├── 📄 Main.java                   (@SpringBootApplication; ▶️ clase que arranca la aplicación)
+    └── 📁 negocio                     (capa de negocio)
+        └── 📁 service
+            └── 📄 ServicioCitas.java
 ```
+
+Es un proyecto Spring Boot normal: se crea con Spring Initializr (Ejemplo 06) y
+basta la dependencia `spring-boot-starter`.
 
 ## 💻 Archivo: `ServicioCitas.java`
 
@@ -64,30 +65,23 @@ public class ServicioCitas {
 }
 ```
 
-## 💻 Archivo: `ConfiguracionApp.java`
-
-```java
-package com.medisalud.config;
-
-// Clase de configuración: le dice al contenedor en qué paquete buscar @Component
-@Configuration
-@ComponentScan(basePackages = "com.medisalud")
-public class ConfiguracionApp {
-}
-```
-
-## 💻 Archivo: `DemoContenedorIoC.java`
+## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 package com.medisalud;
 
-import com.medisalud.config.ConfiguracionApp;
 import com.medisalud.negocio.service.ServicioCitas;
 
-public class DemoContenedorIoC {
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
+public class Main {
+
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        // Arranca Spring Boot: crea el contenedor (ApplicationContext) y los beans
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         ServicioCitas servicioCitas = contexto.getBean(ServicioCitas.class);
         servicioCitas.agendar("Ana Gómez");
@@ -96,6 +90,10 @@ public class DemoContenedorIoC {
     }
 }
 ```
+
+`@SpringBootApplication` ya incluye el escaneo de componentes: Spring busca clases
+anotadas (`@Component`, `@Service`, …) en `com.medisalud` y todos sus subpaquetes,
+por eso no hace falta ninguna clase de configuración aparte.
 
 ## 🗺️ Diagrama: las cuatro fases, en orden
 
@@ -114,13 +112,13 @@ del estudiante: nadie llama explícitamente a `inicializar()` ni a
 
 ## 🧭 Explicación paso a paso
 
-1. `ConfiguracionApp`, anotada `@Configuration` y `@ComponentScan`, le indica al
-   contenedor en qué paquete buscar clases anotadas (`@Component`, `@Service`,
-   etc.); en una aplicación Spring Boot real, `@SpringBootApplication` ya incluye
-   este escaneo automáticamente (Ejemplo 08), pero aquí se declara aparte porque
-   todavía no se armó un proyecto Spring Boot completo.
-2. El `ApplicationContext` es el **contenedor IoC**: al arrancar, escanea las
-   clases anotadas (`@Component`, entre otras) y decide qué beans crear.
+1. `Main`, anotada `@SpringBootApplication`, es el punto de entrada: incluye el
+   escaneo de componentes (Ejemplo 08), así que le indica a Spring en qué paquete
+   buscar clases anotadas (`@Component`, `@Service`, etc.): `com.medisalud` y sus
+   subpaquetes.
+2. `SpringApplication.run(...)` crea el `ApplicationContext`, el **contenedor
+   IoC**: al arrancar, escanea las clases anotadas (`@Component`, entre otras) y
+   decide qué beans crear. Devuelve ese contexto para poder pedirle beans.
 3. **Instanciación**: el contenedor llama al constructor de `ServicioCitas`. El
    código cliente nunca escribe `new ServicioCitas()`.
 4. **Inyección de dependencias**: si `ServicioCitas` dependiera de otro bean (por
@@ -138,12 +136,19 @@ del estudiante: nadie llama explícitamente a `inicializar()` ni a
 
 ## ✅ Resultado esperado
 
+En la consola aparecen el banner y los logs de arranque de Spring Boot; entre ellos,
+las líneas del ciclo de vida del bean:
+
 ```text
 1) Instanciación: el contenedor crea el objeto ServicioCitas
 2) Inicialización: @PostConstruct — el bean ya tiene sus dependencias listas
 3) Uso: agendando cita para Ana Gómez
 4) Destrucción: @PreDestroy — el contenedor libera el bean antes de apagarse
 ```
+
+Las líneas 1 y 2 salen mientras Spring arranca (antes de `Started Main in ...`).
+La 3 sale cuando `Main` pide el bean y lo usa, y la 4 al ejecutar
+`contexto.close()`.
 
 ## 📌 Idea clave
 
@@ -177,14 +182,14 @@ seleccioná **todas** las afirmaciones correctas.
 - **B.** `contexto.getBean(ServicioCitas.class)` pide una instancia ya
   administrada por el contenedor.
 - **C.** `contexto.close()` dispara la ejecución de `@PreDestroy`.
-- **D.** `ConfiguracionApp` le indica al contenedor en qué paquete buscar
-  componentes.
+- **D.** `@SpringBootApplication` hace que el contenedor busque componentes en
+  el paquete de `Main` y sus subpaquetes.
 
 <details>
 <summary>🔑 Ver respuesta</summary>
 
 **Respuestas correctas: B, C, D**. La A es falsa: el código de
-`DemoContenedorIoC` nunca escribe `new ServicioCitas()`.
+`Main` nunca escribe `new ServicioCitas()`.
 
 </details>
 
