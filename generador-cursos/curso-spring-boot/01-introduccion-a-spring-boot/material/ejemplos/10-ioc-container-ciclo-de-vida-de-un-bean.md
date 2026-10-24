@@ -16,6 +16,12 @@ inicialización, uso, destrucción), y `Main` —una aplicación Spring Boot— 
 evidencia que el desarrollador nunca escribe `new ServicioCitas()`: solo se lo
 pide al contenedor que Spring Boot crea al arrancar.
 
+## 🗺️ El contenedor y el contexto, de un vistazo
+
+![SpringApplication.run crea el ApplicationContext, que es el contenedor IoC. @SpringBootApplication escanea las clases anotadas, y el contexto crea los beans, les inyecta sus dependencias y gestiona su ciclo de vida. El código del desarrollador, como Main, le pide beans al contexto o los recibe inyectados.](../imagenes/contenedor-contexto.svg)
+
+**Contenedor y contexto son lo mismo, visto de dos formas**: el *contenedor IoC* es la idea (quien crea y entrega los objetos) y el `ApplicationContext` es el objeto de Spring que lo implementa. `SpringApplication.run(...)` lo crea al arrancar.
+
 ## 🏥 Caso de estudio
 
 MediSalud: un `ServicioCitas` administrado por el contenedor IoC, para observar en

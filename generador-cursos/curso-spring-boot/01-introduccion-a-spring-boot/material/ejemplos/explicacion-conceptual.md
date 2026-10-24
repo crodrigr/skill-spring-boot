@@ -195,6 +195,8 @@ objeto: en vez de que una clase cree sus propias dependencias con `new`,
 un contenedor (`ApplicationContext` en Spring) las crea, las configura y
 se las entrega. Un objeto administrado así se llama **bean**.
 
+![SpringApplication.run crea el ApplicationContext, que es el contenedor IoC. @SpringBootApplication escanea las clases anotadas, y el contexto crea los beans, les inyecta sus dependencias y gestiona su ciclo de vida. El código del desarrollador, como Main, le pide beans al contexto o los recibe inyectados.](../imagenes/contenedor-contexto.svg)
+
 El contenedor sigue, para cada bean, un ciclo de vida ordenado:
 
 - **Instanciación**: crea el objeto.

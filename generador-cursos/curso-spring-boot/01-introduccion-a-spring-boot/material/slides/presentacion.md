@@ -395,6 +395,8 @@ El objeto administrado por el contenedor se llama **bean**.
 
 ## 🧠 ApplicationContext: el contenedor IoC
 
+![SpringApplication.run crea el ApplicationContext, que es el contenedor IoC. @SpringBootApplication escanea las clases anotadas, y el contexto crea los beans, les inyecta sus dependencias y gestiona su ciclo de vida. El código del desarrollador, como Main, le pide beans al contexto o los recibe inyectados.](../imagenes/contenedor-contexto.svg)
+
 Al arrancar, escanea las clases anotadas y decide qué beans crear, configurar y
 entregar.
 
