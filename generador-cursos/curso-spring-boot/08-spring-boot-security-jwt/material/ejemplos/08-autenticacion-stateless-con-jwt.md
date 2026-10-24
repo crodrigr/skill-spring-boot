@@ -208,6 +208,8 @@ public class ManejadorGlobalDeExcepciones {
 
 </details>
 
+![El cliente envía sus credenciales, el servidor las valida y emite un JWT firmado. En cada solicitud posterior el cliente envía el token en la cabecera Authorization y un filtro valida la firma antes de llegar al controlador.](../imagenes/flujo-login-jwt.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 ```text

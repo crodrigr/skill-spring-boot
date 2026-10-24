@@ -12,6 +12,8 @@ cuando no se usa ninguna.
 centralización y uso recomendado, y mostrar el resultado de no aplicar
 ninguno.
 
+![ResponseStatus actúa sobre una sola excepción, ExceptionHandler sobre un controlador y ControllerAdvice sobre toda la aplicación.](../imagenes/alcance-mecanismos.svg)
+
 ## 🧠 Tabla comparativa
 
 | Característica | `@ResponseStatus` | `@ExceptionHandler` | `@ControllerAdvice` |

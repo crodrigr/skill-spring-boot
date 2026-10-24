@@ -38,11 +38,7 @@ Repasar los conceptos clave de Spring Security con ejemplos concretos.
 
 ## Slide 8 — 🗺️ Arquitectura de Spring Security
 
-```text
-Solicitud → Security Filter Chain → Authentication Manager →
-Authentication Providers → PasswordEncoder / UserDetailsService →
-SecurityContextHolder
-```
+![Una solicitud atraviesa la Security Filter Chain, que consulta al Authentication Manager; este delega en los Authentication Providers, que usan PasswordEncoder y UserDetailsService; el resultado se guarda en el SecurityContextHolder.](../imagenes/arquitectura-spring-security.svg)
 
 ## Slide 9 — El flujo completo
 
@@ -62,10 +58,7 @@ proceso de autenticación.
 
 ## Slide 12 — 🗺️ Stateful vs. Stateless
 
-```text
-Stateful: login → sesión guardada → solicitudes dependen de la sesión
-Stateless: login → sin estado → cada solicitud se autoprueba (token)
-```
+![En stateful, el servidor guarda una sesión tras el login y cada solicitud depende de ella. En stateless, el servidor no guarda nada: cada solicitud lleva su propio token que prueba la identidad.](../imagenes/stateful-vs-stateless.svg)
 
 ## Slide 13 — Aplicaciones típicas de arquitecturas stateless
 
@@ -80,6 +73,8 @@ Clasificar sistemas reales como stateful o stateless.
 
 Tres clases concretas: `FilterChainProxy`, `DelegatingFilterProxy`,
 `SecurityFilterChain`.
+
+![DelegatingFilterProxy conecta el contenedor de servlets con Spring; FilterChainProxy decide qué SecurityFilterChain aplicar según la URL de la solicitud.](../imagenes/cadena-filtros.svg)
 
 ## Slide 16 — Los tres roles
 
@@ -122,10 +117,7 @@ firmada digitalmente entre dos partes.
 
 ## Slide 24 — 🗺️ Estructura de un JWT
 
-```text
-header.payload.signature
-(Base64)  (Base64)  (firma con clave secreta)
-```
+![Un JWT son tres partes separadas por puntos: el header con el algoritmo, el payload con los datos y la firma calculada con una clave secreta. Header y payload son Base64 legibles; la firma impide la manipulación.](../imagenes/estructura-jwt.svg)
 
 Base64 no es encriptación: cualquiera puede decodificar header y
 payload; la firma protege contra la manipulación, no contra la lectura.
@@ -136,10 +128,7 @@ Identificar las tres partes de un JWT dado.
 
 ## Slide 26 — 🗺️ Ciclo de vida de un JWT
 
-```text
-Login exitoso → servidor emite JWT → cliente lo reenvía en cada
-solicitud → servidor valida la firma en cada una
-```
+![El cliente envía sus credenciales, el servidor las valida y emite un JWT firmado. En cada solicitud posterior el cliente envía el token en la cabecera Authorization y un filtro valida la firma antes de llegar al controlador.](../imagenes/flujo-login-jwt.svg)
 
 ## Slide 27 — Detección de manipulación
 

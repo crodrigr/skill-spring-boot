@@ -12,6 +12,8 @@ una excepción.
 `Throwable` → `Exception`/`Error`, la distinción oficial entre ambas
 ramas, y las causas típicas que originan excepciones en Java.
 
+![Throwable se divide en Error, problemas graves que no deberían capturarse, y Exception, condiciones que una aplicación razonable puede capturar; de Exception cuelga RuntimeException, de la que derivan NullPointerException y las excepciones de negocio propias.](../imagenes/jerarquia-throwable.svg)
+
 ## 🧠 ¿Qué es una excepción?
 
 Una excepción es un evento o condición anormal que surge durante la

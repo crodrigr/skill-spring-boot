@@ -49,6 +49,8 @@ Uso común: siempre `LAZY` por defecto, salvo que haya una razón fuerte para
 `EAGER` (los datos relacionados casi siempre se necesitan junto con la
 entidad principal).
 
+![Uno a uno: la tabla historia_clinica tiene paciente_id. Uno a muchos: la tabla cita tiene paciente_id. Muchos a muchos: una tabla intermedia libro_autor guarda libro_id y autor_id.](../imagenes/relaciones-jpa.svg)
+
 📎 Ver en la práctica: [Ejemplo 03 — `@OneToMany`/`@ManyToOne` y `fetch`](03-oneToMany-manyToOne-y-fetch.md)
 
 `@ManyToMany` simple alcanza cuando la relación no necesita más información
@@ -71,6 +73,8 @@ relacionadas:
 
 `orphanRemoval = true` elimina automáticamente una entidad hija que deja de
 estar en la colección de su padre (y el padre se vuelve a guardar).
+
+![Con cascade, guardar o borrar al padre propaga la operación a sus hijas. Con orphanRemoval, una hija quitada de la colección del padre se borra de la base de datos.](../imagenes/cascade-orphanremoval.svg)
 
 📎 Ver en la práctica: [Ejemplo 05 — `cascade` y `orphanRemoval`](05-cascade-y-orphanRemoval.md)
 

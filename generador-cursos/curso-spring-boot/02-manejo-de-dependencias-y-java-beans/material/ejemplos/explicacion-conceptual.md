@@ -52,6 +52,8 @@ Beneficios concretos:
 - Facilita las **pruebas unitarias** (se puede inyectar una implementación
   de prueba —un *mock* o un *stub*— en vez de la real).
 
+![A la izquierda, el servicio crea su repositorio con new y queda atado a una implementación. A la derecha, el contenedor crea el repositorio y se lo entrega al servicio, que solo conoce la interfaz.](../imagenes/sin-di-vs-con-di.svg)
+
 📎 Ver en la práctica: [Ejemplo 02 — Inyección de Dependencias: de la clase acoplada a la clase desacoplada](02-inyeccion-de-dependencias.md)
 
 ## 🧠 Concepto: Estructura básica de una dependencia y buenas prácticas
@@ -75,6 +77,8 @@ Una dependencia circular casi nunca se resuelve con más código o una forma
 de inyección distinta: suele ser una señal de que las responsabilidades
 entre esos módulos están mal repartidas, y la solución real es
 reorganizarlas.
+
+![ServicioA necesita a ServicioB y ServicioB necesita a ServicioA, así que ninguno de los dos puede construirse primero.](../imagenes/dependencia-circular.svg)
 
 📎 Ver en la práctica: [Ejemplo 03 — Estructura básica de una dependencia y buenas prácticas de diseño](03-estructura-basica-de-una-dependencia.md)
 
@@ -138,6 +142,8 @@ El ciclo de vida de un bean en Spring Boot tiene cinco fases:
 Cuando la dependencia se recibe por constructor, instanciación y
 configuración ocurren casi al mismo tiempo (dentro de la misma llamada al
 constructor), pero siguen siendo fases lógicamente distintas.
+
+![Cinco fases del bean: instanciación, configuración mediante inyección de dependencias, inicialización con PostConstruct, uso y destrucción con PreDestroy.](../imagenes/ciclo-vida-bean.svg)
 
 📎 Ver en la práctica: [Ejemplo 06 — Ciclo de vida de un bean: la fase de configuración, en detalle](06-ciclo-de-vida-de-un-bean.md)
 

@@ -11,6 +11,8 @@ traduce a su propia arquitectura en capas.
 traduce a la arquitectura en capas de Spring (`Controller` → `Service` →
 `Repository` → `Database`), y qué responsabilidad tiene cada capa.
 
+![El cliente llama al controlador, que llama al servicio, que llama al repositorio, que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
+
 ## 🧠 El patrón Modelo Vista Controlador (MVC)
 
 MVC divide una aplicación en tres partes:

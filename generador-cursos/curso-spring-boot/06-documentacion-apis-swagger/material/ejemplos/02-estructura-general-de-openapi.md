@@ -11,6 +11,8 @@ estructura leyéndola directamente.
 clave de una definición OpenAPI (`paths`, `components`, `servers`) sobre
 un fragmento YAML basado en `GET /libros` (Módulo 5).
 
+![Un documento OpenAPI tiene secciones openapi, info, servers, paths y components; en paths se usa ref para reutilizar los esquemas definidos en components.](../imagenes/estructura-openapi.svg)
+
 ## 🧠 Las tres secciones clave
 
 | Sección | Qué describe |

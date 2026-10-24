@@ -22,6 +22,8 @@ negocio.
 Biblioteca Universitaria: `ServicioPrestamos`, que necesita un
 `RepositorioLibros` para funcionar.
 
+![A la izquierda, el servicio crea su repositorio con new y queda atado a una implementación. A la derecha, el contenedor crea el repositorio y se lo entrega al servicio, que solo conoce la interfaz.](../imagenes/sin-di-vs-con-di.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 En Java, cada clase o interfaz pública va en su propio archivo `.java`. Si

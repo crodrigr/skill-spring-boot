@@ -16,6 +16,8 @@ automáticamente.
 Biblioteca Universitaria: `ControladorLibros`/`ServicioLibros`/`Libro`
 del Módulo 5, reutilizados sin ningún cambio de código.
 
+![springdoc-openapi lee los controladores y las entidades, genera la definición OpenAPI en /v3/api-docs y Swagger UI la muestra en /swagger-ui.html.](../imagenes/flujo-springdoc.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 ```text

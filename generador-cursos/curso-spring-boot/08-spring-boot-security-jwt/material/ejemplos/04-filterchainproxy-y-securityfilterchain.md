@@ -13,6 +13,8 @@ en el lugar correcto de la cadena.
 una sola clase, sino una colaboración entre tres componentes con roles
 distintos y complementarios.
 
+![DelegatingFilterProxy conecta el contenedor de servlets con Spring; FilterChainProxy decide qué SecurityFilterChain aplicar según la URL de la solicitud.](../imagenes/cadena-filtros.svg)
+
 ## 🗺️ Diagrama
 
 ```mermaid

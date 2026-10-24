@@ -13,6 +13,8 @@ que un puñado de buenas prácticas (depender de abstracciones, minimizar
 dependencias transitivas expuestas, evitar dependencias circulares) explica
 esa diferencia de forma concreta, no como reglas abstractas.
 
+![ServicioA necesita a ServicioB y ServicioB necesita a ServicioA, así que ninguno de los dos puede construirse primero.](../imagenes/dependencia-circular.svg)
+
 ## 🏥 Caso de estudio
 
 MediSalud: dos diseños alternativos para que `ServicioCitas` avise al

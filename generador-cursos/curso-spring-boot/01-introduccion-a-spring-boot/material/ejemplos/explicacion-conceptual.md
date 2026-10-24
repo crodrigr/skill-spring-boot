@@ -61,6 +61,8 @@ acotada. Ambos pueden convivir en el mismo proyecto: Spring Boot
 (framework) organiza toda la aplicación, y una librería de validación o de
 manejo de fechas se usa puntualmente dentro de ella.
 
+![Con una librería, el código del desarrollador es quien llama a la librería. Con un framework ocurre al revés: el framework llama al código del desarrollador. Esa es la inversión de control.](../imagenes/framework-vs-libreria.svg)
+
 📎 Ver en la práctica: [Ejemplo 03 — Diferencias entre frameworks y librerías](03-diferencias-frameworks-y-librerias.md)
 
 ## 🧠 Concepto: POO aplicada
@@ -204,6 +206,8 @@ El contenedor sigue, para cada bean, un ciclo de vida ordenado:
 Entender este ciclo es lo que permite entender qué automatiza Spring
 cuando "inyecta" algo.
 
+![Cinco fases que sigue el contenedor para cada bean: instanciación, inyección de dependencias, inicialización con PostConstruct, uso y destrucción con PreDestroy.](../imagenes/ciclo-vida-bean.svg)
+
 📎 Ver en la práctica: [Ejemplo 10 — IoC Container: ApplicationContext y ciclo de vida de un bean](10-ioc-container-ciclo-de-vida-de-un-bean.md)
 
 ## 🧠 Concepto: Inyección de Dependencias (constructor, setter, campo)
@@ -225,5 +229,7 @@ contenedor le da a un bean lo que necesita, en vez de que el bean lo cree
 La inyección por constructor es la forma recomendada por convención en
 Spring para dependencias obligatorias, precisamente por ser explícita,
 inmutable y fácil de instanciar con valores de prueba en un test unitario.
+
+![El contenedor entrega la dependencia al bean por el constructor, por un método setter o directamente en un campo anotado con Autowired. La forma por constructor es la recomendada.](../imagenes/inyeccion-tres-formas.svg)
 
 📎 Ver en la práctica: [Ejemplo 11 — Inyección de Dependencias: constructor, setter y campo](11-inyeccion-de-dependencias.md)

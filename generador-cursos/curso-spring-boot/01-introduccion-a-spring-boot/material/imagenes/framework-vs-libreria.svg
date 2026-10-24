@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380" width="900" height="380" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Librería frente a framework</title>
+<desc id="d">Con una librería, el código del desarrollador es quien llama a la librería. Con un framework ocurre al revés: el framework llama al código del desarrollador. Esa es la inversión de control.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="378" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">¿Quién controla el flujo?</text>
+<line x1="450" y1="60" x2="450" y2="340" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="225" y="76" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Librería</text>
+<text x="675" y="76" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Framework</text>
+<rect x="70" y="110" width="130" height="60" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="135.0" y="135.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Tu código</text>
+<text x="135.0" y="154.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">(el que manda)</text>
+<rect x="270" y="200" width="130" height="60" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="335.0" y="234.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Librería</text>
+<path d="M200 150 C240 150 330 160 335 196" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="300" y="126" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">1. la llamas</text>
+<path d="M320 262 C300 300 200 300 150 174" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="150" y="318" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">2. te devuelve el resultado</text>
+<rect x="500" y="110" width="150" height="60" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="575.0" y="135.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Framework</text>
+<text x="575.0" y="154.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">(el que manda)</text>
+<rect x="720" y="200" width="150" height="60" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="795.0" y="234.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Tu código</text>
+<path d="M650 150 C720 150 790 160 795 196" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="740" y="126" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">1. te llama él</text>
+<text x="675" y="300" text-anchor="middle" font-size="14" font-weight="400" fill="#64748b">Inversión de Control: tú solo escribes las piezas</text>
+<text x="675" y="320" text-anchor="middle" font-size="14" font-weight="400" fill="#64748b">que el framework invoca cuando le toca</text>
+</svg>

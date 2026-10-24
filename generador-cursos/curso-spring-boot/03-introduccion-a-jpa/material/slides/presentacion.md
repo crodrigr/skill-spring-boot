@@ -54,12 +54,7 @@ public class Paciente {
 
 ## Slide 10 — Diagrama de arquitectura
 
-```mermaid
-flowchart LR
-    EMF[EntityManagerFactory] --> EM[EntityManager]
-    EM --> ET[EntityTransaction]
-    EM --> Q[Query / JPQL]
-```
+![La unidad de persistencia, configurada desde application.properties, crea el EntityManagerFactory; este produce EntityManager, que gestiona entidades, ejecuta consultas JPQL y trabaja dentro de una EntityTransaction.](../imagenes/arquitectura-jpa.svg)
 
 ## Slide 11 — Sin `persistence.xml`
 
@@ -100,6 +95,8 @@ viceversa, sin SQL manual.
 Sin ORM: `INSERT INTO paciente ...` a mano. Con ORM:
 `entityManager.persist(paciente)`.
 
+![Sin ORM el programador escribe SQL y convierte filas a objetos a mano. Con ORM trabaja con objetos y el ORM genera el SQL y hace la conversión.](../imagenes/sin-orm-vs-con-orm.svg)
+
 ## Slide 18 — ¿Qué es Hibernate?
 
 Framework de mapeo objeto-relacional para Java: convierte clases en tablas,
@@ -119,6 +116,8 @@ que Hibernate ejecuta por debajo.
 
 Módulo de Spring que evita implementar a mano el acceso a datos: se declara
 una interfaz de repositorio, y Spring genera su implementación.
+
+![De arriba abajo: tu código usa un repositorio de Spring Data JPA, que se apoya en la especificación JPA, implementada por Hibernate, que habla con la base de datos mediante JDBC.](../imagenes/pila-persistencia.svg)
 
 ## Slide 22 — Ventajas de Spring Data JPA
 

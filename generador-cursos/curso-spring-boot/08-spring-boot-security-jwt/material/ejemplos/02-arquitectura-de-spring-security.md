@@ -13,6 +13,8 @@ componentes con responsabilidades específicas — y que, una vez
 entendidos, esos mismos componentes reaparecen sin cambios en la
 implementación de Basic Auth (Ejemplo 05) y de JWT (Ejemplo 08).
 
+![Una solicitud atraviesa la Security Filter Chain, que consulta al Authentication Manager; este delega en los Authentication Providers, que usan PasswordEncoder y UserDetailsService; el resultado se guarda en el SecurityContextHolder.](../imagenes/arquitectura-spring-security.svg)
+
 ## 🗺️ Diagrama
 
 ```mermaid

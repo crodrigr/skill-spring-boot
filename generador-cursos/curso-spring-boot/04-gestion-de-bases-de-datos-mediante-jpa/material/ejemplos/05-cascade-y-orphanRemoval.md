@@ -23,6 +23,8 @@ mostrar ambos comportamientos con código ejecutable.
 MediSalud: `Paciente`↔`Cita`, ahora con propagación automática de
 operaciones.
 
+![Con cascade, guardar o borrar al padre propaga la operación a sus hijas. Con orphanRemoval, una hija quitada de la colección del padre se borra de la base de datos.](../imagenes/cascade-orphanremoval.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 ```text

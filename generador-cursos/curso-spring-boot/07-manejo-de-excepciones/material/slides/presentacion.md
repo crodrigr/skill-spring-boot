@@ -28,11 +28,7 @@ abruptamente.
 
 ## Slide 6 — La jerarquía `Throwable`
 
-```text
-Throwable
-├── Exception   (capturable: NullPointerException)
-└── Error       (no debería capturarse: StackOverflowError)
-```
+![Throwable se divide en Error, problemas graves que no deberían capturarse, y Exception, condiciones que una aplicación razonable puede capturar; de Exception cuelga RuntimeException, de la que derivan NullPointerException y las excepciones de negocio propias.](../imagenes/jerarquia-throwable.svg)
 
 ## Slide 7 — Causas típicas de excepciones
 
@@ -55,11 +51,7 @@ código se llena de `try/catch` innecesarios.
 
 ## Slide 11 — Dónde se producen los errores en capas
 
-```text
-Repository → errores de base de datos
-Service    → reglas de negocio (acá se lanza la excepción)
-Controller → exposición HTTP (acá, o global, se maneja)
-```
+![Una excepción lanzada en el servicio sube al controlador. Con ControllerAdvice la captura un manejador global que devuelve un código HTTP y un cuerpo JSON claros; sin ningún manejo, el cliente recibe un 500 genérico.](../imagenes/flujo-excepcion-api.svg)
 
 ## Slide 12 — Actividad práctica: Ejemplo 02 y Básico 02
 
@@ -137,6 +129,8 @@ controladores.
 |---|---|---|---|
 | Alcance | Puntual | Local | Global |
 | Centralización | No | Parcial | Sí |
+
+![ResponseStatus actúa sobre una sola excepción, ExceptionHandler sobre un controlador y ControllerAdvice sobre toda la aplicación.](../imagenes/alcance-mecanismos.svg)
 
 ## Slide 27 — Y si no se usa ninguno
 

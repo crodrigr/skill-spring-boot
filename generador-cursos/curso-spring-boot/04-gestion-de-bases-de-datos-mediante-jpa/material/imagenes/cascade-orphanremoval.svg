@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">cascade y orphanRemoval</title>
+<desc id="d">Con cascade, guardar o borrar al padre propaga la operación a sus hijas. Con orphanRemoval, una hija quitada de la colección del padre se borra de la base de datos.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="398" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Propagar operaciones del padre a las hijas</text>
+<text x="225" y="68" text-anchor="middle" font-size="16" font-weight="700" fill="#0d9488">cascade = ALL</text>
+<text x="675" y="68" text-anchor="middle" font-size="16" font-weight="700" fill="#dc2626">orphanRemoval = true</text>
+<line x1="450" y1="50" x2="450" y2="370" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 6"/>
+<rect x="130" y="90" width="190" height="50" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="225.0" y="120.25" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">paciente</text>
+<rect x="40" y="200" width="150" height="50" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="115.0" y="229.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">cita 1</text>
+<rect x="260" y="200" width="150" height="50" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="335.0" y="229.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">cita 2</text>
+<path d="M190 142 L120 198" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M260 142 L330 198" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="225" y="176" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">save / delete</text>
+<text x="225" y="290" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">Al guardar o borrar el paciente,</text>
+<text x="225" y="310" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">se guardan o borran sus citas</text>
+<rect x="580" y="90" width="190" height="50" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="675.0" y="120.25" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">paciente</text>
+<rect x="490" y="200" width="150" height="50" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="565.0" y="229.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">cita 1</text>
+<rect x="710" y="200" width="150" height="50" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="785.0" y="229.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">cita 2 (quitada)</text>
+<path d="M580 142 L570 198" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M720 142 L780 198" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="675" y="290" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">Si quitas la cita de la lista del paciente,</text>
+<text x="675" y="310" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">la fila queda huérfana y se borra de la BD</text>
+<text x="450" y="372" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">orphanRemoval borra al quitar de la colección; cascade REMOVE borra al borrar al padre</text>
+</svg>

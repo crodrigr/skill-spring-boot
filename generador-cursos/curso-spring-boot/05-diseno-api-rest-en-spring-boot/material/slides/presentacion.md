@@ -33,6 +33,8 @@ Cliente ── Solicitud (verbo + URL) ──> Servidor
 Cliente <── Respuesta (código + cuerpo) ── Servidor
 ```
 
+![El cliente envía una solicitud con verbo, URL y a veces cuerpo; el servidor responde con un código de estado y normalmente un cuerpo JSON.](../imagenes/ciclo-http.svg)
+
 ## Slide 7 — Los verbos HTTP
 
 `GET` (leer) · `POST` (crear) · `PUT` (reemplazar) · `PATCH` (modificar
@@ -78,6 +80,8 @@ No hay Vista tradicional: el cuerpo JSON de la respuesta cumple ese rol.
 flowchart LR
     Controller --> Service --> Repository --> Database
 ```
+
+![El cliente llama al controlador, que llama al servicio, que llama al repositorio, que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
 
 ## Slide 16 — Responsabilidad de cada capa
 

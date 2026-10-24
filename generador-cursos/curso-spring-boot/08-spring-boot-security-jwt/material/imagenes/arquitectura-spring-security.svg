@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="900" height="300" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Arquitectura de Spring Security</title>
+<desc id="d">Una solicitud atraviesa la Security Filter Chain, que consulta al Authentication Manager; este delega en los Authentication Providers, que usan PasswordEncoder y UserDetailsService; el resultado se guarda en el SecurityContextHolder.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="298" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Camino de una solicitud autenticada</text>
+<text x="450" y="70" text-anchor="middle" font-size="1" font-weight="400" fill="#1f2937"></text>
+<rect x="40" y="90" width="150" height="76" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="115.0" y="123.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Security Filter</text>
+<text x="115.0" y="141.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">Chain</text>
+<rect x="215" y="90" width="150" height="76" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="290.0" y="123.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Authentication</text>
+<text x="290.0" y="141.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">Manager</text>
+<rect x="390" y="90" width="150" height="76" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="465.0" y="123.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Authentication</text>
+<text x="465.0" y="141.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">Providers</text>
+<rect x="565" y="90" width="150" height="76" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="640.0" y="123.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">PasswordEncoder</text>
+<text x="640.0" y="141.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">UserDetailsService</text>
+<path d="M192 128 H213" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M367 128 H388" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M542 128 H563" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<rect x="735" y="90" width="130" height="76" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="800.0" y="123.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Security</text>
+<text x="800.0" y="141.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">ContextHolder</text>
+<path d="M717 128 H733" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="450" y="206" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">Solicitud → filtros → ¿credenciales válidas? → guarda quién es → el resto de la aplicación ya lo sabe</text>
+<text x="450" y="232" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">El resultado de la autenticación se guarda en el SecurityContextHolder</text>
+</svg>

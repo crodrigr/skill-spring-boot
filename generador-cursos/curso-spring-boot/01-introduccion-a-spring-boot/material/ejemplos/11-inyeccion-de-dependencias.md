@@ -21,6 +21,8 @@ Biblioteca Universitaria: un `ServicioPrestamos` que depende de un
 `RepositorioLibros`, implementado con las tres formas de inyección para poder
 compararlas.
 
+![El contenedor entrega la dependencia al bean por el constructor, por un método setter o directamente en un campo anotado con Autowired. La forma por constructor es la recomendada.](../imagenes/inyeccion-tres-formas.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 En Java, cada clase o interfaz pública va en su propio archivo `.java` con su

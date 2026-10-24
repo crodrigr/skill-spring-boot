@@ -99,6 +99,8 @@ public ServicioPrestamosConstructor(RepositorioLibros repositorioLibros) {
 
 La clase depende de una interfaz, no de una implementación.
 
+![A la izquierda, el servicio crea su repositorio con new y queda atado a una implementación. A la derecha, el contenedor crea el repositorio y se lo entrega al servicio, que solo conoce la interfaz.](../imagenes/sin-di-vs-con-di.svg)
+
 ---
 
 ## 🔍 Constructor vs. propiedades (*setter*)
@@ -140,11 +142,7 @@ Ninguna clase debería depender de una implementación concreta directamente.
 
 ## 🚧 Dependencia circular: el anti-patrón
 
-```text
-ServicioA necesita a ServicioB
-ServicioB necesita a ServicioA
-→ ninguno de los dos se puede construir primero
-```
+![ServicioA necesita a ServicioB y ServicioB necesita a ServicioA, así que ninguno de los dos puede construirse primero.](../imagenes/dependencia-circular.svg)
 
 Se resuelve reorganizando responsabilidades, no cambiando la forma de inyección.
 
@@ -212,6 +210,8 @@ Una clase puede cumplir una de las dos convenciones, ambas, o ninguna.
 3. Inicialización (`@PostConstruct`)
 4. Uso
 5. Destrucción (`@PreDestroy`)
+
+![Cinco fases del bean: instanciación, configuración mediante inyección de dependencias, inicialización con PostConstruct, uso y destrucción con PreDestroy.](../imagenes/ciclo-vida-bean.svg)
 
 ---
 

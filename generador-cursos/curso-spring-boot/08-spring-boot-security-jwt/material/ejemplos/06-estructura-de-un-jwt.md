@@ -13,6 +13,8 @@ solicitudes siguientes, sin repetir la contraseña. Antes de implementarlo
 sino tres partes con un propósito específico cada una, y que se puede
 decodificar (aunque no falsificar sin la clave secreta) por cualquiera.
 
+![Un JWT son tres partes separadas por puntos: el header con el algoritmo, el payload con los datos y la firma calculada con una clave secreta. Header y payload son Base64 legibles; la firma impide la manipulación.](../imagenes/estructura-jwt.svg)
+
 ## 🧠 ¿Qué es JWT?
 
 JWT son las siglas de **JSON Web Token**. Es un estándar abierto (**RFC

@@ -45,6 +45,8 @@ Boot, la unidad de persistencia se autoconfigura desde
 `application.properties`, sin un archivo `persistence.xml` manual, y el
 `EntityManager` se recibe inyectado con `@PersistenceContext`.
 
+![La unidad de persistencia, configurada desde application.properties, crea el EntityManagerFactory; este produce EntityManager, que gestiona entidades, ejecuta consultas JPQL y trabaja dentro de una EntityTransaction.](../imagenes/arquitectura-jpa.svg)
+
 📎 Ver en la práctica: [Ejemplo 02 — Arquitectura de JPA](02-arquitectura-de-jpa.md)
 
 ## 🧠 Concepto: Relacionamiento entre clases
@@ -73,6 +75,8 @@ que el desarrollador escriba SQL manualmente para esa conversión. Cubre
 todas las operaciones CRUD, no solo guardar: al consultar, actualizar o
 eliminar, el ORM traduce la operación sobre el objeto a la sentencia SQL
 equivalente.
+
+![Sin ORM el programador escribe SQL y convierte filas a objetos a mano. Con ORM trabaja con objetos y el ORM genera el SQL y hace la conversión.](../imagenes/sin-orm-vs-con-orm.svg)
 
 📎 Ver en la práctica: [Ejemplo 04 — ¿Qué es ORM?](04-que-es-orm.md)
 
@@ -104,6 +108,8 @@ su implementación en tiempo de ejecución. Ventajas:
 - Paginación y ordenamiento integrados.
 - Soporte para consultas personalizadas con `@Query`.
 - Compatibilidad con múltiples bases de datos (H2, MySQL, PostgreSQL, …).
+
+![De arriba abajo: tu código usa un repositorio de Spring Data JPA, que se apoya en la especificación JPA, implementada por Hibernate, que habla con la base de datos mediante JDBC.](../imagenes/pila-persistencia.svg)
 
 📎 Ver en la práctica: [Ejemplo 06 — ¿Qué es Spring Data JPA?](06-que-es-spring-data-jpa.md)
 

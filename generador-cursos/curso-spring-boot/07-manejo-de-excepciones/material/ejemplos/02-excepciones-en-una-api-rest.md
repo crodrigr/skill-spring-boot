@@ -11,6 +11,8 @@ una.
 importante en una API REST, y en qué capa de la arquitectura (`Controller`/
 `Service`/`Repository`) se origina cada tipo de error.
 
+![Una excepción lanzada en el servicio sube al controlador. Con ControllerAdvice la captura un manejador global que devuelve un código HTTP y un cuerpo JSON claros; sin ningún manejo, el cliente recibe un 500 genérico.](../imagenes/flujo-excepcion-api.svg)
+
 ## 🧠 Por qué importa manejar excepciones en una API REST
 
 En una API REST, los errores no son fallos inesperados: son situaciones

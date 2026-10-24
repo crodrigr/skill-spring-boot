@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 460" width="900" height="460" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">La pila de persistencia en Spring Boot</title>
+<desc id="d">De arriba abajo: tu código usa un repositorio de Spring Data JPA, que se apoya en la especificación JPA, implementada por Hibernate, que habla con la base de datos mediante JDBC.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="458" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Quién hace qué en la persistencia</text>
+<rect x="120" y="56" width="660" height="54" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="450.0" y="78.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Tu código</text>
+<text x="450.0" y="97.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">PacienteRepository extends JpaRepository</text>
+<path d="M450 110 V137" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<rect x="120" y="138" width="660" height="54" rx="10" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="450.0" y="160.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Spring Data JPA</text>
+<text x="450.0" y="179.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">genera la implementación del repositorio</text>
+<path d="M450 192 V219" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<rect x="120" y="220" width="660" height="54" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+<text x="450.0" y="242.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">JPA (especificación)</text>
+<text x="450.0" y="261.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">jakarta.persistence: @Entity, EntityManager…</text>
+<path d="M450 274 V301" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<rect x="120" y="302" width="660" height="54" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="450.0" y="324.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Hibernate (implementación)</text>
+<text x="450.0" y="343.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">proveedor de JPA por defecto en Spring Boot</text>
+<path d="M450 356 V383" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<rect x="120" y="384" width="660" height="54" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="450.0" y="406.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">JDBC → Base de datos</text>
+<text x="450.0" y="425.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">H2, MySQL, PostgreSQL…</text>
+</svg>

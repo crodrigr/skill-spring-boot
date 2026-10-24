@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Arquitectura stateful frente a stateless</title>
+<desc id="d">En stateful, el servidor guarda una sesión tras el login y cada solicitud depende de ella. En stateless, el servidor no guarda nada: cada solicitud lleva su propio token que prueba la identidad.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="398" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">¿Quién recuerda al usuario?</text>
+<line x1="450" y1="56" x2="450" y2="370" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="225" y="76" text-anchor="middle" font-size="17" font-weight="700" fill="#1f2937">Stateful (sesión)</text>
+<text x="675" y="76" text-anchor="middle" font-size="17" font-weight="700" fill="#1f2937">Stateless (token)</text>
+<rect x="40" y="110" width="120" height="56" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="100.0" y="142.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Cliente</text>
+<rect x="290" y="110" width="130" height="56" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="355.0" y="142.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Servidor</text>
+<path d="M162 128 H288" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="225" y="120" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">1. login</text>
+<rect x="290" y="200" width="130" height="60" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="355.0" y="225.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Sesión</text>
+<text x="355.0" y="243.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">guardada</text>
+<path d="M355 168 V198" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M288 150 H162" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="225" y="168" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">2. ID de sesión</text>
+<path d="M162 290 H288" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="225" y="282" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">3. solicitud + ID</text>
+<text x="225" y="330" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">El servidor debe consultar su memoria</text>
+<text x="225" y="350" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">en cada solicitud: cuesta escalar</text>
+<rect x="490" y="110" width="120" height="56" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="550.0" y="142.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Cliente</text>
+<rect x="740" y="110" width="130" height="56" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="805.0" y="142.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Servidor</text>
+<path d="M612 128 H738" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="675" y="120" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">1. login</text>
+<path d="M738 150 H612" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="675" y="168" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">2. token firmado</text>
+<path d="M612 290 H738" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="675" y="282" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">3. solicitud + token</text>
+<rect x="740" y="200" width="130" height="60" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="805.0" y="225.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Sin estado</text>
+<text x="805.0" y="243.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">guardado</text>
+<text x="675" y="330" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">Cada solicitud se autoprueba: cualquier</text>
+<text x="675" y="350" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">servidor la valida con la firma</text>
+</svg>

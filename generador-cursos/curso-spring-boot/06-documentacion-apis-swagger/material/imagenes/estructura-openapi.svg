@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 445" width="900" height="445" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Estructura de una definición OpenAPI</title>
+<desc id="d">Un documento OpenAPI tiene secciones openapi, info, servers, paths y components; en paths se usa ref para reutilizar los esquemas definidos en components.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="443" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Estructura general de una definición OpenAPI</text>
+<rect x="40" y="60" width="230" height="48" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="155.0" y="88.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">openapi</text>
+<text x="290" y="89" text-anchor="start" font-size="14" font-weight="400" fill="#64748b">versión de la especificación</text>
+<rect x="40" y="118" width="230" height="48" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="155.0" y="146.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">info</text>
+<text x="290" y="147" text-anchor="start" font-size="14" font-weight="400" fill="#64748b">título, versión, descripción</text>
+<rect x="40" y="176" width="230" height="48" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="155.0" y="204.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">servers</text>
+<text x="290" y="205" text-anchor="start" font-size="14" font-weight="400" fill="#64748b">URL base de la API</text>
+<rect x="40" y="234" width="230" height="48" rx="8" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="155.0" y="262.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">paths</text>
+<text x="290" y="263" text-anchor="start" font-size="14" font-weight="400" fill="#64748b">rutas, verbos, parámetros y respuestas</text>
+<rect x="40" y="292" width="230" height="48" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="155.0" y="320.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">components → schemas</text>
+<text x="290" y="321" text-anchor="start" font-size="14" font-weight="400" fill="#64748b">modelos reutilizables (Libro, Autor…)</text>
+<rect x="40" y="362" width="820" height="64" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="450.0" y="389.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">Cada ruta de paths apunta al modelo con $ref: "#/components/schemas/Libro"</text>
+<text x="450.0" y="407.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">El modelo se define una sola vez en components y se reutiliza donde haga falta</text>
+</svg>

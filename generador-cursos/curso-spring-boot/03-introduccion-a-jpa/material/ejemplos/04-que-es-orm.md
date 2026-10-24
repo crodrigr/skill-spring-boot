@@ -15,6 +15,8 @@ con JPA. No hay código nuevo para ejecutar en este bloque; el objetivo es
 que el contraste quede explícito antes de conocer, en el Ejemplo 05, qué
 herramienta (Hibernate) hace ese trabajo por vos.
 
+![Sin ORM el programador escribe SQL y convierte filas a objetos a mano. Con ORM trabaja con objetos y el ORM genera el SQL y hace la conversión.](../imagenes/sin-orm-vs-con-orm.svg)
+
 ## 🏥 Caso de estudio
 
 MediSalud: guardar un `Paciente`, con y sin ORM.

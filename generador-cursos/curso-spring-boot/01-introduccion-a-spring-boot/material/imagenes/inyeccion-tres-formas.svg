@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Tres formas de inyectar una dependencia</title>
+<desc id="d">El contenedor entrega la dependencia al bean por el constructor, por un método setter o directamente en un campo anotado con Autowired. La forma por constructor es la recomendada.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="398" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Tres formas de entregar la dependencia</text>
+<rect x="24" y="60" width="270" height="310" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="159" y="92" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Por constructor</text>
+<text x="159" y="114" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">recomendada</text>
+<rect x="38" y="130" width="242" height="90" rx="8" fill="#1f2937"/>
+<text x="50" y="158" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">public Servicio(Repo repo) {</text>
+<text x="50" y="180" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">  this.repo = repo;</text>
+<text x="50" y="202" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">}</text>
+<circle cx="50" cy="258" r="4" fill="#16a34a"/>
+<text x="62" y="263" text-anchor="start" font-size="13" font-weight="400" fill="#1f2937">campo final</text>
+<circle cx="50" cy="292" r="4" fill="#16a34a"/>
+<text x="62" y="297" text-anchor="start" font-size="13" font-weight="400" fill="#1f2937">imposible a medio configurar</text>
+<rect x="314" y="60" width="270" height="310" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="449" y="92" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Por setter</text>
+<text x="449" y="114" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">dependencias opcionales</text>
+<rect x="328" y="130" width="242" height="90" rx="8" fill="#1f2937"/>
+<text x="340" y="158" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">public void setRepo(Repo r) {</text>
+<text x="340" y="180" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">  this.repo = r;</text>
+<text x="340" y="202" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">}</text>
+<circle cx="340" cy="258" r="4" fill="#d97706"/>
+<text x="352" y="263" text-anchor="start" font-size="13" font-weight="400" fill="#1f2937">se asigna tras construir</text>
+<circle cx="340" cy="292" r="4" fill="#d97706"/>
+<text x="352" y="297" text-anchor="start" font-size="13" font-weight="400" fill="#1f2937">el campo no puede ser final</text>
+<rect x="604" y="60" width="270" height="310" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+<text x="739" y="92" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Por campo</text>
+<text x="739" y="114" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">la menos recomendada</text>
+<rect x="618" y="130" width="242" height="90" rx="8" fill="#1f2937"/>
+<text x="630" y="158" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">@Autowired</text>
+<text x="630" y="180" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve">private Repo repo;</text>
+<text x="630" y="202" font-size="12.5" font-family="ui-monospace, Menlo, Consolas, monospace" fill="#e2e8f0" xml:space="preserve"></text>
+<circle cx="630" cy="258" r="4" fill="#dc2626"/>
+<text x="642" y="263" text-anchor="start" font-size="13" font-weight="400" fill="#1f2937">oculta las dependencias</text>
+<circle cx="630" cy="292" r="4" fill="#dc2626"/>
+<text x="642" y="297" text-anchor="start" font-size="13" font-weight="400" fill="#1f2937">difícil de probar sin contenedor</text>
+</svg>

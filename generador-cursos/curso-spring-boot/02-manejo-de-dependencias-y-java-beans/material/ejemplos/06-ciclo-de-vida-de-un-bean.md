@@ -19,6 +19,8 @@ mismo `ServicioCitas` del Módulo 1 con una dependencia real.
 MediSalud: `ServicioCitas`, ahora con una dependencia (`RepositorioPacientes`)
 que permite observar la fase de configuración.
 
+![Cinco fases del bean: instanciación, configuración mediante inyección de dependencias, inicialización con PostConstruct, uso y destrucción con PreDestroy.](../imagenes/ciclo-vida-bean.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 ```text

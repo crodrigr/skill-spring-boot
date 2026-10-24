@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Sin ORM y con ORM</title>
+<desc id="d">Sin ORM el programador escribe SQL y convierte filas a objetos a mano. Con ORM trabaja con objetos y el ORM genera el SQL y hace la conversión.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="398" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">El ORM traduce entre objetos y tablas</text>
+<rect x="40" y="90" width="250" height="150" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="165.0" y="141.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Clase Paciente</text>
+<text x="165.0" y="160.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">Long id</text>
+<text x="165.0" y="179.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">String nombre</text>
+<text x="165.0" y="198.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">LocalDate nacimiento</text>
+<rect x="610" y="90" width="250" height="150" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="735.0" y="141.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Tabla paciente</text>
+<text x="735.0" y="160.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">id BIGINT</text>
+<text x="735.0" y="179.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">nombre VARCHAR</text>
+<text x="735.0" y="198.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">nacimiento DATE</text>
+<rect x="350" y="110" width="200" height="110" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="450.0" y="141.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">ORM</text>
+<text x="450.0" y="160.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">(Hibernate)</text>
+<text x="450.0" y="179.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">genera el SQL</text>
+<text x="450.0" y="198.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">y convierte filas</text>
+<path d="M292 150 H348" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M552 150 H608" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M608 195 H554" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<path d="M348 195 H294" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="450" y="262" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">objeto ⇄ fila</text>
+<rect x="40" y="300" width="820" height="70" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="450.0" y="330.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">Sin ORM: tú escribes SELECT/INSERT, recorres el ResultSet y asignas cada columna a mano</text>
+<text x="450.0" y="348.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">Con ORM: paciente.setNombre("Ana"); repositorio.save(paciente);</text>
+</svg>

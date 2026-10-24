@@ -16,6 +16,8 @@ Causas típicas: pérdida de conectividad de red, datos de entrada
 inválidos, archivos ausentes, límites de memoria de la JVM, errores de
 código.
 
+![Throwable se divide en Error, problemas graves que no deberían capturarse, y Exception, condiciones que una aplicación razonable puede capturar; de Exception cuelga RuntimeException, de la que derivan NullPointerException y las excepciones de negocio propias.](../imagenes/jerarquia-throwable.svg)
+
 📎 Ver en la práctica: [Ejemplo 01 — ¿Qué es una excepción?](01-que-es-una-excepcion.md)
 
 En una API REST, los errores (recurso inexistente, duplicado, datos
@@ -26,6 +28,8 @@ genéricos. En una arquitectura en capas:
 - `Repository` — errores de base de datos.
 - `Service` — reglas de negocio (aquí se lanzan las excepciones).
 - `Controller` — exposición HTTP (aquí, o globalmente, se manejan).
+
+![Una excepción lanzada en el servicio sube al controlador. Con ControllerAdvice la captura un manejador global que devuelve un código HTTP y un cuerpo JSON claros; sin ningún manejo, el cliente recibe un 500 genérico.](../imagenes/flujo-excepcion-api.svg)
 
 📎 Ver en la práctica: [Ejemplo 02 — Excepciones en una API REST](02-excepciones-en-una-api-rest.md)
 
@@ -76,5 +80,7 @@ excepciones para toda la aplicación.
 
 Sin ningún mecanismo de manejo, cualquier excepción no capturada produce
 un `500 Internal Server Error` genérico.
+
+![ResponseStatus actúa sobre una sola excepción, ExceptionHandler sobre un controlador y ControllerAdvice sobre toda la aplicación.](../imagenes/alcance-mecanismos.svg)
 
 📎 Ver en la práctica: [Ejemplo 07 — Comparación de los tres mecanismos](07-comparacion-de-mecanismos.md)

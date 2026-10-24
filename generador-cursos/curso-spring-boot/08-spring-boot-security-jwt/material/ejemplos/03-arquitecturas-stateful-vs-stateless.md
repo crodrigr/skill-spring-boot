@@ -12,6 +12,8 @@ autenticación", sino "sin que el servidor almacene el estado de la
 sesión entre solicitudes" — la distinción exacta que hace posible que
 JWT funcione sin sesiones.
 
+![En stateful, el servidor guarda una sesión tras el login y cada solicitud depende de ella. En stateless, el servidor no guarda nada: cada solicitud lleva su propio token que prueba la identidad.](../imagenes/stateful-vs-stateless.svg)
+
 ## 🗺️ Diagrama
 
 ```mermaid

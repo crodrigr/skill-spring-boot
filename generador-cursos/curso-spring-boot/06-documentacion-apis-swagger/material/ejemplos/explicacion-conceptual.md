@@ -21,6 +21,8 @@ Una definición OpenAPI se organiza en tres secciones clave:
 - `components` — esquemas de datos reutilizables entre varias rutas.
 - `servers` — dónde corre la API.
 
+![Un documento OpenAPI tiene secciones openapi, info, servers, paths y components; en paths se usa ref para reutilizar los esquemas definidos en components.](../imagenes/estructura-openapi.svg)
+
 📎 Ver en la práctica: [Ejemplo 02 — Estructura general de una definición OpenAPI](02-estructura-general-de-openapi.md)
 
 ## 🧠 Concepto: Creación de Documentación API
@@ -37,6 +39,8 @@ La codificación automática agrega una única dependencia a un proyecto
 Spring Boot ya existente: `springdoc-openapi-starter-webmvc-ui`. No hace
 falta modificar ninguna clase Java ni agregar ninguna anotación: springdoc
 detecta automáticamente los `@RestController` ya existentes.
+
+![springdoc-openapi lee los controladores y las entidades, genera la definición OpenAPI en /v3/api-docs y Swagger UI la muestra en /swagger-ui.html.](../imagenes/flujo-springdoc.svg)
 
 📎 Ver en la práctica: [Ejemplo 04 — Agregando springdoc-openapi](04-agregando-springdoc-openapi.md)
 

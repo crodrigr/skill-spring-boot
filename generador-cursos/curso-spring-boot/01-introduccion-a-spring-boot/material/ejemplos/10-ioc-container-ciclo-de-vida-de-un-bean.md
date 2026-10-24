@@ -21,6 +21,8 @@ contenedor.
 MediSalud: un `ServicioCitas` administrado por el contenedor IoC, para observar en
 orden las fases de su ciclo de vida.
 
+![Cinco fases que sigue el contenedor para cada bean: instanciación, inyección de dependencias, inicialización con PostConstruct, uso y destrucción con PreDestroy.](../imagenes/ciclo-vida-bean.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 ```text

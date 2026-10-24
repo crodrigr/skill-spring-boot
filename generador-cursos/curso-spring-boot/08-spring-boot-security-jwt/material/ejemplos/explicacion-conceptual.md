@@ -23,6 +23,8 @@ Arquitectura (de la solicitud a la respuesta):
 - **UserDetailsService**: obtiene los datos del usuario desde la base de datos.
 - **SecurityContextHolder**: almacena el resultado de una autenticación exitosa.
 
+![Una solicitud atraviesa la Security Filter Chain, que consulta al Authentication Manager; este delega en los Authentication Providers, que usan PasswordEncoder y UserDetailsService; el resultado se guarda en el SecurityContextHolder.](../imagenes/arquitectura-spring-security.svg)
+
 📎 Ver en la práctica: [Ejemplo 01 — ¿Qué es Spring Boot Security?](01-que-es-spring-security.md), [Ejemplo 02 — Arquitectura de Spring Boot Security](02-arquitectura-de-spring-security.md)
 
 ## 🧠 Concepto: Tipos de arquitecturas RESTful API
@@ -42,6 +44,8 @@ Aplicaciones típicas de arquitecturas stateless:
 - Servicios de autenticación con JWT.
 - Arquitecturas basadas en microservicios.
 
+![En stateful, el servidor guarda una sesión tras el login y cada solicitud depende de ella. En stateless, el servidor no guarda nada: cada solicitud lleva su propio token que prueba la identidad.](../imagenes/stateful-vs-stateless.svg)
+
 📎 Ver en la práctica: [Ejemplo 03 — Arquitecturas RESTful: stateful vs. stateless](03-arquitecturas-stateful-vs-stateless.md)
 
 ## 🧠 Concepto: Implementación de Spring Boot Security en servicios Stateless
@@ -57,6 +61,8 @@ arquitectura:
   filtros, decidiendo cuál aplicar a cada solicitud entrante.
 - **`SecurityFilterChain`**: interfaz que define una cadena de filtros de
   seguridad específica, asociable a un patrón de URL particular.
+
+![DelegatingFilterProxy conecta el contenedor de servlets con Spring; FilterChainProxy decide qué SecurityFilterChain aplicar según la URL de la solicitud.](../imagenes/cadena-filtros.svg)
 
 📎 Ver en la práctica: [Ejemplo 04 — FilterChainProxy, DelegatingFilterProxy y SecurityFilterChain](04-filterchainproxy-y-securityfilterchain.md)
 
@@ -91,6 +97,8 @@ Ciclo de vida:
 - **Uso**: el cliente reenvía el mismo JWT en cada solicitud subsiguiente.
 - **Validación**: el servidor recalcula la firma en cada solicitud; si no coincide, rechaza el token.
 
+![Un JWT son tres partes separadas por puntos: el header con el algoritmo, el payload con los datos y la firma calculada con una clave secreta. Header y payload son Base64 legibles; la firma impide la manipulación.](../imagenes/estructura-jwt.svg)
+
 📎 Ver en la práctica: [Ejemplo 06 — Estructura de un JWT](06-estructura-de-un-jwt.md), [Ejemplo 07 — Ciclo de vida y firma de un JWT](07-ciclo-de-vida-y-firma-de-un-jwt.md)
 
 Implementación completa de autenticación stateless con JWT sobre un
@@ -101,5 +109,7 @@ proyecto REST ya existente:
 - Un endpoint de login (`ControladorAutenticacion`) que emite el JWT.
 - Un filtro (`FiltroAutenticacionJwt`) que lo valida en cada solicitud.
 - Una configuración (`ConfiguracionSeguridad`) que marca la aplicación como `STATELESS` y reemplaza Basic Auth por este filtro.
+
+![El cliente envía sus credenciales, el servidor las valida y emite un JWT firmado. En cada solicitud posterior el cliente envía el token en la cabecera Authorization y un filtro valida la firma antes de llegar al controlador.](../imagenes/flujo-login-jwt.svg)
 
 📎 Ver en la práctica: [Ejemplo 08 — Autenticación stateless completa con JWT](08-autenticacion-stateless-con-jwt.md)

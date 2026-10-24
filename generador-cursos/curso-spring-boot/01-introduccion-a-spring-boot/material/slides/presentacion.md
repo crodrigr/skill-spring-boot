@@ -92,10 +92,7 @@ Un `.jar` de Maven/Gradle se comporta como librería dinámica.
 
 ## 🔍 Frameworks vs librerías: quién controla el flujo
 
-```text
-Librería:  el desarrollador llama a la librería
-Framework: el framework llama al código del desarrollador
-```
+![Con una librería, el código del desarrollador es quien llama a la librería. Con un framework ocurre al revés: el framework llama al código del desarrollador. Esa es la inversión de control.](../imagenes/framework-vs-libreria.svg)
 
 Esa inversión de control es la diferencia clave.
 
@@ -417,6 +414,8 @@ ApplicationContext contexto = new AnnotationConfigApplicationContext(Config.clas
 4. Uso
 5. Destrucción (`@PreDestroy`)
 
+![Cinco fases que sigue el contenedor para cada bean: instanciación, inyección de dependencias, inicialización con PostConstruct, uso y destrucción con PreDestroy.](../imagenes/ciclo-vida-bean.svg)
+
 ---
 
 ## 🧠 Inyección por constructor
@@ -460,6 +459,8 @@ Compacta, pero oculta las dependencias reales de la clase.
 | Constructor | Explícita, testeable | Constructores largos si hay muchas dependencias |
 | Setter | Dependencias opcionales | Objeto puede quedar a medio configurar |
 | Campo | Muy compacta | Difícil de probar sin contenedor |
+
+![El contenedor entrega la dependencia al bean por el constructor, por un método setter o directamente en un campo anotado con Autowired. La forma por constructor es la recomendada.](../imagenes/inyeccion-tres-formas.svg)
 
 ---
 

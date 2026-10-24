@@ -23,6 +23,8 @@ Los códigos de estado se agrupan en cinco rangos:
 - `4xx` — error del cliente (`404 Not Found`).
 - `5xx` — error del servidor (`500 Internal Server Error`).
 
+![El cliente envía una solicitud con verbo, URL y a veces cuerpo; el servidor responde con un código de estado y normalmente un cuerpo JSON.](../imagenes/ciclo-http.svg)
+
 📎 Ver en la práctica: [Ejemplo 01 — ¿Qué es una API y cómo funciona HTTP?](01-que-es-una-api-y-http.md)
 
 Una API REST sigue, además, seis principios de diseño: sin estado,
@@ -43,6 +45,8 @@ de abajo:
 - `Service` (`@Service`) — lógica de negocio.
 - `Repository` (`JpaRepository`) — acceso a datos.
 - `Database` — persistencia.
+
+![El cliente llama al controlador, que llama al servicio, que llama al repositorio, que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
 
 📎 Ver en la práctica: [Ejemplo 03 — MVC y la arquitectura en capas de Spring](03-mvc-y-arquitectura-en-capas.md)
 

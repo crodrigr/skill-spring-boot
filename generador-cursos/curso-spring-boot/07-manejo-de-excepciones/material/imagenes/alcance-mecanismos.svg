@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Alcance de los tres mecanismos de excepciones</title>
+<desc id="d">ResponseStatus actúa sobre una sola excepción, ExceptionHandler sobre un controlador y ControllerAdvice sobre toda la aplicación.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="398" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Alcance de cada mecanismo</text>
+<rect x="40" y="56" width="820" height="320" rx="16" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="60" y="82" text-anchor="start" font-size="15" font-weight="700" fill="#1f2937">@ControllerAdvice — toda la aplicación</text>
+<rect x="70" y="100" width="380" height="250" rx="14" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="90" y="126" text-anchor="start" font-size="14" font-weight="700" fill="#1f2937">@ExceptionHandler — un controlador</text>
+<rect x="90" y="150" width="340" height="64" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="260.0" y="177.55" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">@ResponseStatus</text>
+<text x="260.0" y="195.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">una excepción → un código HTTP</text>
+<text x="260" y="250" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">LibroController: controla código,</text>
+<text x="260" y="270" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">mensaje y cuerpo de ese controlador</text>
+<rect x="480" y="100" width="350" height="250" rx="14" fill="#fff" stroke="#16a34a" stroke-width="2" stroke-dasharray="6 5"/>
+<text x="655" y="126" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Otros controladores</text>
+<text x="655" y="170" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">AutorController</text>
+<text x="655" y="200" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">PrestamoController</text>
+<text x="655" y="250" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">Cubiertos automáticamente por el</text>
+<text x="655" y="270" text-anchor="middle" font-size="13" font-weight="400" fill="#64748b">manejador global, sin código extra</text>
+</svg>

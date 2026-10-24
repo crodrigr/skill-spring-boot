@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" width="900" height="430" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Flujo de autenticación con JWT</title>
+<desc id="d">El cliente envía sus credenciales, el servidor las valida y emite un JWT firmado. En cada solicitud posterior el cliente envía el token en la cabecera Authorization y un filtro valida la firma antes de llegar al controlador.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="428" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Autenticación stateless con JWT</text>
+<rect x="40" y="60" width="140" height="330" rx="12" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="110" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Cliente</text>
+<rect x="700" y="60" width="170" height="330" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="785" y="90" text-anchor="middle" font-size="16" font-weight="700" fill="#1f2937">Servidor</text>
+<text x="450" y="86" text-anchor="middle" font-size="14" font-weight="700" fill="#d97706">A. Login (una vez)</text>
+<path d="M182 112 H698" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="440" y="106" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">POST /login  { usuario, contraseña }</text>
+<path d="M698 152 H182" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="440" y="146" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">200 OK  { token: "eyJhbGci…" }</text>
+<text x="785" y="190" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">valida credenciales</text>
+<text x="785" y="208" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">y firma el JWT</text>
+<line x1="190" y1="236" x2="710" y2="236" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6 6"/>
+<text x="450" y="262" text-anchor="middle" font-size="14" font-weight="700" fill="#16a34a">B. Cada solicitud</text>
+<path d="M182 288 H698" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<text x="440" y="282" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">GET /api/libros  +  Authorization: Bearer eyJ…</text>
+<text x="785" y="318" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">el filtro valida la firma</text>
+<text x="785" y="336" text-anchor="middle" font-size="12" font-weight="400" fill="#64748b">y la fecha de expiración</text>
+<path d="M698 366 H182" fill="none" stroke="#64748b" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#ah)"/>
+<text x="440" y="360" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">200 OK (token válido)  ·  401 Unauthorized (inválido)</text>
+</svg>

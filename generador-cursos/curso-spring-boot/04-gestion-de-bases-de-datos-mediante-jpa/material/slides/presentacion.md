@@ -54,6 +54,8 @@ libro puede tener muchos autores.
 `@OneToOne` · `@OneToMany`/`@ManyToOne` · `@ManyToMany`. Este módulo
 profundiza en cada uno más allá de la sintaxis básica.
 
+![Uno a uno: la tabla historia_clinica tiene paciente_id. Uno a muchos: la tabla cita tiene paciente_id. Muchos a muchos: una tabla intermedia libro_autor guarda libro_id y autor_id.](../imagenes/relaciones-jpa.svg)
+
 ## Slide 11 — `@OneToOne` y el lado dueño
 
 `Paciente`↔`HistoriaClinica`: el lado dueño declara `@JoinColumn` (la clave
@@ -102,6 +104,8 @@ flowchart LR
 
 Cuando una entidad hija deja de estar en la colección de su padre (y el
 padre se vuelve a guardar), se elimina automáticamente de la base de datos.
+
+![Con cascade, guardar o borrar al padre propaga la operación a sus hijas. Con orphanRemoval, una hija quitada de la colección del padre se borra de la base de datos.](../imagenes/cascade-orphanremoval.svg)
 
 ## Slide 19 — Ejemplo: `cascade` + `orphanRemoval`
 

@@ -48,6 +48,8 @@ components  → esquemas de datos reutilizables
 servers     → dónde corre la API
 ```
 
+![Un documento OpenAPI tiene secciones openapi, info, servers, paths y components; en paths se usa ref para reutilizar los esquemas definidos en components.](../imagenes/estructura-openapi.svg)
+
 ## Slide 10 — `$ref`: evitar duplicar esquemas
 
 Cada ruta en `paths` referencia el esquema definido una sola vez en
@@ -86,6 +88,8 @@ Explicar el proceso conceptual de documentación manual en SwaggerHub.
 
 `springdoc-openapi-starter-webmvc-ui`, agregada al `pom.xml` de un
 proyecto que ya tiene controladores REST.
+
+![springdoc-openapi lee los controladores y las entidades, genera la definición OpenAPI en /v3/api-docs y Swagger UI la muestra en /swagger-ui.html.](../imagenes/flujo-springdoc.svg)
 
 ## Slide 18 — Ninguna clase Java cambia
 

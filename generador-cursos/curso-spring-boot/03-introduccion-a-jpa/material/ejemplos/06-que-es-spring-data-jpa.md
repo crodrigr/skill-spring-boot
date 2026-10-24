@@ -29,6 +29,8 @@ el mismo resultado declarando solo una **interfaz**, sin implementarla. El
 repositorio completo, con su código y ejecución real, llega en el Ejemplo
 07.
 
+![De arriba abajo: tu código usa un repositorio de Spring Data JPA, que se apoya en la especificación JPA, implementada por Hibernate, que habla con la base de datos mediante JDBC.](../imagenes/pila-persistencia.svg)
+
 ## 🏥 Caso de estudio
 
 MediSalud: buscar un `Paciente` por código, con y sin Spring Data JPA.

@@ -14,6 +14,8 @@ agregue al proyecto, comparando lado a lado un `main` que llama a una librería
 por su cuenta contra un método que un framework invoca sin que el desarrollador
 lo pida explícitamente.
 
+![Con una librería, el código del desarrollador es quien llama a la librería. Con un framework ocurre al revés: el framework llama al código del desarrollador. Esa es la inversión de control.](../imagenes/framework-vs-libreria.svg)
+
 ## 🔍 Análisis comparado
 
 | Criterio | Framework | Librería |

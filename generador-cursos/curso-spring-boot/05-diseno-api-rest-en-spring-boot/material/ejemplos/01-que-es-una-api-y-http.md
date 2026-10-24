@@ -13,6 +13,8 @@ una API remota/web, y cómo funciona el protocolo HTTP (ciclo
 solicitud-respuesta, verbos, códigos de estado) que casi todas las APIs
 web usan para comunicarse.
 
+![El cliente envía una solicitud con verbo, URL y a veces cuerpo; el servidor responde con un código de estado y normalmente un cuerpo JSON.](../imagenes/ciclo-http.svg)
+
 ## 🧠 ¿Qué es una API?
 
 Una API (*Application Programming Interface*) es un conjunto de reglas que

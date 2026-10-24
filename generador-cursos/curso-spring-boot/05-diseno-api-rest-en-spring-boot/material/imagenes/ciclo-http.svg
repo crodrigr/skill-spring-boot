@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" width="900" height="360" role="img" aria-labelledby="t d" font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<title id="t">Ciclo solicitud-respuesta de HTTP</title>
+<desc id="d">El cliente envía una solicitud con verbo, URL y a veces cuerpo; el servidor responde con un código de estado y normalmente un cuerpo JSON.</desc>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker></defs>
+<rect x="1" y="1" width="898" height="358" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="450.0" y="34" text-anchor="middle" font-size="18" font-weight="700" fill="#1f2937">Ciclo solicitud-respuesta de HTTP</text>
+<rect x="40" y="90" width="170" height="110" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+<text x="125.0" y="130.9" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Cliente</text>
+<text x="125.0" y="149.9" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">Insomnia, navegador,</text>
+<text x="125.0" y="168.9" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">app móvil</text>
+<rect x="690" y="90" width="170" height="110" rx="12" fill="#ccfbf1" stroke="#0d9488" stroke-width="2"/>
+<text x="775.0" y="140.25" text-anchor="middle" font-size="15" font-weight="700" fill="#1f2937">Servidor</text>
+<text x="775.0" y="160.25" text-anchor="middle" font-size="15" font-weight="400" fill="#1f2937">API Spring Boot</text>
+<rect x="260" y="76" width="380" height="60" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+<text x="450.0" y="101.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Solicitud</text>
+<text x="450.0" y="120.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">POST /api/libros  +  cuerpo JSON</text>
+<rect x="260" y="156" width="380" height="60" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+<text x="450.0" y="181.4" text-anchor="middle" font-size="14" font-weight="700" fill="#1f2937">Respuesta</text>
+<text x="450.0" y="200.4" text-anchor="middle" font-size="14" font-weight="400" fill="#1f2937">201 Created  +  cuerpo JSON</text>
+<path d="M212 106 H258" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M640 106 H688" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M688 186 H642" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<path d="M258 186 H212" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#ah)"/>
+<rect x="40" y="250" width="820" height="80" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="2"/>
+<text x="450.0" y="285.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">Verbos: GET leer · POST crear · PUT reemplazar · PATCH modificar · DELETE eliminar</text>
+<text x="450.0" y="303.55" text-anchor="middle" font-size="13" font-weight="400" fill="#1f2937">Códigos: 2xx éxito · 3xx redirección · 4xx error del cliente · 5xx error del servidor</text>
+</svg>

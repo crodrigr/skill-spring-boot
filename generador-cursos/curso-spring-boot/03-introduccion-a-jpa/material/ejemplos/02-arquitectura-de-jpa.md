@@ -34,6 +34,8 @@ anotación.
 
 MediSalud: dos altas de `Paciente` agrupadas en una sola transacción.
 
+![La unidad de persistencia, configurada desde application.properties, crea el EntityManagerFactory; este produce EntityManager, que gestiona entidades, ejecuta consultas JPQL y trabaja dentro de una EntityTransaction.](../imagenes/arquitectura-jpa.svg)
+
 ## 🌳 Árbol de archivos (como se vería en VS Code)
 
 ```text
