@@ -38,15 +38,15 @@ características de un Java Bean.
 ```text
 📁 ejemplo-05-que-es-un-java-bean
 └── 📁 src/com/medisalud
-    ├── 📄 Main.java                           (▶️ clase con el main que se ejecuta)
-    ├── 📁 negocio                             (capa de negocio)
-    │   ├── 📁 model
-    │   │   └── 📄 DatosContactoPaciente.java  (Java Bean clásico — Java puro, sin Spring)
-    │   └── 📁 service
-    │       └── 📄 ServicioContacto.java       (bean administrado por Spring)
-    └── 📁 config
-        └── 📄 ConfiguracionApp.java
+    ├── 📄 Main.java                           (@SpringBootApplication; ▶️ clase que arranca la aplicación)
+    └── 📁 negocio                             (capa de negocio)
+        ├── 📁 model
+        │   └── 📄 DatosContactoPaciente.java  (Java Bean clásico — Java puro, sin Spring)
+        └── 📁 service
+            └── 📄 ServicioContacto.java       (bean administrado por Spring)
 ```
+
+Es un proyecto Spring Boot normal (Spring Initializr, dependencia `spring-boot-starter`).
 
 ## 💻 Archivo: `DatosContactoPaciente.java` (Java puro, sin Spring)
 
@@ -95,30 +95,22 @@ public class ServicioContacto {
 }
 ```
 
-## 💻 Archivo: `ConfiguracionApp.java`
-
-```java
-package com.medisalud.config;
-
-@Configuration
-@ComponentScan(basePackages = "com.medisalud")
-public class ConfiguracionApp {
-}
-```
-
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 package com.medisalud;
 
-import com.medisalud.config.ConfiguracionApp;
 import com.medisalud.negocio.model.DatosContactoPaciente;
 import com.medisalud.negocio.service.ServicioContacto;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         ServicioContacto servicioContacto = contexto.getBean(ServicioContacto.class);
         DatosContactoPaciente contacto = servicioContacto.construirContacto("+54 11 5555-0100", "ana@mail.com");
@@ -138,9 +130,10 @@ public class Main {
    anotación de Spring, y `Main.java` nunca la pide al contenedor: la crea
    directamente con `new` dentro de `construirContacto(...)`.
 2. `ServicioContacto`, en cambio, es un **bean administrado por Spring**
-   (gracias a `@Component`): en `Main.java` se arranca un
-   `AnnotationConfigApplicationContext` real, y `ServicioContacto` se obtiene
-   con `contexto.getBean(...)`, en vez de crearse con `new`. El contenedor lo
+   (gracias a `@Component`): `Main.java` arranca la aplicación con
+   `SpringApplication.run(...)` (`@SpringBootApplication` hace que Spring
+   escanee `com.medisalud`), y `ServicioContacto` se obtiene con
+   `contexto.getBean(...)`, en vez de crearse con `new`. El contenedor lo
    crea y lo entrega a quien lo necesite, pero no tiene propiedades de
    lectura/escritura como `DatosContactoPaciente` — su responsabilidad es
    otra (construir el objeto de contacto).
@@ -158,7 +151,8 @@ public class Main {
 
 ## ✅ Resultado esperado
 
-Al ejecutar `Main.java`:
+Al ejecutar `Main.java`, la consola muestra el banner y los logs de arranque de
+Spring Boot y, entre ellos, la línea del teléfono:
 
 ```text
 +54 11 5555-0100
