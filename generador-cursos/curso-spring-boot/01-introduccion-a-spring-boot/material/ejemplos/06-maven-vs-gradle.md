@@ -61,6 +61,45 @@ dependencies {
 }
 ```
 
+## 🔬 Qué significa cada elemento
+
+### `pom.xml` (Maven)
+
+| Elemento | Qué es | En este ejemplo |
+|---|---|---|
+| `<project>` | Raíz del archivo: todo el `pom.xml` vive dentro de este elemento. | — |
+| `<modelVersion>` | Versión del esquema del POM (*Project Object Model*). Siempre es `4.0.0`. | `4.0.0` |
+| `<groupId>` | Organización o paquete base que identifica a quien publica el proyecto; suele ser un dominio invertido. | `com.medisalud` |
+| `<artifactId>` | Nombre del proyecto; también es el nombre base del `.jar` generado. | `medisalud-api` |
+| `<version>` | Versión del proyecto. Juntos, `groupId` + `artifactId` + `version` identifican de forma única al artefacto. | `1.0.0` |
+| `<packaging>` | Tipo de artefacto que se produce: `jar`, `war`, `pom`… | `jar` |
+| `<dependencies>` | Lista de todas las dependencias del proyecto. | — |
+| `<dependency>` | Una dependencia, identificada con sus propios `groupId`, `artifactId` y, si hace falta, `version`. | `spring-boot-starter-web` y `spring-boot-starter-test` |
+| `<scope>` | En qué fases se necesita la dependencia. Sin `scope`, vale `compile` (compilación, ejecución y `.jar` final). Con `test`, solo para compilar y ejecutar pruebas. | `test` en `spring-boot-starter-test` |
+
+### `build.gradle` (Gradle)
+
+| Elemento | Qué es | En este ejemplo |
+|---|---|---|
+| `plugins { }` | Bloque que activa *plugins*: cada uno agrega tareas y convenciones al build. | — |
+| `id 'java'` | Plugin que sabe compilar código Java, ejecutar pruebas y generar el `.jar`. | `java` |
+| `id 'org.springframework.boot' version '…'` | Plugin de Spring Boot: permite empaquetar la aplicación como `.jar` ejecutable. Aquí se fija su versión. | `3.3.0` |
+| `group` | Equivale a `groupId` de Maven. | `com.medisalud` |
+| `version` | Equivale a `<version>` de Maven. | `1.0.0` |
+| `dependencies { }` | Bloque con las dependencias, una línea por cada una, con la forma `configuración 'grupo:artefacto'`. | — |
+| `implementation` | Dependencia necesaria para compilar y ejecutar la aplicación; equivale al `scope` `compile` de Maven. | `spring-boot-starter-web` |
+| `testImplementation` | Dependencia solo para pruebas; equivale a `<scope>test</scope>`. | `spring-boot-starter-test` |
+
+En Gradle no hay un `artifactId` explícito: el nombre del proyecto sale del
+nombre de la carpeta (o de `settings.gradle`).
+
+> 📝 **Este ejemplo está simplificado.** Un proyecto real generado con Spring
+> Initializr añade más piezas: en Maven, un `<parent>` (`spring-boot-starter-parent`)
+> que fija las versiones de las dependencias de Spring, por eso aquí no se escribe
+> `<version>` en los starters; en Gradle, un bloque `repositories { mavenCentral() }`
+> que indica de dónde se descargan las dependencias, y el plugin
+> `io.spring.dependency-management` que cumple el mismo papel de versiones.
+
 ## 💻 Código — la aplicación que ambos construyen (`App.java`)
 
 Ni `pom.xml` ni `build.gradle` son código Java: son configuración de build. Lo
