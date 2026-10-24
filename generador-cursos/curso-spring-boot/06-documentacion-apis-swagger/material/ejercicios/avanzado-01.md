@@ -28,8 +28,9 @@ springdoc.packages-to-scan=com.biblioteca.controllers
 **Preguntas**:
 
 1. ¿Por qué Swagger UI no muestra ningún endpoint de `ControladorAutores`?
-2. ¿Cómo lo corregirías, respetando la arquitectura MVC del proyecto
-   (capas `controllers`, `services` y `persistences`)?
+2. ¿Cómo lo corregirías, respetando la arquitectura por capas del proyecto
+   (capa de presentación `controllers`, de negocio `services` y de persistencia
+   `persistences`)?
 
 ## 📏 Criterios de evaluación de la solución
 
@@ -38,7 +39,7 @@ springdoc.packages-to-scan=com.biblioteca.controllers
   `com.biblioteca.controllers` — un paquete distinto, que no contiene
   ningún `@RestController`.
 - Propone la corrección preferida: mover `ControladorAutores` al paquete
-  de su capa MVC (`com.biblioteca.controllers`), de modo que coincida con
+  de su capa (`com.biblioteca.controllers`), de modo que coincida con
   `springdoc.packages-to-scan`. Como alternativas válidas, apuntar
   `springdoc.packages-to-scan` a `com.biblioteca.web` o a
   `com.biblioteca` (que escanea todos los subpaquetes).

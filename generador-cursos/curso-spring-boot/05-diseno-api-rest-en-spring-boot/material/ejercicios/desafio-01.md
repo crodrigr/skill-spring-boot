@@ -21,7 +21,9 @@ mismo, siguiendo el mismo patrón usado en `ServicioLibros`/
 `ControladorPacientes`), pero aplicado a `Cita`.
 
 ```java
-// Paciente.java — capa persistences (com.medisalud.persistences.entities)
+package com.medisalud.persistences.entities;
+
+// Paciente.java — capa de persistencia (com.medisalud.persistences.entities)
 // (Módulo 3, reutilizada tal cual)
 @Entity
 public class Paciente {
@@ -54,6 +56,8 @@ public class Paciente {
 ```
 
 ```java
+package com.medisalud.persistences.entities;
+
 // Cita.java (Módulo 3, reutilizada; se agrega getId() y setFecha()/
 // setMotivo(), que el Módulo 3 no necesitaba porque nunca se expuso ni
 // se actualizó vía REST)
@@ -91,7 +95,9 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+package com.medisalud.persistences.repositories;
+
+// RepositorioCitas.java — capa de persistencia (com.medisalud.persistences.repositories)
 // (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
@@ -117,7 +123,7 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
   serialización.
 - `ServicioCitas` y `ControladorCitas` siguen el mismo patrón de capas
   que `ServicioLibros`/`ControladorLibros` y que el Taller: cada clase
-  vive en el paquete de su capa MVC (`services` y `controllers`) y
+  vive en el paquete de su capa (`services` y `controllers`) y
   `ControladorCitas` depende solo de `ServicioCitas`, nunca de
   `RepositorioCitas`.
 - Los cinco endpoints devuelven el código de estado correcto, incluido

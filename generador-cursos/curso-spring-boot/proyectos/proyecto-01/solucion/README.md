@@ -108,7 +108,7 @@ Así queda el proyecto al terminar la Fase 7. Al comienzo de **cada fase** encon
 │   │   ├── 📄 CargadorReservasDemo.java                       [fase 3c]
 │   │   ├── 📄 ConfiguracionBeans.java                         [fase 1]
 │   │   └── 📄 ConfiguracionOpenApi.java                       [fase 5]
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorDisponibilidad.java                  [fase 3b]
 │   │   ├── 📄 ControladorEquipamientos.java                   [fase 3a]
 │   │   ├── 📄 ControladorMiembros.java                        [fase 3b]
@@ -136,7 +136,7 @@ Así queda el proyecto al terminar la Fase 7. Al comienzo de **cada fase** encon
 │   │   ├── 📄 ReglaNegocioException.java                      [fase 3a]
 │   │   ├── 📄 RespuestaError.java                             [fase 4]
 │   │   └── 📄 SolicitudInvalidaException.java                 [fase 3a]
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java                         [fase 2]
 │   │   │   ├── 📄 Equipamiento.java                           [fase 2]
@@ -168,7 +168,7 @@ Así queda el proyecto al terminar la Fase 7. Al comienzo de **cada fase** encon
 │   │   ├── 📁 jwt  (tokens y filtro)
 │   │   │   ├── 📄 FiltroAutenticacionJwt.java                 [fase 6]
 │   │   │   └── 📄 UtilJwt.java                                [fase 6]
-│   │   ├── 📁 persistences  (capa Persistence de seguridad)
+│   │   ├── 📁 persistences  (capa de persistencia de seguridad)
 │   │   │   ├── 📁 entities  (Usuario y Rol)
 │   │   │   │   ├── 📄 Rol.java                                [fase 2]
 │   │   │   │   └── 📄 Usuario.java                            [fase 2]
@@ -177,7 +177,7 @@ Así queda el proyecto al terminar la Fase 7. Al comienzo de **cada fase** encon
 │   │   └── 📁 services  (usuarios y permisos)
 │   │       ├── 📄 ServicioAutorizacion.java                   [fase 6]
 │   │       └── 📄 ServicioDetallesUsuario.java                [fase 6]
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 CalculadoraCostoReserva.java                    [fase 3c]
 │       ├── 📄 ServicioConsumo.java                            [fase 3b]
 │       ├── 📄 ServicioDisponibilidad.java                     [fase 3b]

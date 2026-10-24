@@ -11,7 +11,9 @@ Ejemplo 03.
 ## 💻 Código o contexto de partida
 
 ```java
-// Autor.java — capa persistences (com.biblioteca.persistences.entities)
+package com.biblioteca.persistences.entities;
+
+// Autor.java — capa de persistencia (com.biblioteca.persistences.entities)
 // (Módulo 3, reutilizada)
 @Entity
 public class Autor {
@@ -40,13 +42,17 @@ public class Autor {
 ```
 
 ```java
-// RepositorioAutores.java — capa persistences (com.biblioteca.persistences.repositories)
+package com.biblioteca.persistences.repositories;
+
+// RepositorioAutores.java — capa de persistencia (com.biblioteca.persistences.repositories)
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
 
 ```java
-// ServicioAutores.java — capa services (com.biblioteca.services)
+package com.biblioteca.services;
+
+// ServicioAutores.java — capa de negocio (com.biblioteca.services)
 // (Módulo 5, reutilizada)
 @Service
 public class ServicioAutores {
@@ -88,7 +94,9 @@ public class ServicioAutores {
 ```
 
 ```java
-// ControladorAutores.java — capa controllers (com.biblioteca.controllers)
+package com.biblioteca.controllers;
+
+// ControladorAutores.java — capa de presentación (com.biblioteca.controllers)
 // (Módulo 5, reutilizada)
 @RestController
 @RequestMapping("/autores")
@@ -136,7 +144,7 @@ public class ControladorAutores {
 1. Creá `AutorNoEncontradoException` (`@ResponseStatus(HttpStatus.NOT_FOUND)`)
    en el paquete transversal `com.biblioteca.exception`, siguiendo el
    mismo patrón de `LibroNoEncontradoException` (Ejemplo 03).
-2. Modificá `ServicioAutores.buscarPorId` (capa `services`) para que
+2. Modificá `ServicioAutores.buscarPorId` (capa de negocio, `services`) para que
    devuelva `Autor` directamente y lance la excepción en vez de
    `Optional`.
 3. Modificá `ControladorAutores.buscarPorId` para que ya no construya
@@ -150,7 +158,7 @@ public class ControladorAutores {
   usa `orElseThrow(...)`.
 - `ControladorAutores.buscarPorId` devuelve `Autor` directamente, sin
   ningún `ResponseEntity` construido a mano.
-- La excepción se lanza en `ServicioAutores` (capa `services`), no en
+- La excepción se lanza en `ServicioAutores` (capa de negocio, `services`), no en
   `ControladorAutores`.
 
 ## 🚧 Restricciones

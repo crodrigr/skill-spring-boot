@@ -40,7 +40,7 @@
         └── 📄 application.properties
 ```
 
-**Capas MVC**: tanto el paquete raíz `com.medisalud` como
+**Capas**: tanto el paquete raíz `com.medisalud` como
 `com.medisalud.security` respetan `controllers` → `services` →
 `persistences` (`entities` + `repositories`). `exception`, `config` y
 `jwt` son paquetes transversales, no capas. Ningún controlador inyecta un

@@ -3,8 +3,8 @@
 ## 🧩 Problema
 
 Para cada uno de los siguientes escenarios de error en una API de
-Biblioteca Universitaria, identificá en qué capa de la arquitectura MVC
-(`persistences`, `services` o `controllers`) se origina, y justificá tu
+Biblioteca Universitaria, identificá en qué capa de la arquitectura
+(persistencia `persistences`, negocio `services` o presentación `controllers`) se origina, y justificá tu
 respuesta.
 
 ## 💻 Código o contexto de partida

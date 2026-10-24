@@ -48,7 +48,7 @@ public class AutorNoEncontradoException extends RuntimeException {
 ```
 
 ```java
-// com.biblioteca.services.ServicioAutores — la excepción se lanza en la capa services
+// com.biblioteca.services.ServicioAutores — la excepción se lanza en la capa de negocio
 public Autor buscarPorId(Long id) {
     return repositorioAutores.findById(id)
             .orElseThrow(() -> new AutorNoEncontradoException(id));
@@ -166,7 +166,7 @@ public class CitaNoEncontradaException extends RuntimeException {
 ```
 
 ```java
-// com.medisalud.services.ServicioCitas — lanza la excepción (capa services)
+// com.medisalud.services.ServicioCitas — lanza la excepción (capa de negocio)
 @Service
 public class ServicioCitas {
 

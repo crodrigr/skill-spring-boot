@@ -22,19 +22,19 @@
         └── 📄 application.properties
 ```
 
-**Nota sobre paquetes**: este Taller reorganiza en paquetes por capa MVC
-(`controllers`, `services` y `persistences`, esta última con
-`entities` y `repositories`) la misma arquitectura ya explicada en el
+**Nota sobre paquetes**: este Taller completa las tres capas del curso
+(presentación `controllers`, negocio `services` y persistencia `persistences`,
+esta última con `entities` y `repositories`), la misma arquitectura ya explicada en el
 Ejemplo 03 (Controller → Service → Repository → Database). Cada clase
 declara su `package` y solo importa explícitamente las clases del proyecto
 que vienen de otro paquete; las clases de Spring/Java (`@Service`,
 `Optional`, etc.) se omiten por brevedad, igual que en el resto del curso.
 
-| Capa MVC | Paquete | Clase |
+| Capa | Paquete | Clase |
 |---|---|---|
-| Controller | `com.medisalud.controllers` | `ControladorPacientes` |
-| Service | `com.medisalud.services` | `ServicioPacientes` |
-| Persistence | `com.medisalud.persistences.entities` / `com.medisalud.persistences.repositories` | `Paciente` / `RepositorioPacientes` |
+| Presentación | `com.medisalud.controllers` | `ControladorPacientes` |
+| Negocio | `com.medisalud.services` | `ServicioPacientes` |
+| Persistencia | `com.medisalud.persistences.entities` / `com.medisalud.persistences.repositories` | `Paciente` / `RepositorioPacientes` |
 
 Dirección de las dependencias: `ControladorPacientes` → `ServicioPacientes`
 → `RepositorioPacientes`. El controlador nunca inyecta el repositorio.

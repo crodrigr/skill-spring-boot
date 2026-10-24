@@ -20,6 +20,8 @@ usuario `user` y la contraseña autogenerada que aparece en la consola.
 ## 💻 Archivo: `Autor.java` (`com.biblioteca.persistences.entities`)
 
 ```java
+package com.biblioteca.persistences.entities;
+
 @Entity
 public class Autor {
 
@@ -49,6 +51,8 @@ public class Autor {
 ## 💻 Archivo: `RepositorioAutores.java` (`com.biblioteca.persistences.repositories`)
 
 ```java
+package com.biblioteca.persistences.repositories;
+
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
@@ -56,6 +60,8 @@ public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 ## 💻 Archivo: `AutorNoEncontradoException.java` (`com.biblioteca.exception`, paquete transversal)
 
 ```java
+package com.biblioteca.exception;
+
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class AutorNoEncontradoException extends RuntimeException {
 
@@ -68,6 +74,8 @@ public class AutorNoEncontradoException extends RuntimeException {
 ## 💻 Archivo: `ServicioAutores.java` (`com.biblioteca.services`)
 
 ```java
+package com.biblioteca.services;
+
 @Service
 public class ServicioAutores {
 
@@ -111,6 +119,8 @@ public class ServicioAutores {
 ## 💻 Archivo: `ControladorAutores.java` (`com.biblioteca.controllers`)
 
 ```java
+package com.biblioteca.controllers;
+
 @RestController
 @RequestMapping("/autores")
 public class ControladorAutores {
@@ -155,6 +165,8 @@ public class ControladorAutores {
 ## 💻 Archivo: `ManejadorGlobalDeExcepciones.java` (`com.biblioteca.exception`, paquete transversal)
 
 ```java
+package com.biblioteca.exception;
+
 @ControllerAdvice
 public class ManejadorGlobalDeExcepciones {
 
@@ -184,7 +196,7 @@ public class ManejadorGlobalDeExcepciones {
   Basic Auth (usuario `user` + contraseña de consola), aceptada.
 - No confunde la contraseña autogenerada con una contraseña fija: cada
   reinicio del proyecto genera una nueva.
-- Reconoce que las capas MVC del proyecto (`controllers`, `services`,
+- Reconoce que las capas del proyecto (`controllers`, `services`,
   `persistences`) no cambian: Spring Security se agrega como una
   preocupación transversal, sin tocar ninguna de esas clases.
 

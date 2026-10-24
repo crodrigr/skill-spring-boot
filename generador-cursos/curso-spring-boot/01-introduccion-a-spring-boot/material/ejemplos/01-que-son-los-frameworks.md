@@ -87,7 +87,7 @@ public class SinFrameworkDemo {
 ```java
 // Con framework (Spring Boot): el desarrollador solo declara el "qué"
 @RestController
-public class CitasController {
+public class ControladorCitas {
 
     @GetMapping("/citas/hoy")
     public List<Cita> citasDeHoy() {
@@ -117,7 +117,7 @@ sequenceDiagram
 sequenceDiagram
     participant Cliente as Cliente HTTP
     participant SpringBoot as Spring Boot (framework)
-    participant Controller as CitasController
+    participant Controller as ControladorCitas
 
     Note over Cliente,Controller: Con framework: Spring Boot invoca el código del desarrollador
     Cliente->>SpringBoot: GET /citas/hoy
@@ -202,13 +202,13 @@ exactamente el mismo problema, solo que invirtiendo quién llama a quién.
 
 **3. [Abierta]** Con tus propias palabras, explicá qué significa que "un
 framework invierte el control", usando como referencia la diferencia entre
-`SinFrameworkDemo` y `CitasController`.
+`SinFrameworkDemo` y `ControladorCitas`.
 
 <details>
 <summary>🔑 Ver respuesta modelo</summary>
 
 **Respuesta modelo**: En `SinFrameworkDemo`, el propio programa decide, dentro
-de su `main`, cuándo y qué método ejecutar para cada ruta. En `CitasController`,
+de su `main`, cuándo y qué método ejecutar para cada ruta. En `ControladorCitas`,
 el desarrollador no llama a `citasDeHoy()` en ningún lado: escribe el método y
 lo anota, y es Spring Boot quien decide cuándo invocarlo (al llegar una petición
 HTTP a esa ruta). El control sobre "cuándo se ejecuta mi código" pasó del

@@ -20,7 +20,9 @@ manejo global ya aplicados). Ninguna de estas clases debe cambiar su
 comportamiento en este Desafío.
 
 ```java
-// Cita.java — capa persistences (com.medisalud.persistences.entities)
+package com.medisalud.persistences.entities;
+
+// Cita.java — capa de persistencia (com.medisalud.persistences.entities)
 // (Módulo 3, sin cambios)
 @Entity
 public class Cita {
@@ -56,13 +58,17 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+package com.medisalud.persistences.repositories;
+
+// RepositorioCitas.java — capa de persistencia (com.medisalud.persistences.repositories)
 // (Módulo 3, sin cambios)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
+package com.medisalud.exception;
+
 // CitaNoEncontradaException.java — paquete transversal (com.medisalud.exception)
 // (Módulo 7, sin cambios)
 @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -75,7 +81,9 @@ public class CitaNoEncontradaException extends RuntimeException {
 ```
 
 ```java
-// ServicioCitas.java — capa services (com.medisalud.services)
+package com.medisalud.services;
+
+// ServicioCitas.java — capa de negocio (com.medisalud.services)
 // (Módulo 7, sin cambios)
 @Service
 public class ServicioCitas {
@@ -114,7 +122,9 @@ public class ServicioCitas {
 ```
 
 ```java
-// ControladorCitas.java — capa controllers (com.medisalud.controllers)
+package com.medisalud.controllers;
+
+// ControladorCitas.java — capa de presentación (com.medisalud.controllers)
 // (Módulo 7, sin cambios)
 @RestController
 @RequestMapping("/citas")
@@ -155,7 +165,7 @@ public class ControladorCitas {
 }
 ```
 
-**Ubicación de las clases nuevas (mismas capas MVC, dentro de
+**Ubicación de las clases nuevas (mismas capas, dentro de
 `com.medisalud.security`)**:
 
 | Clase | Paquete |
@@ -192,7 +202,7 @@ public class ControladorCitas {
   token.
 - `FiltroAutenticacionJwt` no consulta `RepositorioCitas` ni ninguna
   entidad de dominio.
-- Cada clase nueva vive en el paquete de su capa MVC (o en un paquete
+- Cada clase nueva vive en el paquete de su capa (o en un paquete
   transversal) según la tabla de ubicación, y `ControladorAutenticacion`
   no accede a `RepositorioUsuarios` directamente.
 

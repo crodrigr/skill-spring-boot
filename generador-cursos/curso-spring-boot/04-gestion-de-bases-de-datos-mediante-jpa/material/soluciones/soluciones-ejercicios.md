@@ -37,7 +37,7 @@ spring.jpa.hibernate.ddl-auto=update
 
 `Main.java` (paquete raíz `com.biblioteca`), junto con los paquetes vacíos
 `com.biblioteca.persistences.entities` y
-`com.biblioteca.persistences.repositories` (capa `persistences`):
+`com.biblioteca.persistences.repositories` (capa de persistencia, `persistences`):
 
 ```java
 @SpringBootApplication
@@ -169,7 +169,7 @@ colección y la elimina de la base de datos.
 
 **Solución propuesta** (`Autor` y `RepositorioAutores` en la capa
 `persistences`; `Main` en el paquete raíz `com.biblioteca`, usando el
-repositorio directamente porque todavía no existe una capa `services`):
+repositorio directamente porque todavía no existe una capa de negocio, `services`):
 
 ```java
 // com.biblioteca.Main

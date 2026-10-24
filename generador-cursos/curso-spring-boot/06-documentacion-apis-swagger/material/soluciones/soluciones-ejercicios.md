@@ -86,7 +86,7 @@ springdoc.packages-to-scan=com.biblioteca
    `springdoc.packages-to-scan` apunta a `com.biblioteca.controllers` —
    springdoc busca en un paquete que no contiene ningún `@RestController`
    (o que ni siquiera existe), así que no encuentra nada que documentar.
-2. Corrección preferida: mover la clase al paquete de su capa MVC, que es
+2. Corrección preferida: mover la clase al paquete de su capa, que es
    el que ya declara la configuración. `web` no es una de las capas del
    proyecto (`controllers`, `services`, `persistences`):
 

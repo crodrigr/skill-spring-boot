@@ -9,7 +9,7 @@ con `@ResponseStatus`, centralizada en un `@ControllerAdvice`.
 ## 🌍 Contexto
 
 MediSalud ya tiene `ControladorPacientes`/`ServicioPacientes` funcionando
-(Taller del Módulo 5, con su estructura de paquetes MVC:
+(Taller del Módulo 5, con su estructura de paquetes por capa:
 `com.medisalud.controllers`, `com.medisalud.services` y
 `com.medisalud.persistences` con sus subpaquetes `entities` y
 `repositories`). Le falta lo mismo que se aplicó a `Libro` en los
@@ -17,7 +17,7 @@ Ejemplos 03-06 de este módulo: reemplazar `Optional`/
 `ResponseEntity.notFound()` por una excepción personalizada y un
 manejador global.
 
-Las tres capas MVC (`controllers`, `services`, `persistences`) no cambian
+Las tres capas (presentación, negocio y persistencia: `controllers`, `services`, `persistences`) no cambian
 de lugar. El paquete `exception` es **transversal**: no es una capa nueva,
 agrupa las clases de error que el `Service` lanza y que el manejador
 global (`@ControllerAdvice`) traduce a una respuesta HTTP para la capa
@@ -35,8 +35,8 @@ global (`@ControllerAdvice`) traduce a una respuesta HTTP para la capa
    `Optional`; actualizá `actualizar` y `eliminar` para reutilizar
    `buscarPorId`; quitá de `ControladorPacientes.buscarPorId` el
    `ResponseEntity.notFound()` manual.
-   La excepción se lanza desde la capa `services` (es donde se conoce la
-   regla de negocio) y nunca desde `controllers`.
+   La excepción se lanza desde la capa de negocio (`services`), que es donde se conoce la
+   regla de negocio, y nunca desde la de presentación (`controllers`).
 3. **Centralizar el manejo**: creá `ManejadorGlobalDeExcepciones`
    (`@ControllerAdvice`) en `com.medisalud.exception`, con un
    `@ExceptionHandler(PacienteNoEncontradoException.class)` que devuelva

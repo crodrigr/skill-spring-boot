@@ -8,11 +8,15 @@ como `@Component`, la aplicación deja de arrancar.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.biblioteca.services.CalculadoraRecargo
 public interface CalculadoraRecargo {
     double calcular(int diasDeAtraso);
 }
 
+// com.biblioteca.services.RecargoFijo
 @Component
 public class RecargoFijo implements CalculadoraRecargo {
     @Override
@@ -21,6 +25,7 @@ public class RecargoFijo implements CalculadoraRecargo {
     }
 }
 
+// com.biblioteca.services.RecargoProgresivo
 @Component
 public class RecargoProgresivo implements CalculadoraRecargo {
     @Override
@@ -29,6 +34,7 @@ public class RecargoProgresivo implements CalculadoraRecargo {
     }
 }
 
+// com.biblioteca.services.ServicioMultas
 @Service
 public class ServicioMultas {
 

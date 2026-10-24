@@ -18,7 +18,7 @@ Ninguno: este ejercicio empieza sin ningún proyecto previo.
    `spring.jpa.hibernate.ddl-auto=update`.
 3. Verificá que el proyecto arranca sin errores (con una clase principal
    `@SpringBootApplication` vacía, sin entidades todavía).
-4. Dejá preparada la estructura de capas MVC del curso: la clase
+4. Dejá preparada la estructura de capas del curso: la clase
    principal `Main` en el paquete raíz `com.biblioteca`, y los paquetes
    `com.biblioteca.persistences.entities` y
    `com.biblioteca.persistences.repositories`, donde irán las entidades y

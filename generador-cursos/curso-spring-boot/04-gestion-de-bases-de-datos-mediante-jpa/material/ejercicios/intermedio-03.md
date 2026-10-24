@@ -9,7 +9,9 @@ nombre de sus `Autor` (Módulo 3), pero **no** necesita eliminarlos todavía
 ## 💻 Código o contexto de partida
 
 ```java
-// Capa persistences: com.biblioteca.persistences.entities
+package com.biblioteca.persistences.entities;
+
+// capa de persistencia: com.biblioteca.persistences.entities
 @Entity
 public class Autor {
 
@@ -33,7 +35,9 @@ public class Autor {
 ```
 
 ```java
-// Capa persistences: com.biblioteca.persistences.repositories
+package com.biblioteca.persistences.repositories;
+
+// capa de persistencia: com.biblioteca.persistences.repositories
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```

@@ -7,16 +7,21 @@ todas las relaciones de dependencia que existen entre ellas.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.biblioteca.persistences.repositories.RepositorioLibros
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
 
+// com.biblioteca.persistences.repositories.RepositorioLibrosEnMemoria
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
     public Optional<Libro> buscarPorIsbn(String isbn) { /* ... */ return Optional.empty(); }
 }
 
+// com.biblioteca.services.ServicioPrestamos
 public class ServicioPrestamos {
     private final RepositorioLibros repositorioLibros;
 
@@ -29,10 +34,11 @@ public class ServicioPrestamos {
     }
 }
 
-public class CatalogoController {
+// com.biblioteca.controllers.ControladorCatalogo
+public class ControladorCatalogo {
     private final ServicioPrestamos servicioPrestamos;
 
-    public CatalogoController(ServicioPrestamos servicioPrestamos) {
+    public ControladorCatalogo(ServicioPrestamos servicioPrestamos) {
         this.servicioPrestamos = servicioPrestamos;
     }
 
@@ -42,16 +48,16 @@ public class CatalogoController {
 }
 ```
 
-Enumerá **todas** las relaciones de dependencia entre `CatalogoController`,
+Enumerá **todas** las relaciones de dependencia entre `ControladorCatalogo`,
 `ServicioPrestamos`, `RepositorioLibros` y `RepositorioLibrosEnMemoria`, e
 indicá para cada una si es directa o transitiva.
 
 ## 📏 Criterios de evaluación de la solución
 
 - Identifica `ServicioPrestamos → RepositorioLibros` como directa.
-- Identifica `CatalogoController → ServicioPrestamos` como directa.
-- Identifica `CatalogoController → RepositorioLibros` como **transitiva**
-  (nunca aparece mencionada en `CatalogoController`).
+- Identifica `ControladorCatalogo → ServicioPrestamos` como directa.
+- Identifica `ControladorCatalogo → RepositorioLibros` como **transitiva**
+  (nunca aparece mencionada en `ControladorCatalogo`).
 - No confunde la relación de **implementación** (`RepositorioLibrosEnMemoria
   implements RepositorioLibros`) con una dependencia: es un contrato que
   cumple, no algo de lo que la interfaz dependa.

@@ -9,26 +9,33 @@ en este mismo escenario.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.medisalud.persistences.repositories.RepositorioPacientes
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
 
+// com.medisalud.persistences.repositories.RepositorioPacientesEnMemoria
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     // ... implementación con una lista o mapa en memoria
 }
 
+// com.medisalud.services.ServicioNotificaciones
 public class ServicioNotificaciones {
     public ServicioNotificaciones(RepositorioPacientes repositorioPacientes) { /* ... */ }
     public void avisarCitaProxima(String codigoPaciente) { /* ... */ }
 }
 
+// com.medisalud.services.ServicioCitas
 public class ServicioCitas {
     public ServicioCitas(RepositorioPacientes repositorioPacientes,
                           ServicioNotificaciones servicioNotificaciones) { /* ... */ }
     public void agendar(String codigoPaciente) { /* ... */ }
 }
 
+// com.medisalud.controllers.ControladorCitas
 public class ControladorCitas {
     public ControladorCitas(ServicioCitas servicioCitas) { /* ... */ }
     public void manejarSolicitudAgendar(String codigoPaciente) { /* ... */ }

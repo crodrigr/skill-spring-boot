@@ -109,7 +109,7 @@ Antes de programar, entregá un documento de análisis con:
 | Código | Categoría | Requisito |
 |---|---|---|
 | **RNF-01** | Tecnología | Java 17, Spring Boot 3.x, Maven, Spring Data JPA y H2 en memoria. Debe ejecutarse solo con `mvn spring-boot:run`, sin instalar nada más. |
-| **RNF-02** | Arquitectura | Arquitectura MVC por capas, con los paquetes `controllers`, `services` y `persistences` (`entities`, `repositories`). `exception`, `config` y `jwt` son paquetes transversales. El controlador solo depende del servicio, y el servicio solo del repositorio. |
+| **RNF-02** | Arquitectura | Arquitectura por capas (presentación, negocio y persistencia), con los paquetes `controllers`, `services` y `persistences` (`entities`, `repositories`). `exception`, `config` y `jwt` son paquetes transversales. El controlador solo depende del servicio, y el servicio solo del repositorio. |
 | **RNF-03** | Diseño | Toda la lógica de negocio vive en `services`. La inyección de dependencias es por constructor. El cálculo de costos es un bean propio (`@Component`) inyectado en el servicio de reservas. |
 | **RNF-04** | Consistencia | Las operaciones que escriben más de una entidad (crear o cancelar una reserva) son transaccionales. Una falla no deja datos a medias. |
 | **RNF-05** | Errores | Todas las respuestas de error usan el mismo cuerpo JSON: `{"error": "...", "codigo": "...", "timestamp": "..."}`. Se genera desde un único `@ControllerAdvice`. Ningún error debe responder `500` por una regla de negocio. |
@@ -180,7 +180,7 @@ Antes de programar, entregá un documento de análisis con:
 | Análisis: trazabilidad, ER justificado y supuestos explícitos | 15 % |
 | Modelo JPA: relaciones, lado dueño, `cascade` y `fetch` correctos | 15 % |
 | Reglas de negocio: RN-01 a RN-13 implementadas y probadas | 25 % |
-| Arquitectura MVC y calidad del código | 15 % |
+| Arquitectura por capas y calidad del código | 15 % |
 | Manejo de excepciones y códigos HTTP | 10 % |
 | Seguridad con JWT y roles | 10 % |
 | Swagger, README y pruebas de aceptación | 10 % |

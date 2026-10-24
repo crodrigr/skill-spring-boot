@@ -7,7 +7,10 @@ y no arranca: hay una dependencia circular entre dos clases.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.biblioteca.services.ServicioPrestamos
 public class ServicioPrestamos {
     private final ServicioMultas servicioMultas;
 
@@ -24,6 +27,7 @@ public class ServicioPrestamos {
     }
 }
 
+// com.biblioteca.services.ServicioMultas
 public class ServicioMultas {
     private final ServicioPrestamos servicioPrestamos;
 

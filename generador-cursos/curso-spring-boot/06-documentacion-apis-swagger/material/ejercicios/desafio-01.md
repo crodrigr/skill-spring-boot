@@ -16,7 +16,9 @@ en Swagger UI.
 ## 💻 Código o contexto de partida
 
 ```java
-// Paciente.java — capa persistences (com.medisalud.persistences.entities)
+package com.medisalud.persistences.entities;
+
+// Paciente.java — capa de persistencia (com.medisalud.persistences.entities)
 // (Módulo 5, con @JsonIgnore ya aplicado — reutilizada tal cual)
 @Entity
 public class Paciente {
@@ -50,7 +52,9 @@ public class Paciente {
 ```
 
 ```java
-// ControladorCitas.java — capa controllers (com.medisalud.controllers)
+package com.medisalud.controllers;
+
+// ControladorCitas.java — capa de presentación (com.medisalud.controllers)
 // (Módulo 5, reutilizada tal cual)
 @RestController
 @RequestMapping("/citas")
@@ -95,7 +99,7 @@ public class ControladorCitas {
 }
 ```
 
-**Capas del proyecto (MVC)**: `ControladorCitas` vive en
+**Capas del proyecto**: `ControladorCitas` vive en
 `com.medisalud.controllers`, `ServicioCitas` en `com.medisalud.services`, y
 `Paciente`, `Cita` y `RepositorioCitas` en `com.medisalud.persistences`
 (`entities` y `repositories`). Ninguna de esas clases se mueve ni se

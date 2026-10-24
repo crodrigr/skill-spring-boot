@@ -25,7 +25,7 @@
         └── 📄 application.properties
 ```
 
-**Capas MVC**: `controllers` → `services` → `persistences`
+**Capas**: `controllers` → `services` → `persistences`
 (`entities` + `repositories`). `exception` es un paquete transversal: la
 excepción se lanza desde `services` y el `@ControllerAdvice` la traduce a
 HTTP para `controllers`.

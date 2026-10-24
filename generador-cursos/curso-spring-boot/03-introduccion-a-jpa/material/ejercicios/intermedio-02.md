@@ -9,7 +9,9 @@ tiene ninguna anotación de JPA.
 ## 💻 Código o contexto de partida
 
 ```java
-// Capa persistences: com.biblioteca.persistences.entities
+package com.biblioteca.persistences.entities;
+
+// capa de persistencia: com.biblioteca.persistences.entities
 public class Categoria {
 
     private Long id;
@@ -25,9 +27,9 @@ public class Categoria {
 }
 ```
 
-**Capas MVC**: `Categoria` va en `com.biblioteca.persistences.entities` y
+**Capas**: `Categoria` va en `com.biblioteca.persistences.entities` y
 `RepositorioCategorias` en `com.biblioteca.persistences.repositories`
-(capa `persistences`).
+(capa de persistencia, `persistences`).
 
 1. Convertí `Categoria` en una entidad JPA: agregá `@Entity`, `@Id` con
    `@GeneratedValue` sobre `id`, y `@Column(nullable = false)` sobre
@@ -46,7 +48,7 @@ public class Categoria {
 - `RepositorioCategorias` extiende `JpaRepository<Categoria, Long>` sin
   declarar ningún método propio (no es necesario para este ejercicio).
 - `Categoria` y `RepositorioCategorias` viven cada una en el paquete de
-  la capa `persistences` que les corresponde (`entities` y
+  la capa de persistencia (`persistences`) que les corresponde (`entities` y
   `repositories`).
 
 ## 🚧 Restricciones

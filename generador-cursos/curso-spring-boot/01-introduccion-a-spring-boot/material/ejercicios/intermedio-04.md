@@ -8,17 +8,22 @@ funcione como una API.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.medisalud.persistences.entities.Paciente
 public record Paciente(String codigo, String nombre) {}
 
 // Sin anotaciones: Spring Boot no reconoce ninguna de estas clases como bean
 
+// com.medisalud.persistences.repositories.RepositorioPacientes
 public class RepositorioPacientes {
     public Optional<Paciente> buscarPorCodigo(String codigo) {
         return Optional.of(new Paciente(codigo, "Paciente de ejemplo")); // simplificado
     }
 }
 
+// com.medisalud.services.ServicioCitas
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -32,11 +37,12 @@ public class ServicioCitas {
     }
 }
 
-public class CitasController {
+// com.medisalud.controllers.ControladorCitas
+public class ControladorCitas {
 
     private final ServicioCitas servicioCitas;
 
-    public CitasController(ServicioCitas servicioCitas) {
+    public ControladorCitas(ServicioCitas servicioCitas) {
         this.servicioCitas = servicioCitas;
     }
 
@@ -45,11 +51,13 @@ public class CitasController {
     }
 }
 
+// com.medisalud.config.ConfiguracionApp
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
 public class ConfiguracionApp {
 }
 
+// com.medisalud.Main
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =
@@ -57,7 +65,7 @@ public class Main {
 
         // Si las tres clases quedaron bien anotadas, el contenedor resuelve
         // este bean sin lanzar ninguna excepción.
-        CitasController controlador = contexto.getBean(CitasController.class);
+        ControladorCitas controlador = contexto.getBean(ControladorCitas.class);
         System.out.println("¿Paciente P-001 registrado? " + controlador.verificar("P-001"));
 
         contexto.close();
@@ -67,10 +75,10 @@ public class Main {
 
 Agregá las anotaciones necesarias para que: (a) las tres clases sean beans
 administrados por el contenedor IoC, con la anotación semánticamente correcta
-según su capa; (b) `CitasController` exponga un endpoint `GET
+según su capa; (b) `ControladorCitas` exponga un endpoint `GET
 /pacientes/{codigo}/verificar` que invoque el método `verificar`. Indicá también
 si hace falta agregar `@Autowired` en algún constructor, y por qué. Ejecutá
-`Main` para confirmar que el contenedor logra construir `CitasController`: si
+`Main` para confirmar que el contenedor logra construir `ControladorCitas`: si
 falta alguna anotación, `contexto.getBean(...)` lanza una excepción en tiempo de
 ejecución.
 
@@ -79,7 +87,7 @@ ejecución.
 - `RepositorioPacientes` queda anotada `@Repository` (acceso a datos), no
   `@Component` genérico ni `@Service`.
 - `ServicioCitas` queda anotada `@Service` (lógica de negocio).
-- `CitasController` queda anotada `@RestController`, y el método `verificar` queda
+- `ControladorCitas` queda anotada `@RestController`, y el método `verificar` queda
   anotado `@GetMapping("/pacientes/{codigo}/verificar")` con el parámetro `codigo`
   anotado `@PathVariable`.
 - La solución explica que **no** hace falta `@Autowired` en los constructores,
@@ -90,7 +98,7 @@ ejecución.
 
 - No cambies `Paciente`, `ConfiguracionApp` ni `Main`; solo agregá anotaciones
   (y el mapeo HTTP) sobre `RepositorioPacientes`, `ServicioCitas` y
-  `CitasController`.
+  `ControladorCitas`.
 
 ## 📊 Dificultad
 

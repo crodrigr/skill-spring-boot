@@ -10,7 +10,9 @@ piden simplificarlo con `cascade`.
 ## 💻 Código o contexto de partida
 
 ```java
-// Capa persistences: com.biblioteca.persistences.entities
+package com.biblioteca.persistences.entities;
+
+// capa de persistencia: com.biblioteca.persistences.entities
 @Entity
 public class Usuario {
 

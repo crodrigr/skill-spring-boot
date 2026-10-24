@@ -22,7 +22,7 @@ reservas de ejemplo. Es la parte más larga del proyecto: avanzá de a un paso.
 │   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
 │   │   ├── 📄 CargadorReservasDemo.java                       ◀ 🆕 nuevo
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorDisponibilidad.java
 │   │   ├── 📄 ControladorEquipamientos.java
 │   │   ├── 📄 ControladorMiembros.java
@@ -46,7 +46,7 @@ reservas de ejemplo. Es la parte más larga del proyecto: avanzá de a un paso.
 │   │   ├── 📄 RecursoNoEncontradoException.java
 │   │   ├── 📄 ReglaNegocioException.java
 │   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
@@ -68,13 +68,13 @@ reservas de ejemplo. Es la parte más larga del proyecto: avanzá de a un paso.
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
 │   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │   └── 📁 persistences  (capa de persistencia de seguridad)
 │   │       ├── 📁 entities  (Usuario y Rol)
 │   │       │   ├── 📄 Rol.java
 │   │       │   └── 📄 Usuario.java
 │   │       └── 📁 repositories  (RepositorioUsuarios)
 │   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 CalculadoraCostoReserva.java                    ◀ 🆕 nuevo
 │       ├── 📄 ServicioConsumo.java
 │       ├── 📄 ServicioDisponibilidad.java

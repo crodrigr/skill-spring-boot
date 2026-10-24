@@ -14,19 +14,23 @@ devolución. El equipo ya escribió las clases, pero no las anotó ni resolvió
 todavía la ambigüedad entre sus dos formas de notificar.
 
 ```java
+// com.biblioteca.persistences.repositories.RepositorioLibros
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
 
+// com.biblioteca.persistences.repositories.RepositorioLibrosEnMemoria
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
     public Optional<Libro> buscarPorIsbn(String isbn) { /* ... */ return Optional.empty(); }
 }
 
+// com.biblioteca.services.CanalDeAviso
 public interface CanalDeAviso {
     void avisar(String destinatario, String mensaje);
 }
 
+// com.biblioteca.services.AvisoPorEmail
 public class AvisoPorEmail implements CanalDeAviso {
     @Override
     public void avisar(String destinatario, String mensaje) {
@@ -34,6 +38,7 @@ public class AvisoPorEmail implements CanalDeAviso {
     }
 }
 
+// com.biblioteca.services.AvisoPorApp
 public class AvisoPorApp implements CanalDeAviso {
     @Override
     public void avisar(String destinatario, String mensaje) {
@@ -41,6 +46,7 @@ public class AvisoPorApp implements CanalDeAviso {
     }
 }
 
+// com.biblioteca.services.ServicioRecordatoriosDevolucion
 public class ServicioRecordatoriosDevolucion {
 
     private final RepositorioLibros repositorioLibros;
@@ -57,6 +63,7 @@ public class ServicioRecordatoriosDevolucion {
     }
 }
 
+// com.biblioteca.controllers.ControladorRecordatorios
 public class ControladorRecordatorios {
 
     private final ServicioRecordatoriosDevolucion servicioRecordatorios;
@@ -70,6 +77,20 @@ public class ControladorRecordatorios {
     }
 }
 ```
+
+## 🏗️ Capas del proyecto
+
+Las clases del fragmento ya están ubicadas en las tres capas del curso, y la
+cadena de dependencias las recorre de arriba hacia abajo:
+
+| Capa | Paquete | Qué contiene | Clases de este taller |
+|---|---|---|---|
+| **Presentación** | `com.biblioteca.controllers` | Recibe las solicitudes del usuario y delega. | `ControladorRecordatorios` |
+| **Negocio** | `com.biblioteca.services` | Reglas del dominio y colaboradores de la lógica. | `ServicioRecordatoriosDevolucion`, `CanalDeAviso`, `AvisoPorEmail`, `AvisoPorApp` |
+| **Persistencia** | `com.biblioteca.persistences` | `entities` y `repositories`. | `RepositorioLibros`, `RepositorioLibrosEnMemoria` |
+
+Regla de dependencia: presentación → negocio → persistencia. Un controlador
+nunca depende directamente de un repositorio.
 
 ## 🪜 Pasos
 
@@ -107,11 +128,27 @@ quedan para que los completes vos.
 
 ## 📦 Entregable
 
-Un pequeño proyecto de archivos (un `.java` por clase/interfaz), con:
-`RepositorioLibros.java`, `RepositorioLibrosEnMemoria.java`,
-`CanalDeAviso.java`, `AvisoPorEmail.java`, `AvisoPorApp.java`,
-`ServicioRecordatoriosDevolucion.java`, `ControladorRecordatorios.java` (todas
-anotadas y con la ambigüedad resuelta), más un archivo `diagnostico.md` con el
+Un pequeño proyecto de archivos (un `.java` por clase/interfaz), con cada clase en
+el paquete de su capa:
+
+```text
+📁 taller-01-biblioteca
+├── 📁 src/com/biblioteca
+│   ├── 📁 controllers                      (capa de presentación)
+│   │   └── 📄 ControladorRecordatorios.java
+│   ├── 📁 services                         (capa de negocio)
+│   │   ├── 📄 ServicioRecordatoriosDevolucion.java
+│   │   ├── 📄 CanalDeAviso.java
+│   │   ├── 📄 AvisoPorEmail.java
+│   │   └── 📄 AvisoPorApp.java
+│   └── 📁 persistences                     (capa de persistencia)
+│       └── 📁 repositories
+│           ├── 📄 RepositorioLibros.java
+│           └── 📄 RepositorioLibrosEnMemoria.java
+└── 📄 diagnostico.md
+```
+
+Las clases van anotadas y con la ambigüedad resuelta; `diagnostico.md` contiene el
 listado de dependencias del paso 1 y las buenas prácticas del paso 5.
 
 ## 🧪 Casos de prueba

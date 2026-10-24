@@ -50,7 +50,7 @@ primero (una por aplicación, en la práctica), y de ella se obtienen los
 
 ## 🟡 Intermedio 01 — Convertir `RepositorioLibros` en un repositorio de Spring Data JPA
 
-**Solución propuesta** (capa `persistences`: entidades en
+**Solución propuesta** (capa de persistencia, `persistences`: entidades en
 `com.biblioteca.persistences.entities`, repositorios en
 `com.biblioteca.persistences.repositories`; `Main` en el paquete raíz
 `com.biblioteca`):
@@ -87,7 +87,7 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
 
-// com.biblioteca.Main (paquete raíz; todavía no existe capa services)
+// com.biblioteca.Main (paquete raíz; todavía no existe capa de negocio)
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
@@ -300,7 +300,7 @@ public interface RepositorioMedicos extends JpaRepository<Medico, Long> {
     Optional<Medico> findByNombre(String nombre);
 }
 
-// com.medisalud.Main (paquete raíz; todavía no existe capa services)
+// com.medisalud.Main (paquete raíz; todavía no existe capa de negocio)
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

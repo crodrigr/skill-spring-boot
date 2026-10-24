@@ -13,32 +13,33 @@ contra H2 (Módulo 3/4). Le falta exponerla como API REST, siguiendo
 exactamente el mismo patrón que `ServicioLibros`/`ControladorLibros`
 (Ejemplos 05-07 de este módulo), pero aplicado a `Paciente`.
 
-Este Taller es, además, el primero del curso en organizar sus clases en
-paquetes separados por capa MVC (`controllers`, `services` y
-`persistences`), llevando a la práctica la arquitectura del Ejemplo 03
-(Controller → Service → Repository → Database) directamente a la
-estructura de carpetas del proyecto — no solo como un concepto, sino como
-paquetes Java reales. De acá en adelante, todo el material del curso
-sigue esta misma organización.
+Este Taller es, además, el primero que completa las tres capas del curso:
+presentación (`controllers`), negocio (`services`) y persistencia
+(`persistences`, que ya existía desde el Módulo 3). Lleva a la práctica la
+arquitectura del Ejemplo 03 (Controller → Service → Repository → Database)
+directamente a la estructura de carpetas del proyecto — no solo como un
+concepto, sino como paquetes Java reales. De acá en adelante, todo el
+material del curso sigue esta misma organización.
 
-## 🏗️ Capas MVC del proyecto
+## 🏗️ Capas del proyecto
 
 | Capa | Paquete | Qué contiene | Clase en este taller |
 |---|---|---|---|
-| **Controller** | `com.medisalud.controllers` | Endpoints HTTP: recibe la solicitud, delega en el servicio y devuelve la respuesta con su código de estado. | `ControladorPacientes` |
-| **Service** | `com.medisalud.services` | Lógica de negocio. Es la única capa que habla con la de persistencia. | `ServicioPacientes` |
-| **Persistence** | `com.medisalud.persistences` | Acceso a datos: `entities` (clases `@Entity`) y `repositories` (interfaces de Spring Data JPA). | `Paciente`, `RepositorioPacientes` |
+| **Presentación** | `com.medisalud.controllers` | Endpoints HTTP: recibe la solicitud, delega en el servicio y devuelve la respuesta con su código de estado. | `ControladorPacientes` |
+| **Negocio** | `com.medisalud.services` | Lógica de negocio. Es la única capa que habla con la de persistencia. | `ServicioPacientes` |
+| **Persistencia** | `com.medisalud.persistences` | Acceso a datos: `entities` (clases `@Entity`) y `repositories` (interfaces de Spring Data JPA). | `Paciente`, `RepositorioPacientes` |
 
 Regla de dependencia: `controllers` → `services` → `persistences`. Un
 controlador nunca inyecta un repositorio directamente.
 
 ## 🪜 Pasos
 
-1. **Reorganizar en paquetes por capa**: movés `Paciente` (Módulo 3/4) al
+1. **Revisar la capa de persistencia**: confirmá que `Paciente` (Módulo 3/4) está en el
    paquete `com.medisalud.persistences.entities`, y `RepositorioPacientes`
-   al paquete `com.medisalud.persistences.repositories` (ambos forman la
-   capa `persistences`) — ningún código de esas dos clases cambia, solo su
-   ubicación y su línea `package`.
+   en `com.medisalud.persistences.repositories` (ambos forman la capa de
+   persistencia, `persistences`). Si en tu proyecto estaban en otro paquete,
+   movelos: ningún código de esas dos clases cambia, solo su ubicación y su
+   línea `package`.
 2. **Crear la clase de servicio**: escribí `ServicioPacientes`
    (`@Service`) en el paquete `com.medisalud.services`, inyectando
    `RepositorioPacientes` por constructor, con los cinco métodos de

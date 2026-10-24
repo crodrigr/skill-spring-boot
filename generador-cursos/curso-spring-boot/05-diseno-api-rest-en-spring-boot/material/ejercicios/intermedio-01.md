@@ -9,7 +9,9 @@ controlador de autores va a necesitar.
 ## 💻 Código o contexto de partida
 
 ```java
-// Autor.java — capa persistences (com.biblioteca.persistences.entities)
+package com.biblioteca.persistences.entities;
+
+// Autor.java — capa de persistencia (com.biblioteca.persistences.entities)
 // (Módulo 3, reutilizada; se agregan getId() y setNombre(),
 // que el Módulo 3 no necesitaba porque nunca se usó en un CRUD)
 @Entity
@@ -39,7 +41,9 @@ public class Autor {
 ```
 
 ```java
-// RepositorioAutores.java — capa persistences (com.biblioteca.persistences.repositories)
+package com.biblioteca.persistences.repositories;
+
+// RepositorioAutores.java — capa de persistencia (com.biblioteca.persistences.repositories)
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```

@@ -20,7 +20,9 @@ com.fasterxml.jackson.databind.JsonMappingException: Infinite recursion (StackOv
 ## 💻 Código o contexto de partida
 
 ```java
-// Paciente.java — capa persistences (com.medisalud.persistences.entities)
+package com.medisalud.persistences.entities;
+
+// Paciente.java — capa de persistencia (com.medisalud.persistences.entities)
 // (Módulo 3, reutilizada tal cual)
 @Entity
 public class Paciente {
@@ -61,7 +63,9 @@ public class Paciente {
 ```
 
 ```java
-// Cita.java — capa persistences (com.medisalud.persistences.entities)
+package com.medisalud.persistences.entities;
+
+// Cita.java — capa de persistencia (com.medisalud.persistences.entities)
 // (Módulo 3, reutilizada; se agrega getId(), que el Módulo 3
 // no necesitaba porque nunca se expuso vía REST)
 @Entity
@@ -96,14 +100,18 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+package com.medisalud.persistences.repositories;
+
+// RepositorioCitas.java — capa de persistencia (com.medisalud.persistences.repositories)
 // (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
-// ServicioCitas.java — capa services (com.medisalud.services)
+package com.medisalud.services;
+
+// ServicioCitas.java — capa de negocio (com.medisalud.services)
 // (nueva, mismo patrón que ServicioLibros)
 @Service
 public class ServicioCitas {
@@ -121,7 +129,9 @@ public class ServicioCitas {
 ```
 
 ```java
-// ControladorCitas.java — capa controllers (com.medisalud.controllers)
+package com.medisalud.controllers;
+
+// ControladorCitas.java — capa de presentación (com.medisalud.controllers)
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {

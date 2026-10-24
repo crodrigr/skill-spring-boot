@@ -39,7 +39,7 @@ correctamente formada, es `5xx`.
 
 **Solución propuesta**:
 
-| Fragmento | Clase | Capa MVC | Paquete | Responsabilidad |
+| Fragmento | Clase | Capa | Paquete | Responsabilidad |
 |---|---|---|---|---|
 | 1 | `RepositorioAutores` | `persistences` | `com.biblioteca.persistences.repositories` | Acceso a datos |
 | 2 | `ControladorAutores` | `controllers` | `com.biblioteca.controllers` | Maneja HTTP sobre `/autores` |
@@ -204,7 +204,7 @@ expusiera) ya no incluiría la lista de `citas` en su respuesta.
 
 ## 🏆 Desafío 01 — API REST de citas para MediSalud
 
-**Solución propuesta** (cada clase en el paquete de su capa MVC):
+**Solución propuesta** (cada clase en el paquete de su capa):
 
 ```java
 // com.medisalud.persistences.entities.Paciente

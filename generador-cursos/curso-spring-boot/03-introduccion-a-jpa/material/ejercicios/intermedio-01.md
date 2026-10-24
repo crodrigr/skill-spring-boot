@@ -11,11 +11,13 @@ implementación manual en memoria y pase a persistir sobre H2, igual que
 ```java
 // Libro.java — todavía es el record del Módulo 1; convertilo en @Entity
 // como se hizo con Paciente en el Ejemplo 01.
-// Capa persistences: com.biblioteca.persistences.entities
+// capa de persistencia: com.biblioteca.persistences.entities
+// com.biblioteca.persistences.entities.Libro
 public record Libro(String isbn, String titulo) {}
 
 // RepositorioLibros.java — todavía tiene su propio método, sin Spring Data JPA
-// Capa persistences: com.biblioteca.persistences.repositories
+// capa de persistencia: com.biblioteca.persistences.repositories
+// com.biblioteca.persistences.repositories.RepositorioLibros
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
@@ -26,7 +28,7 @@ application.properties del proyecto (igual que en el Ejemplo 07, ya
 configurado contra H2 en memoria — no hace falta tocarlo).
 ```
 
-**Capas MVC**: en este módulo solo existe la capa `persistences`. `Libro`
+**Capas**: en este módulo solo existe la capa de persistencia (`persistences`). `Libro`
 va en `com.biblioteca.persistences.entities`, `RepositorioLibros` en
 `com.biblioteca.persistences.repositories` y `Main` en el paquete raíz
 `com.biblioteca`. Las capas `services` y `controllers` llegan en el Módulo

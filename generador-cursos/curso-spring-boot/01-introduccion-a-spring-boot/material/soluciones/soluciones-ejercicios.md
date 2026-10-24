@@ -117,12 +117,12 @@ explícitamente el control del flujo, no una descripción genérica de "es grand
 
 **Respuesta esperada**:
 
-| Clase | Paquete | Justificación |
-|---|---|---|
-| `Libro` | `model` | Representa una entidad del dominio; no tiene lógica de negocio ni acceso a datos. |
-| `CatalogoController` | `controller` | Recibe peticiones HTTP del catálogo. |
-| `RepositorioLibros` | `repository` | Responsable de consultar los datos de los libros. |
-| `ServicioPrestamos` | `service` | Contiene la regla de negocio de si un usuario puede llevarse un libro. |
+| Clase | Capa | Paquete | Justificación |
+|---|---|---|---|
+| `Libro` | Persistencia | `com.biblioteca.persistences.entities` | Representa una entidad del dominio; no tiene lógica de negocio ni acceso a datos. |
+| `ControladorCatalogo` | Presentación | `com.biblioteca.controllers` | Recibe peticiones HTTP del catálogo. |
+| `RepositorioLibros` | Persistencia | `com.biblioteca.persistences.repositories` | Responsable de consultar los datos de los libros. |
+| `ServicioPrestamos` | Negocio | `com.biblioteca.services` | Contiene la regla de negocio de si un usuario puede llevarse un libro. |
 
 **Verificación**: se revisa que cada justificación describa la responsabilidad de
 la clase (qué hace), no solo repita su nombre.
@@ -131,7 +131,10 @@ la clase (qué hace), no solo repita su nombre.
 
 **Solución propuesta**:
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.biblioteca.services.ServicioNotificaciones
 public class ServicioNotificaciones {
 
     private final RepositorioUsuarios repositorioUsuarios;
@@ -151,6 +154,7 @@ public class ServicioNotificaciones {
     }
 }
 
+// com.biblioteca.Main
 public class Main {
     public static void main(String[] args) {
         RepositorioUsuarios repositorioUsuarios = new RepositorioUsuariosJpa();
@@ -182,6 +186,8 @@ final` recibidos por constructor.
 **Solución propuesta**:
 
 ```java
+package com.medisalud.services;
+
 @Service
 public class ServicioFacturacion {
 
@@ -276,6 +282,7 @@ de `Main` coincida con ese orden.
 **Solución propuesta**:
 
 ```java
+// com.medisalud.persistences.repositories.RepositorioPacientes
 @Repository
 public class RepositorioPacientes {
     public Optional<Paciente> buscarPorCodigo(String codigo) {
@@ -283,6 +290,7 @@ public class RepositorioPacientes {
     }
 }
 
+// com.medisalud.services.ServicioCitas
 @Service
 public class ServicioCitas {
 
@@ -297,12 +305,13 @@ public class ServicioCitas {
     }
 }
 
+// com.medisalud.controllers.ControladorCitas
 @RestController
-public class CitasController {
+public class ControladorCitas {
 
     private final ServicioCitas servicioCitas;
 
-    public CitasController(ServicioCitas servicioCitas) {
+    public ControladorCitas(ServicioCitas servicioCitas) {
         this.servicioCitas = servicioCitas;
     }
 
@@ -327,7 +336,7 @@ dependencias sin lanzar ninguna excepción):
 
 **Verificación**: se revisa que `RepositorioPacientes` use `@Repository` (no
 `@Component` ni `@Service`), que `ServicioCitas` use `@Service`, que
-`CitasController` use `@RestController` con `@GetMapping` y `@PathVariable`
+`ControladorCitas` use `@RestController` con `@GetMapping` y `@PathVariable`
 correctamente aplicados, y que la respuesta explique por qué no hace falta
 `@Autowired`.
 
@@ -336,6 +345,7 @@ correctamente aplicados, y que la respuesta explique por qué no hace falta
 **Solución propuesta**:
 
 ```java
+// com.medisalud.services.NotificadorSms
 public class NotificadorSms implements Notificador {
     @Override
     public void enviar(String destinatario, String mensaje) {
@@ -343,6 +353,7 @@ public class NotificadorSms implements Notificador {
     }
 }
 
+// com.medisalud.services.NotificadorEmail
 public class NotificadorEmail implements Notificador {
     @Override
     public void enviar(String destinatario, String mensaje) {
@@ -350,6 +361,7 @@ public class NotificadorEmail implements Notificador {
     }
 }
 
+// com.medisalud.services.ServicioRecordatorios
 public class ServicioRecordatorios {
     private final Notificador notificador;
 
@@ -362,6 +374,7 @@ public class ServicioRecordatorios {
     }
 }
 
+// com.medisalud.Demo
 public class Demo {
     public static void main(String[] args) {
         ServicioRecordatorios recordatoriosMediSalud = new ServicioRecordatorios(new NotificadorSms());

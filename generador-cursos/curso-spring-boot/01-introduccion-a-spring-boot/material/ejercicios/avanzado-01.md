@@ -8,13 +8,17 @@ email, y ambos casos deben poder resolverse con la **misma** clase de servicio.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.medisalud.services.Notificador
 public interface Notificador {
     void enviar(String destinatario, String mensaje);
 }
 
 // Faltan por implementar: NotificadorSms (MediSalud) y NotificadorEmail (Biblioteca)
 
+// com.medisalud.services.ServicioRecordatorios
 public class ServicioRecordatorios {
     // completar: debe depender de Notificador, no de una implementación concreta
 }

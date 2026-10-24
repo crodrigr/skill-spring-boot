@@ -20,7 +20,7 @@ Registrar miembros (junto con su usuario), suspenderlos y consultarlos; calcular
 │   ├── 📄 Main.java
 │   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorDisponibilidad.java                  ◀ 🆕 nuevo
 │   │   ├── 📄 ControladorEquipamientos.java
 │   │   ├── 📄 ControladorMiembros.java                        ◀ 🆕 nuevo
@@ -43,7 +43,7 @@ Registrar miembros (junto con su usuario), suspenderlos y consultarlos; calcular
 │   │   ├── 📄 RecursoNoEncontradoException.java
 │   │   ├── 📄 ReglaNegocioException.java
 │   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
@@ -65,13 +65,13 @@ Registrar miembros (junto con su usuario), suspenderlos y consultarlos; calcular
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
 │   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │   └── 📁 persistences  (capa de persistencia de seguridad)
 │   │       ├── 📁 entities  (Usuario y Rol)
 │   │       │   ├── 📄 Rol.java
 │   │       │   └── 📄 Usuario.java
 │   │       └── 📁 repositories  (RepositorioUsuarios)
 │   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 ServicioConsumo.java                            ◀ 🆕 nuevo
 │       ├── 📄 ServicioDisponibilidad.java                     ◀ 🆕 nuevo
 │       ├── 📄 ServicioEquipamientos.java

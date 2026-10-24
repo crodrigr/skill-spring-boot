@@ -19,20 +19,20 @@ Esta relación es muchos a muchos — la misma categoría de relación que
 puede copiar esa solución tal cual, hay que aplicar el mismo criterio sobre
 un par nuevo.
 
-## 🏗️ Capas MVC del proyecto
+## 🏗️ Capas del proyecto
 
-Desde este módulo, todo proyecto del curso organiza sus clases por capa MVC
-(`controllers`, `services` y `persistences`). En este taller solo existe la
+Todo proyecto del curso organiza sus clases por capa: presentación
+(`controllers`), negocio (`services`) y persistencia (`persistences`). En este taller solo existe la
 capa de **persistencia**, porque todavía no hay API ni lógica de negocio:
 
 | Capa | Paquete | Qué contiene | Clases de este taller |
 |---|---|---|---|
-| **Persistence** | `com.biblioteca.persistences.entities` | Clases `@Entity` | `Libro`, `Etiqueta` |
-| **Persistence** | `com.biblioteca.persistences.repositories` | Interfaces de Spring Data JPA | `RepositorioLibros`, `RepositorioEtiquetas` |
+| **Persistencia** | `com.biblioteca.persistences.entities` | Clases `@Entity` | `Libro`, `Etiqueta` |
+| **Persistencia** | `com.biblioteca.persistences.repositories` | Interfaces de Spring Data JPA | `RepositorioLibros`, `RepositorioEtiquetas` |
 | Punto de entrada | `com.biblioteca` | `@SpringBootApplication` + `CommandLineRunner` | `Main` |
 
 `Main` es solo un ejecutor de prueba (no es una capa): usa los
-repositorios directamente porque todavía no existe una capa `services`.
+repositorios directamente porque todavía no existe una capa de negocio (`services`).
 Las capas `services` y `controllers` se agregan en el Módulo 5, y ahí los
 repositorios dejan de usarse desde fuera de `services`.
 

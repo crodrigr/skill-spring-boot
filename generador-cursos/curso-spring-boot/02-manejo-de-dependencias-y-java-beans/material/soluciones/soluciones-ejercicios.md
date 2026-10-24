@@ -9,10 +9,10 @@ subsección "Soluciones" de `specs/02-manejo-de-dependencias-y-java-beans.md`).
 
 - `ServicioPrestamos → RepositorioLibros`: **directa** (aparece en el
   constructor de `ServicioPrestamos`).
-- `CatalogoController → ServicioPrestamos`: **directa** (aparece en el
-  constructor de `CatalogoController`).
-- `CatalogoController → RepositorioLibros`: **transitiva** (nunca aparece en
-  `CatalogoController`; depende de él solo porque `ServicioPrestamos` lo
+- `ControladorCatalogo → ServicioPrestamos`: **directa** (aparece en el
+  constructor de `ControladorCatalogo`).
+- `ControladorCatalogo → RepositorioLibros`: **transitiva** (nunca aparece en
+  `ControladorCatalogo`; depende de él solo porque `ServicioPrestamos` lo
   necesita).
 - `RepositorioLibrosEnMemoria implements RepositorioLibros`: no es una
   dependencia, es una relación de **implementación** (cumple un contrato).
@@ -46,7 +46,10 @@ found 2: recargoFijo, recargoProgresivo`.
 
 **Solución propuesta**:
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.biblioteca.services.RecargoFijo
 @Component
 @Qualifier("fijo")
 public class RecargoFijo implements CalculadoraRecargo {
@@ -56,6 +59,7 @@ public class RecargoFijo implements CalculadoraRecargo {
     }
 }
 
+// com.biblioteca.services.RecargoProgresivo
 @Component
 @Qualifier("progresivo")
 public class RecargoProgresivo implements CalculadoraRecargo {
@@ -65,6 +69,7 @@ public class RecargoProgresivo implements CalculadoraRecargo {
     }
 }
 
+// com.biblioteca.services.ServicioMultas
 @Service
 public class ServicioMultas {
 
@@ -90,6 +95,7 @@ public class ServicioMultas {
 **Solución propuesta (por constructor)**:
 
 ```java
+// com.medisalud.services.ServicioRecetas
 public class ServicioRecetas {
 
     private final RepositorioMedicamentos repositorioMedicamentos;
@@ -105,6 +111,7 @@ public class ServicioRecetas {
     }
 }
 
+// com.medisalud.Main
 public class Main {
     public static void main(String[] args) {
         RepositorioMedicamentos repositorioMedicamentos = new RepositorioMedicamentosEnMemoria();
@@ -133,10 +140,12 @@ error de estilo.
 `RepositorioPrestamos` del que ambos dependen en un solo sentido):
 
 ```java
+// com.biblioteca.persistences.repositories.RepositorioPrestamos
 public interface RepositorioPrestamos {
     boolean tienePrestamosActivos(String codigoUsuario);
 }
 
+// com.biblioteca.persistences.repositories.RepositorioPrestamosEnMemoria
 public class RepositorioPrestamosEnMemoria implements RepositorioPrestamos {
     @Override
     public boolean tienePrestamosActivos(String codigoUsuario) {
@@ -144,6 +153,7 @@ public class RepositorioPrestamosEnMemoria implements RepositorioPrestamos {
     }
 }
 
+// com.biblioteca.services.ServicioMultas
 public class ServicioMultas {
     private final RepositorioPrestamos repositorioPrestamos;
 
@@ -156,6 +166,7 @@ public class ServicioMultas {
     }
 }
 
+// com.biblioteca.services.ServicioPrestamos
 public class ServicioPrestamos {
     private final ServicioMultas servicioMultas;
     private final RepositorioPrestamos repositorioPrestamos;
@@ -173,6 +184,7 @@ public class ServicioPrestamos {
     }
 }
 
+// com.biblioteca.Main
 public class Main {
     public static void main(String[] args) {
         RepositorioPrestamos repositorioPrestamos = new RepositorioPrestamosEnMemoria();
@@ -202,12 +214,15 @@ errores.
 **Solución propuesta**:
 
 ```java
+// com.medisalud.persistences.entities.Paciente
 public record Paciente(String codigo, String nombre) {}
 
+// com.medisalud.persistences.repositories.RepositorioPacientes
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
 
+// com.medisalud.persistences.repositories.RepositorioPacientesEnMemoria
 @Repository
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     private final Map<String, Paciente> pacientes = Map.of(
@@ -220,6 +235,7 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     }
 }
 
+// com.medisalud.services.ServicioNotificaciones
 @Service
 public class ServicioNotificaciones {
 
@@ -236,6 +252,7 @@ public class ServicioNotificaciones {
     }
 }
 
+// com.medisalud.services.ServicioCitas
 @Service
 public class ServicioCitas {
 
@@ -255,6 +272,7 @@ public class ServicioCitas {
     }
 }
 
+// com.medisalud.controllers.ControladorCitas
 @Component
 public class ControladorCitas {
 
@@ -269,6 +287,7 @@ public class ControladorCitas {
     }
 }
 
+// com.medisalud.services.ServicioResumenCitas
 @Service
 public class ServicioResumenCitas {
 
@@ -283,11 +302,13 @@ public class ServicioResumenCitas {
     }
 }
 
+// com.medisalud.config.ConfiguracionApp
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
 public class ConfiguracionApp {
 }
 
+// com.medisalud.Main
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =
@@ -350,6 +371,8 @@ en el mismo constructor) → (c) → (b) → (a).
 **Solución propuesta**:
 
 ```java
+package com.medisalud.persistences.repositories;
+
 @Repository
 public class RepositorioHistorialesEnMemoria {
 

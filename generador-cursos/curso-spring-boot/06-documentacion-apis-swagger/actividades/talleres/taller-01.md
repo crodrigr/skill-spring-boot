@@ -72,7 +72,7 @@ intentá resolverlo primero por tu cuenta.
 ```
 
 (Las cuatro clases Java quedan exactamente igual que en el Módulo 5, cada
-una en su capa MVC —`controllers`, `services` y `persistences`—; el
+una en su capa —presentación (`controllers`), negocio (`services`) y persistencia (`persistences`)—; el
 `pom.xml` y `application.properties` son los únicos archivos que
 cambian.)
 

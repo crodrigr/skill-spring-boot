@@ -21,7 +21,7 @@ No se provee ningún scaffold: diseñá vos las entidades y su repositorio,
 siguiendo el mismo criterio aplicado en el Taller (una relación padre-hijas
 con `cascade`/`orphanRemoval`) pero sobre este par nuevo.
 
-**Capas MVC**: las entidades van en
+**Capas**: las entidades van en
 `com.biblioteca.persistences.entities`, el repositorio en
 `com.biblioteca.persistences.repositories` y `Main` en el paquete raíz
 `com.biblioteca`. Todavía no existen `services` ni `controllers`

@@ -7,13 +7,18 @@ lo que impide reemplazarla en un test.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.medisalud.persistences.repositories.RepositorioMedicamentos
 public interface RepositorioMedicamentos {
     Optional<Medicamento> buscarPorCodigo(String codigo);
 }
 
+// com.medisalud.persistences.entities.Medicamento
 public record Medicamento(String codigo, String nombre, boolean requiereReceta) {}
 
+// com.medisalud.persistences.repositories.RepositorioMedicamentosEnMemoria
 public class RepositorioMedicamentosEnMemoria implements RepositorioMedicamentos {
     @Override
     public Optional<Medicamento> buscarPorCodigo(String codigo) {
@@ -21,6 +26,7 @@ public class RepositorioMedicamentosEnMemoria implements RepositorioMedicamentos
     }
 }
 
+// com.medisalud.services.ServicioRecetas
 public class ServicioRecetas {
 
     private RepositorioMedicamentos repositorioMedicamentos = new RepositorioMedicamentosEnMemoria();
@@ -32,6 +38,7 @@ public class ServicioRecetas {
     }
 }
 
+// com.medisalud.Main
 public class Main {
     public static void main(String[] args) {
         ServicioRecetas servicioRecetas = new ServicioRecetas();

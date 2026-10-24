@@ -7,13 +7,18 @@ contenedor IoC y define un método de inicialización y uno de limpieza.
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.biblioteca.persistences.repositories.RepositorioLibros
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
 
+// com.biblioteca.persistences.entities.Libro
 public record Libro(String isbn, String titulo) {}
 
+// com.biblioteca.persistences.repositories.RepositorioLibrosEnMemoria
 @Repository
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
@@ -22,6 +27,7 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     }
 }
 
+// com.biblioteca.services.ServicioPrestamos
 @Component
 public class ServicioPrestamos {
 
@@ -47,11 +53,13 @@ public class ServicioPrestamos {
     }
 }
 
+// com.biblioteca.config.ConfiguracionApp
 @Configuration
 @ComponentScan(basePackages = "com.biblioteca")
 public class ConfiguracionApp {
 }
 
+// com.biblioteca.Main
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

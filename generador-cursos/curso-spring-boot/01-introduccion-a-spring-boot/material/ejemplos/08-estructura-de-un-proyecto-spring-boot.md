@@ -24,7 +24,7 @@ biblioteca-api/
     │   │   └── com/biblioteca/api/
     │   │       ├── BibliotecaApiApplication.java   (clase principal)
     │   │       ├── controller/
-    │   │       │   └── CatalogoController.java
+    │   │       │   └── ControladorCatalogo.java
     │   │       ├── service/
     │   │       │   └── ServicioPrestamos.java
     │   │       ├── repository/
@@ -43,7 +43,7 @@ biblioteca-api/
 
 ```mermaid
 flowchart LR
-    Cliente["Cliente HTTP"] --> Controller["controller/\nCatalogoController"]
+    Cliente["Cliente HTTP"] --> Controller["controller/\nControladorCatalogo"]
     Controller --> Service["service/\nServicioPrestamos"]
     Service --> Repository["repository/\nRepositorioLibros"]
     Repository --> Model["model/\nLibro"]
@@ -52,7 +52,7 @@ flowchart LR
 Cada flecha va en un solo sentido: `controller` conoce a `service`, `service`
 conoce a `repository`, y `repository` produce objetos `model`. Ninguna capa
 "de más abajo" conoce a las de arriba: `RepositorioLibros` no sabe que existe
-`CatalogoController`. Esa dirección única es la que evita que un cambio en
+`ControladorCatalogo`. Esa dirección única es la que evita que un cambio en
 `controller/` obligue a tocar `repository/`.
 
 ## 💻 Código — la clase principal (`BibliotecaApiApplication.java`)
@@ -123,7 +123,7 @@ Started BibliotecaApiApplication in 1.234 seconds
 ```
 
 Spring Boot escaneó `com.biblioteca.api` y sus subpaquetes, registró
-`CatalogoController`, `ServicioPrestamos` y `RepositorioLibros` como beans, leyó
+`ControladorCatalogo`, `ServicioPrestamos` y `RepositorioLibros` como beans, leyó
 `application.properties`, y dejó la aplicación escuchando en el puerto
 configurado (por defecto, `8080`), lista para recibir peticiones HTTP.
 

@@ -6,15 +6,20 @@ subsección "Soluciones" de `specs/02-manejo-de-dependencias-y-java-beans.md`).
 ## 🌳 Árbol de archivos (entregable final)
 
 ```text
-taller-01-biblioteca/
-├── RepositorioLibros.java
-├── RepositorioLibrosEnMemoria.java
-├── CanalDeAviso.java
-├── AvisoPorEmail.java
-├── AvisoPorApp.java
-├── ServicioRecordatoriosDevolucion.java
-├── ControladorRecordatorios.java
-└── diagnostico.md
+📁 taller-01-biblioteca
+├── 📁 src/com/biblioteca
+│   ├── 📁 controllers                      (capa de presentación)
+│   │   └── 📄 ControladorRecordatorios.java
+│   ├── 📁 services                         (capa de negocio)
+│   │   ├── 📄 ServicioRecordatoriosDevolucion.java
+│   │   ├── 📄 CanalDeAviso.java
+│   │   ├── 📄 AvisoPorEmail.java
+│   │   └── 📄 AvisoPorApp.java
+│   └── 📁 persistences                     (capa de persistencia)
+│       └── 📁 repositories
+│           ├── 📄 RepositorioLibros.java
+│           └── 📄 RepositorioLibrosEnMemoria.java
+└── 📄 diagnostico.md
 ```
 
 ## 📄 Archivo: `diagnostico.md` (paso 1 y paso 5)
@@ -39,6 +44,8 @@ Buenas prácticas aplicadas:
 ## 📄 Archivo: `RepositorioLibrosEnMemoria.java`
 
 ```java
+package com.biblioteca.persistences.repositories;
+
 @Repository
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
@@ -51,6 +58,8 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 ## 📄 Archivo: `AvisoPorEmail.java`
 
 ```java
+package com.biblioteca.services;
+
 @Component
 @Qualifier("email")
 public class AvisoPorEmail implements CanalDeAviso {
@@ -64,6 +73,8 @@ public class AvisoPorEmail implements CanalDeAviso {
 ## 📄 Archivo: `AvisoPorApp.java`
 
 ```java
+package com.biblioteca.services;
+
 @Component
 @Qualifier("app")
 public class AvisoPorApp implements CanalDeAviso {
@@ -77,6 +88,8 @@ public class AvisoPorApp implements CanalDeAviso {
 ## 📄 Archivo: `ServicioRecordatoriosDevolucion.java`
 
 ```java
+package com.biblioteca.services;
+
 @Service
 public class ServicioRecordatoriosDevolucion {
 
@@ -99,6 +112,8 @@ public class ServicioRecordatoriosDevolucion {
 ## 📄 Archivo: `ControladorRecordatorios.java`
 
 ```java
+package com.biblioteca.controllers;
+
 @Component
 public class ControladorRecordatorios {
 

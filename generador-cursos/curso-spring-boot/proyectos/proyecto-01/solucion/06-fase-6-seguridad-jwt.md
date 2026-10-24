@@ -63,7 +63,7 @@ rechaza. **El contenido no está cifrado**, solo firmado: nunca pongas datos sen
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   ├── 📄 ConfiguracionBeans.java
 │   │   └── 📄 ConfiguracionOpenApi.java
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorDisponibilidad.java
 │   │   ├── 📄 ControladorEquipamientos.java
 │   │   ├── 📄 ControladorMiembros.java                        ◀ ✏️ se modifica
@@ -91,7 +91,7 @@ rechaza. **El contenido no está cifrado**, solo firmado: nunca pongas datos sen
 │   │   ├── 📄 ReglaNegocioException.java
 │   │   ├── 📄 RespuestaError.java
 │   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
@@ -123,7 +123,7 @@ rechaza. **El contenido no está cifrado**, solo firmado: nunca pongas datos sen
 │   │   ├── 📁 jwt  (tokens y filtro)
 │   │   │   ├── 📄 FiltroAutenticacionJwt.java                 ◀ 🆕 nuevo
 │   │   │   └── 📄 UtilJwt.java                                ◀ 🆕 nuevo
-│   │   ├── 📁 persistences  (capa Persistence de seguridad)
+│   │   ├── 📁 persistences  (capa de persistencia de seguridad)
 │   │   │   ├── 📁 entities  (Usuario y Rol)
 │   │   │   │   ├── 📄 Rol.java
 │   │   │   │   └── 📄 Usuario.java
@@ -132,7 +132,7 @@ rechaza. **El contenido no está cifrado**, solo firmado: nunca pongas datos sen
 │   │   └── 📁 services  (usuarios y permisos)
 │   │       ├── 📄 ServicioAutorizacion.java                   ◀ 🆕 nuevo
 │   │       └── 📄 ServicioDetallesUsuario.java                ◀ 🆕 nuevo
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 CalculadoraCostoReserva.java
 │       ├── 📄 ServicioConsumo.java
 │       ├── 📄 ServicioDisponibilidad.java
@@ -388,7 +388,7 @@ En `RepositorioReservas`, antes de `existsByDetallesServicioId`:
 
 ### Paso 6.7 — `ServicioAutorizacion`
 
-Un servicio (capa `services` de seguridad) que responde dos preguntas a partir de esas
+Un servicio (capa de negocio, `services` de seguridad) que responde dos preguntas a partir de esas
 consultas. Tiene un **nombre de bean explícito**, `@Service("autorizacion")`, porque las
 expresiones de autorización lo invocarán como `@autorizacion.esElMiembro(...)`.
 

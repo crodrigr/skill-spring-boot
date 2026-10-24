@@ -12,7 +12,9 @@ al Módulo 5 (igual que en los Ejemplos y en el Taller).
 ## 💻 Código o contexto de partida
 
 ```java
-// Cita.java — capa persistences (com.medisalud.persistences.entities)
+package com.medisalud.persistences.entities;
+
+// Cita.java — capa de persistencia (com.medisalud.persistences.entities)
 // (Módulo 3, reutilizada tal cual)
 @Entity
 public class Cita {
@@ -48,14 +50,18 @@ public class Cita {
 ```
 
 ```java
-// RepositorioCitas.java — capa persistences (com.medisalud.persistences.repositories)
+package com.medisalud.persistences.repositories;
+
+// RepositorioCitas.java — capa de persistencia (com.medisalud.persistences.repositories)
 // (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
-// ServicioCitas.java — capa services (com.medisalud.services)
+package com.medisalud.services;
+
+// ServicioCitas.java — capa de negocio (com.medisalud.services)
 // (Módulo 5, con buscarPorId todavía devolviendo Optional)
 @Service
 public class ServicioCitas {
@@ -98,7 +104,9 @@ public class ServicioCitas {
 ```
 
 ```java
-// ControladorCitas.java — capa controllers (com.medisalud.controllers)
+package com.medisalud.controllers;
+
+// ControladorCitas.java — capa de presentación (com.medisalud.controllers)
 // (Módulo 5, con manejo manual de errores)
 @RestController
 @RequestMapping("/citas")

@@ -18,20 +18,20 @@ compacta de este mismo patrón con un único detalle; este taller pide
 construirlo completo, desde la creación del proyecto hasta las operaciones
 de alta y edición.
 
-## 🏗️ Capas MVC del proyecto
+## 🏗️ Capas del proyecto
 
-Todo proyecto del curso organiza sus clases por capa MVC (`controllers`,
-`services` y `persistences`). En este taller solo existe la capa de
+Todo proyecto del curso organiza sus clases por capa: presentación
+(`controllers`), negocio (`services`) y persistencia (`persistences`). En este taller solo existe la capa de
 **persistencia**, porque todavía no hay API ni lógica de negocio:
 
 | Capa | Paquete | Qué contiene | Clases de este taller |
 |---|---|---|---|
-| **Persistence** | `com.medisalud.persistences.entities` | Clases `@Entity` | `Paciente`, `Factura`, `DetalleFactura` |
-| **Persistence** | `com.medisalud.persistences.repositories` | Interfaces de Spring Data JPA | `RepositorioPacientes`, `RepositorioFacturas` |
+| **Persistencia** | `com.medisalud.persistences.entities` | Clases `@Entity` | `Paciente`, `Factura`, `DetalleFactura` |
+| **Persistencia** | `com.medisalud.persistences.repositories` | Interfaces de Spring Data JPA | `RepositorioPacientes`, `RepositorioFacturas` |
 | Punto de entrada | `com.medisalud` | `@SpringBootApplication` + `CommandLineRunner` | `Main` |
 
 `Main` es solo un ejecutor de prueba (no es una capa) y usa los
-repositorios directamente porque todavía no existe una capa `services`.
+repositorios directamente porque todavía no existe una capa de negocio (`services`).
 `services` y `controllers` se agregan en el Módulo 5.
 
 ## 🪜 Pasos

@@ -8,13 +8,13 @@ API REST: por ahora, solo los endpoints de lectura.
 ## 💻 Código o contexto de partida
 
 ```java
-// ServicioAutores.java — capa services (com.biblioteca.services)
+// ServicioAutores.java — capa de negocio (com.biblioteca.services)
 // ya existe (Intermedio 01), con listarTodos, buscarPorId, crear,
 // actualizar y eliminar.
 ```
 
 1. Creá `ControladorAutores` (`@RestController`, `@RequestMapping("/autores")`)
-   en el paquete de la capa de controladores (`com.biblioteca.controllers`),
+   en el paquete de la capa de presentación (`com.biblioteca.controllers`),
    inyectando `ServicioAutores`.
 2. Agregá `GET /autores` (listar todos) y `GET /autores/{id}` (buscar por
    id), devolviendo `404` cuando el autor no existe.

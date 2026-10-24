@@ -29,7 +29,7 @@ terminar verás las tablas creadas por Hibernate y los datos en la base.
 │   ├── 📄 Main.java
 │   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java                         ◀ 🆕 nuevo
 │   │   │   ├── 📄 Equipamiento.java                           ◀ 🆕 nuevo
@@ -51,7 +51,7 @@ terminar verás las tablas creadas por Hibernate y los datos en la base.
 │   │       ├── 📄 RepositorioSedes.java                       ◀ 🆕 nuevo
 │   │       └── 📄 RepositorioServiciosAdicionales.java        ◀ 🆕 nuevo
 │   └── 📁 security  (autenticación y autorización)
-│       └── 📁 persistences  (capa Persistence de seguridad)
+│       └── 📁 persistences  (capa de persistencia de seguridad)
 │           ├── 📁 entities  (Usuario y Rol)
 │           │   ├── 📄 Rol.java                                ◀ 🆕 nuevo
 │           │   └── 📄 Usuario.java                            ◀ 🆕 nuevo

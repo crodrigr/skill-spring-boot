@@ -46,8 +46,8 @@ sino explicaciones concretas de qué automatiza cada paso de esa reducción.
 public class WebConfig {
 
     @Bean
-    public CatalogoController catalogoController() {
-        return new CatalogoController();
+    public ControladorCatalogo catalogoController() {
+        return new ControladorCatalogo();
     }
 }
 ```
@@ -76,7 +76,7 @@ public class WebConfig {
 └── 📁 src/main
     ├── 📁 java/com/biblioteca/api
     │   ├── 📄 BibliotecaApiApplication.java  (▶️ clase con el main que se ejecuta)
-    │   └── 📄 CatalogoController.java
+    │   └── 📄 ControladorCatalogo.java
     └── 📁 resources
         └── 📄 application.properties
 ```
@@ -92,11 +92,11 @@ public class BibliotecaApiApplication {
 }
 ```
 
-### 💻 Archivo: `CatalogoController.java`
+### 💻 Archivo: `ControladorCatalogo.java`
 
 ```java
 @RestController
-public class CatalogoController {
+public class ControladorCatalogo {
 
     @GetMapping("/catalogo")
     public String catalogo() {

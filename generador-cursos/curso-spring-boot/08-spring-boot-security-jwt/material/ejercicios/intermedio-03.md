@@ -8,7 +8,7 @@ El proyecto de `ControladorAutores` (Intermedio 01) ya tiene
 como código de partida), pero todavía no existe ningún endpoint de
 login.
 
-**Pregunta**: implementá `ControladorAutenticacion` (capa `controllers`,
+**Pregunta**: implementá `ControladorAutenticacion` (capa de presentación, `controllers`,
 paquete `com.biblioteca.security.controllers`), con un endpoint
 `POST /auth/login` que reciba `nombreUsuario` y `contrasena`, los
 verifique usando el `AuthenticationManager`, y devuelva un JWT generado
@@ -22,6 +22,8 @@ con `UtilJwt.generarToken` si son válidos.
 ## 💻 Archivo: `Credencial.java` (`com.biblioteca.security.persistences.entities`)
 
 ```java
+package com.biblioteca.security.persistences.entities;
+
 @Entity
 public class Credencial {
 
@@ -55,6 +57,8 @@ public class Credencial {
 ## 💻 Archivo: `RepositorioCredenciales.java` (`com.biblioteca.security.persistences.repositories`)
 
 ```java
+package com.biblioteca.security.persistences.repositories;
+
 public interface RepositorioCredenciales extends JpaRepository<Credencial, Long> {
     Optional<Credencial> findByNombreUsuario(String nombreUsuario);
 }
@@ -63,6 +67,8 @@ public interface RepositorioCredenciales extends JpaRepository<Credencial, Long>
 ## 💻 Archivo: `ServicioDetallesUsuario.java` (`com.biblioteca.security.services`)
 
 ```java
+package com.biblioteca.security.services;
+
 @Service
 public class ServicioDetallesUsuario implements UserDetailsService {
 
@@ -89,6 +95,8 @@ public class ServicioDetallesUsuario implements UserDetailsService {
 ## 💻 Archivo: `UtilJwt.java` (`com.biblioteca.security.jwt`, paquete transversal)
 
 ```java
+package com.biblioteca.security.jwt;
+
 @Component
 public class UtilJwt {
 

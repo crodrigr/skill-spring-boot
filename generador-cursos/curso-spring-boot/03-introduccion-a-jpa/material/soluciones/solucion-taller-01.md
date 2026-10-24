@@ -21,7 +21,7 @@
         └── 📄 application.properties
 ```
 
-**Capas MVC**: en este módulo solo existe la capa `persistences`
+**Capas**: en este módulo solo existe la capa de persistencia (`persistences`)
 (`entities` + `repositories`). `Main` es el punto de entrada de prueba, en
 el paquete raíz; las capas `services` y `controllers` llegan en el Módulo 5.
 

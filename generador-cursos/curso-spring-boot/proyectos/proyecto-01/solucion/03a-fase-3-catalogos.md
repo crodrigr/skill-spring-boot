@@ -5,7 +5,7 @@
 ## 🎯 Qué vas a lograr
 
 Exponer por REST los cinco catálogos (sedes, salas, equipamientos, servicios adicionales y
-planes) con la arquitectura de capas `controller → service → repository`. Al terminar
+planes) con la arquitectura de capas presentación → negocio → persistencia (`controllers → services → persistences`). Al terminar
 podrás crear, consultar, modificar y borrar catálogos con Insomnia o `curl`.
 
 **Módulo que se aplica**: 05 (Diseño de API REST). La Fase 3 se divide en tres partes para
@@ -30,7 +30,7 @@ que puedas verificar tu avance sin esperar al final:
 │   ├── 📄 Main.java
 │   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorEquipamientos.java                   ◀ 🆕 nuevo
 │   │   ├── 📄 ControladorPlanes.java                          ◀ 🆕 nuevo
 │   │   ├── 📄 ControladorSalas.java                           ◀ 🆕 nuevo
@@ -51,7 +51,7 @@ que puedas verificar tu avance sin esperar al final:
 │   │   ├── 📄 RecursoNoEncontradoException.java               ◀ 🆕 nuevo
 │   │   ├── 📄 ReglaNegocioException.java                      ◀ 🆕 nuevo
 │   │   └── 📄 SolicitudInvalidaException.java                 ◀ 🆕 nuevo
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
@@ -73,13 +73,13 @@ que puedas verificar tu avance sin esperar al final:
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
 │   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │   └── 📁 persistences  (capa de persistencia de seguridad)
 │   │       ├── 📁 entities  (Usuario y Rol)
 │   │       │   ├── 📄 Rol.java
 │   │       │   └── 📄 Usuario.java
 │   │       └── 📁 repositories  (RepositorioUsuarios)
 │   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 ServicioEquipamientos.java                      ◀ 🆕 nuevo
 │       ├── 📄 ServicioPlanes.java                             ◀ 🆕 nuevo
 │       ├── 📄 ServicioSalas.java                              ◀ 🆕 nuevo
@@ -371,7 +371,7 @@ final class Validaciones {
 
 Es el molde de los demás. Estudialo con calma.
 
-#### `ServicioSedes` (capa Service)
+#### `ServicioSedes` (capa de negocio)
 
 - `@Service`: Spring lo registra como bean para poder inyectarlo.
 - `@Transactional(readOnly = true)` **a nivel de clase**: todos los métodos corren en una
@@ -465,7 +465,7 @@ public class ServicioSedes {
 }
 ```
 
-#### `ControladorSedes` (capa Controller)
+#### `ControladorSedes` (capa de presentación)
 
 Un controlador **solo traduce HTTP ↔ llamadas al servicio**. No tiene lógica.
 

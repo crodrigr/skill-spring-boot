@@ -27,7 +27,7 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   ├── 📄 ConfiguracionBeans.java
 │   │   └── 📄 ConfiguracionOpenApi.java
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorDisponibilidad.java
 │   │   ├── 📄 ControladorEquipamientos.java
 │   │   ├── 📄 ControladorMiembros.java
@@ -55,7 +55,7 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 │   │   ├── 📄 ReglaNegocioException.java
 │   │   ├── 📄 RespuestaError.java
 │   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
@@ -87,7 +87,7 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 │   │   ├── 📁 jwt  (tokens y filtro)
 │   │   │   ├── 📄 FiltroAutenticacionJwt.java
 │   │   │   └── 📄 UtilJwt.java
-│   │   ├── 📁 persistences  (capa Persistence de seguridad)
+│   │   ├── 📁 persistences  (capa de persistencia de seguridad)
 │   │   │   ├── 📁 entities  (Usuario y Rol)
 │   │   │   │   ├── 📄 Rol.java
 │   │   │   │   └── 📄 Usuario.java
@@ -96,7 +96,7 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 │   │   └── 📁 services  (usuarios y permisos)
 │   │       ├── 📄 ServicioAutorizacion.java
 │   │       └── 📄 ServicioDetallesUsuario.java
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 CalculadoraCostoReserva.java
 │       ├── 📄 ServicioConsumo.java
 │       ├── 📄 ServicioDisponibilidad.java

@@ -63,7 +63,7 @@ para autoevaluarte antes de entregar.
 
 ## 3. ⚙️ Reglas de negocio — 25 puntos
 
-Cada regla se otorga si está **implementada en la capa `services`** y hay una prueba que
+Cada regla se otorga si está **implementada en la capa de negocio (`services`)** y hay una prueba que
 la demuestra (idealmente uno de los [escenarios de aceptación](enunciado.md#10-escenarios-de-aceptación-mínimos)).
 
 | Regla | Qué se demuestra | Pts |
@@ -90,7 +90,7 @@ la demuestra (idealmente uno de los [escenarios de aceptación](enunciado.md#10-
 | 🟡 | 13 – 17: faltan reglas de cálculo (RN-07, RN-08) o de estados |
 | 🔴 | menos de 13, o las reglas viven en los controladores |
 
-## 4. 🏗️ Arquitectura MVC y calidad del código — 15 puntos
+## 4. 🏗️ Arquitectura por capas y calidad del código — 15 puntos
 
 | Indicador | Pts |
 |---|---|

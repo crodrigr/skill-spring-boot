@@ -8,13 +8,18 @@ sobre préstamos próximos a vencer. La clase crea sus propias dependencias con
 
 ## 💻 Código o contexto de partida
 
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+
 ```java
+// com.biblioteca.persistences.entities.Usuario
 public record Usuario(String codigo, String email) {}
 
+// com.biblioteca.persistences.repositories.RepositorioUsuarios
 public interface RepositorioUsuarios {
     Usuario buscarPorCodigo(String codigo);
 }
 
+// com.biblioteca.persistences.repositories.RepositorioUsuariosJpa
 public class RepositorioUsuariosJpa implements RepositorioUsuarios {
     @Override
     public Usuario buscarPorCodigo(String codigo) {
@@ -22,10 +27,12 @@ public class RepositorioUsuariosJpa implements RepositorioUsuarios {
     }
 }
 
+// com.biblioteca.services.ClienteEmail
 public interface ClienteEmail {
     void enviar(String destinatario, String mensaje);
 }
 
+// com.biblioteca.services.ClienteEmailSmtp
 public class ClienteEmailSmtp implements ClienteEmail {
     @Override
     public void enviar(String destinatario, String mensaje) {
@@ -33,6 +40,7 @@ public class ClienteEmailSmtp implements ClienteEmail {
     }
 }
 
+// com.biblioteca.services.ServicioNotificaciones
 public class ServicioNotificaciones {
 
     private RepositorioUsuarios repositorioUsuarios = new RepositorioUsuariosJpa();
@@ -47,6 +55,7 @@ public class ServicioNotificaciones {
     }
 }
 
+// com.biblioteca.Main
 public class Main {
     public static void main(String[] args) {
         ServicioNotificaciones servicio = new ServicioNotificaciones();

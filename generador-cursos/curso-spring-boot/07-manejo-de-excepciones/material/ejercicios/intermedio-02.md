@@ -14,7 +14,9 @@ Boot. Te piden personalizar ese cuerpo, igual que se hizo con
 ```
 
 ```java
-// ControladorAutores.java — capa controllers (com.biblioteca.controllers)
+package com.biblioteca.controllers;
+
+// ControladorAutores.java — capa de presentación (com.biblioteca.controllers)
 // (con buscarPorId ya modificado en Intermedio 01)
 @RestController
 @RequestMapping("/autores")

@@ -10,14 +10,14 @@ emite un JWT validado por un filtro propio en cada solicitud.
 
 Este Taller parte de la solución del Taller 01 del Módulo 7
 (`ControladorPacientes`/`ServicioPacientes`, ya con `PacienteNoEncontradoException`
-y `ManejadorGlobalDeExcepciones` aplicados, en sus paquetes MVC `com.medisalud.controllers`, `com.medisalud.services`
+y `ManejadorGlobalDeExcepciones` aplicados, en sus paquetes por capa `com.medisalud.controllers`, `com.medisalud.services`
 y `com.medisalud.persistences` —con `entities` y `repositories`—, más el
 paquete transversal `com.medisalud.exception`).
 Ninguna de esas clases cambia su comportamiento en este Taller: solo se
 les agrega una funcionalidad nueva de seguridad, en el paquete
 `com.medisalud.security`.
 
-## 🏗️ Capas MVC del paquete `security`
+## 🏗️ Capas del paquete `security`
 
 La seguridad no rompe la arquitectura del proyecto: respeta las mismas tres
 capas, replicadas dentro de `com.medisalud.security`, y suma dos paquetes
@@ -25,9 +25,9 @@ transversales propios de Spring Security.
 
 | Capa / paquete | Paquete | Clase en este taller |
 |---|---|---|
-| **Controller** | `com.medisalud.security.controllers` | `ControladorAutenticacion` (`POST /auth/login`) |
-| **Service** | `com.medisalud.security.services` | `ServicioDetallesUsuario` |
-| **Persistence** | `com.medisalud.security.persistences.entities` / `.repositories` | `Usuario` / `RepositorioUsuarios` |
+| **Presentación** | `com.medisalud.security.controllers` | `ControladorAutenticacion` (`POST /auth/login`) |
+| **Negocio** | `com.medisalud.security.services` | `ServicioDetallesUsuario` |
+| **Persistencia** | `com.medisalud.security.persistences.entities` / `.repositories` | `Usuario` / `RepositorioUsuarios` |
 | Transversal | `com.medisalud.security.config` | `ConfiguracionSeguridad` |
 | Transversal | `com.medisalud.security.jwt` | `UtilJwt`, `FiltroAutenticacionJwt` |
 
@@ -146,7 +146,7 @@ Respuesta exacta.
 
 - `Paciente`, `ServicioPacientes` y `ControladorPacientes` no cambiaron
   ninguna línea de su lógica de negocio (FR-015).
-- Las clases nuevas de `security` viven en el paquete de su capa MVC
+- Las clases nuevas de `security` viven en el paquete de su capa
   (`controllers`, `services`, `persistences`) o en un paquete transversal
   (`config`, `jwt`), y ningún controlador accede a un repositorio
   directamente.

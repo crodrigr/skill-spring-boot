@@ -35,7 +35,7 @@ probarlos desde el navegador.
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   ├── 📄 ConfiguracionBeans.java
 │   │   └── 📄 ConfiguracionOpenApi.java                       ◀ 🆕 nuevo
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorDisponibilidad.java                  ◀ ✏️ se modifica
 │   │   ├── 📄 ControladorEquipamientos.java                   ◀ ✏️ se modifica
 │   │   ├── 📄 ControladorMiembros.java                        ◀ ✏️ se modifica
@@ -61,7 +61,7 @@ probarlos desde el navegador.
 │   │   ├── 📄 ReglaNegocioException.java
 │   │   ├── 📄 RespuestaError.java                             ◀ ✏️ se modifica
 │   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
@@ -83,13 +83,13 @@ probarlos desde el navegador.
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
 │   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │   └── 📁 persistences  (capa de persistencia de seguridad)
 │   │       ├── 📁 entities  (Usuario y Rol)
 │   │       │   ├── 📄 Rol.java
 │   │       │   └── 📄 Usuario.java
 │   │       └── 📁 repositories  (RepositorioUsuarios)
 │   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 CalculadoraCostoReserva.java
 │       ├── 📄 ServicioConsumo.java
 │       ├── 📄 ServicioDisponibilidad.java

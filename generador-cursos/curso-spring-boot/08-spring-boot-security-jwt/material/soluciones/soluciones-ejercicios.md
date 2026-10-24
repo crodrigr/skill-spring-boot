@@ -74,7 +74,7 @@ eyJhbGciOiJIUzI1NiJ9 . eyJzdWIiOiJhbmEiLCJyb2wiOiJVU0VSIiwiZXhwIjoxOTk5OTk5OTk5f
 ## Intermedio 03 — Implementar el endpoint de login que emite un JWT
 
 ```java
-// com.biblioteca.security.controllers.ControladorAutenticacion — capa controllers
+// com.biblioteca.security.controllers.ControladorAutenticacion — capa de presentación
 @RestController
 @RequestMapping("/auth")
 public class ControladorAutenticacion {
@@ -212,7 +212,7 @@ proyecto de `Cita`/`ServicioCitas`/`ControladorCitas` en vez de
 `Paciente`/`ServicioPacientes`/`ControladorPacientes`. `Cita`,
 `ServicioCitas` y `ControladorCitas` no cambian ninguna línea.
 
-Ubicación de las clases nuevas (las mismas capas MVC, dentro de
+Ubicación de las clases nuevas (las mismas capas, dentro de
 `com.medisalud.security`):
 
 | Clase | Paquete |

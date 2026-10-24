@@ -9,18 +9,26 @@ archivos, no como un único archivo con varias clases.
 
 ## 🌳 Árbol de archivos (entregable final, tras el Paso 7)
 
+Cada clase está en el paquete de su capa: `services` (negocio) y `persistences`
+(persistencia, con `entities` y `repositories`); `Main` va en el paquete raíz.
+
 ```text
-taller-01-medisalud/
-├── Paciente.java
-├── Medico.java
-├── Cita.java
-├── RepositorioPacientes.java
-├── RepositorioMedicos.java
-├── RepositorioPacientesEnMemoria.java
-├── RepositorioMedicosEnMemoria.java
-├── ServicioCitas.java              (versión final: inyección por constructor)
-├── Main.java                       (versión final)
-└── acoplamientos.md                (lista del Paso 6)
+📁 taller-01-medisalud
+├── 📁 src/com/medisalud
+│   ├── 📁 services                         (capa de negocio)
+│   │   └── 📄 ServicioCitas.java  (versión final: inyección por constructor)
+│   ├── 📁 persistences                     (capa de persistencia)
+│   │   ├── 📁 entities
+│   │   │   ├── 📄 Paciente.java
+│   │   │   ├── 📄 Medico.java
+│   │   │   └── 📄 Cita.java
+│   │   └── 📁 repositories
+│   │       ├── 📄 RepositorioPacientes.java
+│   │       ├── 📄 RepositorioMedicos.java
+│   │       ├── 📄 RepositorioPacientesEnMemoria.java
+│   │       └── 📄 RepositorioMedicosEnMemoria.java
+│   └── 📄 Main.java               (versión final)
+└── 📄 acoplamientos.md        (lista del Paso 6)
 ```
 
 Las clases `ServicioCitasAcoplada` y `MainAcoplado` que aparecen más abajo son una
@@ -33,6 +41,8 @@ versión con inyección por constructor.
 ### 📄 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.persistences.entities;
+
 public class Paciente {
 
     private final String nombre;
@@ -51,6 +61,8 @@ public class Paciente {
 ### 📄 Archivo: `Medico.java`
 
 ```java
+package com.medisalud.persistences.entities;
+
 public class Medico {
 
     private final String nombre;
@@ -69,6 +81,8 @@ public class Medico {
 ### 📄 Archivo: `Cita.java`
 
 ```java
+package com.medisalud.persistences.entities;
+
 public class Cita {
 
     private final Paciente paciente;
@@ -100,6 +114,8 @@ public class Cita {
 ### 📄 Archivo: `RepositorioPacientes.java`
 
 ```java
+package com.medisalud.persistences.repositories;
+
 public interface RepositorioPacientes {
     Paciente buscarPorCodigo(String codigo);
 }
@@ -108,6 +124,8 @@ public interface RepositorioPacientes {
 ### 📄 Archivo: `RepositorioMedicos.java`
 
 ```java
+package com.medisalud.persistences.repositories;
+
 public interface RepositorioMedicos {
     Medico buscarPorCodigo(String codigo);
 }
@@ -116,6 +134,8 @@ public interface RepositorioMedicos {
 ### 📄 Archivo: `RepositorioPacientesEnMemoria.java`
 
 ```java
+package com.medisalud.persistences.repositories;
+
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     @Override
     public Paciente buscarPorCodigo(String codigo) {
@@ -127,6 +147,8 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
 ### 📄 Archivo: `RepositorioMedicosEnMemoria.java`
 
 ```java
+package com.medisalud.persistences.repositories;
+
 public class RepositorioMedicosEnMemoria implements RepositorioMedicos {
     @Override
     public Medico buscarPorCodigo(String codigo) {
@@ -138,6 +160,8 @@ public class RepositorioMedicosEnMemoria implements RepositorioMedicos {
 ### 📄 Archivo: `ServicioCitas.java` — 🕐 versión intermedia, reemplazada en el Paso 7
 
 ```java
+package com.medisalud.services;
+
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes = new RepositorioPacientesEnMemoria();
@@ -193,6 +217,8 @@ cambio de código de negocio.
 ### 📄 Archivo: `ServicioCitas.java` — ✅ versión final (reemplaza a la del Paso 4-5)
 
 ```java
+package com.medisalud.services;
+
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes;

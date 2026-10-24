@@ -60,7 +60,7 @@ public class QuienLlamaAQuienDemo {
 ```java
 // Framework (Spring Boot): el framework decide cuándo llamar al código del desarrollador
 @RestController
-public class CatalogoController {
+public class ControladorCatalogo {
     @GetMapping("/catalogo/{isbn}")
     public Libro buscar(@PathVariable String isbn) {
         // este método lo invoca Spring Boot al recibir una petición GET,
@@ -88,7 +88,7 @@ flowchart LR
     subgraph Framework["Framework (Spring Boot)"]
         direction LR
         C["Cliente HTTP"] -->|"GET /catalogo/isbn"| SB["Spring Boot"]
-        SB -->|"invoca"| CC["CatalogoController.buscar(...)"]
+        SB -->|"invoca"| CC["ControladorCatalogo.buscar(...)"]
         CC -->|"devuelve"| SB
         SB -->|"200 OK"| C
     end
@@ -105,7 +105,7 @@ entre ambos.
 1. En `QuienLlamaAQuienDemo`, el propio `main` decide, línea por línea, cuándo se
    llama a `ValidadorIsbn.esValido(...)`: antes, después, o ni siquiera llamarlo.
    Ese control es del desarrollador.
-2. En `CatalogoController`, el desarrollador **nunca** escribe una llamada a
+2. En `ControladorCatalogo`, el desarrollador **nunca** escribe una llamada a
    `buscar(...)`: ese método existe para que Spring Boot lo invoque cuando llega
    una petición HTTP a `/catalogo/{isbn}`. El control quedó invertido.
 3. Ninguna forma es "mejor" en abstracto: una librería es la herramienta correcta
@@ -156,7 +156,7 @@ quién llama a quién, no el tamaño, las anotaciones ni el nombre del paquete.
 
 </details>
 
-**2. [Selección múltiple]** Sobre `CatalogoController.buscar(...)` en este
+**2. [Selección múltiple]** Sobre `ControladorCatalogo.buscar(...)` en este
 ejemplo, seleccioná **todas** las afirmaciones correctas.
 
 - **A.** El desarrollador lo invoca explícitamente desde un `main`.

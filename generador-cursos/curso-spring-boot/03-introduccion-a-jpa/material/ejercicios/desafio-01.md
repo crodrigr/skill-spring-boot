@@ -121,7 +121,7 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 
 ## 🎯 Tu tarea
 
-**Capas MVC**: las entidades (`Paciente`, `Cita`, `HistoriaClinica` y la
+**Capas**: las entidades (`Paciente`, `Cita`, `HistoriaClinica` y la
 nueva `Medico`) van en `com.medisalud.persistences.entities`; los
 repositorios (incluido `RepositorioMedicos`) en
 `com.medisalud.persistences.repositories`; y `Main`, en el paquete raíz

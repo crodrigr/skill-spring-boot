@@ -39,7 +39,7 @@ De los tres mecanismos del Módulo 07 elegimos el más adecuado para este caso:
 │   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 controllers  (capa Controller, HTTP)
+│   ├── 📁 controllers  (capa de presentación, HTTP)
 │   │   ├── 📄 ControladorDisponibilidad.java
 │   │   ├── 📄 ControladorEquipamientos.java
 │   │   ├── 📄 ControladorMiembros.java
@@ -65,7 +65,7 @@ De los tres mecanismos del Módulo 07 elegimos el más adecuado para este caso:
 │   │   ├── 📄 ReglaNegocioException.java
 │   │   ├── 📄 RespuestaError.java                             ◀ 🆕 nuevo
 │   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa Persistence)
+│   ├── 📁 persistences  (capa de persistencia)
 │   │   ├── 📁 entities  (clases @Entity)
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
@@ -87,13 +87,13 @@ De los tres mecanismos del Módulo 07 elegimos el más adecuado para este caso:
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
 │   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa Persistence de seguridad)
+│   │   └── 📁 persistences  (capa de persistencia de seguridad)
 │   │       ├── 📁 entities  (Usuario y Rol)
 │   │       │   ├── 📄 Rol.java
 │   │       │   └── 📄 Usuario.java
 │   │       └── 📁 repositories  (RepositorioUsuarios)
 │   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa Service, reglas de negocio)
+│   └── 📁 services  (capa de negocio, reglas del dominio)
 │       ├── 📄 CalculadoraCostoReserva.java
 │       ├── 📄 ServicioConsumo.java
 │       ├── 📄 ServicioDisponibilidad.java

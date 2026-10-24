@@ -10,7 +10,7 @@ en una única clase `@ControllerAdvice`.
 ## 💻 Código o contexto de partida
 
 ```java
-// Dentro de ControladorLibros (capa controllers):
+// Dentro de ControladorLibros (capa de presentación):
 @ExceptionHandler(LibroNoEncontradoException.class)
 public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
     Map<String, String> cuerpo = new HashMap<>();
@@ -20,7 +20,7 @@ public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncon
 ```
 
 ```java
-// Dentro de ControladorAutores (capa controllers):
+// Dentro de ControladorAutores (capa de presentación):
 @ExceptionHandler(AutorNoEncontradoException.class)
 public ResponseEntity<Map<String, String>> manejarAutorNoEncontrado(AutorNoEncontradoException ex) {
     Map<String, String> cuerpo = new HashMap<>();
