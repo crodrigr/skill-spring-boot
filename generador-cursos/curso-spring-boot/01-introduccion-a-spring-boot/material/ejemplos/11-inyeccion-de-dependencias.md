@@ -9,11 +9,11 @@ setter y campo— y las tres funcionan igual dentro de una aplicación en marcha
 la diferencia real aparece recién cuando se necesita reemplazar esa dependencia
 por una versión de prueba, fuera del contenedor.
 
-**Qué busca demostrar este ejemplo**: que, aunque las tres formas dan el mismo
-resultado de negocio, solo la versión por constructor puede instanciarse con
-`new` en una línea; la de campo, en cambio, obliga a recurrir a reflexión — el
-"costo" de esa forma no es una afirmación teórica, es algo que el propio
-`Main.java` tiene que pagar para poder ejecutarla.
+**Qué busca demostrar este ejemplo**: que en una aplicación Spring Boot normal
+**nadie escribe `new`**: las tres clases reciben su `RepositorioLibros` del
+contenedor, cada una a su manera, y dan el mismo resultado. La diferencia entre
+las formas se ve después, en la sección de pruebas, donde solo la de constructor
+se arma con una línea.
 
 ## 📚 Caso de estudio
 
@@ -32,7 +32,7 @@ mismo nombre. Si abrieras este ejemplo como una carpeta en VS Code, el panel
 ```text
 📁 ejemplo-11-inyeccion-dependencias
 └── 📁 src/com/biblioteca
-    ├── 📄 Main.java                                  (▶️ clase con el main que se ejecuta)
+    ├── 📄 Main.java                                  (@SpringBootApplication; ▶️ clase que arranca la aplicación)
     ├── 📁 negocio                                    (capa de negocio)
     │   ├── 📁 model
     │   │   └── 📄 Libro.java                         (record)
@@ -42,29 +42,35 @@ mismo nombre. Si abrieras este ejemplo como una carpeta en VS Code, el panel
     │       └── 📄 ServicioPrestamosCampo.java
     └── 📁 persistence                                (capa de persistencia)
         └── 📁 repository
-            └── 📄 RepositorioLibros.java             (interfaz)
+            ├── 📄 RepositorioLibros.java             (interfaz)
+            └── 📄 RepositorioLibrosEnMemoria.java    (@Repository)
 ```
 
 Cada bloque de código de abajo está encabezado con el nombre exacto del archivo
 en el que iría, en ese mismo orden.
 
-## 🧠 Por qué hay `@Service` y `@Autowired` si no vamos a usar Spring
+Es un proyecto Spring Boot normal: se crea con Spring Initializr (Ejemplo 06) y
+basta la dependencia `spring-boot-starter`; no necesita base de datos ni web.
 
-Las tres clases `ServicioPrestamos...` llevan `@Service` (y `@Autowired` en la
-versión por setter y por campo) porque así es como se **verían realmente** en un
-proyecto Spring Boot. Pero en este ejemplo **no se arranca ningún contenedor**
-(no hay `ApplicationContext` ni `@SpringBootApplication`): `Main.java` construye
-los objetos a mano, con `new` y reflexión.
+## 🧠 Qué hace Spring en este ejemplo
 
-Esto no es una contradicción: como se vio en el Ejemplo 09, una anotación es
-solo un **metadato**, no ejecuta nada por sí sola. `@Service` y `@Autowired`
-solo tienen efecto si algo las **lee** — normalmente, el contenedor de Spring al
-arrancar. Si nadie arranca un contenedor (como acá), esas anotaciones quedan
-ahí, compiladas, pero completamente ignoradas: el código se comporta exactamente
-igual que si no las tuviera. Dejarlas puestas es intencional: sirve para mostrar
-que **la misma clase**, sin cambiar una línea, funciona tanto si Spring la
-administra (en la aplicación real) como si se instancia a mano (en `Main.java`,
-o en un test unitario).
+Es una aplicación Spring Boot completa: `Main` lleva `@SpringBootApplication`,
+así que al arrancar Spring **escanea** el paquete `com.biblioteca` y sus
+subpaquetes, encuentra las clases anotadas (`@Repository`, `@Service`), crea un
+bean de cada una y **resuelve sus dependencias**:
+
+1. Crea `RepositorioLibrosEnMemoria` (es el único bean que cumple el tipo
+   `RepositorioLibros`).
+2. Crea `ServicioPrestamosConstructor` llamando a su constructor con ese
+   repositorio.
+3. Crea `ServicioPrestamosSetter` y llama a `setRepositorioLibros(...)`
+   (por la anotación `@Autowired` del setter).
+4. Crea `ServicioPrestamosCampo` y asigna el campo `repositorioLibros` (por
+   `@Autowired` sobre el campo).
+
+Tu código no hace nada de eso: solo **declara** qué necesita cada clase. En
+`Main`, un `CommandLineRunner` recibe los tres servicios ya construidos y los
+usa.
 
 ## 💻 Archivo: `RepositorioLibros.java`
 
@@ -93,6 +99,7 @@ package com.biblioteca.persistence.repository;
 
 import com.biblioteca.negocio.model.Libro;
 
+@Repository
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 
     private final List<Libro> libros = List.of(
@@ -210,34 +217,25 @@ Eso es justo lo que la tabla siguiente compara en detalle.
 
 1. Las tres versiones son **funcionalmente equivalentes** en una aplicación Spring
    en ejecución: el contenedor resuelve `RepositorioLibros` y se lo entrega a
-   `ServicioPrestamos` de una forma u otra.
-2. La diferencia aparece en las **pruebas** y en la **legibilidad**: con
+   cada servicio de una forma u otra, sin que `Main` lo haga a mano.
+2. `Main` solo hace dos cosas: arrancar Spring (`SpringApplication.run`) y
+   declarar un `CommandLineRunner`, un bloque de código que Spring ejecuta
+   **una vez, justo después de arrancar**. Sus tres parámetros son los
+   servicios: Spring los inyecta también ahí.
+3. La diferencia aparece en las **pruebas** y en la **legibilidad**: con
    `ServicioPrestamosConstructor`, un test puede escribir
    `new ServicioPrestamosConstructor(repositorioFalso)` directamente, sin arrancar
    ningún `ApplicationContext`.
-3. Con `ServicioPrestamosCampo`, no hay ningún constructor ni setter que reciba
+4. Con `ServicioPrestamosCampo`, no hay ningún constructor ni setter que reciba
    `RepositorioLibros`: para probarlo sin Spring hay que asignar el campo con
    reflexión o usar un framework como Mockito con `@InjectMocks`, lo cual agrega
    complejidad innecesaria.
-4. Por eso Spring recomienda, desde hace varias versiones, **inyección por
+5. Por eso Spring recomienda, desde hace varias versiones, **inyección por
    constructor** como forma preferida para dependencias obligatorias, dejando
    setter para casos realmente opcionales y evitando la inyección por campo en
    código nuevo.
-5. `Main.java` hace visible esa diferencia: arma `porConstructor` y `porSetter`
-   con una línea de código normal, pero necesita `java.lang.reflect.Field` para
-   asignar `repositorioLibros` en `porCampo`, exactamente el "costo extra" del
-   que habla el análisis comparado.
 
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
-
-Para comparar las tres formas en un mismo programa (sin necesidad de **arrancar**
-un contenedor Spring — las anotaciones siguen ahí, pero nadie las lee), `Main`
-instancia las tres clases a mano, exactamente como lo haría un test unitario.
-Las versiones por constructor y por setter se arman directamente; la de campo
-**no tiene ningún constructor ni setter público** para `repositorioLibros`, así
-que `Main` tiene que recurrir a reflexión para asignarlo — el mismo costo extra
-que enfrentaría un test unitario real, y la prueba concreta de la desventaja de
-esta forma señalada en el análisis comparado.
 
 ```java
 package com.biblioteca;
@@ -245,47 +243,82 @@ package com.biblioteca;
 import com.biblioteca.negocio.service.ServicioPrestamosCampo;
 import com.biblioteca.negocio.service.ServicioPrestamosConstructor;
 import com.biblioteca.negocio.service.ServicioPrestamosSetter;
-import com.biblioteca.persistence.repository.RepositorioLibros;
-import com.biblioteca.persistence.repository.RepositorioLibrosEnMemoria;
 
-import java.lang.reflect.Field;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
+@SpringBootApplication
 public class Main {
 
-    public static void main(String[] args) throws Exception {
-        RepositorioLibros repositorio = new RepositorioLibrosEnMemoria();
-        String isbnExistente = "978-3-16-148410-0";
-        String isbnInexistente = "000-0-00-000000-0";
+    public static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
+    }
 
-        // Por constructor: se arma completo en una sola línea
-        ServicioPrestamosConstructor porConstructor = new ServicioPrestamosConstructor(repositorio);
-        System.out.println("Por constructor -> " + porConstructor.prestar(isbnExistente));
+    // Spring ejecuta este bloque una vez, después de arrancar.
+    // Los tres servicios llegan ya construidos: Spring los inyecta como parámetros.
+    @Bean
+    CommandLineRunner demostracion(ServicioPrestamosConstructor porConstructor,
+                                   ServicioPrestamosSetter porSetter,
+                                   ServicioPrestamosCampo porCampo) {
+        return args -> {
+            String isbnExistente = "978-3-16-148410-0";
+            String isbnInexistente = "000-0-00-000000-0";
 
-        // Por setter: se arma en dos pasos
-        ServicioPrestamosSetter porSetter = new ServicioPrestamosSetter();
-        porSetter.setRepositorioLibros(repositorio);
-        System.out.println("Por setter -> " + porSetter.prestar(isbnExistente));
-
-        // Por campo: sin constructor ni setter, hace falta reflexión para asignarlo
-        // (fuera de un contenedor Spring, esto es exactamente lo que habría que
-        // hacer a mano en un test, o delegarlo en un framework como Mockito)
-        ServicioPrestamosCampo porCampo = new ServicioPrestamosCampo();
-        Field campoRepositorio = ServicioPrestamosCampo.class.getDeclaredField("repositorioLibros");
-        campoRepositorio.setAccessible(true);
-        campoRepositorio.set(porCampo, repositorio);
-        System.out.println("Por campo -> " + porCampo.prestar(isbnExistente));
-
-        System.out.println("ISBN inexistente por constructor -> " + porConstructor.prestar(isbnInexistente));
+            System.out.println("Por constructor -> " + porConstructor.prestar(isbnExistente));
+            System.out.println("Por setter -> " + porSetter.prestar(isbnExistente));
+            System.out.println("Por campo -> " + porCampo.prestar(isbnExistente));
+            System.out.println("ISBN inexistente por constructor -> " + porConstructor.prestar(isbnInexistente));
+        };
     }
 }
 ```
 
+Nótese lo que **no** aparece en `Main`: ningún `new ServicioPrestamos...`, ningún
+`new RepositorioLibrosEnMemoria()` y ninguna asignación del repositorio. Eso es
+la inyección de dependencias funcionando.
+
+## 🧪 ¿Dónde se nota la diferencia? Al probar sin Spring
+
+Dentro de la aplicación las tres formas se ven igual. La diferencia aparece en un
+**test unitario**, donde no hay contenedor y hay que armar el objeto a mano con un
+repositorio falso:
+
+```java
+// Por constructor: una línea, el compilador obliga a pasar la dependencia
+var servicio = new ServicioPrestamosConstructor(repositorioFalso);
+
+// Por setter: dos pasos (y entre ambos el objeto está incompleto)
+var servicio = new ServicioPrestamosSetter();
+servicio.setRepositorioLibros(repositorioFalso);
+
+// Por campo: no hay constructor ni setter; hace falta reflexión
+var servicio = new ServicioPrestamosCampo();
+Field campo = ServicioPrestamosCampo.class.getDeclaredField("repositorioLibros");
+campo.setAccessible(true);
+campo.set(servicio, repositorioFalso);
+```
+
+Ese es el "costo" de la inyección por campo: dentro de Spring pasa
+desapercibido, pero fuera de Spring obliga a recurrir a reflexión.
+
 ## ✅ Resultado esperado
 
 En VS Code, al abrir `Main.java` aparece un botón **▶ Run** (o "Run Java")
-arriba del método `main`; al hacer clic, el panel `TERMINAL` de abajo muestra:
+arriba del método `main`; al hacer clic, el panel `TERMINAL` muestra primero el
+arranque de Spring Boot y, al final, las líneas del `CommandLineRunner`:
 
 ```text
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::
+
+Started Main in 0.9 seconds
 Por constructor -> true
 Por setter -> true
 Por campo -> true
@@ -294,7 +327,7 @@ ISBN inexistente por constructor -> false
 
 Las tres clases, con el mismo `RepositorioLibros`, devuelven el mismo resultado de
 negocio; la elección entre las tres no cambia **qué** responden, solo qué tan
-fácil es armarlas fuera de un contenedor Spring, como acaba de hacer `Main.java`.
+fácil es armarlas fuera de un contenedor Spring, como en el test de arriba.
 
 ## ❓ Preguntas de repaso
 
@@ -314,37 +347,35 @@ más fácil de instanciar en un test sin contenedor.
 
 </details>
 
-**2. [Selección múltiple]** Sobre `ServicioPrestamosCampo` en este ejemplo,
-seleccioná **todas** las afirmaciones correctas.
+**2. [Selección múltiple]** Sobre `Main.java` de este ejemplo, seleccioná
+**todas** las afirmaciones correctas.
 
-- **A.** Puede instanciarse en `Main` con una sola línea, sin reflexión.
-- **B.** Necesita `java.lang.reflect.Field` para asignar `repositorioLibros`
-  desde `Main`.
-- **C.** Tiene un constructor que recibe `RepositorioLibros`.
-- **D.** Sus anotaciones (`@Service`, `@Autowired`) no producen ningún efecto en
-  este ejemplo, porque `Main` nunca arranca un `ApplicationContext`.
+- **A.** Crea los tres servicios con `new` y les asigna el repositorio.
+- **B.** `@SpringBootApplication` hace que Spring escanee `com.biblioteca` y sus
+  subpaquetes en busca de `@Repository` y `@Service`.
+- **C.** El `CommandLineRunner` recibe los tres servicios ya construidos,
+  inyectados por Spring.
+- **D.** Se ejecuta el bloque del `CommandLineRunner` una vez, después de arrancar.
 
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuestas correctas: B, D**. La A es falsa: por eso hace falta reflexión. La
-C es falsa: `ServicioPrestamosCampo` no declara ningún constructor propio.
+**Respuestas correctas: B, C, D**. La A es falsa: `Main` nunca usa `new` para los
+servicios; los crea y los inyecta Spring.
 
 </details>
 
-**3. [Abierta]** ¿Por qué no es una contradicción que las tres clases tengan
-`@Service`/`@Autowired` y, aun así, `Main.java` las instancie con `new` (y
-reflexión), sin ningún contenedor Spring?
+**3. [Abierta]** ¿Por qué `ServicioPrestamosCampo` funciona sin problemas dentro
+de la aplicación, pero resulta incómodo de probar en un test unitario?
 
 <details>
 <summary>🔑 Ver respuesta modelo</summary>
 
-**Respuesta modelo**: Porque una anotación es solo metadata: no ejecuta nada por
-sí sola, solo tiene efecto si algo la lee — normalmente, el contenedor de Spring
-al arrancar. Como en este ejemplo nunca se arranca un `ApplicationContext`, esas
-anotaciones quedan compiladas pero completamente ignoradas, y el código se
-comporta igual que si no las tuviera. Por eso la misma clase anotada funciona
-tanto administrada por Spring (en una aplicación real) como instanciada a mano
-(en `Main.java`, o en un test unitario).
+**Respuesta modelo**: Dentro de la aplicación, Spring asigna el campo
+`repositorioLibros` por reflexión gracias a `@Autowired`, así que nadie nota que
+la clase no tiene constructor ni setter para recibirlo. En un test unitario no hay
+contenedor: para darle un repositorio falso hay que repetir esa reflexión a mano
+(`getDeclaredField`, `setAccessible`, `set`) o usar un framework como Mockito.
+Con inyección por constructor bastaría `new ServicioPrestamosConstructor(repositorioFalso)`.
 
 </details>
