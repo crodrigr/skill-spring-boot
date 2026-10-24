@@ -41,21 +41,19 @@ Universitaria (`Libro`↔`Autor`).
 
 ```text
 📁 ejemplo-08-anotaciones-en-jpa
-└── 📁 src/main
-    ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java          (del Ejemplo 01/07, extendida con las relaciones)
-    │   ├── 📄 Cita.java              (nuevo — @ManyToOne hacia Paciente)
-    │   ├── 📄 HistoriaClinica.java   (nuevo)
-    │   ├── 📄 RepositorioPacientes.java (del Ejemplo 07, reutilizada)
-    │   └── 📄 RepositorioCitas.java  (nuevo)
-    ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java             (del Ejercicio Intermedio 01, extendida con la relación)
-    │   ├── 📄 Autor.java             (nuevo — @ManyToMany hacia Libro)
-    │   └── 📄 RepositorioLibros.java (del Ejercicio Intermedio 01, reutilizada)
-    ├── 📁 java
-    │   └── 📄 Main.java              (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties (igual que en el Ejemplo 07)
+└── 📁 src/com/medisalud
+    └── 📁 src/main
+        ├── 📁 java/com/medisalud
+        │   ├── 📄 Paciente.java          (del Ejemplo 01/07, extendida con las relaciones)
+        │   ├── 📄 Cita.java              (nuevo — @ManyToOne hacia Paciente)
+        │   ├── 📄 HistoriaClinica.java   (nuevo)
+        │   └── 📄 RepositorioCitas.java  (nuevo)
+        ├── 📁 java/com/biblioteca
+        │   ├── 📄 Libro.java             (del Ejercicio Intermedio 01, extendida con la relación)
+        │   └── 📄 Autor.java             (nuevo — @ManyToMany hacia Libro)
+        ├── 📁 java
+        │   └── 📄 Main.java              (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
 ```
 
 <details>
@@ -64,6 +62,10 @@ Universitaria (`Libro`↔`Autor`).
 ## 💻 Archivo: `RepositorioPacientes.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 
@@ -75,6 +77,10 @@ public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -97,6 +103,8 @@ spring.h2.console.enabled=true
 ## 💻 Archivo: `Paciente.java` (extendida con las relaciones de este ejemplo)
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Paciente {
 
@@ -138,6 +146,8 @@ public class Paciente {
 ## 💻 Archivo: `Cita.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Cita {
 
@@ -171,6 +181,8 @@ public class Cita {
 ## 💻 Archivo: `HistoriaClinica.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class HistoriaClinica {
 
@@ -194,6 +206,10 @@ public class HistoriaClinica {
 ## 💻 Archivo: `RepositorioCitas.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Cita;
+
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
@@ -201,6 +217,8 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 ## 💻 Archivo: `Libro.java` (extendida con la relación de este ejemplo)
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -243,6 +261,8 @@ public class Libro {
 ## 💻 Archivo: `Autor.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Autor {
 
@@ -269,6 +289,17 @@ public class Autor {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.model.Autor;
+import com.medisalud.negocio.model.Cita;
+import com.medisalud.negocio.model.HistoriaClinica;
+import com.medisalud.negocio.model.Libro;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioCitas;
+import com.medisalud.persistence.repository.RepositorioLibros;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

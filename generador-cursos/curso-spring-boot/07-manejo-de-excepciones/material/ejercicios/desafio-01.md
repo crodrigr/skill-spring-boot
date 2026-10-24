@@ -12,9 +12,9 @@ al Módulo 5 (igual que en los Ejemplos y en el Taller).
 ## 💻 Código o contexto de partida
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
-// Cita.java — capa de persistencia (com.medisalud.persistences.entities)
+// Cita.java — capa de negocio (modelo) (com.medisalud.negocio.model)
 // (Módulo 3, reutilizada tal cual)
 @Entity
 public class Cita {
@@ -50,18 +50,18 @@ public class Cita {
 ```
 
 ```java
-package com.medisalud.persistences.repositories;
+package com.medisalud.persistence.repository;
 
-// RepositorioCitas.java — capa de persistencia (com.medisalud.persistences.repositories)
+// RepositorioCitas.java — capa de persistencia (com.medisalud.persistence.repository)
 // (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
-// ServicioCitas.java — capa de negocio (com.medisalud.services)
+// ServicioCitas.java — capa de negocio (com.medisalud.negocio.service)
 // (Módulo 5, con buscarPorId todavía devolviendo Optional)
 @Service
 public class ServicioCitas {
@@ -104,9 +104,9 @@ public class ServicioCitas {
 ```
 
 ```java
-package com.medisalud.controllers;
+package com.medisalud.presentacion.controlador;
 
-// ControladorCitas.java — capa de presentación (com.medisalud.controllers)
+// ControladorCitas.java — capa de presentación (com.medisalud.presentacion.controlador)
 // (Módulo 5, con manejo manual de errores)
 @RestController
 @RequestMapping("/citas")
@@ -152,7 +152,7 @@ public class ControladorCitas {
 ```
 
 1. Creá `CitaNoEncontradaException` (`@ResponseStatus(HttpStatus.NOT_FOUND)`)
-   en el paquete transversal `com.medisalud.exception`.
+   en el paquete `com.medisalud.negocio.excepcion`.
 2. Modificá `ServicioCitas.buscarPorId` para que devuelva `Cita`
    directamente y lance la excepción; actualizá `actualizar` y
    `eliminar` para reutilizarlo. **Documentá explícitamente**, en tu
@@ -161,9 +161,10 @@ public class ControladorCitas {
    en el Taller.
 3. Quitá de `ControladorCitas` cualquier `ResponseEntity.notFound()`
    manual.
-4. Creá un `@ControllerAdvice` (también en `com.medisalud.exception`) que
+4. Creá un `@ControllerAdvice` (también en `com.medisalud.presentacion.excepcion`) que
    centralice el manejo de `CitaNoEncontradaException`, devolviendo `{"error": "<mensaje>"}"` con
-   `404`.
+   `404`, usando el DTO `RespuestaError` (`record RespuestaError(String error)`
+   en `com.medisalud.presentacion.dto`).
 5. Sin caso de duplicado: `Cita` no tiene un campo único natural (a
    diferencia de `Libro.isbn` o `Paciente.codigo`) sobre el cual definir
    esa regla de negocio.

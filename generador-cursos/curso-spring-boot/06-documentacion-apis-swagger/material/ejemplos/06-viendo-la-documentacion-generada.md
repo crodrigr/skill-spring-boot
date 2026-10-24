@@ -23,6 +23,8 @@ Biblioteca Universitaria (`ControladorLibros`) y MediSalud
 ## 💻 Archivo: `ControladorLibros.java`
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {

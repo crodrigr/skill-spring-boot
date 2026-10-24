@@ -54,45 +54,43 @@ rechaza. **El contenido no está cifrado**, solo firmado: nunca pongas datos sen
 📁 coworkhub
 ├── 📄 .gitignore
 ├── 📄 docker-compose.yml
-├── 📄 pom.xml                                                 ◀ ✏️ se modifica
-├── 📁 docs  (documentación del proyecto)
+├── 📄 pom.xml                                           ◀ ✏️ se modifica
+├── 📁 docs                                              (documentación del proyecto)
 │   └── 📄 analisis.md
 ├── 📁 src/main/java/com/coworkhub
 │   ├── 📄 Main.java
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   ├── 📄 ConfiguracionBeans.java
 │   │   └── 📄 ConfiguracionOpenApi.java
-│   ├── 📁 controllers  (capa de presentación, HTTP)
-│   │   ├── 📄 ControladorDisponibilidad.java
-│   │   ├── 📄 ControladorEquipamientos.java
-│   │   ├── 📄 ControladorMiembros.java                        ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorPlanes.java
-│   │   ├── 📄 ControladorReservas.java                        ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorSalas.java
-│   │   ├── 📄 ControladorSedes.java
-│   │   └── 📄 ControladorServiciosAdicionales.java
-│   ├── 📁 dto  (solicitudes y respuestas, en records)
-│   │   ├── 📄 ItemServicio.java
-│   │   ├── 📄 RespuestaLogin.java                             ◀ 🆕 nuevo
-│   │   ├── 📄 ResumenConsumo.java
-│   │   ├── 📄 SolicitudActualizarMiembro.java
-│   │   ├── 📄 SolicitudEquipamiento.java
-│   │   ├── 📄 SolicitudLogin.java                             ◀ 🆕 nuevo
-│   │   ├── 📄 SolicitudMiembro.java
-│   │   ├── 📄 SolicitudPlan.java
-│   │   ├── 📄 SolicitudReserva.java
-│   │   ├── 📄 SolicitudSala.java
-│   │   ├── 📄 SolicitudSede.java
-│   │   └── 📄 SolicitudServicioAdicional.java
-│   ├── 📁 exception  (excepciones y manejador global)
-│   │   ├── 📄 ManejadorGlobalDeExcepciones.java               ◀ ✏️ se modifica
-│   │   ├── 📄 RecursoNoEncontradoException.java
-│   │   ├── 📄 ReglaNegocioException.java
-│   │   ├── 📄 RespuestaError.java
-│   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   ├── 📁 controlador
+│   │   │   ├── 📄 ControladorDisponibilidad.java
+│   │   │   ├── 📄 ControladorEquipamientos.java
+│   │   │   ├── 📄 ControladorMiembros.java              ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorPlanes.java
+│   │   │   ├── 📄 ControladorReservas.java              ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorSalas.java
+│   │   │   ├── 📄 ControladorSedes.java
+│   │   │   └── 📄 ControladorServiciosAdicionales.java
+│   │   ├── 📁 dto
+│   │   │   ├── 📄 ItemServicio.java
+│   │   │   ├── 📄 RespuestaError.java
+│   │   │   ├── 📄 RespuestaLogin.java                   ◀ 🆕 nuevo
+│   │   │   ├── 📄 ResumenConsumo.java
+│   │   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   │   ├── 📄 SolicitudEquipamiento.java
+│   │   │   ├── 📄 SolicitudLogin.java                   ◀ 🆕 nuevo
+│   │   │   ├── 📄 SolicitudMiembro.java
+│   │   │   ├── 📄 SolicitudPlan.java
+│   │   │   ├── 📄 SolicitudReserva.java
+│   │   │   ├── 📄 SolicitudSala.java
+│   │   │   ├── 📄 SolicitudSede.java
+│   │   │   └── 📄 SolicitudServicioAdicional.java
+│   │   └── 📁 excepcion
+│   │       └── 📄 ManejadorGlobalDeExcepciones.java     ◀ ✏️ se modifica
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   ├── 📁 model
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
 │   │   │   ├── 📄 EstadoMiembro.java
@@ -104,51 +102,58 @@ rechaza. **El contenido no está cifrado**, solo firmado: nunca pongas datos sen
 │   │   │   ├── 📄 Sede.java
 │   │   │   ├── 📄 ServicioAdicional.java
 │   │   │   └── 📄 TipoSala.java
-│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │   ├── 📁 service
+│   │   │   ├── 📄 CalculadoraCostoReserva.java
+│   │   │   ├── 📄 ServicioConsumo.java
+│   │   │   ├── 📄 ServicioDisponibilidad.java
+│   │   │   ├── 📄 ServicioEquipamientos.java
+│   │   │   ├── 📄 ServicioMiembros.java
+│   │   │   ├── 📄 ServicioPlanes.java
+│   │   │   ├── 📄 ServicioReservas.java
+│   │   │   ├── 📄 ServicioSalas.java
+│   │   │   ├── 📄 ServicioSedes.java
+│   │   │   ├── 📄 ServicioServiciosAdicionales.java
+│   │   │   └── 📄 Validaciones.java
+│   │   └── 📁 excepcion
+│   │       ├── 📄 RecursoNoEncontradoException.java
+│   │       ├── 📄 ReglaNegocioException.java
+│   │       └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
 │   │       ├── 📄 RepositorioEquipamientos.java
-│   │       ├── 📄 RepositorioMiembros.java                    ◀ ✏️ se modifica
+│   │       ├── 📄 RepositorioMiembros.java              ◀ ✏️ se modifica
 │   │       ├── 📄 RepositorioPlanes.java
-│   │       ├── 📄 RepositorioReservas.java                    ◀ ✏️ se modifica
+│   │       ├── 📄 RepositorioReservas.java              ◀ ✏️ se modifica
 │   │       ├── 📄 RepositorioSalas.java
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
-│   ├── 📁 security  (autenticación y autorización)
-│   │   ├── 📁 config  (reglas de seguridad)
-│   │   │   ├── 📄 ConfiguracionSeguridad.java                 ◀ 🆕 nuevo
-│   │   │   ├── 📄 ManejadorAccesoDenegado.java                ◀ 🆕 nuevo
-│   │   │   ├── 📄 Permisos.java                               ◀ 🆕 nuevo
-│   │   │   └── 📄 PuntoEntradaJwt.java                        ◀ 🆕 nuevo
-│   │   ├── 📁 controllers  (login)
-│   │   │   └── 📄 ControladorAutenticacion.java               ◀ 🆕 nuevo
-│   │   ├── 📁 jwt  (tokens y filtro)
-│   │   │   ├── 📄 FiltroAutenticacionJwt.java                 ◀ 🆕 nuevo
-│   │   │   └── 📄 UtilJwt.java                                ◀ 🆕 nuevo
-│   │   ├── 📁 persistences  (capa de persistencia de seguridad)
-│   │   │   ├── 📁 entities  (Usuario y Rol)
-│   │   │   │   ├── 📄 Rol.java
-│   │   │   │   └── 📄 Usuario.java
-│   │   │   └── 📁 repositories  (RepositorioUsuarios)
-│   │   │       └── 📄 RepositorioUsuarios.java
-│   │   └── 📁 services  (usuarios y permisos)
-│   │       ├── 📄 ServicioAutorizacion.java                   ◀ 🆕 nuevo
-│   │       └── 📄 ServicioDetallesUsuario.java                ◀ 🆕 nuevo
-│   └── 📁 services  (capa de negocio, reglas del dominio)
-│       ├── 📄 CalculadoraCostoReserva.java
-│       ├── 📄 ServicioConsumo.java
-│       ├── 📄 ServicioDisponibilidad.java
-│       ├── 📄 ServicioEquipamientos.java
-│       ├── 📄 ServicioMiembros.java
-│       ├── 📄 ServicioPlanes.java
-│       ├── 📄 ServicioReservas.java
-│       ├── 📄 ServicioSalas.java
-│       ├── 📄 ServicioSedes.java
-│       ├── 📄 ServicioServiciosAdicionales.java
-│       └── 📄 Validaciones.java
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 config                                    (reglas de seguridad)
+│       │   ├── 📄 ConfiguracionSeguridad.java           ◀ 🆕 nuevo
+│       │   ├── 📄 ManejadorAccesoDenegado.java          ◀ 🆕 nuevo
+│       │   ├── 📄 Permisos.java                         ◀ 🆕 nuevo
+│       │   └── 📄 PuntoEntradaJwt.java                  ◀ 🆕 nuevo
+│       ├── 📁 presentacion                              (capa de presentación)
+│       │   └── 📁 controlador
+│       │       └── 📄 ControladorAutenticacion.java     ◀ 🆕 nuevo
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   ├── 📁 model
+│       │   │   ├── 📄 Rol.java
+│       │   │   └── 📄 Usuario.java
+│       │   └── 📁 service
+│       │       ├── 📄 ServicioAutorizacion.java         ◀ 🆕 nuevo
+│       │       └── 📄 ServicioDetallesUsuario.java      ◀ 🆕 nuevo
+│       ├── 📁 persistence                               (capa de persistencia)
+│       │   └── 📁 repository
+│       │       └── 📄 RepositorioUsuarios.java
+│       └── 📁 jwt                                       (tokens y filtro)
+│           ├── 📄 FiltroAutenticacionJwt.java           ◀ 🆕 nuevo
+│           └── 📄 UtilJwt.java                          ◀ 🆕 nuevo
 └── 📁 src/main/resources
     ├── 📄 application-h2.properties
     ├── 📄 application-mysql.properties
     ├── 📄 application-postgres.properties
-    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    ├── 📄 application.properties                        ◀ ✏️ se modifica
     └── 📄 data.sql
 ```
 
@@ -218,10 +223,10 @@ Necesita **al menos 32 caracteres** para el algoritmo HMAC. Y aunque acá está 
 
 ### Paso 6.3 — DTOs de login
 
-**📄 `src/main/java/com/coworkhub/dto/SolicitudLogin.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/dto/SolicitudLogin.java`**
 
 ```java
-package com.coworkhub.dto;
+package com.coworkhub.presentacion.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -231,10 +236,10 @@ public record SolicitudLogin(
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/dto/RespuestaLogin.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/dto/RespuestaLogin.java`**
 
 ```java
-package com.coworkhub.dto;
+package com.coworkhub.presentacion.dto;
 
 public record RespuestaLogin(String token, String rol, long expiraEnMinutos) {
 }
@@ -324,10 +329,10 @@ Spring Security necesita saber cómo **buscar un usuario** por nombre. Lo hace m
 `roles("ADMIN")` crea la autoridad **`ROLE_ADMIN`** (Spring antepone `ROLE_`): es la que
 después buscan `hasRole('ADMIN')` y `hasAnyRole(...)`.
 
-**📄 `src/main/java/com/coworkhub/security/services/ServicioDetallesUsuario.java`**
+**📄 `src/main/java/com/coworkhub/security/negocio/service/ServicioDetallesUsuario.java`**
 
 ```java
-package com.coworkhub.security.services;
+package com.coworkhub.security.negocio.service;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -335,8 +340,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.coworkhub.security.persistences.entities.Usuario;
-import com.coworkhub.security.persistences.repositories.RepositorioUsuarios;
+import com.coworkhub.security.negocio.model.Usuario;
+import com.coworkhub.security.persistence.repository.RepositorioUsuarios;
 
 @Service
 public class ServicioDetallesUsuario implements UserDetailsService {
@@ -370,7 +375,7 @@ agregamos dos métodos derivados. Ambos recorren la relación hasta el nombre de
 
 En `RepositorioMiembros`, junto a `findByUsuarioNombreUsuario`:
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioMiembros.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioMiembros.java`** (fragmento)
 
 ```java
     // ¿El miembro con este id es el dueño del usuario con este nombre? (RN-13)
@@ -379,7 +384,7 @@ En `RepositorioMiembros`, junto a `findByUsuarioNombreUsuario`:
 
 En `RepositorioReservas`, antes de `existsByDetallesServicioId`:
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioReservas.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioReservas.java`** (fragmento)
 
 ```java
     // ¿La reserva pertenece a un miembro cuyo usuario tiene este nombre? (RN-13)
@@ -388,20 +393,20 @@ En `RepositorioReservas`, antes de `existsByDetallesServicioId`:
 
 ### Paso 6.7 — `ServicioAutorizacion`
 
-Un servicio (capa de negocio, `services` de seguridad) que responde dos preguntas a partir de esas
+Un servicio (capa de negocio, `negocio` de seguridad) que responde dos preguntas a partir de esas
 consultas. Tiene un **nombre de bean explícito**, `@Service("autorizacion")`, porque las
 expresiones de autorización lo invocarán como `@autorizacion.esElMiembro(...)`.
 
-**📄 `src/main/java/com/coworkhub/security/services/ServicioAutorizacion.java`**
+**📄 `src/main/java/com/coworkhub/security/negocio/service/ServicioAutorizacion.java`**
 
 ```java
-package com.coworkhub.security.services;
+package com.coworkhub.security.negocio.service;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import com.coworkhub.persistences.repositories.RepositorioMiembros;
-import com.coworkhub.persistences.repositories.RepositorioReservas;
+import com.coworkhub.persistence.repository.RepositorioMiembros;
+import com.coworkhub.persistence.repository.RepositorioReservas;
 
 // RN-13: decide si el usuario autenticado es dueño de un miembro o de una reserva.
 // Se usa desde las expresiones de @PreAuthorize como @autorizacion.esElMiembro(...).
@@ -460,7 +465,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.coworkhub.security.services.ServicioDetallesUsuario;
+import com.coworkhub.security.negocio.service.ServicioDetallesUsuario;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -531,7 +536,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import com.coworkhub.exception.RespuestaError;
+import com.coworkhub.presentacion.dto.RespuestaError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -574,7 +579,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import com.coworkhub.exception.RespuestaError;
+import com.coworkhub.presentacion.dto.RespuestaError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -748,10 +753,10 @@ public class ConfiguracionSeguridad {
 - `@SecurityRequirements` (vacío) hace que Swagger UI **no** muestre el candado en este
   endpoint: es público.
 
-**📄 `src/main/java/com/coworkhub/security/controllers/ControladorAutenticacion.java`**
+**📄 `src/main/java/com/coworkhub/security/presentacion/controlador/ControladorAutenticacion.java`**
 
 ```java
-package com.coworkhub.security.controllers;
+package com.coworkhub.security.presentacion.controlador;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -761,11 +766,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coworkhub.dto.RespuestaLogin;
-import com.coworkhub.dto.SolicitudLogin;
-import com.coworkhub.exception.SolicitudInvalidaException;
+import com.coworkhub.presentacion.dto.RespuestaLogin;
+import com.coworkhub.presentacion.dto.SolicitudLogin;
+import com.coworkhub.negocio.excepcion.SolicitudInvalidaException;
 import com.coworkhub.security.jwt.UtilJwt;
-import com.coworkhub.security.services.ServicioDetallesUsuario;
+import com.coworkhub.security.negocio.service.ServicioDetallesUsuario;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -814,7 +819,7 @@ de Spring MVC, así que sí pasa por tu `@ControllerAdvice`. Sin estos dos méto
 en el `@ExceptionHandler(Exception.class)` y respondería `500`. En
 `ManejadorGlobalDeExcepciones`, agregá los `import` y los dos métodos:
 
-**📄 `src/main/java/com/coworkhub/exception/ManejadorGlobalDeExcepciones.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/excepcion/ManejadorGlobalDeExcepciones.java`** (fragmento)
 
 ```java
 import org.springframework.security.access.AccessDeniedException;
@@ -863,10 +868,10 @@ lleva cada método:
 Reemplazá el contenido de ambos archivos por estas versiones finales (incluyen las
 anotaciones de la Fase 5 y las nuevas de esta fase):
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorReservas.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorReservas.java`**
 
 ```java
-package com.coworkhub.controllers;
+package com.coworkhub.presentacion.controlador;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -886,12 +891,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coworkhub.dto.ItemServicio;
-import com.coworkhub.dto.SolicitudReserva;
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Reserva;
+import com.coworkhub.presentacion.dto.ItemServicio;
+import com.coworkhub.presentacion.dto.SolicitudReserva;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Reserva;
 import com.coworkhub.security.config.Permisos;
-import com.coworkhub.services.ServicioReservas;
+import com.coworkhub.negocio.service.ServicioReservas;
 
 @Tag(name = "Reservas", description = "Crear, consultar, modificar y cancelar reservas")
 @RestController
@@ -974,10 +979,10 @@ public class ControladorReservas {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorMiembros.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorMiembros.java`**
 
 ```java
-package com.coworkhub.controllers;
+package com.coworkhub.presentacion.controlador;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -998,13 +1003,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coworkhub.dto.ResumenConsumo;
-import com.coworkhub.dto.SolicitudActualizarMiembro;
-import com.coworkhub.dto.SolicitudMiembro;
-import com.coworkhub.persistences.entities.Miembro;
+import com.coworkhub.presentacion.dto.ResumenConsumo;
+import com.coworkhub.presentacion.dto.SolicitudActualizarMiembro;
+import com.coworkhub.presentacion.dto.SolicitudMiembro;
+import com.coworkhub.negocio.model.Miembro;
 import com.coworkhub.security.config.Permisos;
-import com.coworkhub.services.ServicioConsumo;
-import com.coworkhub.services.ServicioMiembros;
+import com.coworkhub.negocio.service.ServicioConsumo;
+import com.coworkhub.negocio.service.ServicioMiembros;
 
 @Tag(name = "Miembros", description = "Registro de miembros y resumen de consumo mensual")
 @RestController

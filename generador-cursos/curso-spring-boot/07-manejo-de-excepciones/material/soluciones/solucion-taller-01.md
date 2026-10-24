@@ -9,31 +9,36 @@
 📁 taller-01-manejo-de-excepciones-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 controllers
-    │   │   └── 📄 ControladorPacientes.java
-    │   ├── 📁 services
-    │   │   └── 📄 ServicioPacientes.java
-    │   ├── 📁 persistences
-    │   │   ├── 📁 entities
+    │   ├── 📁 presentacion                                (capa de presentación)
+    │   │   ├── 📁 controlador
+    │   │   │   └── 📄 ControladorPacientes.java
+    │   │   ├── 📁 dto
+    │   │   │   └── 📄 RespuestaError.java
+    │   │   └── 📁 excepcion
+    │   │       └── 📄 ManejadorGlobalDeExcepciones.java
+    │   ├── 📁 negocio                                     (capa de negocio)
+    │   │   ├── 📁 model
     │   │   │   └── 📄 Paciente.java
-    │   │   └── 📁 repositories
-    │   │       └── 📄 RepositorioPacientes.java
-    │   └── 📁 exception
-    │       ├── 📄 PacienteNoEncontradoException.java
-    │       └── 📄 ManejadorGlobalDeExcepciones.java
+    │   │   ├── 📁 service
+    │   │   │   └── 📄 ServicioPacientes.java
+    │   │   └── 📁 excepcion
+    │   │       └── 📄 PacienteNoEncontradoException.java
+    │   └── 📁 persistence                                 (capa de persistencia)
+    │       └── 📁 repository
+    │           └── 📄 RepositorioPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
-**Capas**: `controllers` → `services` → `persistences`
-(`entities` + `repositories`). `exception` es un paquete transversal: la
-excepción se lanza desde `services` y el `@ControllerAdvice` la traduce a
-HTTP para `controllers`.
+**Capas**: `presentacion` → `negocio` → `persistence`. Las excepciones
+se reparten por capa: `PacienteNoEncontradoException` vive en
+`presentacion/excepcion` (la lanza el servicio) y `ManejadorGlobalDeExcepciones`
+en `presentacion/excepcion` (el `@ControllerAdvice` la traduce a HTTP).
 
-## 📄 Archivo: `Paciente.java` (`com.medisalud.persistences.entities`, Módulo 5, sin cambios)
+## 📄 Archivo: `Paciente.java` (`com.medisalud.negocio.model`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
 @Entity
 public class Paciente {
@@ -62,22 +67,22 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistences.repositories`, Módulo 5, sin cambios)
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistence.repository`, Módulo 5, sin cambios)
 
 ```java
-package com.medisalud.persistences.repositories;
+package com.medisalud.persistence.repository;
 
-import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.negocio.model.Paciente;
 
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 ```
 
-## 📄 Archivo: `PacienteNoEncontradoException.java` (`com.medisalud.exception`, nueva)
+## 📄 Archivo: `PacienteNoEncontradoException.java` (`com.medisalud.negocio.excepcion`, nueva)
 
 ```java
-package com.medisalud.exception;
+package com.medisalud.negocio.excepcion;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class PacienteNoEncontradoException extends RuntimeException {
@@ -88,14 +93,14 @@ public class PacienteNoEncontradoException extends RuntimeException {
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.services`, modificada)
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.negocio.service`, modificada)
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
-import com.medisalud.persistences.entities.Paciente;
-import com.medisalud.exception.PacienteNoEncontradoException;
-import com.medisalud.persistences.repositories.RepositorioPacientes;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.negocio.excepcion.PacienteNoEncontradoException;
+import com.medisalud.persistence.repository.RepositorioPacientes;
 
 @Service
 public class ServicioPacientes {
@@ -138,13 +143,13 @@ public class ServicioPacientes {
 ya no verifican por su cuenta (`Optional.map`/`existsById`): reutilizan
 `buscarPorId`, que ya lanza si corresponde.
 
-## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controllers`, modificada)
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.presentacion.controlador`, modificada)
 
 ```java
-package com.medisalud.controllers;
+package com.medisalud.presentacion.controlador;
 
-import com.medisalud.persistences.entities.Paciente;
-import com.medisalud.services.ServicioPacientes;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.negocio.service.ServicioPacientes;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -191,19 +196,30 @@ ahora devuelve `Paciente` directamente, sin ningún `ResponseEntity` de
 error — el `404` lo produce la excepción propagada desde el `Service`.
 `actualizar` y `eliminar` tampoco construyen más `ResponseEntity.notFound()`.
 
-## 📄 Archivo: `ManejadorGlobalDeExcepciones.java` (`com.medisalud.exception`, nueva)
+## 📄 Archivo: `RespuestaError.java` (`com.medisalud.presentacion.dto`, nueva)
+
+DTO con el cuerpo de error `{"error": "<mensaje>"}`; vive en la capa de presentación porque define lo que sale por HTTP.
 
 ```java
-package com.medisalud.exception;
+package com.medisalud.presentacion.dto;
+
+public record RespuestaError(String error) {
+}
+```
+
+## 📄 Archivo: `ManejadorGlobalDeExcepciones.java` (`com.medisalud.presentacion.excepcion`, nueva)
+
+```java
+package com.medisalud.presentacion.excepcion;
+
+import com.medisalud.presentacion.dto.RespuestaError;
 
 @ControllerAdvice
 public class ManejadorGlobalDeExcepciones {
 
     @ExceptionHandler(PacienteNoEncontradoException.class)
-    public ResponseEntity<Map<String, String>> manejarPacienteNoEncontrado(PacienteNoEncontradoException ex) {
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cuerpo);
+    public ResponseEntity<RespuestaError> manejarPacienteNoEncontrado(PacienteNoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RespuestaError(ex.getMessage()));
     }
 }
 ```

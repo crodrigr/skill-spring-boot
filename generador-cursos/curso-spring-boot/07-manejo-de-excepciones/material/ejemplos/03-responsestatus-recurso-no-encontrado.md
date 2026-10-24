@@ -21,15 +21,16 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros`/`ServicioLibros`/
 
 ```text
 📁 gestion-bd-jpa
-└── 📁 src/main
-    ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java                      (del Módulo 3, reutilizada)
-    │   ├── 📄 RepositorioLibros.java          (del Módulo 3, reutilizada)
-    │   ├── 📄 LibroNoEncontradoException.java
-    │   ├── 📄 ServicioLibros.java             (modificada en este ejemplo)
-    │   └── 📄 ControladorLibros.java          (modificada en este ejemplo)
-    └── 📁 resources
-        └── 📄 application.properties          (del Módulo 3, reutilizada)
+└── 📁 src/com/biblioteca
+    └── 📁 src/main
+        ├── 📁 java/com/biblioteca
+        │   ├── 📄 Libro.java                       (del Módulo 3, reutilizada)
+        │   ├── 📄 RepositorioLibros.java           (del Módulo 3, reutilizada)
+        │   ├── 📄 LibroNoEncontradoException.java
+        │   ├── 📄 ServicioLibros.java              (modificada en este ejemplo)
+        │   └── 📄 ControladorLibros.java           (modificada en este ejemplo)
+        └── 📁 resources
+            └── 📄 application.properties           (del Módulo 3, reutilizada)
 ```
 
 <details>
@@ -38,6 +39,8 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros`/`ServicioLibros`/
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -68,6 +71,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -89,6 +96,8 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `LibroNoEncontradoException.java`
 
 ```java
+package com.biblioteca.negocio.excepcion;
+
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class LibroNoEncontradoException extends RuntimeException {
 
@@ -101,6 +110,12 @@ public class LibroNoEncontradoException extends RuntimeException {
 ## 💻 Archivo: `ServicioLibros.java` (modificada: `buscarPorId` ya no devuelve `Optional`)
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.negocio.excepcion.LibroNoEncontradoException;
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioLibros {
 
@@ -143,6 +158,11 @@ public class ServicioLibros {
 ## 💻 Archivo: `ControladorLibros.java` (modificada: `buscarPorId` ya no construye `ResponseEntity.notFound()`)
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.service.ServicioLibros;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {

@@ -11,9 +11,9 @@ Ejemplo 03.
 ## 💻 Código o contexto de partida
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
-// Autor.java — capa de persistencia (com.biblioteca.persistences.entities)
+// Autor.java — capa de negocio (modelo) (com.biblioteca.negocio.model)
 // (Módulo 3, reutilizada)
 @Entity
 public class Autor {
@@ -42,17 +42,17 @@ public class Autor {
 ```
 
 ```java
-package com.biblioteca.persistences.repositories;
+package com.biblioteca.persistence.repository;
 
-// RepositorioAutores.java — capa de persistencia (com.biblioteca.persistences.repositories)
+// RepositorioAutores.java — capa de persistencia (com.biblioteca.persistence.repository)
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
 
 ```java
-package com.biblioteca.services;
+package com.biblioteca.negocio.service;
 
-// ServicioAutores.java — capa de negocio (com.biblioteca.services)
+// ServicioAutores.java — capa de negocio (com.biblioteca.negocio.service)
 // (Módulo 5, reutilizada)
 @Service
 public class ServicioAutores {
@@ -94,9 +94,9 @@ public class ServicioAutores {
 ```
 
 ```java
-package com.biblioteca.controllers;
+package com.biblioteca.presentacion.controlador;
 
-// ControladorAutores.java — capa de presentación (com.biblioteca.controllers)
+// ControladorAutores.java — capa de presentación (com.biblioteca.presentacion.controlador)
 // (Módulo 5, reutilizada)
 @RestController
 @RequestMapping("/autores")
@@ -142,9 +142,9 @@ public class ControladorAutores {
 ```
 
 1. Creá `AutorNoEncontradoException` (`@ResponseStatus(HttpStatus.NOT_FOUND)`)
-   en el paquete transversal `com.biblioteca.exception`, siguiendo el
+   en el paquete `com.biblioteca.negocio.excepcion`, siguiendo el
    mismo patrón de `LibroNoEncontradoException` (Ejemplo 03).
-2. Modificá `ServicioAutores.buscarPorId` (capa de negocio, `services`) para que
+2. Modificá `ServicioAutores.buscarPorId` (capa de negocio, `negocio`) para que
    devuelva `Autor` directamente y lance la excepción en vez de
    `Optional`.
 3. Modificá `ControladorAutores.buscarPorId` para que ya no construya
@@ -158,7 +158,7 @@ public class ControladorAutores {
   usa `orElseThrow(...)`.
 - `ControladorAutores.buscarPorId` devuelve `Autor` directamente, sin
   ningún `ResponseEntity` construido a mano.
-- La excepción se lanza en `ServicioAutores` (capa de negocio, `services`), no en
+- La excepción se lanza en `ServicioAutores` (capa de negocio, `negocio`), no en
   `ControladorAutores`.
 
 ## 🚧 Restricciones

@@ -8,22 +8,22 @@ funcione como una API.
 
 ## 💻 Código o contexto de partida
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
-// com.medisalud.persistences.entities.Paciente
+// com.medisalud.negocio.model.Paciente
 public record Paciente(String codigo, String nombre) {}
 
 // Sin anotaciones: Spring Boot no reconoce ninguna de estas clases como bean
 
-// com.medisalud.persistences.repositories.RepositorioPacientes
+// com.medisalud.persistence.repository.RepositorioPacientes
 public class RepositorioPacientes {
     public Optional<Paciente> buscarPorCodigo(String codigo) {
         return Optional.of(new Paciente(codigo, "Paciente de ejemplo")); // simplificado
     }
 }
 
-// com.medisalud.services.ServicioCitas
+// com.medisalud.negocio.service.ServicioCitas
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -37,7 +37,7 @@ public class ServicioCitas {
     }
 }
 
-// com.medisalud.controllers.ControladorCitas
+// com.medisalud.presentacion.controlador.ControladorCitas
 public class ControladorCitas {
 
     private final ServicioCitas servicioCitas;

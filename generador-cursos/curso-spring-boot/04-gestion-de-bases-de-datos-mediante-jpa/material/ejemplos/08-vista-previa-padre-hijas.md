@@ -23,17 +23,17 @@ MediSalud: `Paciente` (Módulo 3, reutilizado) tiene `Factura`, y cada
 
 ```text
 📁 ejemplo-08-vista-previa
-└── 📁 src/main
-    ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java           (del Módulo 3, reutilizada)
-    │   ├── 📄 Factura.java
-    │   ├── 📄 DetalleFactura.java
-    │   ├── 📄 RepositorioPacientes.java (del Módulo 3, reutilizada)
-    │   └── 📄 RepositorioFacturas.java
-    ├── 📁 java
-    │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties  (igual que en el Ejemplo 01)
+└── 📁 src/com/medisalud
+    └── 📁 src/main
+        ├── 📁 java/com/medisalud
+        │   ├── 📄 Paciente.java             (del Módulo 3, reutilizada)
+        │   ├── 📄 Factura.java
+        │   ├── 📄 DetalleFactura.java
+        │   └── 📄 RepositorioFacturas.java
+        ├── 📁 java
+        │   └── 📄 Main.java                 (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
+            └── 📄 application.properties    (igual que en el Ejemplo 01)
 ```
 
 <details>
@@ -42,6 +42,8 @@ MediSalud: `Paciente` (Módulo 3, reutilizado) tiene `Factura`, y cada
 ## 💻 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Paciente {
 
@@ -84,6 +86,10 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `RepositorioPacientes.java` (del Módulo 3, reutilizada)
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
@@ -92,6 +98,10 @@ public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
 ## 💻 Archivo: `RepositorioFacturas.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Factura;
+
 public interface RepositorioFacturas extends JpaRepository<Factura, Long> {
 }
 ```
@@ -99,6 +109,8 @@ public interface RepositorioFacturas extends JpaRepository<Factura, Long> {
 ## 💻 Archivo: `Factura.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Factura {
 
@@ -137,6 +149,8 @@ public class Factura {
 ## 💻 Archivo: `DetalleFactura.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class DetalleFactura {
 
@@ -169,6 +183,14 @@ public class DetalleFactura {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.model.DetalleFactura;
+import com.medisalud.negocio.model.Factura;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioFacturas;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

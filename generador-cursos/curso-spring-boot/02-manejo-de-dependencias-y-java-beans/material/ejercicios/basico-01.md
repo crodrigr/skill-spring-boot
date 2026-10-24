@@ -7,21 +7,21 @@ todas las relaciones de dependencia que existen entre ellas.
 
 ## 💻 Código o contexto de partida
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
-// com.biblioteca.persistences.repositories.RepositorioLibros
+// com.biblioteca.persistence.repository.RepositorioLibros
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
 
-// com.biblioteca.persistences.repositories.RepositorioLibrosEnMemoria
+// com.biblioteca.persistence.repository.RepositorioLibrosEnMemoria
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
     public Optional<Libro> buscarPorIsbn(String isbn) { /* ... */ return Optional.empty(); }
 }
 
-// com.biblioteca.services.ServicioPrestamos
+// com.biblioteca.negocio.service.ServicioPrestamos
 public class ServicioPrestamos {
     private final RepositorioLibros repositorioLibros;
 
@@ -34,7 +34,7 @@ public class ServicioPrestamos {
     }
 }
 
-// com.biblioteca.controllers.ControladorCatalogo
+// com.biblioteca.presentacion.controlador.ControladorCatalogo
 public class ControladorCatalogo {
     private final ServicioPrestamos servicioPrestamos;
 

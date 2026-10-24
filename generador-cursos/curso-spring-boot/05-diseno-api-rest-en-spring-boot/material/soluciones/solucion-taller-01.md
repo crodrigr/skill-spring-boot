@@ -9,22 +9,24 @@
 📁 taller-01-api-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 controllers
-    │   │   └── 📄 ControladorPacientes.java
-    │   ├── 📁 services
-    │   │   └── 📄 ServicioPacientes.java
-    │   └── 📁 persistences
-    │       ├── 📁 entities
-    │       │   └── 📄 Paciente.java
-    │       └── 📁 repositories
+    │   ├── 📁 presentacion                       (capa de presentación)
+    │   │   └── 📁 controlador
+    │   │       └── 📄 ControladorPacientes.java
+    │   ├── 📁 negocio                            (capa de negocio)
+    │   │   ├── 📁 model
+    │   │   │   └── 📄 Paciente.java
+    │   │   └── 📁 service
+    │   │       └── 📄 ServicioPacientes.java
+    │   └── 📁 persistence                        (capa de persistencia)
+    │       └── 📁 repository
     │           └── 📄 RepositorioPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
 **Nota sobre paquetes**: este Taller completa las tres capas del curso
-(presentación `controllers`, negocio `services` y persistencia `persistences`,
-esta última con `entities` y `repositories`), la misma arquitectura ya explicada en el
+(presentación `presentacion`, negocio `negocio` y persistencia `persistence`,
+esta última con `model` y `repository`), la misma arquitectura ya explicada en el
 Ejemplo 03 (Controller → Service → Repository → Database). Cada clase
 declara su `package` y solo importa explícitamente las clases del proyecto
 que vienen de otro paquete; las clases de Spring/Java (`@Service`,
@@ -32,17 +34,17 @@ que vienen de otro paquete; las clases de Spring/Java (`@Service`,
 
 | Capa | Paquete | Clase |
 |---|---|---|
-| Presentación | `com.medisalud.controllers` | `ControladorPacientes` |
-| Negocio | `com.medisalud.services` | `ServicioPacientes` |
-| Persistencia | `com.medisalud.persistences.entities` / `com.medisalud.persistences.repositories` | `Paciente` / `RepositorioPacientes` |
+| Presentación | `com.medisalud.presentacion.controlador` | `ControladorPacientes` |
+| Negocio | `com.medisalud.negocio.service` | `ServicioPacientes` |
+| Persistencia | `com.medisalud.negocio.model` / `com.medisalud.persistence.repository` | `Paciente` / `RepositorioPacientes` |
 
 Dirección de las dependencias: `ControladorPacientes` → `ServicioPacientes`
 → `RepositorioPacientes`. El controlador nunca inyecta el repositorio.
 
-## 📄 Archivo: `Paciente.java` (`com.medisalud.persistences.entities`)
+## 📄 Archivo: `Paciente.java` (`com.medisalud.negocio.model`)
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
 @Entity
 public class Paciente {
@@ -71,25 +73,25 @@ public class Paciente {
 }
 ```
 
-## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistences.repositories`)
+## 📄 Archivo: `RepositorioPacientes.java` (`com.medisalud.persistence.repository`)
 
 ```java
-package com.medisalud.persistences.repositories;
+package com.medisalud.persistence.repository;
 
-import com.medisalud.persistences.entities.Paciente;
+import com.medisalud.negocio.model.Paciente;
 
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 ```
 
-## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.services`)
+## 📄 Archivo: `ServicioPacientes.java` (`com.medisalud.negocio.service`)
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
-import com.medisalud.persistences.entities.Paciente;
-import com.medisalud.persistences.repositories.RepositorioPacientes;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioPacientes;
 
 @Service
 public class ServicioPacientes {
@@ -130,13 +132,13 @@ public class ServicioPacientes {
 }
 ```
 
-## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.controllers`)
+## 📄 Archivo: `ControladorPacientes.java` (`com.medisalud.presentacion.controlador`)
 
 ```java
-package com.medisalud.controllers;
+package com.medisalud.presentacion.controlador;
 
-import com.medisalud.persistences.entities.Paciente;
-import com.medisalud.services.ServicioPacientes;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.negocio.service.ServicioPacientes;
 
 @RestController
 @RequestMapping("/pacientes")

@@ -14,37 +14,34 @@ Registrar miembros (junto con su usuario), suspenderlos y consultarlos; calcular
 ├── 📄 .gitignore
 ├── 📄 docker-compose.yml
 ├── 📄 pom.xml
-├── 📁 docs  (documentación del proyecto)
+├── 📁 docs                                              (documentación del proyecto)
 │   └── 📄 analisis.md
 ├── 📁 src/main/java/com/coworkhub
 │   ├── 📄 Main.java
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 controllers  (capa de presentación, HTTP)
-│   │   ├── 📄 ControladorDisponibilidad.java                  ◀ 🆕 nuevo
-│   │   ├── 📄 ControladorEquipamientos.java
-│   │   ├── 📄 ControladorMiembros.java                        ◀ 🆕 nuevo
-│   │   ├── 📄 ControladorPlanes.java
-│   │   ├── 📄 ControladorSalas.java
-│   │   ├── 📄 ControladorSedes.java
-│   │   └── 📄 ControladorServiciosAdicionales.java
-│   ├── 📁 dto  (solicitudes y respuestas, en records)
-│   │   ├── 📄 ItemServicio.java
-│   │   ├── 📄 ResumenConsumo.java
-│   │   ├── 📄 SolicitudActualizarMiembro.java
-│   │   ├── 📄 SolicitudEquipamiento.java
-│   │   ├── 📄 SolicitudMiembro.java
-│   │   ├── 📄 SolicitudPlan.java
-│   │   ├── 📄 SolicitudReserva.java
-│   │   ├── 📄 SolicitudSala.java
-│   │   ├── 📄 SolicitudSede.java
-│   │   └── 📄 SolicitudServicioAdicional.java
-│   ├── 📁 exception  (excepciones y manejador global)
-│   │   ├── 📄 RecursoNoEncontradoException.java
-│   │   ├── 📄 ReglaNegocioException.java
-│   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   ├── 📁 controlador
+│   │   │   ├── 📄 ControladorDisponibilidad.java        ◀ 🆕 nuevo
+│   │   │   ├── 📄 ControladorEquipamientos.java
+│   │   │   ├── 📄 ControladorMiembros.java              ◀ 🆕 nuevo
+│   │   │   ├── 📄 ControladorPlanes.java
+│   │   │   ├── 📄 ControladorSalas.java
+│   │   │   ├── 📄 ControladorSedes.java
+│   │   │   └── 📄 ControladorServiciosAdicionales.java
+│   │   └── 📁 dto
+│   │       ├── 📄 ItemServicio.java
+│   │       ├── 📄 ResumenConsumo.java
+│   │       ├── 📄 SolicitudActualizarMiembro.java
+│   │       ├── 📄 SolicitudEquipamiento.java
+│   │       ├── 📄 SolicitudMiembro.java
+│   │       ├── 📄 SolicitudPlan.java
+│   │       ├── 📄 SolicitudReserva.java
+│   │       ├── 📄 SolicitudSala.java
+│   │       ├── 📄 SolicitudSede.java
+│   │       └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   ├── 📁 model
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
 │   │   │   ├── 📄 EstadoMiembro.java
@@ -56,7 +53,22 @@ Registrar miembros (junto con su usuario), suspenderlos y consultarlos; calcular
 │   │   │   ├── 📄 Sede.java
 │   │   │   ├── 📄 ServicioAdicional.java
 │   │   │   └── 📄 TipoSala.java
-│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │   ├── 📁 service
+│   │   │   ├── 📄 ServicioConsumo.java                  ◀ 🆕 nuevo
+│   │   │   ├── 📄 ServicioDisponibilidad.java           ◀ 🆕 nuevo
+│   │   │   ├── 📄 ServicioEquipamientos.java
+│   │   │   ├── 📄 ServicioMiembros.java                 ◀ 🆕 nuevo
+│   │   │   ├── 📄 ServicioPlanes.java
+│   │   │   ├── 📄 ServicioSalas.java
+│   │   │   ├── 📄 ServicioSedes.java
+│   │   │   ├── 📄 ServicioServiciosAdicionales.java
+│   │   │   └── 📄 Validaciones.java
+│   │   └── 📁 excepcion
+│   │       ├── 📄 RecursoNoEncontradoException.java
+│   │       ├── 📄 ReglaNegocioException.java
+│   │       └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
 │   │       ├── 📄 RepositorioEquipamientos.java
 │   │       ├── 📄 RepositorioMiembros.java
 │   │       ├── 📄 RepositorioPlanes.java
@@ -64,23 +76,14 @@ Registrar miembros (junto con su usuario), suspenderlos y consultarlos; calcular
 │   │       ├── 📄 RepositorioSalas.java
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
-│   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa de persistencia de seguridad)
-│   │       ├── 📁 entities  (Usuario y Rol)
-│   │       │   ├── 📄 Rol.java
-│   │       │   └── 📄 Usuario.java
-│   │       └── 📁 repositories  (RepositorioUsuarios)
-│   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa de negocio, reglas del dominio)
-│       ├── 📄 ServicioConsumo.java                            ◀ 🆕 nuevo
-│       ├── 📄 ServicioDisponibilidad.java                     ◀ 🆕 nuevo
-│       ├── 📄 ServicioEquipamientos.java
-│       ├── 📄 ServicioMiembros.java                           ◀ 🆕 nuevo
-│       ├── 📄 ServicioPlanes.java
-│       ├── 📄 ServicioSalas.java
-│       ├── 📄 ServicioSedes.java
-│       ├── 📄 ServicioServiciosAdicionales.java
-│       └── 📄 Validaciones.java
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   └── 📁 model
+│       │       ├── 📄 Rol.java
+│       │       └── 📄 Usuario.java
+│       └── 📁 persistence                               (capa de persistencia)
+│           └── 📁 repository
+│               └── 📄 RepositorioUsuarios.java
 └── 📁 src/main/resources
     ├── 📄 application-h2.properties
     ├── 📄 application-mysql.properties
@@ -117,13 +120,13 @@ Recorré sus decisiones:
   elimina y el `cascade` + `orphanRemoval` de `Miembro.usuario` elimina también su
   usuario (así, ese usuario ya no puede iniciar sesión).
 
-**📄 `src/main/java/com/coworkhub/services/ServicioMiembros.java`**
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioMiembros.java`**
 
 ```java
-package com.coworkhub.services;
+package com.coworkhub.negocio.service;
 
-import static com.coworkhub.services.Validaciones.requerido;
-import static com.coworkhub.services.Validaciones.texto;
+import static com.coworkhub.negocio.service.Validaciones.requerido;
+import static com.coworkhub.negocio.service.Validaciones.texto;
 
 import java.util.List;
 
@@ -131,20 +134,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.coworkhub.dto.SolicitudActualizarMiembro;
-import com.coworkhub.dto.SolicitudMiembro;
-import com.coworkhub.exception.ReglaNegocioException;
-import com.coworkhub.exception.RecursoNoEncontradoException;
-import com.coworkhub.exception.SolicitudInvalidaException;
-import com.coworkhub.persistences.entities.EstadoMiembro;
-import com.coworkhub.persistences.entities.Miembro;
-import com.coworkhub.persistences.entities.PlanMembresia;
-import com.coworkhub.persistences.repositories.RepositorioMiembros;
-import com.coworkhub.persistences.repositories.RepositorioPlanes;
-import com.coworkhub.persistences.repositories.RepositorioReservas;
-import com.coworkhub.security.persistences.entities.Rol;
-import com.coworkhub.security.persistences.entities.Usuario;
-import com.coworkhub.security.persistences.repositories.RepositorioUsuarios;
+import com.coworkhub.presentacion.dto.SolicitudActualizarMiembro;
+import com.coworkhub.presentacion.dto.SolicitudMiembro;
+import com.coworkhub.negocio.excepcion.ReglaNegocioException;
+import com.coworkhub.negocio.excepcion.RecursoNoEncontradoException;
+import com.coworkhub.negocio.excepcion.SolicitudInvalidaException;
+import com.coworkhub.negocio.model.EstadoMiembro;
+import com.coworkhub.negocio.model.Miembro;
+import com.coworkhub.negocio.model.PlanMembresia;
+import com.coworkhub.persistence.repository.RepositorioMiembros;
+import com.coworkhub.persistence.repository.RepositorioPlanes;
+import com.coworkhub.persistence.repository.RepositorioReservas;
+import com.coworkhub.security.negocio.model.Rol;
+import com.coworkhub.security.negocio.model.Usuario;
+import com.coworkhub.security.persistence.repository.RepositorioUsuarios;
 
 @Service
 @Transactional(readOnly = true)
@@ -273,10 +276,10 @@ Fase 2). Con ese total y las horas del plan obtiene cuatro números:
 Si no se indica el mes se usa el actual, tomado del **`Clock` inyectado** (nunca de
 `LocalDateTime.now()` directo). Los minutos se convierten a horas con dos decimales.
 
-**📄 `src/main/java/com/coworkhub/services/ServicioConsumo.java`**
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioConsumo.java`**
 
 ```java
-package com.coworkhub.services;
+package com.coworkhub.negocio.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -286,11 +289,11 @@ import java.time.YearMonth;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.coworkhub.dto.ResumenConsumo;
-import com.coworkhub.exception.RecursoNoEncontradoException;
-import com.coworkhub.persistences.entities.Miembro;
-import com.coworkhub.persistences.repositories.RepositorioMiembros;
-import com.coworkhub.persistences.repositories.RepositorioReservas;
+import com.coworkhub.presentacion.dto.ResumenConsumo;
+import com.coworkhub.negocio.excepcion.RecursoNoEncontradoException;
+import com.coworkhub.negocio.model.Miembro;
+import com.coworkhub.persistence.repository.RepositorioMiembros;
+import com.coworkhub.persistence.repository.RepositorioReservas;
 
 @Service
 @Transactional(readOnly = true)
@@ -348,10 +351,10 @@ Además del CRUD, expone:
 El controlador recibe **dos** servicios (`ServicioMiembros` y `ServicioConsumo`): es
 correcto, porque sigue sin tocar ningún repositorio.
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorMiembros.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorMiembros.java`**
 
 ```java
-package com.coworkhub.controllers;
+package com.coworkhub.presentacion.controlador;
 
 import java.time.YearMonth;
 import java.util.List;
@@ -369,12 +372,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coworkhub.dto.ResumenConsumo;
-import com.coworkhub.dto.SolicitudActualizarMiembro;
-import com.coworkhub.dto.SolicitudMiembro;
-import com.coworkhub.persistences.entities.Miembro;
-import com.coworkhub.services.ServicioConsumo;
-import com.coworkhub.services.ServicioMiembros;
+import com.coworkhub.presentacion.dto.ResumenConsumo;
+import com.coworkhub.presentacion.dto.SolicitudActualizarMiembro;
+import com.coworkhub.presentacion.dto.SolicitudMiembro;
+import com.coworkhub.negocio.model.Miembro;
+import com.coworkhub.negocio.service.ServicioConsumo;
+import com.coworkhub.negocio.service.ServicioMiembros;
 
 @RestController
 @RequestMapping("/api/miembros")
@@ -448,12 +451,12 @@ El controlador recibe todo por `@RequestParam` (con `required = false` para que 
 responda su propio error). Los tipos `LocalDate` y `LocalTime` se convierten desde
 `yyyy-MM-dd` y `HH:mm`. `equipamientoIds=1,4` llega como `Set<Long>`.
 
-**📄 `src/main/java/com/coworkhub/services/ServicioDisponibilidad.java`**
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioDisponibilidad.java`**
 
 ```java
-package com.coworkhub.services;
+package com.coworkhub.negocio.service;
 
-import static com.coworkhub.services.Validaciones.requerido;
+import static com.coworkhub.negocio.service.Validaciones.requerido;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -465,14 +468,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.coworkhub.exception.RecursoNoEncontradoException;
-import com.coworkhub.exception.SolicitudInvalidaException;
-import com.coworkhub.persistences.entities.Equipamiento;
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Sala;
-import com.coworkhub.persistences.entities.Sede;
-import com.coworkhub.persistences.repositories.RepositorioSalas;
-import com.coworkhub.persistences.repositories.RepositorioSedes;
+import com.coworkhub.negocio.excepcion.RecursoNoEncontradoException;
+import com.coworkhub.negocio.excepcion.SolicitudInvalidaException;
+import com.coworkhub.negocio.model.Equipamiento;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Sala;
+import com.coworkhub.negocio.model.Sede;
+import com.coworkhub.persistence.repository.RepositorioSalas;
+import com.coworkhub.persistence.repository.RepositorioSedes;
 
 @Service
 @Transactional(readOnly = true)
@@ -523,10 +526,10 @@ public class ServicioDisponibilidad {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorDisponibilidad.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorDisponibilidad.java`**
 
 ```java
-package com.coworkhub.controllers;
+package com.coworkhub.presentacion.controlador;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -538,8 +541,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coworkhub.persistences.entities.Sala;
-import com.coworkhub.services.ServicioDisponibilidad;
+import com.coworkhub.negocio.model.Sala;
+import com.coworkhub.negocio.service.ServicioDisponibilidad;
 
 @RestController
 @RequestMapping("/api/disponibilidad")

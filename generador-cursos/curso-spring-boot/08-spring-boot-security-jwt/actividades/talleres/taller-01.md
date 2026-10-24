@@ -10,9 +10,9 @@ emite un JWT validado por un filtro propio en cada solicitud.
 
 Este Taller parte de la solución del Taller 01 del Módulo 7
 (`ControladorPacientes`/`ServicioPacientes`, ya con `PacienteNoEncontradoException`
-y `ManejadorGlobalDeExcepciones` aplicados, en sus paquetes por capa `com.medisalud.controllers`, `com.medisalud.services`
-y `com.medisalud.persistences` —con `entities` y `repositories`—, más el
-paquete transversal `com.medisalud.exception`).
+y `ManejadorGlobalDeExcepciones` aplicados, en sus paquetes por capa `com.medisalud.presentacion.controlador`, `com.medisalud.negocio.service`
+`com.medisalud.negocio.model` y `com.medisalud.persistence.repository`, más
+`com.medisalud.negocio.excepcion` y `com.medisalud.presentacion.excepcion`).
 Ninguna de esas clases cambia su comportamiento en este Taller: solo se
 les agrega una funcionalidad nueva de seguridad, en el paquete
 `com.medisalud.security`.
@@ -25,13 +25,14 @@ transversales propios de Spring Security.
 
 | Capa / paquete | Paquete | Clase en este taller |
 |---|---|---|
-| **Presentación** | `com.medisalud.security.controllers` | `ControladorAutenticacion` (`POST /auth/login`) |
-| **Negocio** | `com.medisalud.security.services` | `ServicioDetallesUsuario` |
-| **Persistencia** | `com.medisalud.security.persistences.entities` / `.repositories` | `Usuario` / `RepositorioUsuarios` |
+| **Presentación** | `com.medisalud.security.presentacion.controlador` | `ControladorAutenticacion` (`POST /auth/login`) |
+| **Negocio** | `com.medisalud.security.negocio.service` | `ServicioDetallesUsuario` |
+| **Negocio** | `com.medisalud.security.negocio.model` | `Usuario` |
+| **Persistencia** | `com.medisalud.security.persistence.repository` | `RepositorioUsuarios` |
 | Transversal | `com.medisalud.security.config` | `ConfiguracionSeguridad` |
 | Transversal | `com.medisalud.security.jwt` | `UtilJwt`, `FiltroAutenticacionJwt` |
 
-Regla de dependencia: `controllers` → `services` → `persistences`.
+Regla de dependencia: `presentacion` → `negocio` → `persistence`.
 `ControladorAutenticacion` no accede a `RepositorioUsuarios` directamente:
 lo hace a través de `AuthenticationManager` y `ServicioDetallesUsuario`.
 
@@ -42,20 +43,21 @@ lo hace a través de `AuthenticationManager` y `ServicioDetallesUsuario`.
    confirmá con Insomnia que `GET /pacientes` ahora exige autenticación
    (usuario `user` + contraseña autogenerada en consola).
 2. **Crear `Usuario` y `RepositorioUsuarios`**
-   (`com.medisalud.security.persistences.entities`/`com.medisalud.security.persistences.repositories`):
+   (`com.medisalud.security.negocio.model`/`com.medisalud.security.persistence.repository`):
    una entidad con `nombreUsuario`, `contrasena` (codificada) y `rol`, y
    su repositorio con `findByNombreUsuario`.
-3. **Crear `ServicioDetallesUsuario`** (`com.medisalud.security.services`,
+3. **Crear `ServicioDetallesUsuario`** (`com.medisalud.security.negocio.service`,
    implementa `UserDetailsService`), que busca el `Usuario` por
    nombre de usuario y construye el `UserDetails` correspondiente.
 4. **Configurar `ConfiguracionSeguridad`** (`com.medisalud.security.config`)
    como `SessionCreationPolicy.STATELESS`, permitiendo `/auth/login` sin
    autenticación previa y exigiendo autenticación para el resto —
    **desactivando Basic Auth** en favor de JWT.
-5. **Implementar `ControladorAutenticacion`** (`com.medisalud.security.controllers`,
+5. **Implementar `ControladorAutenticacion`** (`com.medisalud.security.presentacion.controlador`,
    `POST /auth/login`) que verifica las credenciales con el
    `AuthenticationManager` y devuelve un JWT (`UtilJwt.generarToken`,
-   `com.medisalud.security.jwt`).
+   `com.medisalud.security.jwt`). Recibe un DTO `SolicitudLogin` y responde
+   con un DTO `RespuestaLogin`, ambos `record` en `com.medisalud.presentacion.dto`.
 6. **Implementar y registrar `FiltroAutenticacionJwt`**
    (`com.medisalud.security.jwt`, extiende `OncePerRequestFilter`) que
    valida el JWT del encabezado `Authorization` en cada solicitud, y
@@ -71,7 +73,7 @@ lo hace a través de `AuthenticationManager` y `ServicioDetallesUsuario`.
 ## 💡 Ejemplo resuelto (parcial)
 
 ```java
-package com.medisalud.security.persistences.entities;
+package com.medisalud.security.negocio.model;
 
 @Entity
 public class Usuario {
@@ -115,24 +117,44 @@ adaptado al paquete `com.medisalud.security`.)
 📁 taller-01-security-jwt-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 controllers/ControladorPacientes.java (sin cambios)
-    │   ├── 📁 services/ServicioPacientes.java (sin cambios)
-    │   ├── 📁 persistences/
-    │   │   ├── 📁 entities/Paciente.java (sin cambios)
-    │   │   └── 📁 repositories/RepositorioPacientes.java (sin cambios)
-    │   ├── 📁 exception/
-    │   │   ├── 📄 PacienteNoEncontradoException.java (sin cambios)
-    │   │   └── 📄 ManejadorGlobalDeExcepciones.java (sin cambios)
-    │   └── 📁 security/
-    │       ├── 📁 controllers/ControladorAutenticacion.java
-    │       ├── 📁 services/ServicioDetallesUsuario.java
-    │       ├── 📁 persistences/
-    │       │   ├── 📁 entities/Usuario.java
-    │       │   └── 📁 repositories/RepositorioUsuarios.java
-    │       ├── 📁 config/ConfiguracionSeguridad.java
-    │       ├── 📁 jwt/UtilJwt.java
-    │       └── 📁 jwt/FiltroAutenticacionJwt.java
-    └── 📁 resources/application.properties (sin cambios)
+    │   ├── 📁 presentacion
+    │   │   ├── 📁 controlador
+    │   │   │   └── 📄 ControladorPacientes.java (sin cambios)
+    │   │   ├── 📁 dto
+    │   │   │   ├── 📄 RespuestaError.java (sin cambios)
+    │   │   │   ├── 📄 SolicitudLogin.java
+    │   │   │   └── 📄 RespuestaLogin.java
+    │   │   └── 📁 excepcion
+    │   │       └── 📄 ManejadorGlobalDeExcepciones.java (sin cambios)
+    │   ├── 📁 negocio
+    │   │   ├── 📁 model
+    │   │   │   └── 📄 Paciente.java (sin cambios)
+    │   │   ├── 📁 service
+    │   │   │   └── 📄 ServicioPacientes.java (sin cambios)
+    │   │   └── 📁 excepcion
+    │   │       └── 📄 PacienteNoEncontradoException.java (sin cambios)
+    │   ├── 📁 persistence
+    │   │   └── 📁 repository
+    │   │       └── 📄 RepositorioPacientes.java (sin cambios)
+    │   └── 📁 security
+    │       ├── 📁 presentacion
+    │       │   └── 📁 controlador
+    │       │       └── 📄 ControladorAutenticacion.java
+    │       ├── 📁 negocio
+    │       │   ├── 📁 model
+    │       │   │   └── 📄 Usuario.java
+    │       │   └── 📁 service
+    │       │       └── 📄 ServicioDetallesUsuario.java
+    │       ├── 📁 persistence
+    │       │   └── 📁 repository
+    │       │       └── 📄 RepositorioUsuarios.java
+    │       ├── 📁 config
+    │       │   └── 📄 ConfiguracionSeguridad.java
+    │       └── 📁 jwt
+    │           ├── 📄 UtilJwt.java
+    │           └── 📄 FiltroAutenticacionJwt.java
+    └── 📁 resources
+        └── 📄 application.properties (sin cambios)
 ```
 
 ## 🧪 Casos de prueba
@@ -147,7 +169,7 @@ Respuesta exacta.
 - `Paciente`, `ServicioPacientes` y `ControladorPacientes` no cambiaron
   ninguna línea de su lógica de negocio (FR-015).
 - Las clases nuevas de `security` viven en el paquete de su capa
-  (`controllers`, `services`, `persistences`) o en un paquete transversal
+  (`presentacion`, `negocio`, `persistence`) o en un paquete transversal
   (`config`, `jwt`), y ningún controlador accede a un repositorio
   directamente.
 - Las 5 pruebas de Insomnia del Paso 7 están documentadas con su

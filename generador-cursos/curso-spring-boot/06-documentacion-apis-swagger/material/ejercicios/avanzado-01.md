@@ -22,30 +22,31 @@ public class ControladorAutores {
 springdoc.api-docs.enabled=true
 springdoc.swagger-ui.enabled=true
 springdoc.swagger-ui.path=/doc/swagger-ui.html
-springdoc.packages-to-scan=com.biblioteca.controllers
+springdoc.packages-to-scan=com.biblioteca.presentacion.controlador
 ```
 
 **Preguntas**:
 
 1. ¿Por qué Swagger UI no muestra ningún endpoint de `ControladorAutores`?
 2. ¿Cómo lo corregirías, respetando la arquitectura por capas del proyecto
-   (capa de presentación `controllers`, de negocio `services` y de persistencia
-   `persistences`)?
+   (capa de presentación `presentacion`, de negocio `negocio` y de persistencia
+   `persistence`)?
 
 ## 📏 Criterios de evaluación de la solución
 
 - Identifica que `ControladorAutores` vive en el paquete
   `com.biblioteca.web`, pero `springdoc.packages-to-scan` apunta a
-  `com.biblioteca.controllers` — un paquete distinto, que no contiene
+  `com.biblioteca.presentacion.controlador` — un paquete distinto, que no contiene
   ningún `@RestController`.
 - Propone la corrección preferida: mover `ControladorAutores` al paquete
-  de su capa (`com.biblioteca.controllers`), de modo que coincida con
+  de su capa (`com.biblioteca.presentacion.controlador`), de modo que coincida con
   `springdoc.packages-to-scan`. Como alternativas válidas, apuntar
   `springdoc.packages-to-scan` a `com.biblioteca.web` o a
   `com.biblioteca` (que escanea todos los subpaquetes).
 - Explica por qué `web` no es un nombre de capa del proyecto: los
-  controladores viven en `controllers`, igual que los servicios viven en
-  `services` y las entidades/repositorios en `persistences`.
+  controladores viven en `presentacion/controlador`, los servicios en
+  `negocio/service`, las entidades en `negocio/model` y los repositorios en
+  `persistence/repository`.
 - Explica que Swagger UI puede cargar correctamente (la interfaz en sí
   funciona) aunque no encuentre ningún endpoint que documentar — no es un
   error de la herramienta, sino de configuración.

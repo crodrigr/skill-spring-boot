@@ -22,38 +22,38 @@ un par nuevo.
 ## 🏗️ Capas del proyecto
 
 Todo proyecto del curso organiza sus clases por capa: presentación
-(`controllers`), negocio (`services`) y persistencia (`persistences`). En este taller solo existe la
-capa de **persistencia**, porque todavía no hay API ni lógica de negocio:
+(`presentacion`), negocio (`negocio`) y persistencia (`persistence`). En este taller solo se trabajan las entidades (`negocio/model`) y los
+repositorios (`persistence/repository`), porque todavía no hay API ni servicios:
 
 | Capa | Paquete | Qué contiene | Clases de este taller |
 |---|---|---|---|
-| **Persistencia** | `com.biblioteca.persistences.entities` | Clases `@Entity` | `Libro`, `Etiqueta` |
-| **Persistencia** | `com.biblioteca.persistences.repositories` | Interfaces de Spring Data JPA | `RepositorioLibros`, `RepositorioEtiquetas` |
+| **Negocio** | `com.biblioteca.negocio.model` | Clases `@Entity` | `Libro`, `Etiqueta` |
+| **Persistencia** | `com.biblioteca.persistence.repository` | Interfaces de Spring Data JPA | `RepositorioLibros`, `RepositorioEtiquetas` |
 | Punto de entrada | `com.biblioteca` | `@SpringBootApplication` + `CommandLineRunner` | `Main` |
 
 `Main` es solo un ejecutor de prueba (no es una capa): usa los
-repositorios directamente porque todavía no existe una capa de negocio (`services`).
-Las capas `services` y `controllers` se agregan en el Módulo 5, y ahí los
-repositorios dejan de usarse desde fuera de `services`.
+repositorios directamente porque todavía no existe `negocio/service` (los servicios llegan en el Módulo 5).
+`negocio/service` y `presentacion` se agregan en el Módulo 5; ahí los
+repositorios dejan de usarse desde fuera de `negocio/service`.
 
 `Main` va en el paquete raíz `com.biblioteca`, por encima de
-`persistences`, para que Spring Boot encuentre las entidades y los
+`negocio` y `persistence`, para que Spring Boot encuentre las entidades y los
 repositorios de los subpaquetes.
 
 ## 🪜 Pasos
 
 1. Convertí `Libro` (`isbn`, `titulo`) en una entidad JPA (en el paquete
-   `com.biblioteca.persistences.entities`), reutilizando el
+   `com.biblioteca.negocio.model`), reutilizando el
    diseño ya usado en el Ejemplo 01/07 (`@Entity`, `@Id`,
    `@GeneratedValue`, `@Column(unique = true)` sobre `isbn`).
 2. Creá la entidad `Etiqueta`, con `id` y `nombre`, en el mismo paquete
-   `com.biblioteca.persistences.entities`.
+   `com.biblioteca.negocio.model`.
 3. Agregá la relación `@ManyToMany` entre ambas: decidí cuál de las dos
    clases es el lado propietario (la que declara `@JoinTable`) y cuál es el
    lado inverso (con `mappedBy`).
 4. Creá los repositorios `RepositorioLibros` y `RepositorioEtiquetas`,
    ambos extendiendo `JpaRepository`, en el paquete
-   `com.biblioteca.persistences.repositories`.
+   `com.biblioteca.persistence.repository`.
 5. Agregá al repositorio del lado que te parezca más natural un método
    derivado que permita buscar por nombre (por ejemplo,
    `findByNombre(String nombre)` en `RepositorioEtiquetas`, o
@@ -69,7 +69,7 @@ Así se ve la entidad `Etiqueta`, para que uses el mismo estilo en el resto
 del entregable:
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
 @Entity
 public class Etiqueta {
@@ -104,11 +104,12 @@ El resto del entregable (la relación en `Libro`, los dos repositorios y el
 └── 📁 src/main
     ├── 📁 java/com/biblioteca
     │   ├── 📄 Main.java
-    │   └── 📁 persistences
-    │       ├── 📁 entities
-    │       │   ├── 📄 Libro.java
-    │       │   └── 📄 Etiqueta.java
-    │       └── 📁 repositories
+    │   ├── 📁 negocio                            (capa de negocio)
+    │   │   └── 📁 model
+    │   │       ├── 📄 Libro.java
+    │   │       └── 📄 Etiqueta.java
+    │   └── 📁 persistence                        (capa de persistencia)
+    │       └── 📁 repository
     │           ├── 📄 RepositorioLibros.java
     │           └── 📄 RepositorioEtiquetas.java
     └── 📁 resources
@@ -130,7 +131,7 @@ El resto del entregable (la relación en `Libro`, los dos repositorios y el
   propietario (`@JoinTable`) y un lado inverso (`mappedBy`) explícitos.
 - El `Main` ejecuta sin excepciones contra H2 y produce una salida
   coherente con los datos guardados.
-- Las entidades viven en `persistences.entities` y los repositorios en
-  `persistences.repositories`, cada uno con su línea `package` correcta y
+- Las entidades viven en `negocio.model` y los repositorios en
+  `persistence.repository`, cada uno con su línea `package` correcta y
   los `import` necesarios entre paquetes; `Main` está en el paquete
   raíz.

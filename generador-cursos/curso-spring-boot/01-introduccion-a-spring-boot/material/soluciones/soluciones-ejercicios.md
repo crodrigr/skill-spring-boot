@@ -119,10 +119,10 @@ explícitamente el control del flujo, no una descripción genérica de "es grand
 
 | Clase | Capa | Paquete | Justificación |
 |---|---|---|---|
-| `Libro` | Persistencia | `com.biblioteca.persistences.entities` | Representa una entidad del dominio; no tiene lógica de negocio ni acceso a datos. |
-| `ControladorCatalogo` | Presentación | `com.biblioteca.controllers` | Recibe peticiones HTTP del catálogo. |
-| `RepositorioLibros` | Persistencia | `com.biblioteca.persistences.repositories` | Responsable de consultar los datos de los libros. |
-| `ServicioPrestamos` | Negocio | `com.biblioteca.services` | Contiene la regla de negocio de si un usuario puede llevarse un libro. |
+| `Libro` | Persistencia | `com.biblioteca.negocio.model` | Representa una entidad del dominio; no tiene lógica de negocio ni acceso a datos. |
+| `ControladorCatalogo` | Presentación | `com.biblioteca.presentacion.controlador` | Recibe peticiones HTTP del catálogo. |
+| `RepositorioLibros` | Persistencia | `com.biblioteca.persistence.repository` | Responsable de consultar los datos de los libros. |
+| `ServicioPrestamos` | Negocio | `com.biblioteca.negocio.service` | Contiene la regla de negocio de si un usuario puede llevarse un libro. |
 
 **Verificación**: se revisa que cada justificación describa la responsabilidad de
 la clase (qué hace), no solo repita su nombre.
@@ -131,10 +131,10 @@ la clase (qué hace), no solo repita su nombre.
 
 **Solución propuesta**:
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
-// com.biblioteca.services.ServicioNotificaciones
+// com.biblioteca.negocio.service.ServicioNotificaciones
 public class ServicioNotificaciones {
 
     private final RepositorioUsuarios repositorioUsuarios;
@@ -186,7 +186,7 @@ final` recibidos por constructor.
 **Solución propuesta**:
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
 @Service
 public class ServicioFacturacion {
@@ -282,7 +282,7 @@ de `Main` coincida con ese orden.
 **Solución propuesta**:
 
 ```java
-// com.medisalud.persistences.repositories.RepositorioPacientes
+// com.medisalud.persistence.repository.RepositorioPacientes
 @Repository
 public class RepositorioPacientes {
     public Optional<Paciente> buscarPorCodigo(String codigo) {
@@ -290,7 +290,7 @@ public class RepositorioPacientes {
     }
 }
 
-// com.medisalud.services.ServicioCitas
+// com.medisalud.negocio.service.ServicioCitas
 @Service
 public class ServicioCitas {
 
@@ -305,7 +305,7 @@ public class ServicioCitas {
     }
 }
 
-// com.medisalud.controllers.ControladorCitas
+// com.medisalud.presentacion.controlador.ControladorCitas
 @RestController
 public class ControladorCitas {
 
@@ -345,7 +345,7 @@ correctamente aplicados, y que la respuesta explique por qué no hace falta
 **Solución propuesta**:
 
 ```java
-// com.medisalud.services.NotificadorSms
+// com.medisalud.negocio.service.NotificadorSms
 public class NotificadorSms implements Notificador {
     @Override
     public void enviar(String destinatario, String mensaje) {
@@ -353,7 +353,7 @@ public class NotificadorSms implements Notificador {
     }
 }
 
-// com.medisalud.services.NotificadorEmail
+// com.medisalud.negocio.service.NotificadorEmail
 public class NotificadorEmail implements Notificador {
     @Override
     public void enviar(String destinatario, String mensaje) {
@@ -361,7 +361,7 @@ public class NotificadorEmail implements Notificador {
     }
 }
 
-// com.medisalud.services.ServicioRecordatorios
+// com.medisalud.negocio.service.ServicioRecordatorios
 public class ServicioRecordatorios {
     private final Notificador notificador;
 

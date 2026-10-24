@@ -26,43 +26,41 @@ probarlos desde el navegador.
 📁 coworkhub
 ├── 📄 .gitignore
 ├── 📄 docker-compose.yml
-├── 📄 pom.xml                                                 ◀ ✏️ se modifica
-├── 📁 docs  (documentación del proyecto)
+├── 📄 pom.xml                                           ◀ ✏️ se modifica
+├── 📁 docs                                              (documentación del proyecto)
 │   └── 📄 analisis.md
 ├── 📁 src/main/java/com/coworkhub
 │   ├── 📄 Main.java
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   ├── 📄 ConfiguracionBeans.java
-│   │   └── 📄 ConfiguracionOpenApi.java                       ◀ 🆕 nuevo
-│   ├── 📁 controllers  (capa de presentación, HTTP)
-│   │   ├── 📄 ControladorDisponibilidad.java                  ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorEquipamientos.java                   ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorMiembros.java                        ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorPlanes.java                          ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorReservas.java                        ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorSalas.java                           ◀ ✏️ se modifica
-│   │   ├── 📄 ControladorSedes.java                           ◀ ✏️ se modifica
-│   │   └── 📄 ControladorServiciosAdicionales.java            ◀ ✏️ se modifica
-│   ├── 📁 dto  (solicitudes y respuestas, en records)
-│   │   ├── 📄 ItemServicio.java                               ◀ ✏️ se modifica
-│   │   ├── 📄 ResumenConsumo.java
-│   │   ├── 📄 SolicitudActualizarMiembro.java
-│   │   ├── 📄 SolicitudEquipamiento.java
-│   │   ├── 📄 SolicitudMiembro.java                           ◀ ✏️ se modifica
-│   │   ├── 📄 SolicitudPlan.java
-│   │   ├── 📄 SolicitudReserva.java                           ◀ ✏️ se modifica
-│   │   ├── 📄 SolicitudSala.java
-│   │   ├── 📄 SolicitudSede.java
-│   │   └── 📄 SolicitudServicioAdicional.java
-│   ├── 📁 exception  (excepciones y manejador global)
-│   │   ├── 📄 ManejadorGlobalDeExcepciones.java
-│   │   ├── 📄 RecursoNoEncontradoException.java
-│   │   ├── 📄 ReglaNegocioException.java
-│   │   ├── 📄 RespuestaError.java                             ◀ ✏️ se modifica
-│   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
+│   │   └── 📄 ConfiguracionOpenApi.java                 ◀ 🆕 nuevo
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   ├── 📁 controlador
+│   │   │   ├── 📄 ControladorDisponibilidad.java        ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorEquipamientos.java         ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorMiembros.java              ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorPlanes.java                ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorReservas.java              ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorSalas.java                 ◀ ✏️ se modifica
+│   │   │   ├── 📄 ControladorSedes.java                 ◀ ✏️ se modifica
+│   │   │   └── 📄 ControladorServiciosAdicionales.java  ◀ ✏️ se modifica
+│   │   ├── 📁 dto
+│   │   │   ├── 📄 ItemServicio.java                     ◀ ✏️ se modifica
+│   │   │   ├── 📄 RespuestaError.java                   ◀ ✏️ se modifica
+│   │   │   ├── 📄 ResumenConsumo.java
+│   │   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   │   ├── 📄 SolicitudEquipamiento.java
+│   │   │   ├── 📄 SolicitudMiembro.java                 ◀ ✏️ se modifica
+│   │   │   ├── 📄 SolicitudPlan.java
+│   │   │   ├── 📄 SolicitudReserva.java                 ◀ ✏️ se modifica
+│   │   │   ├── 📄 SolicitudSala.java
+│   │   │   ├── 📄 SolicitudSede.java
+│   │   │   └── 📄 SolicitudServicioAdicional.java
+│   │   └── 📁 excepcion
+│   │       └── 📄 ManejadorGlobalDeExcepciones.java
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   ├── 📁 model
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
 │   │   │   ├── 📄 EstadoMiembro.java
@@ -74,7 +72,24 @@ probarlos desde el navegador.
 │   │   │   ├── 📄 Sede.java
 │   │   │   ├── 📄 ServicioAdicional.java
 │   │   │   └── 📄 TipoSala.java
-│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │   ├── 📁 service
+│   │   │   ├── 📄 CalculadoraCostoReserva.java
+│   │   │   ├── 📄 ServicioConsumo.java
+│   │   │   ├── 📄 ServicioDisponibilidad.java
+│   │   │   ├── 📄 ServicioEquipamientos.java
+│   │   │   ├── 📄 ServicioMiembros.java
+│   │   │   ├── 📄 ServicioPlanes.java
+│   │   │   ├── 📄 ServicioReservas.java
+│   │   │   ├── 📄 ServicioSalas.java
+│   │   │   ├── 📄 ServicioSedes.java
+│   │   │   ├── 📄 ServicioServiciosAdicionales.java
+│   │   │   └── 📄 Validaciones.java
+│   │   └── 📁 excepcion
+│   │       ├── 📄 RecursoNoEncontradoException.java
+│   │       ├── 📄 ReglaNegocioException.java
+│   │       └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
 │   │       ├── 📄 RepositorioEquipamientos.java
 │   │       ├── 📄 RepositorioMiembros.java
 │   │       ├── 📄 RepositorioPlanes.java
@@ -82,30 +97,19 @@ probarlos desde el navegador.
 │   │       ├── 📄 RepositorioSalas.java
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
-│   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa de persistencia de seguridad)
-│   │       ├── 📁 entities  (Usuario y Rol)
-│   │       │   ├── 📄 Rol.java
-│   │       │   └── 📄 Usuario.java
-│   │       └── 📁 repositories  (RepositorioUsuarios)
-│   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa de negocio, reglas del dominio)
-│       ├── 📄 CalculadoraCostoReserva.java
-│       ├── 📄 ServicioConsumo.java
-│       ├── 📄 ServicioDisponibilidad.java
-│       ├── 📄 ServicioEquipamientos.java
-│       ├── 📄 ServicioMiembros.java
-│       ├── 📄 ServicioPlanes.java
-│       ├── 📄 ServicioReservas.java
-│       ├── 📄 ServicioSalas.java
-│       ├── 📄 ServicioSedes.java
-│       ├── 📄 ServicioServiciosAdicionales.java
-│       └── 📄 Validaciones.java
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   └── 📁 model
+│       │       ├── 📄 Rol.java
+│       │       └── 📄 Usuario.java
+│       └── 📁 persistence                               (capa de persistencia)
+│           └── 📁 repository
+│               └── 📄 RepositorioUsuarios.java
 └── 📁 src/main/resources
     ├── 📄 application-h2.properties
     ├── 📄 application-mysql.properties
     ├── 📄 application-postgres.properties
-    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    ├── 📄 application.properties                        ◀ ✏️ se modifica
     └── 📄 data.sql
 ```
 
@@ -151,7 +155,7 @@ springdoc.packages-to-scan=com.coworkhub
 | `springdoc.api-docs.enabled` | Publica el documento OpenAPI en `/v3/api-docs` |
 | `springdoc.swagger-ui.enabled` | Habilita la interfaz web |
 | `springdoc.swagger-ui.path` | Dirección de la interfaz: `/doc/swagger-ui.html` |
-| `springdoc.packages-to-scan` | Paquete donde buscar `@RestController`. Usamos el paquete **raíz** `com.coworkhub`: springdoc escanea también los subpaquetes, así incluye `controllers` y, más adelante, `security.controllers`. Si apuntaras a un paquete sin controladores, Swagger UI cargaría vacío |
+| `springdoc.packages-to-scan` | Paquete donde buscar `@RestController`. Usamos el paquete **raíz** `com.coworkhub`: springdoc escanea también los subpaquetes, así incluye `presentacion` y, más adelante, `security.presentacion.controlador`. Si apuntaras a un paquete sin controladores, Swagger UI cargaría vacío |
 
 ### ✅ Primer vistazo (sin escribir nada más)
 
@@ -187,7 +191,7 @@ import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.coworkhub.exception.RespuestaError;
+import com.coworkhub.presentacion.dto.RespuestaError;
 
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.oas.models.Components;
@@ -258,10 +262,10 @@ cuerpo de ejemplo del `POST`. Reemplazá el contenido de estos cuatro archivos:
 > `example`: sin él, springdoc descarta el ejemplo porque no puede interpretar el formato
 > de fecha del valor.
 
-**📄 `src/main/java/com/coworkhub/dto/SolicitudReserva.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/dto/SolicitudReserva.java`**
 
 ```java
-package com.coworkhub.dto;
+package com.coworkhub.presentacion.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -278,10 +282,10 @@ public record SolicitudReserva(
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/dto/ItemServicio.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/dto/ItemServicio.java`**
 
 ```java
-package com.coworkhub.dto;
+package com.coworkhub.presentacion.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -291,10 +295,10 @@ public record ItemServicio(
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/dto/SolicitudMiembro.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/dto/SolicitudMiembro.java`**
 
 ```java
-package com.coworkhub.dto;
+package com.coworkhub.presentacion.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -308,10 +312,10 @@ public record SolicitudMiembro(
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/exception/RespuestaError.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/dto/RespuestaError.java`**
 
 ```java
-package com.coworkhub.exception;
+package com.coworkhub.presentacion.dto;
 
 import java.time.Instant;
 
@@ -337,7 +341,7 @@ anotación `@Tag`, **encima de `@RestController`**:
 
 `ControladorSedes`:
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorSedes.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorSedes.java`** (fragmento)
 
 ```java
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -347,7 +351,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 `ControladorSalas`:
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorSalas.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorSalas.java`** (fragmento)
 
 ```java
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -357,7 +361,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 `ControladorEquipamientos`:
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorEquipamientos.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorEquipamientos.java`** (fragmento)
 
 ```java
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -367,7 +371,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 `ControladorServiciosAdicionales`:
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorServiciosAdicionales.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorServiciosAdicionales.java`** (fragmento)
 
 ```java
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -377,7 +381,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 `ControladorPlanes`:
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorPlanes.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorPlanes.java`** (fragmento)
 
 ```java
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -387,7 +391,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 `ControladorMiembros`:
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorMiembros.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorMiembros.java`** (fragmento)
 
 ```java
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -397,7 +401,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 `ControladorDisponibilidad`:
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorDisponibilidad.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorDisponibilidad.java`** (fragmento)
 
 ```java
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -411,10 +415,10 @@ Las reservas son lo más importante de la API, así que cada método lleva `@Ope
 un resumen y —donde importa— la regla que aplica. Reemplazá `ControladorReservas`
 completo (tiene el `@Tag` y todos los `@Operation`):
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorReservas.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorReservas.java`**
 
 ```java
-package com.coworkhub.controllers;
+package com.coworkhub.presentacion.controlador;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -433,11 +437,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coworkhub.dto.ItemServicio;
-import com.coworkhub.dto.SolicitudReserva;
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Reserva;
-import com.coworkhub.services.ServicioReservas;
+import com.coworkhub.presentacion.dto.ItemServicio;
+import com.coworkhub.presentacion.dto.SolicitudReserva;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Reserva;
+import com.coworkhub.negocio.service.ServicioReservas;
 
 @Tag(name = "Reservas", description = "Crear, consultar, modificar y cancelar reservas")
 @RestController

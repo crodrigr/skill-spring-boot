@@ -8,7 +8,7 @@ CRUD REST agregando crear, actualizar y eliminar.
 ## 💻 Código o contexto de partida
 
 ```java
-// ControladorAutores.java — capa de presentación (com.biblioteca.controllers)
+// ControladorAutores.java — capa de presentación (com.biblioteca.presentacion.controlador)
 // ya existe (Intermedio 02), con los endpoints GET /autores y
 // GET /autores/{id}.
 ```

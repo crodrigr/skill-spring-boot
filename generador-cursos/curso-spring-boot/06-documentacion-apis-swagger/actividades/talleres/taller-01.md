@@ -25,7 +25,7 @@ y la configuración de springdoc-openapi.
    `springdoc.packages-to-scan=com.medisalud`, siguiendo el mismo patrón
    del Ejemplo 05. Alcanza con apuntar al paquete raíz `com.medisalud`,
    aunque `ControladorPacientes` viva en el subpaquete
-   `com.medisalud.controllers`: springdoc escanea recursivamente todos los
+   `com.medisalud.presentacion.controlador`: springdoc escanea recursivamente todos los
    subpaquetes.
 3. **Verificar en Swagger UI**: accedé a
    `http://localhost:8080/doc/swagger-ui.html` y confirmá que los cinco
@@ -58,21 +58,23 @@ intentá resolverlo primero por tu cuenta.
 📁 taller-01-documentacion-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 controllers
-    │   │   └── 📄 ControladorPacientes.java
-    │   ├── 📁 services
-    │   │   └── 📄 ServicioPacientes.java
-    │   └── 📁 persistences
-    │       ├── 📁 entities
-    │       │   └── 📄 Paciente.java
-    │       └── 📁 repositories
+    │   ├── 📁 presentacion                       (capa de presentación)
+    │   │   └── 📁 controlador
+    │   │       └── 📄 ControladorPacientes.java
+    │   ├── 📁 negocio                            (capa de negocio)
+    │   │   ├── 📁 model
+    │   │   │   └── 📄 Paciente.java
+    │   │   └── 📁 service
+    │   │       └── 📄 ServicioPacientes.java
+    │   └── 📁 persistence                        (capa de persistencia)
+    │       └── 📁 repository
     │           └── 📄 RepositorioPacientes.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
 (Las cuatro clases Java quedan exactamente igual que en el Módulo 5, cada
-una en su capa —presentación (`controllers`), negocio (`services`) y persistencia (`persistences`)—; el
+una en su capa —presentación (`presentacion`), negocio (`negocio`) y persistencia (`persistence`)—; el
 `pom.xml` y `application.properties` son los únicos archivos que
 cambian.)
 

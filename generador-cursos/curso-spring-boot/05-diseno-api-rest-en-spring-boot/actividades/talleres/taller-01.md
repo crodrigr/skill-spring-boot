@@ -14,8 +14,8 @@ exactamente el mismo patrón que `ServicioLibros`/`ControladorLibros`
 (Ejemplos 05-07 de este módulo), pero aplicado a `Paciente`.
 
 Este Taller es, además, el primero que completa las tres capas del curso:
-presentación (`controllers`), negocio (`services`) y persistencia
-(`persistences`, que ya existía desde el Módulo 3). Lleva a la práctica la
+presentación (`presentacion`), negocio (`negocio`) y persistencia
+(`persistence`, que ya existía desde el Módulo 3). Lleva a la práctica la
 arquitectura del Ejemplo 03 (Controller → Service → Repository → Database)
 directamente a la estructura de carpetas del proyecto — no solo como un
 concepto, sino como paquetes Java reales. De acá en adelante, todo el
@@ -25,29 +25,29 @@ material del curso sigue esta misma organización.
 
 | Capa | Paquete | Qué contiene | Clase en este taller |
 |---|---|---|---|
-| **Presentación** | `com.medisalud.controllers` | Endpoints HTTP: recibe la solicitud, delega en el servicio y devuelve la respuesta con su código de estado. | `ControladorPacientes` |
-| **Negocio** | `com.medisalud.services` | Lógica de negocio. Es la única capa que habla con la de persistencia. | `ServicioPacientes` |
-| **Persistencia** | `com.medisalud.persistences` | Acceso a datos: `entities` (clases `@Entity`) y `repositories` (interfaces de Spring Data JPA). | `Paciente`, `RepositorioPacientes` |
+| **Presentación** | `com.medisalud.presentacion.controlador` | Endpoints HTTP: recibe la solicitud, delega en el servicio y devuelve la respuesta con su código de estado. | `ControladorPacientes` |
+| **Negocio** | `com.medisalud.negocio.service` | Lógica de negocio. Es la única capa que habla con la de persistencia. | `ServicioPacientes` |
+| **Persistencia** | `com.medisalud.persistence` | Acceso a datos: `model` (clases `@Entity`) y `repository` (interfaces de Spring Data JPA). | `Paciente`, `RepositorioPacientes` |
 
-Regla de dependencia: `controllers` → `services` → `persistences`. Un
+Regla de dependencia: `presentacion` → `negocio` → `persistence`. Un
 controlador nunca inyecta un repositorio directamente.
 
 ## 🪜 Pasos
 
 1. **Revisar la capa de persistencia**: confirmá que `Paciente` (Módulo 3/4) está en el
-   paquete `com.medisalud.persistences.entities`, y `RepositorioPacientes`
-   en `com.medisalud.persistences.repositories` (ambos forman la capa de
-   persistencia, `persistences`). Si en tu proyecto estaban en otro paquete,
+   paquete `com.medisalud.negocio.model`, y `RepositorioPacientes`
+   en `com.medisalud.persistence.repository` (ambos forman la capa de
+   persistencia, `persistence`). Si en tu proyecto estaban en otro paquete,
    movelos: ningún código de esas dos clases cambia, solo su ubicación y su
    línea `package`.
 2. **Crear la clase de servicio**: escribí `ServicioPacientes`
-   (`@Service`) en el paquete `com.medisalud.services`, inyectando
+   (`@Service`) en el paquete `com.medisalud.negocio.service`, inyectando
    `RepositorioPacientes` por constructor, con los cinco métodos de
    negocio (`listarTodos`, `buscarPorId`, `crear`, `actualizar`,
    `eliminar`) siguiendo el mismo patrón de `ServicioLibros`.
 3. **Crear el controlador REST**: escribí `ControladorPacientes`
    (`@RestController`, `@RequestMapping("/pacientes")`) en el paquete
-   `com.medisalud.controllers`, inyectando `ServicioPacientes`, con los
+   `com.medisalud.presentacion.controlador`, inyectando `ServicioPacientes`, con los
    cinco endpoints CRUD: `GET /pacientes`, `GET /pacientes/{id}`, `POST
    /pacientes`, `PUT /pacientes/{id}` y `DELETE /pacientes/{id}`,
    devolviendo el código de estado correcto en cada caso (`200`, `201`,
@@ -64,10 +64,10 @@ Así se ve el encabezado y el método `actualizar` de `ServicioPacientes`,
 para que uses el mismo estilo en el resto del entregable:
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
-import com.medisalud.persistences.entities.Paciente;
-import com.medisalud.persistences.repositories.RepositorioPacientes;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioPacientes;
 
 // ...
 
@@ -83,7 +83,7 @@ public Optional<Paciente> actualizar(Long id, Paciente datos) {
 **Nota sobre paquetes**: cada clase declara su propio `package` según la
 capa a la que pertenece, y solo importa explícitamente las clases del
 proyecto que vienen de **otro** paquete (por ejemplo, `Paciente` desde
-`persistences.entities`); las clases de Spring/Java (`@Service`, `Optional`, etc.) se
+`negocio.model`); las clases de Spring/Java (`@Service`, `Optional`, etc.) se
 omiten de estos fragmentos por brevedad, igual que en el resto del curso.
 
 **Nota**: `Paciente` necesita un método `setNombre(String nombre)` que el
@@ -101,14 +101,16 @@ resolverlo primero por tu cuenta.
 📁 taller-01-api-pacientes
 └── 📁 src/main
     ├── 📁 java/com/medisalud
-    │   ├── 📁 controllers
-    │   │   └── 📄 ControladorPacientes.java
-    │   ├── 📁 services
-    │   │   └── 📄 ServicioPacientes.java
-    │   └── 📁 persistences
-    │       ├── 📁 entities
-    │       │   └── 📄 Paciente.java
-    │       └── 📁 repositories
+    │   ├── 📁 presentacion                       (capa de presentación)
+    │   │   └── 📁 controlador
+    │   │       └── 📄 ControladorPacientes.java
+    │   ├── 📁 negocio                            (capa de negocio)
+    │   │   ├── 📁 model
+    │   │   │   └── 📄 Paciente.java
+    │   │   └── 📁 service
+    │   │       └── 📄 ServicioPacientes.java
+    │   └── 📁 persistence                        (capa de persistencia)
+    │       └── 📁 repository
     │           └── 📄 RepositorioPacientes.java
     └── 📁 resources
         └── 📄 application.properties
@@ -129,12 +131,12 @@ resolverlo primero por tu cuenta.
 
 - `Paciente`, `RepositorioPacientes`, `ServicioPacientes` y
   `ControladorPacientes` viven cada una en su paquete correspondiente
-  (`persistences.entities`, `persistences.repositories`, `services`,
-  `controllers`), con la línea `package` correcta y los `import`
+  (`negocio.model`, `persistence.repository`, `negocio`,
+  `presentacion`), con la línea `package` correcta y los `import`
   necesarios hacia las clases de otro paquete del proyecto.
 - El controlador solo depende de `ServicioPacientes` y el servicio solo
   depende de `RepositorioPacientes`: ninguna capa se salta a la
-  siguiente (`controllers` → `services` → `persistences`).
+  siguiente (`presentacion` → `negocio` → `persistence`).
 - `ServicioPacientes` y `ControladorPacientes` siguen exactamente el
   mismo patrón de capas que `ServicioLibros`/`ControladorLibros`.
 - Los cinco endpoints devuelven el código de estado correcto en cada

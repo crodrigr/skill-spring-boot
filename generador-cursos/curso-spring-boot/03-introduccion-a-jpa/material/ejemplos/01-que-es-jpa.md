@@ -41,13 +41,14 @@ entidad JPA del curso.
 
 ```text
 📁 ejemplo-01-que-es-jpa
-└── 📁 src/main
-    ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java           (nuevo — @Entity; antes era un record en el Módulo 1)
-    │   ├── 📄 ServicioPacientes.java  (nuevo — usa EntityManager directamente)
-    │   └── 📄 Main.java               (▶️ @SpringBootApplication — clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties  (la explicación de cada propiedad está en el Ejemplo 07; por ahora, copiala tal cual)
+└── 📁 src/com/medisalud
+    └── 📁 src/main
+        ├── 📁 java/com/medisalud
+        │   ├── 📄 Paciente.java           (nuevo — @Entity; antes era un record en el Módulo 1)
+        │   ├── 📄 ServicioPacientes.java  (nuevo — usa EntityManager directamente)
+        │   └── 📄 Main.java               (▶️ @SpringBootApplication — clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
+            └── 📄 application.properties  (la explicación de cada propiedad está en el Ejemplo 07; por ahora, copiala tal cual)
 ```
 
 **Dependencias Maven** (`pom.xml`, resumidas): `spring-boot-starter-data-jpa`
@@ -57,6 +58,8 @@ El detalle completo de las dependencias vive en el Ejemplo 07.
 ## 💻 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Paciente {
 
@@ -95,6 +98,10 @@ public class Paciente {
 ## 💻 Archivo: `ServicioPacientes.java`
 
 ```java
+package com.medisalud.negocio.service;
+
+import com.medisalud.negocio.model.Paciente;
+
 @Service
 public class ServicioPacientes {
 
@@ -121,6 +128,10 @@ public class ServicioPacientes {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.service.ServicioPacientes;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

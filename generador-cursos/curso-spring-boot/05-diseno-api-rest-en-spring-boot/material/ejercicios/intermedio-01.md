@@ -9,9 +9,9 @@ controlador de autores va a necesitar.
 ## 💻 Código o contexto de partida
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
-// Autor.java — capa de persistencia (com.biblioteca.persistences.entities)
+// Autor.java — capa de negocio (modelo) (com.biblioteca.negocio.model)
 // (Módulo 3, reutilizada; se agregan getId() y setNombre(),
 // que el Módulo 3 no necesitaba porque nunca se usó en un CRUD)
 @Entity
@@ -41,15 +41,15 @@ public class Autor {
 ```
 
 ```java
-package com.biblioteca.persistences.repositories;
+package com.biblioteca.persistence.repository;
 
-// RepositorioAutores.java — capa de persistencia (com.biblioteca.persistences.repositories)
+// RepositorioAutores.java — capa de persistencia (com.biblioteca.persistence.repository)
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
 
 1. Creá `ServicioAutores` (`@Service`) en el paquete de la capa de
-   servicios (`com.biblioteca.services`), inyectando `RepositorioAutores`
+   servicios (`com.biblioteca.negocio.service`), inyectando `RepositorioAutores`
    por constructor.
 2. Agregá los mismos cinco métodos de negocio del Ejemplo 05:
    `listarTodos`, `buscarPorId`, `crear`, `actualizar` (actualiza
@@ -58,7 +58,7 @@ public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 ## 📏 Criterios de evaluación de la solución
 
 - `ServicioAutores` está anotada con `@Service`, vive en
-  `com.biblioteca.services` e inyecta `RepositorioAutores` por
+  `com.biblioteca.negocio.service` e inyecta `RepositorioAutores` por
   constructor.
 - Los cinco métodos delegan en el repositorio, sin escribir SQL/JPQL.
 - `actualizar` devuelve `Optional<Autor>` (vacío si no existe); `eliminar`

@@ -8,10 +8,10 @@ aplicación web siguiendo el patrón Modelo Vista Controlador (MVC), pero lo
 traduce a su propia arquitectura en capas.
 
 **Qué busca demostrar este ejemplo**: qué es MVC en general, cómo se
-traduce a la arquitectura en capas de Spring (`Controller` → `Service` →
-`Repository` → `Database`), y qué responsabilidad tiene cada capa.
+traduce a las tres capas de Spring (`presentacion` → `negocio` →
+`persistence`), y qué responsabilidad tiene cada subpaquete.
 
-![El cliente llama al controlador, que llama al servicio, que llama al repositorio, que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
+![El cliente llama a la capa de presentación (controlador y dto), que llama a la capa de negocio (service y model), que llama a la capa de persistencia (repository), que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
 
 ## 🧠 El patrón Modelo Vista Controlador (MVC)
 
@@ -30,22 +30,39 @@ respuesta cumple, en la práctica, el rol que la Vista cumplía antes.
 
 ## 🧠 La arquitectura en capas de Spring
 
-Spring Boot traduce MVC a cuatro capas con responsabilidades bien
-definidas:
+Spring Boot traduce MVC a **tres capas**: presentación, negocio y
+persistencia. Son las mismas que el curso de Java usa en su proyecto
+final, con el modelo dentro de la capa de negocio:
 
 ```mermaid
 flowchart LR
-    Controller["Controller<br/>(maneja HTTP)"] --> Service["Service<br/>(lógica de negocio)"]
-    Service --> Repository["Repository<br/>(acceso a datos)"]
-    Repository --> Database[("Database<br/>(persistencia)")]
+    Cliente["Cliente HTTP"] --> Presentacion["presentacion<br/>Controlador + DTO"]
+    Presentacion --> Negocio["negocio<br/>Service + model"]
+    Negocio --> Persistence["persistence<br/>Repository"]
+    Persistence --> Database[("Base de datos")]
 ```
 
-| Capa | Responsabilidad | Anotación típica |
-|---|---|---|
-| `Controller` | Recibir la solicitud HTTP, delegar en el `Service`, devolver la respuesta con su código de estado | `@RestController` |
-| `Service` | Lógica de negocio: qué hacer con los datos, en qué orden, con qué validaciones | `@Service` |
-| `Repository` | Acceso a datos: leer/escribir en la base de datos | `interface ... extends JpaRepository` |
-| `Database` | Persistencia real de los datos | H2 en memoria |
+| Capa | Subpaquete | Responsabilidad | Tipo o anotación típica |
+|---|---|---|---|
+| **Presentación** | `controlador` | Recibir la solicitud HTTP, delegar en el servicio y devolver la respuesta con su código de estado | `@RestController` |
+| | `dto` | Objetos que definen **qué datos entran y salen** de la API (`Solicitud…`, `Respuesta…`), separados de las entidades | `record` |
+| | `excepcion` | Traducir los errores a respuestas HTTP (Módulo 7) | `@ControllerAdvice` |
+| **Negocio** | `service` | Lógica de negocio: qué hacer con los datos, en qué orden, con qué validaciones | `@Service` |
+| | `model` | El modelo del dominio: las entidades | `@Entity` |
+| | `excepcion` | Errores de negocio que lanza el servicio (Módulo 7) | `extends RuntimeException` |
+| **Persistencia** | `repository` | Acceso a datos: leer y escribir en la base de datos | `interface ... extends JpaRepository` |
+
+> 💡 **¿Dónde están la vista y el DAO?** En la versión Java del curso había una
+> `vista/` (`VistaConsola`) y un `dao/` (el SQL con JDBC). En una API REST la
+> "vista" es el JSON de la respuesta (los `dto` definen su forma), y Spring Data
+> JPA genera la implementación del repositorio, así que no se escribe un `dao/`.
+
+**Sobre los DTO**: en este módulo los endpoints reciben y devuelven las
+entidades directamente, para centrar la atención en las capas. Los
+DTO aparecen primero en el Módulo 7 (`RespuestaError`, el cuerpo de los
+errores) y en el Módulo 8 (`SolicitudLogin` y `RespuestaLogin`), y el
+Proyecto los usa para todas las solicitudes: así el cliente no puede enviar
+campos que no le corresponden.
 
 ## 🗂️ Cómo se organiza en paquetes
 
@@ -53,17 +70,35 @@ Las capas no son solo un concepto: en cada proyecto del curso se
 convierten en paquetes Java con nombre fijo, para que cualquiera que abra
 el proyecto sepa dónde está cada clase.
 
-| Capa MVC | Paquete | Qué contiene |
-|---|---|---|
-| `controllers` | `com.medisalud.controllers` | Clases `@RestController` |
-| `services` | `com.medisalud.services` | Clases `@Service` (lógica de negocio) |
-| `persistences` | `com.medisalud.persistences.entities` y `com.medisalud.persistences.repositories` | Entidades `@Entity` e interfaces `JpaRepository` (acceso a datos) |
+```text
+📁 medisalud
+└── 📁 src/main/java/com/medisalud
+    ├── 📄 Main.java                              (clase @SpringBootApplication)
+    ├── 📁 presentacion                           (1 · capa de presentación)
+    │   ├── 📁 controlador
+    │   │   └── 📄 ControladorPacientes.java
+    │   ├── 📁 dto
+    │   │   └── 📄 SolicitudPaciente.java         (aparece en el Proyecto)
+    │   └── 📁 excepcion
+    │       └── 📄 ManejadorGlobalDeExcepciones.java   (Módulo 7)
+    ├── 📁 negocio                                (2 · capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 Paciente.java
+    │   ├── 📁 service
+    │   │   └── 📄 ServicioPacientes.java
+    │   └── 📁 excepcion
+    │       └── 📄 PacienteNoEncontradoException.java  (Módulo 7)
+    └── 📁 persistence                            (3 · capa de persistencia)
+        └── 📁 repository
+            └── 📄 RepositorioPacientes.java
+```
 
 La clase `@SpringBootApplication` vive en el paquete raíz
 (`com.medisalud`), por encima de las tres capas, para que Spring Boot
-encuentre todo lo que está en los subpaquetes. Los paquetes `exception`,
-`config` y `jwt` que aparecen más adelante en el curso no son capas: son
-transversales.
+encuentre todo lo que está en los subpaquetes. Los paquetes `config` y
+`jwt` que aparecen más adelante en el curso no son capas: son
+transversales, y la seguridad (Módulo 8) repite las tres capas dentro de
+`security`.
 
 **Regla clave**: cada capa solo se comunica con la de abajo. El
 `Controller` nunca accede directamente al `Repository`, saltándose el

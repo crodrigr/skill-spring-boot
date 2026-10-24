@@ -22,9 +22,9 @@ API ni interfaz de usuario: `Main` solo ejecuta la prueba.
 
 | Capa | Paquete | Qué contiene | Clases de este taller |
 |---|---|---|---|
-| **Presentación** | `com.medisalud.controllers` | Recibe las solicitudes del usuario y responde. | Ninguna todavía |
-| **Negocio** | `com.medisalud.services` | Reglas del dominio y coordinación de las operaciones. | `ServicioCitas` |
-| **Persistencia** | `com.medisalud.persistences` | `entities` (el modelo del dominio) y `repositories` (acceso a datos). | `Paciente`, `Medico`, `Cita` y los cuatro repositorios |
+| **Presentación** | `com.medisalud.presentacion.controlador` | Recibe las solicitudes del usuario y responde. | Ninguna todavía |
+| **Negocio** | `com.medisalud.negocio.service` | Reglas del dominio y coordinación de las operaciones. | `ServicioCitas` |
+| **Persistencia** | `com.medisalud.persistence` | `model` (el modelo del dominio) y `repository` (acceso a datos). | `Paciente`, `Medico`, `Cita` y los cuatro repositorios |
 
 Regla de dependencia: presentación → negocio → persistencia. Una capa solo usa
 a la de abajo. `Main` queda en el paquete raíz `com.medisalud` y puede crear
@@ -32,7 +32,7 @@ las piezas de todas las capas.
 
 ## 🪜 Pasos
 
-1. Modelá la clase `Paciente` (en `persistences.entities`) con al menos nombre y código de historia clínica.
+1. Modelá la clase `Paciente` (en `negocio.model`) con al menos nombre y código de historia clínica.
 2. Modelá la clase `Medico` con al menos nombre y especialidad.
 3. Modelá la clase `Cita`, que relaciona un `Paciente` con un `Medico` en una fecha
    dada, y agregá un método `confirmar()` que cambie su estado.
@@ -55,7 +55,7 @@ las piezas de todas las capas.
 ## 💡 Ejemplo resuelto (versión acoplada, punto de partida del paso 4)
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
 public class ServicioCitas {
 
@@ -88,20 +88,21 @@ propio `.java`, dentro del paquete de su capa), con esta estructura:
 ```text
 📁 taller-01-medisalud
 ├── 📁 src/com/medisalud
-│   ├── 📁 services                         (capa de negocio)
-│   │   └── 📄 ServicioCitas.java     (versión final, con inyección por constructor)
-│   ├── 📁 persistences                     (capa de persistencia)
-│   │   ├── 📁 entities
+│   ├── 📁 negocio                                     (capa de negocio)
+│   │   ├── 📁 model
 │   │   │   ├── 📄 Paciente.java
 │   │   │   ├── 📄 Medico.java
 │   │   │   └── 📄 Cita.java
-│   │   └── 📁 repositories
+│   │   └── 📁 service
+│   │       └── 📄 ServicioCitas.java                  (versión final, con inyección por constructor)
+│   ├── 📁 persistence                                 (capa de persistencia)
+│   │   └── 📁 repository
 │   │       ├── 📄 RepositorioPacientes.java
 │   │       ├── 📄 RepositorioMedicos.java
 │   │       ├── 📄 RepositorioPacientesEnMemoria.java
 │   │       └── 📄 RepositorioMedicosEnMemoria.java
-│   └── 📄 Main.java              (agenda al menos dos citas)
-└── 📄 acoplamientos.md       (lista del paso 6, redactada antes de refactorizar)
+│   └── 📄 Main.java                                   (agenda al menos dos citas)
+└── 📄 acoplamientos.md                                (lista del paso 6, redactada antes de refactorizar)
 ```
 
 `ServicioCitas.java` y `Main.java` se entregan en su versión final del paso 7; la

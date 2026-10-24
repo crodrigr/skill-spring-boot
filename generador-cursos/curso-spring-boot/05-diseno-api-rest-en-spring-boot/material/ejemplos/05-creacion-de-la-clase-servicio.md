@@ -19,13 +19,14 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros` del Módulo 3.
 
 ```text
 📁 gestion-bd-jpa
-└── 📁 src/main
-    ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java              (del Módulo 3, reutilizada)
-    │   ├── 📄 RepositorioLibros.java  (del Módulo 3, reutilizada)
-    │   └── 📄 ServicioLibros.java
-    └── 📁 resources
-        └── 📄 application.properties  (del Módulo 3, reutilizada)
+└── 📁 src/com/biblioteca
+    └── 📁 src/main
+        ├── 📁 java/com/biblioteca
+        │   ├── 📄 Libro.java              (del Módulo 3, reutilizada)
+        │   ├── 📄 RepositorioLibros.java  (del Módulo 3, reutilizada)
+        │   └── 📄 ServicioLibros.java
+        └── 📁 resources
+            └── 📄 application.properties  (del Módulo 3, reutilizada)
 ```
 
 <details>
@@ -34,6 +35,8 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros` del Módulo 3.
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -64,6 +67,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -85,6 +92,11 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `ServicioLibros.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioLibros {
 

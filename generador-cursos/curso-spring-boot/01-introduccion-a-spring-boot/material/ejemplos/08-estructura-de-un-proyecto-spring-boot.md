@@ -16,49 +16,52 @@ que Spring Boot descubra y registre automáticamente todo lo demás.
 ## 🌳 Árbol de carpetas
 
 ```text
-biblioteca-api/
-├── pom.xml                                  (o build.gradle, ver Ejemplo 06)
-└── src/
-    ├── main/
-    │   ├── java/
-    │   │   └── com/biblioteca/api/
-    │   │       ├── BibliotecaApiApplication.java   (clase principal)
-    │   │       ├── controller/
-    │   │       │   └── ControladorCatalogo.java
-    │   │       ├── service/
-    │   │       │   └── ServicioPrestamos.java
-    │   │       ├── repository/
-    │   │       │   └── RepositorioLibros.java
-    │   │       └── model/
-    │   │           └── Libro.java
-    │   └── resources/
-    │       └── application.properties
-    └── test/
-        └── java/
-            └── com/biblioteca/api/
-                └── ServicioPrestamosTest.java
+📁 biblioteca-api
+├── 📄 pom.xml                                   (o build.gradle, ver Ejemplo 06)
+└── 📁 src
+    ├── 📁 main
+    │   ├── 📁 java/com/biblioteca
+    │   │   ├── 📄 BibliotecaApiApplication.java   (clase principal)
+    │   │   ├── 📁 presentacion                  (1 · capa de presentación)
+    │   │   │   ├── 📁 controlador
+    │   │   │   │   └── 📄 ControladorCatalogo.java
+    │   │   │   └── 📁 dto                       (datos que entran y salen de la API)
+    │   │   ├── 📁 negocio                       (2 · capa de negocio)
+    │   │   │   ├── 📁 model
+    │   │   │   │   └── 📄 Libro.java
+    │   │   │   └── 📁 service
+    │   │   │       └── 📄 ServicioPrestamos.java
+    │   │   └── 📁 persistence                   (3 · capa de persistencia)
+    │   │       └── 📁 repository
+    │   │           └── 📄 RepositorioLibros.java
+    │   └── 📁 resources
+    │       └── 📄 application.properties
+    └── 📁 test/java/com/biblioteca
+        └── 📄 ServicioPrestamosTest.java
 ```
 
 ## 🗺️ Diagrama: la arquitectura por capas
 
 ```mermaid
 flowchart LR
-    Cliente["Cliente HTTP"] --> Controller["controller/\nControladorCatalogo"]
-    Controller --> Service["service/\nServicioPrestamos"]
-    Service --> Repository["repository/\nRepositorioLibros"]
-    Repository --> Model["model/\nLibro"]
+    Cliente["Cliente HTTP"] --> Presentacion["presentacion/controlador<br/>ControladorCatalogo"]
+    Presentacion --> Negocio["negocio/service<br/>ServicioPrestamos"]
+    Negocio --> Persistence["persistence/repository<br/>RepositorioLibros"]
+    Negocio -. usa .-> Model["negocio/model<br/>Libro"]
+    Persistence -. devuelve .-> Model
 ```
 
-Cada flecha va en un solo sentido: `controller` conoce a `service`, `service`
-conoce a `repository`, y `repository` produce objetos `model`. Ninguna capa
-"de más abajo" conoce a las de arriba: `RepositorioLibros` no sabe que existe
-`ControladorCatalogo`. Esa dirección única es la que evita que un cambio en
-`controller/` obligue a tocar `repository/`.
+Cada flecha va en un solo sentido: `presentacion` conoce a `negocio`, y
+`negocio` conoce a `persistence`. Ninguna capa "de más abajo" conoce a las de
+arriba: `RepositorioLibros` no sabe que existe `ControladorCatalogo`. Esa
+dirección única es la que evita que un cambio en `presentacion/` obligue a
+tocar `persistence/`. El modelo (`Libro`) vive dentro de `negocio` porque
+representa el dominio, y las otras capas lo usan.
 
 ## 💻 Código — la clase principal (`BibliotecaApiApplication.java`)
 
 ```java
-package com.biblioteca.api;
+package com.biblioteca;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -78,22 +81,24 @@ public class BibliotecaApiApplication {
 |---|---|
 | `pom.xml` / `build.gradle` | Declara las dependencias del proyecto (starters) y cómo construirlo (Ejemplo 06). |
 | `BibliotecaApiApplication.java` | Clase principal, anotada `@SpringBootApplication`; contiene el método `main` que arranca la aplicación. |
-| `controller/` | Clases que reciben peticiones HTTP y devuelven una respuesta (`@RestController`); no contienen lógica de negocio. |
-| `service/` | Clases con la lógica de negocio (por ejemplo, las reglas para prestar un libro); es lo que en este módulo se vio como `ServicioPrestamos`. |
-| `repository/` | Clases o interfaces responsables de acceder a los datos (en este módulo, en memoria; en el módulo de persistencia, contra una base de datos real). |
-| `model/` | Clases que representan las entidades del dominio (`Libro`, `Usuario`), como las vistas en POO aplicada (Ejemplo 04). |
+| `presentacion/controlador/` | Capa de presentación: clases que reciben peticiones HTTP y devuelven una respuesta (`@RestController`); no contienen lógica de negocio. |
+| `presentacion/dto/` | Capa de presentación: los datos que entran y salen de la API, separados de las entidades (se usan desde el Módulo 5). |
+| `negocio/service/` | Capa de negocio: clases con la lógica de negocio (por ejemplo, las reglas para prestar un libro); es lo que en este módulo se vio como `ServicioPrestamos`. |
+| `negocio/model/` | Capa de negocio: clases que representan las entidades del dominio (`Libro`, `Usuario`), como las vistas en POO aplicada (Ejemplo 04). |
+| `persistence/repository/` | Capa de persistencia: clases o interfaces responsables de acceder a los datos (en este módulo, en memoria; en el módulo de persistencia, contra una base de datos real). |
 | `src/main/resources/application.properties` | Configuración de la aplicación (por ejemplo, `server.port`), vista en el Ejemplo 07. |
 | `src/test/java/...` | Pruebas automatizadas, organizadas con el mismo paquete que el código que prueban. |
 
 ## 🧭 Explicación paso a paso
 
-1. La separación en `controller/`, `service/` y `repository/` no es exigida por el
-   compilador de Java: es una **convención de arquitectura por capas**, adoptada
-   por la comunidad Spring, que separa "cómo llega la petición" (controller), "qué
-   regla de negocio se aplica" (service) y "de dónde vienen los datos"
-   (repository). Este curso profundiza esta arquitectura en un módulo posterior.
+1. La separación en `presentacion`, `negocio` y `persistence` no es exigida por el
+   compilador de Java: es una **convención de arquitectura por capas** (la misma
+   del curso de Java), que separa "cómo llega la petición" (presentación), "qué
+   regla de negocio se aplica" (negocio) y "de dónde vienen los datos"
+   (persistencia). Este curso la usa en todos sus módulos y la profundiza en el
+   Módulo 5.
 2. `BibliotecaApiApplication.java` suele ubicarse en el paquete raíz
-   (`com.biblioteca.api`) porque, por convención, Spring Boot escanea ese paquete
+   (`com.biblioteca`) porque, por convención, Spring Boot escanea ese paquete
    y todos sus subpaquetes en busca de componentes (`@Component`, `@Service`,
    `@RestController`, etc.) para registrarlos como beans.
 3. `src/main/resources/application.properties` es el lugar donde Spring Boot
@@ -122,7 +127,7 @@ Tomcat inicializado en el puerto 8080
 Started BibliotecaApiApplication in 1.234 seconds
 ```
 
-Spring Boot escaneó `com.biblioteca.api` y sus subpaquetes, registró
+Spring Boot escaneó `com.biblioteca` y sus subpaquetes, registró
 `ControladorCatalogo`, `ServicioPrestamos` y `RepositorioLibros` como beans, leyó
 `application.properties`, y dejó la aplicación escuchando en el puerto
 configurado (por defecto, `8080`), lista para recibir peticiones HTTP.
@@ -130,13 +135,13 @@ configurado (por defecto, `8080`), lista para recibir peticiones HTTP.
 ## 📌 Idea clave
 
 Esta estructura por capas es la que los ejemplos y ejercicios de los módulos
-siguientes del curso asumen como punto de partida: controlador → servicio →
-repositorio → modelo, la misma separación de responsabilidades que promueve el
+siguientes del curso asumen como punto de partida: presentación → negocio →
+persistencia, la misma separación de responsabilidades que promueve el
 patrón MVC mencionado en el Ejemplo 01.
 
 ## ❓ Preguntas de repaso
 
-**1. [Selección]** ¿Qué contiene, por convención, el paquete `service`?
+**1. [Selección]** ¿Qué contiene, por convención, el paquete `negocio/service`?
 
 - **A.** Las clases que reciben peticiones HTTP.
 - **B.** La lógica de negocio de la aplicación.
@@ -146,9 +151,9 @@ patrón MVC mencionado en el Ejemplo 01.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B**. `controller` recibe peticiones, `repository` accede a
-datos y `model` representa entidades; `service` es donde vive la regla de
-negocio.
+**Respuesta correcta: B**. `presentacion/controlador` recibe peticiones,
+`persistence/repository` accede a datos y `negocio/model` representa entidades;
+`negocio/service` es donde vive la regla de negocio.
 
 </details>
 
@@ -159,7 +164,7 @@ sobre la estructura de un proyecto Spring Boot.
   `src/main/java`.
 - **B.** `BibliotecaApiApplication.java` suele ubicarse en el paquete raíz.
 - **C.** Spring Boot exige, por especificación del lenguaje, usar los nombres
-  `controller`/`service`/`repository`.
+  `presentacion`/`negocio`/`persistence`.
 - **D.** Si falta `application.properties`, la aplicación igual arranca con
   valores por defecto.
 
@@ -171,8 +176,8 @@ convención de la comunidad Spring, no una exigencia del compilador de Java.
 
 </details>
 
-**3. [Abierta]** ¿Por qué se dice que la separación en `controller/`,
-`service/` y `repository/` es una convención y no una obligación del
+**3. [Abierta]** ¿Por qué se dice que la separación en `presentacion/`,
+`negocio/` y `persistence/` es una convención y no una obligación del
 compilador?
 
 <details>

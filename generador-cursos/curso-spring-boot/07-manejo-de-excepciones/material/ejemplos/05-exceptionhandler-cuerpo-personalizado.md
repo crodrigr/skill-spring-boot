@@ -22,6 +22,8 @@ Biblioteca Universitaria: mismo proyecto de los Ejemplos 03-04.
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -52,6 +54,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -60,6 +66,8 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 ## 💻 Archivo: `LibroNoEncontradoException.java`
 
 ```java
+package com.biblioteca.negocio.excepcion;
+
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class LibroNoEncontradoException extends RuntimeException {
 
@@ -72,6 +80,8 @@ public class LibroNoEncontradoException extends RuntimeException {
 ## 💻 Archivo: `LibroDuplicadoException.java`
 
 ```java
+package com.biblioteca.negocio.excepcion;
+
 @ResponseStatus(HttpStatus.CONFLICT)
 public class LibroDuplicadoException extends RuntimeException {
 
@@ -84,6 +94,13 @@ public class LibroDuplicadoException extends RuntimeException {
 ## 💻 Archivo: `ServicioLibros.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.negocio.excepcion.LibroDuplicadoException;
+import com.biblioteca.negocio.excepcion.LibroNoEncontradoException;
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioLibros {
 
@@ -129,9 +146,27 @@ public class ServicioLibros {
 
 </details>
 
+## Archivo: `RespuestaError.java` (`com.biblioteca.presentacion.dto`, nueva)
+
+Un **DTO** (*Data Transfer Object*) define qué datos viaja en la respuesta de la API. Este `record` reemplaza al `Map<String, String>`: el cuerpo sigue siendo `{"error": "<mensaje>"}`, pero ahora su forma queda declarada en una clase de la capa de presentación.
+
+```java
+package com.biblioteca.presentacion.dto;
+
+public record RespuestaError(String error) {
+}
+```
+
 ## 💻 Archivo: `ControladorLibros.java` (con `@ExceptionHandler` agregado)
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
+import com.biblioteca.negocio.excepcion.LibroNoEncontradoException;
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.service.ServicioLibros;
+import com.biblioteca.presentacion.dto.RespuestaError;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {
@@ -177,10 +212,8 @@ public class ControladorLibros {
     }
 
     @ExceptionHandler(LibroNoEncontradoException.class)
-    public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cuerpo);
+    public ResponseEntity<RespuestaError> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RespuestaError(ex.getMessage()));
     }
 }
 ```
@@ -208,6 +241,8 @@ public class ControladorLibros {
    controlador todavía: sigue devolviendo el cuerpo por defecto de
    `@ResponseStatus`, ya que este ejemplo se concentra en un solo caso
    para mostrar el contraste con claridad.
+
+> 💡 **¿Por qué un DTO y no un `Map`?** `RespuestaError` es un *Data Transfer Object*: una clase (aquí un `record`) que declara qué datos viajan en la respuesta de la API. Vive en `presentacion/dto` porque describe lo que sale por HTTP, no una regla de negocio. El JSON es el mismo (`{"error": "<mensaje>"}`), pero el contrato queda escrito en código y el compilador lo verifica.
 
 ## ✅ Resultado esperado
 

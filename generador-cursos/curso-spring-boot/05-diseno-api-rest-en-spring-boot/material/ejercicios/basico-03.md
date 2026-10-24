@@ -3,9 +3,9 @@
 ## 🧩 Problema
 
 Para cada uno de los siguientes fragmentos de código, identificá a qué
-capa de la arquitectura (presentación `controllers`, negocio `services` o persistencia `persistences`)
+capa de la arquitectura (presentación `presentacion`, negocio `negocio` o persistencia `persistence`)
 pertenece, indicá en qué paquete debería vivir (por ejemplo,
-`com.biblioteca.services`) y explicá en una oración cuál sería su
+`com.biblioteca.negocio.service`) y explicá en una oración cuál sería su
 responsabilidad ahí.
 
 ## 💻 Código o contexto de partida
@@ -13,7 +13,7 @@ responsabilidad ahí.
 **Fragmento 1**:
 
 ```java
-package com.biblioteca.persistences.repositories;
+package com.biblioteca.persistence.repository;
 
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
@@ -22,7 +22,7 @@ public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 **Fragmento 2**:
 
 ```java
-package com.biblioteca.controllers;
+package com.biblioteca.presentacion.controlador;
 
 @RestController
 @RequestMapping("/autores")
@@ -34,7 +34,7 @@ public class ControladorAutores {
 **Fragmento 3**:
 
 ```java
-package com.biblioteca.services;
+package com.biblioteca.negocio.service;
 
 @Service
 public class ServicioAutores {
@@ -49,18 +49,18 @@ cuál nunca debería llamar directamente?
 
 ## 📏 Criterios de evaluación de la solución
 
-- Fragmento 1: capa de persistencia (subpaquete `repositories`, paquete
-  `com.biblioteca.persistences.repositories`); responsable del acceso a
+- Fragmento 1: capa de persistencia (subpaquete `repository`, paquete
+  `com.biblioteca.persistence.repository`); responsable del acceso a
   datos (`JpaRepository` ya trae las operaciones básicas).
-- Fragmento 2: capa de presentación (`com.biblioteca.controllers`);
+- Fragmento 2: capa de presentación (`com.biblioteca.presentacion.controlador`);
   responsable de manejar la solicitud y respuesta HTTP sobre la ruta
   `/autores`.
-- Fragmento 3: capa de negocio (`com.biblioteca.services`); responsable de
+- Fragmento 3: capa de negocio (`com.biblioteca.negocio.service`); responsable de
   la lógica de negocio, delegando en el repositorio.
 - Pregunta adicional: `ControladorAutores` debería llamar a
   `ServicioAutores` (nunca directamente a `RepositorioAutores`), para
   respetar que cada capa solo se comunica con la de abajo
-  (presentación `controllers` → negocio `services` → persistencia `persistences`).
+  (presentación `presentacion` → negocio `negocio` → persistencia `persistence`).
 
 ## 🚧 Restricciones
 

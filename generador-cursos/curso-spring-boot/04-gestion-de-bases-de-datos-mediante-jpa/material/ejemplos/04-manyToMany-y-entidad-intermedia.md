@@ -26,6 +26,8 @@ intermedia. `Libro` se reutiliza del Módulo 3.
 ## 🧭 Forma simple (sin atributos propios) — solo ilustrativa, no se implementa
 
 ```java
+package com.biblioteca.negocio.model;
+
 // Así se vería @ManyToMany simple entre Usuario y Libro:
 @Entity
 public class Usuario {
@@ -45,18 +47,15 @@ suficiente.
 
 ```text
 📁 ejemplo-04-manyToMany-entidad-intermedia
-└── 📁 src/main
-    ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java             (del Módulo 3, reutilizada)
-    │   ├── 📄 Usuario.java           (nuevo)
-    │   ├── 📄 Prestamo.java          (nuevo — entidad intermedia)
-    │   ├── 📄 RepositorioLibros.java (del Módulo 3, reutilizada)
-    │   ├── 📄 RepositorioUsuarios.java (nuevo)
-    │   └── 📄 RepositorioPrestamos.java (nuevo)
-    ├── 📁 java
-    │   └── 📄 Main.java              (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties (igual que en el Ejemplo 01, base "biblioteca")
+└── 📁 src/com/biblioteca
+    └── 📁 src/main
+        ├── 📁 java/com/biblioteca
+        │   ├── 📄 Libro.java       (del Módulo 3, reutilizada)
+        │   ├── 📄 Usuario.java     (nuevo)
+        │   └── 📄 Prestamo.java    (nuevo — entidad intermedia)
+        ├── 📁 java
+        │   └── 📄 Main.java        (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
 ```
 
 <details>
@@ -65,6 +64,8 @@ suficiente.
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -94,6 +95,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -115,6 +120,8 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `Usuario.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Usuario {
 
@@ -139,6 +146,8 @@ public class Usuario {
 ## 💻 Archivo: `Prestamo.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Prestamo {
 
@@ -174,6 +183,10 @@ public class Prestamo {
 ## 💻 Archivo: `RepositorioUsuarios.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Usuario;
+
 public interface RepositorioUsuarios extends JpaRepository<Usuario, Long> {
 }
 ```
@@ -181,6 +194,11 @@ public interface RepositorioUsuarios extends JpaRepository<Usuario, Long> {
 ## 💻 Archivo: `RepositorioPrestamos.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Prestamo;
+import com.biblioteca.negocio.model.Usuario;
+
 public interface RepositorioPrestamos extends JpaRepository<Prestamo, Long> {
     List<Prestamo> findByUsuario(Usuario usuario);
 }
@@ -189,6 +207,15 @@ public interface RepositorioPrestamos extends JpaRepository<Prestamo, Long> {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.biblioteca;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.model.Prestamo;
+import com.biblioteca.negocio.model.Usuario;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+import com.biblioteca.persistence.repository.RepositorioPrestamos;
+import com.biblioteca.persistence.repository.RepositorioUsuarios;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

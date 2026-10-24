@@ -40,13 +40,14 @@ MediSalud: dos altas de `Paciente` agrupadas en una sola transacción.
 
 ```text
 📁 ejemplo-02-arquitectura-de-jpa
-└── 📁 src/main
-    ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java           (del Ejemplo 01, reutilizada)
-    │   ├── 📄 ServicioPacientes.java  (extendida respecto del Ejemplo 01)
-    │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties  (igual que en el Ejemplo 01/Ejemplo 07)
+└── 📁 src/com/medisalud
+    └── 📁 src/main
+        ├── 📁 java/com/medisalud
+        │   ├── 📄 Paciente.java           (del Ejemplo 01, reutilizada)
+        │   ├── 📄 ServicioPacientes.java  (extendida respecto del Ejemplo 01)
+        │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
+            └── 📄 application.properties  (igual que en el Ejemplo 01/Ejemplo 07)
 ```
 
 <details>
@@ -55,6 +56,8 @@ MediSalud: dos altas de `Paciente` agrupadas en una sola transacción.
 ## 💻 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Paciente {
 
@@ -106,6 +109,10 @@ spring.h2.console.enabled=true
 ## 💻 Archivo: `ServicioPacientes.java`
 
 ```java
+package com.medisalud.negocio.service;
+
+import com.medisalud.negocio.model.Paciente;
+
 @Service
 public class ServicioPacientes {
 
@@ -130,6 +137,10 @@ public class ServicioPacientes {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.service.ServicioPacientes;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

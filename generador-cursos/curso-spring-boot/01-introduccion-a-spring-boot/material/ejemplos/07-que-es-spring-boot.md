@@ -74,9 +74,10 @@ public class WebConfig {
 ```text
 📁 biblioteca-api
 └── 📁 src/main
-    ├── 📁 java/com/biblioteca/api
+    ├── 📁 java/com/biblioteca
     │   ├── 📄 BibliotecaApiApplication.java  (▶️ clase con el main que se ejecuta)
-    │   └── 📄 ControladorCatalogo.java
+    │   └── 📁 presentacion/controlador
+    │       └── 📄 ControladorCatalogo.java
     └── 📁 resources
         └── 📄 application.properties
 ```

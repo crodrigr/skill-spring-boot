@@ -10,9 +10,9 @@ piden simplificarlo con `cascade`.
 ## 💻 Código o contexto de partida
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
-// capa de persistencia: com.biblioteca.persistences.entities
+// capa de negocio (modelo): com.biblioteca.negocio.model
 @Entity
 public class Usuario {
 
@@ -37,7 +37,7 @@ public class Usuario {
 ```
 
 ```java
-// Prestamo.java (com.biblioteca.persistences.entities) ya existe (Ejemplo 04),
+// Prestamo.java (com.biblioteca.negocio.model) ya existe (Ejemplo 04),
 // con id, fechaPrestamo, usuario y libro.
 ```
 

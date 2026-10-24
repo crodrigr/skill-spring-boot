@@ -83,15 +83,15 @@ springdoc.packages-to-scan=com.biblioteca
 **Solución propuesta**:
 
 1. `ControladorAutores` vive en `com.biblioteca.web`, pero
-   `springdoc.packages-to-scan` apunta a `com.biblioteca.controllers` —
+   `springdoc.packages-to-scan` apunta a `com.biblioteca.presentacion.controlador` —
    springdoc busca en un paquete que no contiene ningún `@RestController`
    (o que ni siquiera existe), así que no encuentra nada que documentar.
 2. Corrección preferida: mover la clase al paquete de su capa, que es
    el que ya declara la configuración. `web` no es una de las capas del
-   proyecto (`controllers`, `services`, `persistences`):
+   proyecto (`presentacion`, `negocio`, `persistence`):
 
 ```java
-package com.biblioteca.controllers;
+package com.biblioteca.presentacion.controlador;
 
 @RestController
 @RequestMapping("/autores")
@@ -100,7 +100,7 @@ public class ControladorAutores {
 }
 ```
 
-   `springdoc.packages-to-scan=com.biblioteca.controllers` queda sin
+   `springdoc.packages-to-scan=com.biblioteca.presentacion.controlador` queda sin
    cambios.
 
    Alternativa válida, si no se puede mover la clase:

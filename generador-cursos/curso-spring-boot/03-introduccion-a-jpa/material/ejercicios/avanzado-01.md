@@ -16,11 +16,11 @@ ninguna de las cuales aparece en los ejemplos del módulo (elegí una):
 ## 💻 Código o contexto de partida
 
 ```java
-// Opción A — capa de persistencia: com.biblioteca.persistences.entities
-// com.biblioteca.persistences.entities.Libro
+// Opción A — capa de negocio (modelo): com.biblioteca.negocio.model
+// com.biblioteca.negocio.model.Libro
 public class Libro { /* ya existe, con id, isbn, titulo */ }
 
-// com.biblioteca.persistences.entities.FichaTecnica
+// com.biblioteca.negocio.model.FichaTecnica
 public class FichaTecnica {
     private Long id;
     private int numeroPaginas;
@@ -29,14 +29,14 @@ public class FichaTecnica {
 ```
 
 ```java
-// Opción B — capa de persistencia: com.biblioteca.persistences.entities
-// com.biblioteca.persistences.entities.Estudiante
+// Opción B — capa de negocio (modelo): com.biblioteca.negocio.model
+// com.biblioteca.negocio.model.Estudiante
 public class Estudiante {
     private Long id;
     private String nombre;
 }
 
-// com.biblioteca.persistences.entities.Curso
+// com.biblioteca.negocio.model.Curso
 public class Curso {
     private Long id;
     private String nombre;
@@ -47,7 +47,7 @@ Elegí una opción, convertí las clases involucradas en entidades JPA
 completas (`@Entity`, `@Id`, `@GeneratedValue`, constructor sin argumentos),
 y agregá la relación elegida, decidiendo explícitamente cuál es el lado
 propietario. Las entidades van en el paquete
-`com.biblioteca.persistences.entities` (capa de persistencia, `persistences`).
+`com.biblioteca.negocio.model` (capa de negocio, modelo).
 
 ## 📏 Criterios de evaluación de la solución
 

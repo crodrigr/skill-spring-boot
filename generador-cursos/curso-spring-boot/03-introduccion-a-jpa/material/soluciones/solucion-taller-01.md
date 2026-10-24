@@ -10,25 +10,26 @@
 └── 📁 src/main
     ├── 📁 java/com/biblioteca
     │   ├── 📄 Main.java
-    │   └── 📁 persistences
-    │       ├── 📁 entities
-    │       │   ├── 📄 Libro.java
-    │       │   └── 📄 Etiqueta.java
-    │       └── 📁 repositories
+    │   ├── 📁 negocio                            (capa de negocio)
+    │   │   └── 📁 model
+    │   │       ├── 📄 Libro.java
+    │   │       └── 📄 Etiqueta.java
+    │   └── 📁 persistence                        (capa de persistencia)
+    │       └── 📁 repository
     │           ├── 📄 RepositorioLibros.java
     │           └── 📄 RepositorioEtiquetas.java
     └── 📁 resources
         └── 📄 application.properties
 ```
 
-**Capas**: en este módulo solo existe la capa de persistencia (`persistences`)
-(`entities` + `repositories`). `Main` es el punto de entrada de prueba, en
-el paquete raíz; las capas `services` y `controllers` llegan en el Módulo 5.
+**Capas**: en este módulo solo se trabajan `negocio/model` (las entidades) y
+`persistence/repository`. `Main` es el punto de entrada de prueba, en
+el paquete raíz; `negocio/service` y la capa `presentacion` llegan en el Módulo 5.
 
-## 📄 Archivo: `Libro.java` (`com.biblioteca.persistences.entities`)
+## 📄 Archivo: `Libro.java` (`com.biblioteca.negocio.model`)
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
 @Entity
 public class Libro {
@@ -73,10 +74,10 @@ public class Libro {
 etiqueta un libro (no al revés); es una elección razonable, no la única
 correcta.
 
-## 📄 Archivo: `Etiqueta.java` (`com.biblioteca.persistences.entities`)
+## 📄 Archivo: `Etiqueta.java` (`com.biblioteca.negocio.model`)
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
 @Entity
 public class Etiqueta {
@@ -102,24 +103,24 @@ public class Etiqueta {
 }
 ```
 
-## 📄 Archivo: `RepositorioLibros.java` (`com.biblioteca.persistences.repositories`)
+## 📄 Archivo: `RepositorioLibros.java` (`com.biblioteca.persistence.repository`)
 
 ```java
-package com.biblioteca.persistences.repositories;
+package com.biblioteca.persistence.repository;
 
-import com.biblioteca.persistences.entities.Libro;
+import com.biblioteca.negocio.model.Libro;
 
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
 ```
 
-## 📄 Archivo: `RepositorioEtiquetas.java` (`com.biblioteca.persistences.repositories`)
+## 📄 Archivo: `RepositorioEtiquetas.java` (`com.biblioteca.persistence.repository`)
 
 ```java
-package com.biblioteca.persistences.repositories;
+package com.biblioteca.persistence.repository;
 
-import com.biblioteca.persistences.entities.Etiqueta;
+import com.biblioteca.negocio.model.Etiqueta;
 
 public interface RepositorioEtiquetas extends JpaRepository<Etiqueta, Long> {
     Optional<Etiqueta> findByNombre(String nombre);
@@ -131,10 +132,10 @@ public interface RepositorioEtiquetas extends JpaRepository<Etiqueta, Long> {
 ```java
 package com.biblioteca;
 
-import com.biblioteca.persistences.entities.Etiqueta;
-import com.biblioteca.persistences.entities.Libro;
-import com.biblioteca.persistences.repositories.RepositorioEtiquetas;
-import com.biblioteca.persistences.repositories.RepositorioLibros;
+import com.biblioteca.negocio.model.Etiqueta;
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioEtiquetas;
+import com.biblioteca.persistence.repository.RepositorioLibros;
 
 @SpringBootApplication
 public class Main implements CommandLineRunner {

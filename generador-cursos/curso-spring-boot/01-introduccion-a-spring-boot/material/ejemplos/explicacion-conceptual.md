@@ -153,9 +153,11 @@ ampliamente adoptada:
 - Un archivo de build (`pom.xml` o `build.gradle`) en la raíz.
 - Una clase principal anotada `@SpringBootApplication` con el método
   `main`.
-- El código organizado en paquetes por capa dentro de `src/main/java`:
-  `controller` (recibe peticiones HTTP), `service` (lógica de negocio),
-  `repository` (acceso a datos) y `model` (entidades del dominio).
+- El código organizado en tres capas, cada una un paquete dentro de
+  `src/main/java`: `presentacion` (`controlador` recibe peticiones HTTP y
+  `dto` define los datos de la API), `negocio` (`service` con la lógica de
+  negocio y `model` con las entidades del dominio) y `persistence`
+  (`repository`, el acceso a datos).
 - La configuración en `src/main/resources/application.properties`.
 - Las pruebas en `src/test/java`, reflejando el mismo paquete que el
   código que prueban.

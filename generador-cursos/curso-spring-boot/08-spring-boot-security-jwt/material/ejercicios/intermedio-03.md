@@ -8,21 +8,23 @@ El proyecto de `ControladorAutores` (Intermedio 01) ya tiene
 como código de partida), pero todavía no existe ningún endpoint de
 login.
 
-**Pregunta**: implementá `ControladorAutenticacion` (capa de presentación, `controllers`,
-paquete `com.biblioteca.security.controllers`), con un endpoint
+**Pregunta**: implementá `ControladorAutenticacion` (capa de presentación, `presentacion`,
+paquete `com.biblioteca.security.presentacion.controlador`), con un endpoint
 `POST /auth/login` que reciba `nombreUsuario` y `contrasena`, los
 verifique usando el `AuthenticationManager`, y devuelva un JWT generado
-con `UtilJwt.generarToken` si son válidos.
+con `UtilJwt.generarToken` si son válidos. Modelá la entrada y la salida
+como DTO (`record SolicitudLogin(String nombreUsuario, String contrasena)` y
+`record RespuestaLogin(String token)`) en `com.biblioteca.presentacion.dto`.
 
 ## 💻 Código o contexto de partida
 
 <details>
 <summary>📄 Ver código completo de <code>Credencial.java</code>, <code>RepositorioCredenciales.java</code>, <code>ServicioDetallesUsuario.java</code> y <code>UtilJwt.java</code> (ya dados, no crear de nuevo)</summary>
 
-## 💻 Archivo: `Credencial.java` (`com.biblioteca.security.persistences.entities`)
+## 💻 Archivo: `Credencial.java` (`com.biblioteca.security.negocio.model`)
 
 ```java
-package com.biblioteca.security.persistences.entities;
+package com.biblioteca.security.negocio.model;
 
 @Entity
 public class Credencial {
@@ -54,20 +56,20 @@ public class Credencial {
 }
 ```
 
-## 💻 Archivo: `RepositorioCredenciales.java` (`com.biblioteca.security.persistences.repositories`)
+## 💻 Archivo: `RepositorioCredenciales.java` (`com.biblioteca.security.persistence.repository`)
 
 ```java
-package com.biblioteca.security.persistences.repositories;
+package com.biblioteca.security.persistence.repository;
 
 public interface RepositorioCredenciales extends JpaRepository<Credencial, Long> {
     Optional<Credencial> findByNombreUsuario(String nombreUsuario);
 }
 ```
 
-## 💻 Archivo: `ServicioDetallesUsuario.java` (`com.biblioteca.security.services`)
+## 💻 Archivo: `ServicioDetallesUsuario.java` (`com.biblioteca.security.negocio.service`)
 
 ```java
-package com.biblioteca.security.services;
+package com.biblioteca.security.negocio.service;
 
 @Service
 public class ServicioDetallesUsuario implements UserDetailsService {
@@ -145,7 +147,7 @@ public class UtilJwt {
   incluye el JWT generado por `UtilJwt.generarToken`.
 - No crea ningún endpoint que devuelva la contraseña de la `Credencial`
   en texto plano.
-- `ControladorAutenticacion` vive en `com.biblioteca.security.controllers`
+- `ControladorAutenticacion` vive en `com.biblioteca.security.presentacion.controlador`
   y no accede a `RepositorioCredenciales` directamente: la verificación
   pasa por `AuthenticationManager` y `ServicioDetallesUsuario`.
 

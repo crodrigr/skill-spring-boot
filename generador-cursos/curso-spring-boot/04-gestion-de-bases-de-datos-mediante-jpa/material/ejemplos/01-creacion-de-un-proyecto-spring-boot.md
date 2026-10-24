@@ -46,13 +46,14 @@ falta escribirlas a mano.
 
 ```text
 📁 gestion-bd-jpa
-├── 📄 pom.xml                  (generado por Spring Initializr)
-└── 📁 src/main
-    ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java    (del Módulo 3, reutilizada)
-    │   └── 📄 Main.java        (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties
+└── 📁 src/com/medisalud
+    ├── 📄 pom.xml                         (generado por Spring Initializr)
+    └── 📁 src/main
+        ├── 📁 java/com/medisalud
+        │   ├── 📄 Paciente.java           (del Módulo 3, reutilizada)
+        │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
+            └── 📄 application.properties
 ```
 
 ## 💻 Archivo: `pom.xml` (dependencias relevantes, ya agregadas por Spring Initializr)
@@ -74,6 +75,8 @@ falta escribirlas a mano.
 ## 💻 Archivo: `Paciente.java` (del Módulo 3, reutilizada)
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Paciente {
 
@@ -119,6 +122,10 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.model.Paciente;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

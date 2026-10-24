@@ -15,39 +15,36 @@ reservas de ejemplo. Es la parte más larga del proyecto: avanzá de a un paso.
 ├── 📄 .gitignore
 ├── 📄 docker-compose.yml
 ├── 📄 pom.xml
-├── 📁 docs  (documentación del proyecto)
+├── 📁 docs                                              (documentación del proyecto)
 │   └── 📄 analisis.md
 ├── 📁 src/main/java/com/coworkhub
 │   ├── 📄 Main.java
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
-│   │   ├── 📄 CargadorReservasDemo.java                       ◀ 🆕 nuevo
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java                 ◀ 🆕 nuevo
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 controllers  (capa de presentación, HTTP)
-│   │   ├── 📄 ControladorDisponibilidad.java
-│   │   ├── 📄 ControladorEquipamientos.java
-│   │   ├── 📄 ControladorMiembros.java
-│   │   ├── 📄 ControladorPlanes.java
-│   │   ├── 📄 ControladorReservas.java                        ◀ 🆕 nuevo
-│   │   ├── 📄 ControladorSalas.java
-│   │   ├── 📄 ControladorSedes.java
-│   │   └── 📄 ControladorServiciosAdicionales.java
-│   ├── 📁 dto  (solicitudes y respuestas, en records)
-│   │   ├── 📄 ItemServicio.java
-│   │   ├── 📄 ResumenConsumo.java
-│   │   ├── 📄 SolicitudActualizarMiembro.java
-│   │   ├── 📄 SolicitudEquipamiento.java
-│   │   ├── 📄 SolicitudMiembro.java
-│   │   ├── 📄 SolicitudPlan.java
-│   │   ├── 📄 SolicitudReserva.java
-│   │   ├── 📄 SolicitudSala.java
-│   │   ├── 📄 SolicitudSede.java
-│   │   └── 📄 SolicitudServicioAdicional.java
-│   ├── 📁 exception  (excepciones y manejador global)
-│   │   ├── 📄 RecursoNoEncontradoException.java
-│   │   ├── 📄 ReglaNegocioException.java
-│   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   ├── 📁 controlador
+│   │   │   ├── 📄 ControladorDisponibilidad.java
+│   │   │   ├── 📄 ControladorEquipamientos.java
+│   │   │   ├── 📄 ControladorMiembros.java
+│   │   │   ├── 📄 ControladorPlanes.java
+│   │   │   ├── 📄 ControladorReservas.java              ◀ 🆕 nuevo
+│   │   │   ├── 📄 ControladorSalas.java
+│   │   │   ├── 📄 ControladorSedes.java
+│   │   │   └── 📄 ControladorServiciosAdicionales.java
+│   │   └── 📁 dto
+│   │       ├── 📄 ItemServicio.java
+│   │       ├── 📄 ResumenConsumo.java
+│   │       ├── 📄 SolicitudActualizarMiembro.java
+│   │       ├── 📄 SolicitudEquipamiento.java
+│   │       ├── 📄 SolicitudMiembro.java
+│   │       ├── 📄 SolicitudPlan.java
+│   │       ├── 📄 SolicitudReserva.java
+│   │       ├── 📄 SolicitudSala.java
+│   │       ├── 📄 SolicitudSede.java
+│   │       └── 📄 SolicitudServicioAdicional.java
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   ├── 📁 model
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
 │   │   │   ├── 📄 EstadoMiembro.java
@@ -59,7 +56,24 @@ reservas de ejemplo. Es la parte más larga del proyecto: avanzá de a un paso.
 │   │   │   ├── 📄 Sede.java
 │   │   │   ├── 📄 ServicioAdicional.java
 │   │   │   └── 📄 TipoSala.java
-│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │   ├── 📁 service
+│   │   │   ├── 📄 CalculadoraCostoReserva.java          ◀ 🆕 nuevo
+│   │   │   ├── 📄 ServicioConsumo.java
+│   │   │   ├── 📄 ServicioDisponibilidad.java
+│   │   │   ├── 📄 ServicioEquipamientos.java
+│   │   │   ├── 📄 ServicioMiembros.java
+│   │   │   ├── 📄 ServicioPlanes.java
+│   │   │   ├── 📄 ServicioReservas.java                 ◀ 🆕 nuevo
+│   │   │   ├── 📄 ServicioSalas.java
+│   │   │   ├── 📄 ServicioSedes.java
+│   │   │   ├── 📄 ServicioServiciosAdicionales.java
+│   │   │   └── 📄 Validaciones.java
+│   │   └── 📁 excepcion
+│   │       ├── 📄 RecursoNoEncontradoException.java
+│   │       ├── 📄 ReglaNegocioException.java
+│   │       └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
 │   │       ├── 📄 RepositorioEquipamientos.java
 │   │       ├── 📄 RepositorioMiembros.java
 │   │       ├── 📄 RepositorioPlanes.java
@@ -67,30 +81,19 @@ reservas de ejemplo. Es la parte más larga del proyecto: avanzá de a un paso.
 │   │       ├── 📄 RepositorioSalas.java
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
-│   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa de persistencia de seguridad)
-│   │       ├── 📁 entities  (Usuario y Rol)
-│   │       │   ├── 📄 Rol.java
-│   │       │   └── 📄 Usuario.java
-│   │       └── 📁 repositories  (RepositorioUsuarios)
-│   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa de negocio, reglas del dominio)
-│       ├── 📄 CalculadoraCostoReserva.java                    ◀ 🆕 nuevo
-│       ├── 📄 ServicioConsumo.java
-│       ├── 📄 ServicioDisponibilidad.java
-│       ├── 📄 ServicioEquipamientos.java
-│       ├── 📄 ServicioMiembros.java
-│       ├── 📄 ServicioPlanes.java
-│       ├── 📄 ServicioReservas.java                           ◀ 🆕 nuevo
-│       ├── 📄 ServicioSalas.java
-│       ├── 📄 ServicioSedes.java
-│       ├── 📄 ServicioServiciosAdicionales.java
-│       └── 📄 Validaciones.java
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   └── 📁 model
+│       │       ├── 📄 Rol.java
+│       │       └── 📄 Usuario.java
+│       └── 📁 persistence                               (capa de persistencia)
+│           └── 📁 repository
+│               └── 📄 RepositorioUsuarios.java
 └── 📁 src/main/resources
     ├── 📄 application-h2.properties
     ├── 📄 application-mysql.properties
     ├── 📄 application-postgres.properties
-    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    ├── 📄 application.properties                        ◀ ✏️ se modifica
     └── 📄 data.sql
 ```
 
@@ -129,10 +132,10 @@ RoundingMode.HALF_UP)` exige indicar cuántos decimales conservar y cómo redond
 dividir por 60 puede dar infinitos decimales; recién al final se redondea a 2 con
 `setScale(2, HALF_UP)`.
 
-**📄 `src/main/java/com/coworkhub/services/CalculadoraCostoReserva.java`**
+**📄 `src/main/java/com/coworkhub/negocio/service/CalculadoraCostoReserva.java`**
 
 ```java
-package com.coworkhub.services;
+package com.coworkhub.negocio.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -140,9 +143,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.coworkhub.persistences.entities.DetalleReserva;
-import com.coworkhub.persistences.entities.PlanMembresia;
-import com.coworkhub.persistences.entities.Sala;
+import com.coworkhub.negocio.model.DetalleReserva;
+import com.coworkhub.negocio.model.PlanMembresia;
+import com.coworkhub.negocio.model.Sala;
 
 // Bean que concentra las fórmulas de costo (RN-07 y RN-08). No accede a la base de datos:
 // recibe los datos que necesita y devuelve resultados, por eso es fácil de probar.
@@ -191,13 +194,13 @@ public class CalculadoraCostoReserva {
 
 Es la clase más importante. Copiala completa y después leé la guía de abajo.
 
-**📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`**
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioReservas.java`**
 
 ```java
-package com.coworkhub.services;
+package com.coworkhub.negocio.service;
 
-import static com.coworkhub.services.Validaciones.enteroPositivo;
-import static com.coworkhub.services.Validaciones.requerido;
+import static com.coworkhub.negocio.service.Validaciones.enteroPositivo;
+import static com.coworkhub.negocio.service.Validaciones.requerido;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -212,23 +215,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.coworkhub.dto.ItemServicio;
-import com.coworkhub.dto.SolicitudReserva;
-import com.coworkhub.exception.ReglaNegocioException;
-import com.coworkhub.exception.RecursoNoEncontradoException;
-import com.coworkhub.exception.SolicitudInvalidaException;
-import com.coworkhub.persistences.entities.DetalleReserva;
-import com.coworkhub.persistences.entities.EstadoMiembro;
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Miembro;
-import com.coworkhub.persistences.entities.Reserva;
-import com.coworkhub.persistences.entities.Sala;
-import com.coworkhub.persistences.entities.Sede;
-import com.coworkhub.persistences.entities.ServicioAdicional;
-import com.coworkhub.persistences.repositories.RepositorioMiembros;
-import com.coworkhub.persistences.repositories.RepositorioReservas;
-import com.coworkhub.persistences.repositories.RepositorioSalas;
-import com.coworkhub.persistences.repositories.RepositorioServiciosAdicionales;
+import com.coworkhub.presentacion.dto.ItemServicio;
+import com.coworkhub.presentacion.dto.SolicitudReserva;
+import com.coworkhub.negocio.excepcion.ReglaNegocioException;
+import com.coworkhub.negocio.excepcion.RecursoNoEncontradoException;
+import com.coworkhub.negocio.excepcion.SolicitudInvalidaException;
+import com.coworkhub.negocio.model.DetalleReserva;
+import com.coworkhub.negocio.model.EstadoMiembro;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Miembro;
+import com.coworkhub.negocio.model.Reserva;
+import com.coworkhub.negocio.model.Sala;
+import com.coworkhub.negocio.model.Sede;
+import com.coworkhub.negocio.model.ServicioAdicional;
+import com.coworkhub.persistence.repository.RepositorioMiembros;
+import com.coworkhub.persistence.repository.RepositorioReservas;
+import com.coworkhub.persistence.repository.RepositorioSalas;
+import com.coworkhub.persistence.repository.RepositorioServiciosAdicionales;
 
 @Service
 @Transactional(readOnly = true)
@@ -516,7 +519,7 @@ public class ServicioReservas {
 **1. El orden de validación en `crear`.** Sigue una lógica: primero lo barato y lo que
 casi seguro falla, y al final lo que consulta la base de datos.
 
-**📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioReservas.java`** (fragmento)
 
 ```java
         validarMiembroActivo(miembro);
@@ -544,7 +547,7 @@ reserva para la misma sala y hora. Sin protección, **ambas** pasan la verificac
 solapamiento (ninguna ve a la otra todavía) y **ambas** se guardan: justo el problema
 que la empresa quiere resolver.
 
-**📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioReservas.java`** (fragmento)
 
 ```java
         // La sala se bloquea hasta terminar la transacción: así, dos solicitudes simultáneas
@@ -566,7 +569,7 @@ por defecto `READ COMMITTED` (cada consulta ve lo ya confirmado), pero **MySQL u
 en su primera lectura, y no ve los cambios confirmados después. Por eso `crear` fija el
 nivel explícitamente:
 
-**📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioReservas.java`** (fragmento)
 
 ```java
     @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -580,7 +583,7 @@ un motor. Con la línea, las tres bases dan exactamente un `201`.
 
 **3. RN-02 en detalle.** Todo se mide en segundos para evitar errores de redondeo:
 
-**📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioReservas.java`** (fragmento)
 
 ```java
         long segundos = Duration.between(inicio, fin).getSeconds();
@@ -594,7 +597,7 @@ da resto 900 y se rechaza.
 
 **4. El costo se calcula al final**, con el consumo del mes ya acumulado por ese miembro:
 
-**📄 `src/main/java/com/coworkhub/services/ServicioReservas.java`** (fragmento)
+**📄 `src/main/java/com/coworkhub/negocio/service/ServicioReservas.java`** (fragmento)
 
 ```java
         long minutos = segundos / 60;
@@ -659,10 +662,10 @@ Las acciones (`confirmar`, `cancelar`, `completar`) son `POST` sobre un sub-recu
 **no son un simple cambio de datos**: ejecutan lógica de negocio. Devuelven la reserva
 actualizada, por eso en `cancelar` ves el `cargoCancelacion` en la respuesta (RF-08).
 
-**📄 `src/main/java/com/coworkhub/controllers/ControladorReservas.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/controlador/ControladorReservas.java`**
 
 ```java
-package com.coworkhub.controllers;
+package com.coworkhub.presentacion.controlador;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -678,11 +681,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coworkhub.dto.ItemServicio;
-import com.coworkhub.dto.SolicitudReserva;
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Reserva;
-import com.coworkhub.services.ServicioReservas;
+import com.coworkhub.presentacion.dto.ItemServicio;
+import com.coworkhub.presentacion.dto.SolicitudReserva;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Reserva;
+import com.coworkhub.negocio.service.ServicioReservas;
 
 @RestController
 @RequestMapping("/api/reservas")
@@ -796,17 +799,17 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.coworkhub.persistences.entities.DetalleReserva;
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Miembro;
-import com.coworkhub.persistences.entities.Reserva;
-import com.coworkhub.persistences.entities.Sala;
-import com.coworkhub.persistences.entities.ServicioAdicional;
-import com.coworkhub.persistences.repositories.RepositorioMiembros;
-import com.coworkhub.persistences.repositories.RepositorioReservas;
-import com.coworkhub.persistences.repositories.RepositorioSalas;
-import com.coworkhub.persistences.repositories.RepositorioServiciosAdicionales;
-import com.coworkhub.services.CalculadoraCostoReserva;
+import com.coworkhub.negocio.model.DetalleReserva;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Miembro;
+import com.coworkhub.negocio.model.Reserva;
+import com.coworkhub.negocio.model.Sala;
+import com.coworkhub.negocio.model.ServicioAdicional;
+import com.coworkhub.persistence.repository.RepositorioMiembros;
+import com.coworkhub.persistence.repository.RepositorioReservas;
+import com.coworkhub.persistence.repository.RepositorioSalas;
+import com.coworkhub.persistence.repository.RepositorioServiciosAdicionales;
+import com.coworkhub.negocio.service.CalculadoraCostoReserva;
 
 // Reservas de ejemplo en distintos estados (RNF-09). Los catálogos (salas, miembros, servicios...) ya
 // los cargó data.sql. Estas reservas no van en el script SQL porque sus fechas son relativas a "hoy"

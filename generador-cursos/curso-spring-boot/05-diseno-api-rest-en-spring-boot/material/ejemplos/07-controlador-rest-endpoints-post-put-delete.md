@@ -21,6 +21,8 @@ Biblioteca Universitaria: mismo proyecto de los Ejemplos 04-06.
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -51,6 +53,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -59,6 +65,11 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 ## 💻 Archivo: `ServicioLibros.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioLibros {
 
@@ -109,6 +120,11 @@ public class ServicioLibros {
 ## 💻 Archivo: `ControladorLibros.java` (endpoints `GET` del Ejemplo 06)
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.service.ServicioLibros;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {

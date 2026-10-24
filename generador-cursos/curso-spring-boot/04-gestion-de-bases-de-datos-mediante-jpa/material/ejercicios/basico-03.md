@@ -20,10 +20,10 @@ Ninguno: este ejercicio empieza sin ningún proyecto previo.
    `@SpringBootApplication` vacía, sin entidades todavía).
 4. Dejá preparada la estructura de capas del curso: la clase
    principal `Main` en el paquete raíz `com.biblioteca`, y los paquetes
-   `com.biblioteca.persistences.entities` y
-   `com.biblioteca.persistences.repositories`, donde irán las entidades y
-   los repositorios de los próximos ejercicios. Los paquetes `services` y
-   `controllers` se agregan en el Módulo 5.
+   `com.biblioteca.negocio.model` y
+   `com.biblioteca.persistence.repository`, donde irán las entidades y
+   los repositorios de los próximos ejercicios. Los paquetes `negocio/service` y
+   `presentacion` se agregan en el Módulo 5.
 
 ## 📏 Criterios de evaluación de la solución
 
@@ -34,7 +34,7 @@ Ninguno: este ejercicio empieza sin ningún proyecto previo.
   dominio de Biblioteca Universitaria).
 - La aplicación arranca sin errores, confirmado por el log de consola.
 - `Main` está en el paquete raíz `com.biblioteca` (por encima de
-  `persistences`), para que Spring Boot encuentre las entidades y los
+  `negocio` y `persistence`), para que Spring Boot encuentre las entidades y los
   repositorios de los subpaquetes.
 
 ## 🚧 Restricciones

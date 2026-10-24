@@ -25,24 +25,35 @@ que permite observar la fase de configuración.
 
 ```text
 📁 ejemplo-06-ciclo-de-vida
-└── 📁 src
-    ├── 📄 Paciente.java                      (record — del Módulo 1, reutilizado)
-    ├── 📄 RepositorioPacientes.java          (interfaz — del Ejemplo 01 de este módulo)
-    ├── 📄 RepositorioPacientesEnMemoria.java (modificada, con println en el constructor)
-    ├── 📄 ServicioCitas.java                 (extendida respecto del Módulo 1, Ejemplo 10)
-    ├── 📄 ConfiguracionApp.java
-    └── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/medisalud
+    ├── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                            (capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 Paciente.java              (record — del Módulo 1, reutilizado)
+    │   └── 📁 service
+    │       └── 📄 ServicioCitas.java         (extendida respecto del Módulo 1, Ejemplo 10)
+    ├── 📁 persistence                        (capa de persistencia)
+    │   └── 📁 repository
+    │       └── 📄 RepositorioPacientes.java  (interfaz — del Ejemplo 01 de este módulo)
+    └── 📁 config
+        └── 📄 ConfiguracionApp.java
 ```
 
 ## 💻 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 public record Paciente(String codigo, String nombre) {}
 ```
 
 ## 💻 Archivo: `RepositorioPacientes.java` (interfaz — del Ejemplo 01 de este módulo)
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
@@ -51,6 +62,11 @@ public interface RepositorioPacientes {
 ## 💻 Archivo: `RepositorioPacientesEnMemoria.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.negocio.service.ServicioCitas;
+
 @Repository
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     public RepositorioPacientesEnMemoria() {
@@ -67,6 +83,10 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
 ## 💻 Archivo: `ServicioCitas.java`
 
 ```java
+package com.medisalud.negocio.service;
+
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 @Component
 public class ServicioCitas {
 
@@ -98,6 +118,8 @@ public class ServicioCitas {
 ## 💻 Archivo: `ConfiguracionApp.java`
 
 ```java
+package com.medisalud.config;
+
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
 public class ConfiguracionApp {
@@ -107,6 +129,11 @@ public class ConfiguracionApp {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.config.ConfiguracionApp;
+import com.medisalud.negocio.service.ServicioCitas;
+
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

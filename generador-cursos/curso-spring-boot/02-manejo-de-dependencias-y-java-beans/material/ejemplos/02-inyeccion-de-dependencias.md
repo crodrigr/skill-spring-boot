@@ -32,14 +32,18 @@ vería así:
 
 ```text
 📁 ejemplo-02-inyeccion-dependencias
-└── 📁 src
-    ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
-    ├── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
-    ├── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, Ejemplo 11)
-    ├── 📄 ServicioPrestamosAcoplado.java   (nuevo — versión con el problema)
-    ├── 📄 ServicioPrestamosConstructor.java (nuevo — inyección por constructor)
-    ├── 📄 ServicioPrestamosSetter.java     (nuevo — inyección por setter)
-    └── 📄 Main.java                        (nuevo — ▶️ clase con el main que se ejecuta)
+└── 📁 src/com/biblioteca
+    ├── 📄 Main.java                                (nuevo — ▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                                  (capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
+    │   └── 📁 service
+    │       ├── 📄 ServicioPrestamosAcoplado.java   (nuevo — versión con el problema)
+    │       └── 📄 ServicioPrestamosSetter.java     (nuevo — inyección por setter)
+    └── 📁 persistence                              (capa de persistencia)
+        └── 📁 repository
+            ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
+            └── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, Ejemplo 11)
 ```
 
 Los primeros tres archivos se reutilizan tal cual del Módulo 1 (Ejemplo 11),
@@ -54,6 +58,10 @@ nombre exacto del archivo en el que iría.
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
@@ -62,12 +70,18 @@ public interface RepositorioLibros {
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 public record Libro(String isbn, String titulo) {}
 ```
 
 ## 💻 Archivo: `RepositorioLibrosEnMemoria.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 
     private final List<Libro> libros = List.of(
@@ -86,6 +100,11 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 ## 💻 Archivo: `ServicioPrestamosAcoplado.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.persistence.repository.RepositorioLibros;
+import com.biblioteca.persistence.repository.RepositorioLibrosEnMemoria;
+
 public class ServicioPrestamosAcoplado {
 
     // La clase crea su propia dependencia: queda acoplada a esta implementación concreta
@@ -110,6 +129,10 @@ acoplada a esa implementación concreta de motor.
 ## 💻 Archivo: `ServicioPrestamosConstructor.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 public class ServicioPrestamosConstructor {
 
     private final RepositorioLibros repositorioLibros; // recibido, no creado
@@ -127,6 +150,10 @@ public class ServicioPrestamosConstructor {
 ## 💻 Archivo: `ServicioPrestamosSetter.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 public class ServicioPrestamosSetter {
 
     private RepositorioLibros repositorioLibros; // no puede ser final
@@ -178,6 +205,14 @@ lo que permite enchufar `repositorioDePrueba` en un test, sin tocar
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.biblioteca;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.service.ServicioPrestamosConstructor;
+import com.biblioteca.negocio.service.ServicioPrestamosSetter;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+import com.biblioteca.persistence.repository.RepositorioLibrosEnMemoria;
+
 public class Main {
     public static void main(String[] args) {
         RepositorioLibros repositorioReal = new RepositorioLibrosEnMemoria();

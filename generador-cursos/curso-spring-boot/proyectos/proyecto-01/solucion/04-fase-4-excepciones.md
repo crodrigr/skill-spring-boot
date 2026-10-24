@@ -32,41 +32,39 @@ De los tres mecanismos del Módulo 07 elegimos el más adecuado para este caso:
 ├── 📄 .gitignore
 ├── 📄 docker-compose.yml
 ├── 📄 pom.xml
-├── 📁 docs  (documentación del proyecto)
+├── 📁 docs                                              (documentación del proyecto)
 │   └── 📄 analisis.md
 ├── 📁 src/main/java/com/coworkhub
 │   ├── 📄 Main.java
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 controllers  (capa de presentación, HTTP)
-│   │   ├── 📄 ControladorDisponibilidad.java
-│   │   ├── 📄 ControladorEquipamientos.java
-│   │   ├── 📄 ControladorMiembros.java
-│   │   ├── 📄 ControladorPlanes.java
-│   │   ├── 📄 ControladorReservas.java
-│   │   ├── 📄 ControladorSalas.java
-│   │   ├── 📄 ControladorSedes.java
-│   │   └── 📄 ControladorServiciosAdicionales.java
-│   ├── 📁 dto  (solicitudes y respuestas, en records)
-│   │   ├── 📄 ItemServicio.java
-│   │   ├── 📄 ResumenConsumo.java
-│   │   ├── 📄 SolicitudActualizarMiembro.java
-│   │   ├── 📄 SolicitudEquipamiento.java
-│   │   ├── 📄 SolicitudMiembro.java
-│   │   ├── 📄 SolicitudPlan.java
-│   │   ├── 📄 SolicitudReserva.java
-│   │   ├── 📄 SolicitudSala.java
-│   │   ├── 📄 SolicitudSede.java
-│   │   └── 📄 SolicitudServicioAdicional.java
-│   ├── 📁 exception  (excepciones y manejador global)
-│   │   ├── 📄 ManejadorGlobalDeExcepciones.java               ◀ 🆕 nuevo
-│   │   ├── 📄 RecursoNoEncontradoException.java
-│   │   ├── 📄 ReglaNegocioException.java
-│   │   ├── 📄 RespuestaError.java                             ◀ 🆕 nuevo
-│   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   ├── 📁 controlador
+│   │   │   ├── 📄 ControladorDisponibilidad.java
+│   │   │   ├── 📄 ControladorEquipamientos.java
+│   │   │   ├── 📄 ControladorMiembros.java
+│   │   │   ├── 📄 ControladorPlanes.java
+│   │   │   ├── 📄 ControladorReservas.java
+│   │   │   ├── 📄 ControladorSalas.java
+│   │   │   ├── 📄 ControladorSedes.java
+│   │   │   └── 📄 ControladorServiciosAdicionales.java
+│   │   ├── 📁 dto
+│   │   │   ├── 📄 ItemServicio.java
+│   │   │   ├── 📄 RespuestaError.java                   ◀ 🆕 nuevo
+│   │   │   ├── 📄 ResumenConsumo.java
+│   │   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   │   ├── 📄 SolicitudEquipamiento.java
+│   │   │   ├── 📄 SolicitudMiembro.java
+│   │   │   ├── 📄 SolicitudPlan.java
+│   │   │   ├── 📄 SolicitudReserva.java
+│   │   │   ├── 📄 SolicitudSala.java
+│   │   │   ├── 📄 SolicitudSede.java
+│   │   │   └── 📄 SolicitudServicioAdicional.java
+│   │   └── 📁 excepcion
+│   │       └── 📄 ManejadorGlobalDeExcepciones.java     ◀ 🆕 nuevo
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   ├── 📁 model
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
 │   │   │   ├── 📄 EstadoMiembro.java
@@ -78,7 +76,24 @@ De los tres mecanismos del Módulo 07 elegimos el más adecuado para este caso:
 │   │   │   ├── 📄 Sede.java
 │   │   │   ├── 📄 ServicioAdicional.java
 │   │   │   └── 📄 TipoSala.java
-│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │   ├── 📁 service
+│   │   │   ├── 📄 CalculadoraCostoReserva.java
+│   │   │   ├── 📄 ServicioConsumo.java
+│   │   │   ├── 📄 ServicioDisponibilidad.java
+│   │   │   ├── 📄 ServicioEquipamientos.java
+│   │   │   ├── 📄 ServicioMiembros.java
+│   │   │   ├── 📄 ServicioPlanes.java
+│   │   │   ├── 📄 ServicioReservas.java
+│   │   │   ├── 📄 ServicioSalas.java
+│   │   │   ├── 📄 ServicioSedes.java
+│   │   │   ├── 📄 ServicioServiciosAdicionales.java
+│   │   │   └── 📄 Validaciones.java
+│   │   └── 📁 excepcion
+│   │       ├── 📄 RecursoNoEncontradoException.java
+│   │       ├── 📄 ReglaNegocioException.java
+│   │       └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
 │   │       ├── 📄 RepositorioEquipamientos.java
 │   │       ├── 📄 RepositorioMiembros.java
 │   │       ├── 📄 RepositorioPlanes.java
@@ -86,25 +101,14 @@ De los tres mecanismos del Módulo 07 elegimos el más adecuado para este caso:
 │   │       ├── 📄 RepositorioSalas.java
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
-│   ├── 📁 security  (autenticación y autorización)
-│   │   └── 📁 persistences  (capa de persistencia de seguridad)
-│   │       ├── 📁 entities  (Usuario y Rol)
-│   │       │   ├── 📄 Rol.java
-│   │       │   └── 📄 Usuario.java
-│   │       └── 📁 repositories  (RepositorioUsuarios)
-│   │           └── 📄 RepositorioUsuarios.java
-│   └── 📁 services  (capa de negocio, reglas del dominio)
-│       ├── 📄 CalculadoraCostoReserva.java
-│       ├── 📄 ServicioConsumo.java
-│       ├── 📄 ServicioDisponibilidad.java
-│       ├── 📄 ServicioEquipamientos.java
-│       ├── 📄 ServicioMiembros.java
-│       ├── 📄 ServicioPlanes.java
-│       ├── 📄 ServicioReservas.java
-│       ├── 📄 ServicioSalas.java
-│       ├── 📄 ServicioSedes.java
-│       ├── 📄 ServicioServiciosAdicionales.java
-│       └── 📄 Validaciones.java
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   └── 📁 model
+│       │       ├── 📄 Rol.java
+│       │       └── 📄 Usuario.java
+│       └── 📁 persistence                               (capa de persistencia)
+│           └── 📁 repository
+│               └── 📄 RepositorioUsuarios.java
 └── 📁 src/main/resources
     ├── 📄 application-h2.properties
     ├── 📄 application-mysql.properties
@@ -133,10 +137,10 @@ La razón de tener `codigo` además del mensaje: el mensaje puede cambiar de red
 de idioma); el código, no. Un cliente puede hacer `if (codigo == "RN-01")` sin depender
 del texto.
 
-**📄 `src/main/java/com/coworkhub/exception/RespuestaError.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/dto/RespuestaError.java`**
 
 ```java
-package com.coworkhub.exception;
+package com.coworkhub.presentacion.dto;
 
 import java.time.Instant;
 
@@ -186,10 +190,10 @@ Dos decisiones para destacar:
   *"Ocurrió un error inesperado"*. Devolver el mensaje o el *stack trace* filtraría
   información interna.
 
-**📄 `src/main/java/com/coworkhub/exception/ManejadorGlobalDeExcepciones.java`**
+**📄 `src/main/java/com/coworkhub/presentacion/excepcion/ManejadorGlobalDeExcepciones.java`**
 
 ```java
-package com.coworkhub.exception;
+package com.coworkhub.presentacion.excepcion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

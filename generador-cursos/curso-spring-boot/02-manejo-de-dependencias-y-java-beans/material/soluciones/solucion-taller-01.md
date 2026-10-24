@@ -8,15 +8,17 @@ subsección "Soluciones" de `specs/02-manejo-de-dependencias-y-java-beans.md`).
 ```text
 📁 taller-01-biblioteca
 ├── 📁 src/com/biblioteca
-│   ├── 📁 controllers                      (capa de presentación)
-│   │   └── 📄 ControladorRecordatorios.java
-│   ├── 📁 services                         (capa de negocio)
-│   │   ├── 📄 ServicioRecordatoriosDevolucion.java
-│   │   ├── 📄 CanalDeAviso.java
-│   │   ├── 📄 AvisoPorEmail.java
-│   │   └── 📄 AvisoPorApp.java
-│   └── 📁 persistences                     (capa de persistencia)
-│       └── 📁 repositories
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   └── 📁 controlador
+│   │       └── 📄 ControladorRecordatorios.java
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   └── 📁 service
+│   │       ├── 📄 ServicioRecordatoriosDevolucion.java
+│   │       ├── 📄 CanalDeAviso.java
+│   │       ├── 📄 AvisoPorEmail.java
+│   │       └── 📄 AvisoPorApp.java
+│   └── 📁 persistence                                   (capa de persistencia)
+│       └── 📁 repository
 │           ├── 📄 RepositorioLibros.java
 │           └── 📄 RepositorioLibrosEnMemoria.java
 └── 📄 diagnostico.md
@@ -44,7 +46,7 @@ Buenas prácticas aplicadas:
 ## 📄 Archivo: `RepositorioLibrosEnMemoria.java`
 
 ```java
-package com.biblioteca.persistences.repositories;
+package com.biblioteca.persistence.repository;
 
 @Repository
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
@@ -58,7 +60,7 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 ## 📄 Archivo: `AvisoPorEmail.java`
 
 ```java
-package com.biblioteca.services;
+package com.biblioteca.negocio.service;
 
 @Component
 @Qualifier("email")
@@ -73,7 +75,7 @@ public class AvisoPorEmail implements CanalDeAviso {
 ## 📄 Archivo: `AvisoPorApp.java`
 
 ```java
-package com.biblioteca.services;
+package com.biblioteca.negocio.service;
 
 @Component
 @Qualifier("app")
@@ -88,7 +90,7 @@ public class AvisoPorApp implements CanalDeAviso {
 ## 📄 Archivo: `ServicioRecordatoriosDevolucion.java`
 
 ```java
-package com.biblioteca.services;
+package com.biblioteca.negocio.service;
 
 @Service
 public class ServicioRecordatoriosDevolucion {
@@ -112,7 +114,7 @@ public class ServicioRecordatoriosDevolucion {
 ## 📄 Archivo: `ControladorRecordatorios.java`
 
 ```java
-package com.biblioteca.controllers;
+package com.biblioteca.presentacion.controlador;
 
 @Component
 public class ControladorRecordatorios {

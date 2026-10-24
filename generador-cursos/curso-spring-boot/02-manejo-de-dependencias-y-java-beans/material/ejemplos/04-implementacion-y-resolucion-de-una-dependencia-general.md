@@ -27,13 +27,16 @@ ahora administrados por el contenedor IoC.
 
 ```text
 📁 ejemplo-04-resolucion-dependencia-general
-└── 📁 src
-    ├── 📄 Notificador.java          (interfaz)
-    ├── 📄 NotificadorSms.java       (con @Qualifier al final del recorrido)
-    ├── 📄 NotificadorEmail.java     (aparece recién en el Paso 2)
-    ├── 📄 ServicioRecordatorios.java
-    ├── 📄 ConfiguracionApp.java     (igual que en el Ejemplo 06 del Módulo 1)
-    └── 📄 Main.java                 (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/medisalud
+    ├── 📄 Main.java                           (▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                             (capa de negocio)
+    │   └── 📁 service
+    │       ├── 📄 Notificador.java            (interfaz)
+    │       ├── 📄 NotificadorSms.java         (con @Qualifier al final del recorrido)
+    │       ├── 📄 NotificadorEmail.java       (aparece recién en el Paso 2)
+    │       └── 📄 ServicioRecordatorios.java
+    └── 📁 config
+        └── 📄 ConfiguracionApp.java           (igual que en el Ejemplo 06 del Módulo 1)
 ```
 
 Los tres pasos de abajo son la **evolución** de estos mismos archivos, no
@@ -45,6 +48,8 @@ proyectos distintos: empezás con dos archivos (Paso 1), agregás un tercero
 ### 📄 Archivo: `Notificador.java`
 
 ```java
+package com.medisalud.negocio.service;
+
 public interface Notificador {
     void enviar(String destinatario, String mensaje);
 }
@@ -53,6 +58,8 @@ public interface Notificador {
 ### 📄 Archivo: `NotificadorSms.java` (versión inicial)
 
 ```java
+package com.medisalud.negocio.service;
+
 @Component
 public class NotificadorSms implements Notificador {
     @Override
@@ -65,6 +72,8 @@ public class NotificadorSms implements Notificador {
 ### 📄 Archivo: `ServicioRecordatorios.java` (versión inicial)
 
 ```java
+package com.medisalud.negocio.service;
+
 @Service
 public class ServicioRecordatorios {
 
@@ -89,6 +98,8 @@ ningún error.
 ### 📄 Archivo nuevo: `NotificadorEmail.java`
 
 ```java
+package com.medisalud.negocio.service;
+
 @Component
 public class NotificadorEmail implements Notificador {
     @Override
@@ -116,6 +127,8 @@ Ahora se modifican los tres archivos:
 ### 📄 Archivo: `NotificadorSms.java` (modificado)
 
 ```java
+package com.medisalud.negocio.service;
+
 @Component
 @Qualifier("sms")
 public class NotificadorSms implements Notificador {
@@ -129,6 +142,8 @@ public class NotificadorSms implements Notificador {
 ### 📄 Archivo: `NotificadorEmail.java` (modificado)
 
 ```java
+package com.medisalud.negocio.service;
+
 @Component
 @Qualifier("email")
 public class NotificadorEmail implements Notificador {
@@ -142,6 +157,8 @@ public class NotificadorEmail implements Notificador {
 ### 📄 Archivo: `ServicioRecordatorios.java` (modificado, ▶️ se ejecuta desde acá)
 
 ```java
+package com.medisalud.negocio.service;
+
 @Service
 public class ServicioRecordatorios {
 
@@ -160,6 +177,8 @@ public class ServicioRecordatorios {
 ### 📄 Archivo: `ConfiguracionApp.java`
 
 ```java
+package com.medisalud.config;
+
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
 public class ConfiguracionApp {
@@ -169,6 +188,11 @@ public class ConfiguracionApp {
 ### 📄 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.config.ConfiguracionApp;
+import com.medisalud.negocio.service.ServicioRecordatorios;
+
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

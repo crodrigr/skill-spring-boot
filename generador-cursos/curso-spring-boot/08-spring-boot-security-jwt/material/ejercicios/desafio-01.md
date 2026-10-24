@@ -20,9 +20,9 @@ manejo global ya aplicados). Ninguna de estas clases debe cambiar su
 comportamiento en este Desafío.
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
-// Cita.java — capa de persistencia (com.medisalud.persistences.entities)
+// Cita.java — capa de negocio (modelo) (com.medisalud.negocio.model)
 // (Módulo 3, sin cambios)
 @Entity
 public class Cita {
@@ -58,18 +58,18 @@ public class Cita {
 ```
 
 ```java
-package com.medisalud.persistences.repositories;
+package com.medisalud.persistence.repository;
 
-// RepositorioCitas.java — capa de persistencia (com.medisalud.persistences.repositories)
+// RepositorioCitas.java — capa de persistencia (com.medisalud.persistence.repository)
 // (Módulo 3, sin cambios)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
 
 ```java
-package com.medisalud.exception;
+package com.medisalud.negocio.excepcion;
 
-// CitaNoEncontradaException.java — paquete transversal (com.medisalud.exception)
+// CitaNoEncontradaException.java — capa de negocio (com.medisalud.negocio.excepcion)
 // (Módulo 7, sin cambios)
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class CitaNoEncontradaException extends RuntimeException {
@@ -81,9 +81,9 @@ public class CitaNoEncontradaException extends RuntimeException {
 ```
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
-// ServicioCitas.java — capa de negocio (com.medisalud.services)
+// ServicioCitas.java — capa de negocio (com.medisalud.negocio.service)
 // (Módulo 7, sin cambios)
 @Service
 public class ServicioCitas {
@@ -122,9 +122,9 @@ public class ServicioCitas {
 ```
 
 ```java
-package com.medisalud.controllers;
+package com.medisalud.presentacion.controlador;
 
-// ControladorCitas.java — capa de presentación (com.medisalud.controllers)
+// ControladorCitas.java — capa de presentación (com.medisalud.presentacion.controlador)
 // (Módulo 7, sin cambios)
 @RestController
 @RequestMapping("/citas")
@@ -170,10 +170,10 @@ public class ControladorCitas {
 
 | Clase | Paquete |
 |---|---|
-| `Usuario` | `com.medisalud.security.persistences.entities` |
-| `RepositorioUsuarios` | `com.medisalud.security.persistences.repositories` |
-| `ServicioDetallesUsuario` | `com.medisalud.security.services` |
-| `ControladorAutenticacion` | `com.medisalud.security.controllers` |
+| `Usuario` | `com.medisalud.security.negocio.model` |
+| `RepositorioUsuarios` | `com.medisalud.security.persistence.repository` |
+| `ServicioDetallesUsuario` | `com.medisalud.security.negocio.service` |
+| `ControladorAutenticacion` | `com.medisalud.security.presentacion.controlador` |
 | `UtilJwt`, `FiltroAutenticacionJwt` | `com.medisalud.security.jwt` (transversal) |
 | `ConfiguracionSeguridad` | `com.medisalud.security.config` (transversal) |
 

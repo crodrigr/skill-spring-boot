@@ -21,9 +21,9 @@ mismo, siguiendo el mismo patrón usado en `ServicioLibros`/
 `ControladorPacientes`), pero aplicado a `Cita`.
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
-// Paciente.java — capa de persistencia (com.medisalud.persistences.entities)
+// Paciente.java — capa de negocio (modelo) (com.medisalud.negocio.model)
 // (Módulo 3, reutilizada tal cual)
 @Entity
 public class Paciente {
@@ -56,7 +56,7 @@ public class Paciente {
 ```
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
 // Cita.java (Módulo 3, reutilizada; se agrega getId() y setFecha()/
 // setMotivo(), que el Módulo 3 no necesitaba porque nunca se expuso ni
@@ -95,9 +95,9 @@ public class Cita {
 ```
 
 ```java
-package com.medisalud.persistences.repositories;
+package com.medisalud.persistence.repository;
 
-// RepositorioCitas.java — capa de persistencia (com.medisalud.persistences.repositories)
+// RepositorioCitas.java — capa de persistencia (com.medisalud.persistence.repository)
 // (Módulo 3, reutilizada tal cual)
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
@@ -106,11 +106,11 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 1. Resolvé primero el problema de recursión infinita: agregá
    `@JsonIgnore` en el lado apropiado de la relación `Paciente`↔`Cita`
    (pista: el mismo lado que en el Ejercicio Avanzado 02).
-2. Creá `ServicioCitas` (`@Service`) en `com.medisalud.services`, con los
+2. Creá `ServicioCitas` (`@Service`) en `com.medisalud.negocio.service`, con los
    cinco métodos de negocio (`listarTodos`, `buscarPorId`, `crear`,
    `actualizar`, `eliminar`).
 3. Creá `ControladorCitas` (`@RestController`, `@RequestMapping("/citas")`)
-   en `com.medisalud.controllers`, con los cinco endpoints CRUD,
+   en `com.medisalud.presentacion.controlador`, con los cinco endpoints CRUD,
    devolviendo el código de estado correcto en cada caso.
 4. Probá los cinco endpoints en Insomnia, incluyendo al menos un caso de
    error (`404`), y verificá que la respuesta JSON de una `Cita` incluye
@@ -123,7 +123,7 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
   serialización.
 - `ServicioCitas` y `ControladorCitas` siguen el mismo patrón de capas
   que `ServicioLibros`/`ControladorLibros` y que el Taller: cada clase
-  vive en el paquete de su capa (`services` y `controllers`) y
+  vive en el paquete de su capa (`negocio` y `presentacion`) y
   `ControladorCitas` depende solo de `ServicioCitas`, nunca de
   `RepositorioCitas`.
 - Los cinco endpoints devuelven el código de estado correcto, incluido

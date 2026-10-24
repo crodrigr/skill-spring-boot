@@ -19,14 +19,15 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros`/`ServicioLibros`.
 
 ```text
 📁 gestion-bd-jpa
-└── 📁 src/main
-    ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java              (del Módulo 3, reutilizada)
-    │   ├── 📄 RepositorioLibros.java  (del Módulo 3, reutilizada)
-    │   ├── 📄 ServicioLibros.java     (del Ejemplo 05, reutilizada)
-    │   └── 📄 ControladorLibros.java
-    └── 📁 resources
-        └── 📄 application.properties  (del Módulo 3, reutilizada)
+└── 📁 src/com/biblioteca
+    └── 📁 src/main
+        ├── 📁 java/com/biblioteca
+        │   ├── 📄 Libro.java              (del Módulo 3, reutilizada)
+        │   ├── 📄 RepositorioLibros.java  (del Módulo 3, reutilizada)
+        │   ├── 📄 ServicioLibros.java     (del Ejemplo 05, reutilizada)
+        │   └── 📄 ControladorLibros.java
+        └── 📁 resources
+            └── 📄 application.properties  (del Módulo 3, reutilizada)
 ```
 
 <details>
@@ -35,6 +36,8 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros`/`ServicioLibros`.
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -65,6 +68,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -73,6 +80,11 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 ## 💻 Archivo: `ServicioLibros.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioLibros {
 
@@ -128,6 +140,11 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `ControladorLibros.java`
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.service.ServicioLibros;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {

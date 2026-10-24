@@ -178,8 +178,8 @@ nuevo.
 
 `@SpringBootApplication` activa la configuración automática y el escaneo de
 componentes. **Escanea el paquete donde está esta clase y todos sus subpaquetes**, por
-eso `Main` va en el paquete raíz `com.coworkhub`, por encima de `controllers`,
-`services` y `persistences`.
+eso `Main` va en el paquete raíz `com.coworkhub`, por encima de `presentacion`,
+`negocio` y `persistence`.
 
 **📄 `src/main/java/com/coworkhub/Main.java`**
 
@@ -207,26 +207,29 @@ carpetas vacías, así que no aparecerán hasta que tengan una clase.
 ```text
 📁 com.coworkhub
 ├── 📄 Main.java
-├── 📁 config                     → beans y cargador de reservas de ejemplo (transversal)
-├── 📁 controllers                → capa Controller
-├── 📁 services                   → capa Service
-├── 📁 persistences
-│   ├── 📁 entities               → clases @Entity
-│   └── 📁 repositories           → interfaces JpaRepository
-├── 📁 dto                        → records de solicitud y respuesta (transversal)
-├── 📁 exception                  → excepciones y manejador global (transversal)
+├── 📁 config               → beans y cargador de reservas de ejemplo (transversal)
+├── 📁 presentacion         (capa de presentación)
+│   ├── 📁 controlador
+│   └── 📁 dto
+├── 📁 negocio              (capa de negocio)
+│   ├── 📁 model
+│   └── 📁 service
+├── 📁 persistence          (capa de persistencia)
+│   └── 📁 repository
 └── 📁 security
-    ├── 📁 controllers
-    ├── 📁 services
-    ├── 📁 persistences
-    │   ├── 📁 entities
-    │   └── 📁 repositories
+    ├── 📁 presentacion     (capa de presentación)
+    │   └── 📁 controlador
+    ├── 📁 negocio          (capa de negocio)
+    │   ├── 📁 model
+    │   └── 📁 service
+    ├── 📁 persistence      (capa de persistencia)
+    │   └── 📁 repository
     ├── 📁 config
     └── 📁 jwt
 ```
 
 Regla de dependencias que vas a respetar en todo el proyecto:
-`controllers` → `services` → `persistences`. Un controlador **nunca** usa un repositorio.
+`presentacion` → `negocio` → `persistence`. Un controlador **nunca** usa un repositorio.
 
 ### Paso 1.5 — `application.properties` (configuración común)
 

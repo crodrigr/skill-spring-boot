@@ -36,8 +36,8 @@ spring.jpa.hibernate.ddl-auto=update
 ```
 
 `Main.java` (paquete raíz `com.biblioteca`), junto con los paquetes vacíos
-`com.biblioteca.persistences.entities` y
-`com.biblioteca.persistences.repositories` (capa de persistencia, `persistences`):
+`com.biblioteca.negocio.model` y
+`com.biblioteca.persistence.repository`:
 
 ```java
 @SpringBootApplication
@@ -105,7 +105,7 @@ dato que no pertenece a ninguna de las dos entidades por separado?
 **Solución propuesta**:
 
 ```java
-// com.biblioteca.persistences.entities.Usuario
+// com.biblioteca.negocio.model.Usuario
 @Entity
 public class Usuario {
 
@@ -167,9 +167,9 @@ colección y la elimina de la base de datos.
 
 ## 🟡 Intermedio 03 — Implementar un CRUD parcial
 
-**Solución propuesta** (`Autor` y `RepositorioAutores` en la capa
-`persistences`; `Main` en el paquete raíz `com.biblioteca`, usando el
-repositorio directamente porque todavía no existe una capa de negocio, `services`):
+**Solución propuesta** (`Autor` en `negocio.model` y `RepositorioAutores` en
+`persistence.repository`; `Main` en el paquete raíz `com.biblioteca`, usando el
+repositorio directamente porque todavía no existe `negocio/service`):
 
 ```java
 // com.biblioteca.Main
@@ -232,12 +232,12 @@ spring.datasource.url=jdbc:h2:mem:biblioteca;DB_CLOSE_DELAY=-1
 ## 🏆 Desafío 01 — Órdenes de compra de Biblioteca Universitaria
 
 **Solución propuesta** (entidades en
-`com.biblioteca.persistences.entities`, repositorio en
-`com.biblioteca.persistences.repositories`, `Main` en el paquete raíz
+`com.biblioteca.negocio.model`, repositorio en
+`com.biblioteca.persistence.repository`, `Main` en el paquete raíz
 `com.biblioteca`):
 
 ```java
-// com.biblioteca.persistences.entities.OrdenCompra
+// com.biblioteca.negocio.model.OrdenCompra
 @Entity
 public class OrdenCompra {
 
@@ -271,7 +271,7 @@ public class OrdenCompra {
 ```
 
 ```java
-// com.biblioteca.persistences.entities.DetalleOrdenCompra
+// com.biblioteca.negocio.model.DetalleOrdenCompra
 @Entity
 public class DetalleOrdenCompra {
 
@@ -303,7 +303,7 @@ public class DetalleOrdenCompra {
 ```
 
 ```java
-// com.biblioteca.persistences.repositories.RepositorioOrdenesCompra
+// com.biblioteca.persistence.repository.RepositorioOrdenesCompra
 public interface RepositorioOrdenesCompra extends JpaRepository<OrdenCompra, Long> {
 }
 ```

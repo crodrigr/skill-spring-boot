@@ -30,6 +30,8 @@ Ejemplo 05 (Módulo 7, sin cambios).
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -60,6 +62,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -68,6 +74,8 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 ## 💻 Archivo: `LibroNoEncontradoException.java`
 
 ```java
+package com.biblioteca.negocio.excepcion;
+
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class LibroNoEncontradoException extends RuntimeException {
 
@@ -80,6 +88,8 @@ public class LibroNoEncontradoException extends RuntimeException {
 ## 💻 Archivo: `LibroDuplicadoException.java`
 
 ```java
+package com.biblioteca.negocio.excepcion;
+
 @ResponseStatus(HttpStatus.CONFLICT)
 public class LibroDuplicadoException extends RuntimeException {
 
@@ -92,6 +102,13 @@ public class LibroDuplicadoException extends RuntimeException {
 ## 💻 Archivo: `ServicioLibros.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.negocio.excepcion.LibroDuplicadoException;
+import com.biblioteca.negocio.excepcion.LibroNoEncontradoException;
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioLibros {
 
@@ -138,6 +155,11 @@ public class ServicioLibros {
 ## 💻 Archivo: `ControladorLibros.java`
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.service.ServicioLibros;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {
@@ -187,21 +209,23 @@ public class ControladorLibros {
 ## 💻 Archivo: `ManejadorGlobalDeExcepciones.java`
 
 ```java
+package com.biblioteca.presentacion.excepcion;
+
+import com.biblioteca.negocio.excepcion.LibroDuplicadoException;
+import com.biblioteca.negocio.excepcion.LibroNoEncontradoException;
+import com.biblioteca.presentacion.dto.RespuestaError;
+
 @ControllerAdvice
 public class ManejadorGlobalDeExcepciones {
 
     @ExceptionHandler(LibroNoEncontradoException.class)
-    public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cuerpo);
+    public ResponseEntity<RespuestaError> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RespuestaError(ex.getMessage()));
     }
 
     @ExceptionHandler(LibroDuplicadoException.class)
-    public ResponseEntity<Map<String, String>> manejarLibroDuplicado(LibroDuplicadoException ex) {
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(cuerpo);
+    public ResponseEntity<RespuestaError> manejarLibroDuplicado(LibroDuplicadoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new RespuestaError(ex.getMessage()));
     }
 }
 ```
@@ -259,6 +283,8 @@ public class ManejadorGlobalDeExcepciones {
 ## 💻 Archivo: `Credencial.java`
 
 ```java
+package com.biblioteca.security.negocio.model;
+
 @Entity
 public class Credencial {
 
@@ -292,6 +318,10 @@ public class Credencial {
 ## 💻 Archivo: `RepositorioCredenciales.java`
 
 ```java
+package com.biblioteca.security.persistence.repository;
+
+import com.biblioteca.security.negocio.model.Credencial;
+
 public interface RepositorioCredenciales extends JpaRepository<Credencial, Long> {
     Optional<Credencial> findByNombreUsuario(String nombreUsuario);
 }
@@ -300,6 +330,11 @@ public interface RepositorioCredenciales extends JpaRepository<Credencial, Long>
 ## 💻 Archivo: `ServicioDetallesUsuario.java`
 
 ```java
+package com.biblioteca.security.negocio.service;
+
+import com.biblioteca.security.negocio.model.Credencial;
+import com.biblioteca.security.persistence.repository.RepositorioCredenciales;
+
 @Service
 public class ServicioDetallesUsuario implements UserDetailsService {
 
@@ -326,6 +361,8 @@ public class ServicioDetallesUsuario implements UserDetailsService {
 ## 💻 Archivo: `UtilJwt.java`
 
 ```java
+package com.biblioteca;
+
 @Component
 public class UtilJwt {
 
@@ -368,6 +405,10 @@ public class UtilJwt {
 ## 💻 Archivo: `FiltroAutenticacionJwt.java`
 
 ```java
+package com.biblioteca;
+
+import com.biblioteca.security.negocio.service.ServicioDetallesUsuario;
+
 @Component
 public class FiltroAutenticacionJwt extends OncePerRequestFilter {
 
@@ -402,9 +443,39 @@ public class FiltroAutenticacionJwt extends OncePerRequestFilter {
 }
 ```
 
+## 💻 Archivo: `SolicitudLogin.java` (`com.biblioteca.presentacion.dto`, nueva)
+
+DTO de entrada del login: declara exactamente qué campos acepta `POST /auth/login`
+(antes se recibía un `Map<String, String>` sin forma definida).
+
+```java
+package com.biblioteca.presentacion.dto;
+
+public record SolicitudLogin(String nombreUsuario, String contrasena) {
+}
+```
+
+## 💻 Archivo: `RespuestaLogin.java` (`com.biblioteca.presentacion.dto`, nueva)
+
+DTO de salida: el cuerpo `{"token": "<jwt>"}`.
+
+```java
+package com.biblioteca.presentacion.dto;
+
+public record RespuestaLogin(String token) {
+}
+```
+
 ## 💻 Archivo: `ControladorAutenticacion.java`
 
 ```java
+package com.biblioteca.security.presentacion.controlador;
+
+import com.biblioteca.security.jwt.UtilJwt;
+import com.biblioteca.security.negocio.service.ServicioDetallesUsuario;
+import com.biblioteca.presentacion.dto.SolicitudLogin;
+import com.biblioteca.presentacion.dto.RespuestaLogin;
+
 @RestController
 @RequestMapping("/auth")
 public class ControladorAutenticacion {
@@ -422,18 +493,16 @@ public class ControladorAutenticacion {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> credenciales) {
+    public ResponseEntity<RespuestaLogin> login(@RequestBody SolicitudLogin solicitud) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        credenciales.get("nombreUsuario"),
-                        credenciales.get("contrasena")));
+                        solicitud.nombreUsuario(),
+                        solicitud.contrasena()));
 
-        UserDetails usuario = servicioDetallesUsuario.loadUserByUsername(credenciales.get("nombreUsuario"));
+        UserDetails usuario = servicioDetallesUsuario.loadUserByUsername(solicitud.nombreUsuario());
         String token = utilJwt.generarToken(usuario);
 
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("token", token);
-        return ResponseEntity.ok(cuerpo);
+        return ResponseEntity.ok(new RespuestaLogin(token));
     }
 }
 ```
@@ -441,6 +510,8 @@ public class ControladorAutenticacion {
 ## 💻 Archivo: `ConfiguracionSeguridad.java`
 
 ```java
+package com.biblioteca;
+
 @Configuration
 @EnableWebSecurity
 public class ConfiguracionSeguridad {

@@ -331,24 +331,22 @@ Endpoints de administración listos para usar, sin escribirlos a mano.
 ```text
 biblioteca-api/
 ├── pom.xml
-└── src/main/java/com/biblioteca/api/
+└── src/main/java/com/biblioteca/
     ├── BibliotecaApiApplication.java
-    ├── controller/
-    ├── service/
-    ├── repository/
-    └── model/
+    ├── presentacion/   (controlador, dto)
+    ├── negocio/        (service, model)
+    └── persistence/    (repository)
 ```
 
 ---
 
 ## 🔍 Qué hace cada capa
 
-- **controller** → recibe peticiones HTTP.
-- **service** → lógica de negocio.
-- **repository** → acceso a datos.
-- **model** → entidades del dominio.
+- **presentacion** → `controlador` recibe peticiones HTTP; `dto` define los datos de la API.
+- **negocio** → `service` tiene la lógica de negocio; `model` son las entidades del dominio.
+- **persistence** → `repository` accede a los datos.
 
-Convención de arquitectura por capas (aplica el patrón MVC).
+Tres capas, cada una solo conoce a la de abajo (aplica el patrón MVC).
 
 ---
 

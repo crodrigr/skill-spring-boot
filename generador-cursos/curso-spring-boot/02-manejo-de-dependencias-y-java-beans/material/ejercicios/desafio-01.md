@@ -17,18 +17,18 @@ módulo), y agregás una quinta:
 <details>
 <summary>📄 Ver código completo de <code>Paciente.java</code>, <code>RepositorioPacientes.java</code>, <code>RepositorioPacientesEnMemoria.java</code>, <code>ServicioNotificaciones.java</code>, <code>ServicioCitas.java</code> y <code>ControladorCitas.java</code> (reutilizados del Ejemplo 01 de este módulo, resolución del Desafío 01 del Módulo 1)</summary>
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
-// com.medisalud.persistences.entities.Paciente
+// com.medisalud.negocio.model.Paciente
 public record Paciente(String codigo, String nombre) {}
 
-// com.medisalud.persistences.repositories.RepositorioPacientes
+// com.medisalud.persistence.repository.RepositorioPacientes
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
 
-// com.medisalud.persistences.repositories.RepositorioPacientesEnMemoria
+// com.medisalud.persistence.repository.RepositorioPacientesEnMemoria
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     private final Map<String, Paciente> pacientes = Map.of(
             "P-001", new Paciente("P-001", "Ana Gómez")
@@ -40,7 +40,7 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     }
 }
 
-// com.medisalud.services.ServicioNotificaciones
+// com.medisalud.negocio.service.ServicioNotificaciones
 public class ServicioNotificaciones {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -56,7 +56,7 @@ public class ServicioNotificaciones {
     }
 }
 
-// com.medisalud.services.ServicioCitas
+// com.medisalud.negocio.service.ServicioCitas
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -75,7 +75,7 @@ public class ServicioCitas {
     }
 }
 
-// com.medisalud.controllers.ControladorCitas
+// com.medisalud.presentacion.controlador.ControladorCitas
 public class ControladorCitas {
 
     private final ServicioCitas servicioCitas;
@@ -93,7 +93,7 @@ public class ControladorCitas {
 </details>
 
 ```java
-package com.medisalud.services;
+package com.medisalud.negocio.service;
 
 public class ServicioResumenCitas {
 

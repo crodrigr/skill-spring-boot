@@ -255,7 +255,7 @@ El enunciado deja varios puntos abiertos. Estos son los que resolvió esta soluc
 
 | Tema | Decisión | Motivo |
 |---|---|---|
-| Capas | `controllers` → `services` → `persistences` | RNF-02: cada capa solo conoce a la de abajo |
+| Capas | `presentacion` → `negocio` → `persistence` | RNF-02: cada capa solo conoce a la de abajo |
 | Errores | Excepciones propias (`RecursoNoEncontradoException`, `ReglaNegocioException`, `SolicitudInvalidaException`) + un `@ControllerAdvice` | Los servicios no conocen HTTP; el manejador es el único que traduce a códigos |
 | Costos | Bean `CalculadoraCostoReserva` | RNF-03: las fórmulas viven en un solo lugar y no tocan la base de datos |
 | Datos iniciales | Catálogos con un script `data.sql`; reservas de ejemplo con un `CommandLineRunner` | Los catálogos son datos estáticos y quedan más legibles en SQL. Las reservas del pasado no pueden pasar por `ServicioReservas` (RN-03), y sus fechas y costos dependen del `Clock` y de la calculadora |

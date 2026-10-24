@@ -16,9 +16,9 @@ en Swagger UI.
 ## 💻 Código o contexto de partida
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
-// Paciente.java — capa de persistencia (com.medisalud.persistences.entities)
+// Paciente.java — capa de negocio (modelo) (com.medisalud.negocio.model)
 // (Módulo 5, con @JsonIgnore ya aplicado — reutilizada tal cual)
 @Entity
 public class Paciente {
@@ -52,9 +52,9 @@ public class Paciente {
 ```
 
 ```java
-package com.medisalud.controllers;
+package com.medisalud.presentacion.controlador;
 
-// ControladorCitas.java — capa de presentación (com.medisalud.controllers)
+// ControladorCitas.java — capa de presentación (com.medisalud.presentacion.controlador)
 // (Módulo 5, reutilizada tal cual)
 @RestController
 @RequestMapping("/citas")
@@ -100,9 +100,9 @@ public class ControladorCitas {
 ```
 
 **Capas del proyecto**: `ControladorCitas` vive en
-`com.medisalud.controllers`, `ServicioCitas` en `com.medisalud.services`, y
-`Paciente`, `Cita` y `RepositorioCitas` en `com.medisalud.persistences`
-(`entities` y `repositories`). Ninguna de esas clases se mueve ni se
+`com.medisalud.presentacion.controlador`, `ServicioCitas` en `com.medisalud.negocio.service`, y
+`Paciente` y `Cita` en `com.medisalud.negocio.model` y `RepositorioCitas` en
+`com.medisalud.persistence.repository`. Ninguna de esas clases se mueve ni se
 modifica en este desafío.
 
 1. Agregá `springdoc-openapi-starter-webmvc-ui` al `pom.xml` de este

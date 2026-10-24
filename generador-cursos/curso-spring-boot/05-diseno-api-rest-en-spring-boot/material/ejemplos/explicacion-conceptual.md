@@ -38,15 +38,17 @@ reglas de negocio), Vista (lo que el usuario ve) y Controlador (coordina
 entre ambos). En una API REST no hay Vista tradicional: el cuerpo JSON de
 la respuesta cumple ese rol.
 
-Spring Boot traduce MVC a cuatro capas, cada una comunicándose solo con la
-de abajo:
+Spring Boot traduce MVC a tres capas, cada una comunicándose solo con la
+de abajo, y cada una con su paquete:
 
-- `Controller` (`@RestController`) — maneja HTTP.
-- `Service` (`@Service`) — lógica de negocio.
-- `Repository` (`JpaRepository`) — acceso a datos.
-- `Database` — persistencia.
+- **Presentación** (`presentacion`) — `controlador` (`@RestController`) maneja
+  HTTP; `dto` define los datos que entran y salen de la API.
+- **Negocio** (`negocio`) — `service` (`@Service`) tiene la lógica de negocio;
+  `model` contiene las entidades.
+- **Persistencia** (`persistence`) — `repository` (`JpaRepository`) accede a la
+  base de datos.
 
-![El cliente llama al controlador, que llama al servicio, que llama al repositorio, que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
+![El cliente llama a la capa de presentación (controlador y dto), que llama a la capa de negocio (service y model), que llama a la capa de persistencia (repository), que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
 
 📎 Ver en la práctica: [Ejemplo 03 — MVC y la arquitectura en capas de Spring](03-mvc-y-arquitectura-en-capas.md)
 

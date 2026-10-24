@@ -21,18 +21,17 @@ de alta y edición.
 ## 🏗️ Capas del proyecto
 
 Todo proyecto del curso organiza sus clases por capa: presentación
-(`controllers`), negocio (`services`) y persistencia (`persistences`). En este taller solo existe la capa de
-**persistencia**, porque todavía no hay API ni lógica de negocio:
+(`presentacion`), negocio (`negocio`) y persistencia (`persistence`). En este taller solo se trabajan
+las entidades (`negocio/model`) y los repositorios (`persistence/repository`), porque todavía no hay API ni servicios:
 
 | Capa | Paquete | Qué contiene | Clases de este taller |
 |---|---|---|---|
-| **Persistencia** | `com.medisalud.persistences.entities` | Clases `@Entity` | `Paciente`, `Factura`, `DetalleFactura` |
-| **Persistencia** | `com.medisalud.persistences.repositories` | Interfaces de Spring Data JPA | `RepositorioPacientes`, `RepositorioFacturas` |
+| **Negocio** | `com.medisalud.negocio.model` | Clases `@Entity` | `Paciente`, `Factura`, `DetalleFactura` |
+| **Persistencia** | `com.medisalud.persistence.repository` | Interfaces de Spring Data JPA | `RepositorioPacientes`, `RepositorioFacturas` |
 | Punto de entrada | `com.medisalud` | `@SpringBootApplication` + `CommandLineRunner` | `Main` |
 
 `Main` es solo un ejecutor de prueba (no es una capa) y usa los
-repositorios directamente porque todavía no existe una capa de negocio (`services`).
-`services` y `controllers` se agregan en el Módulo 5.
+repositorios directamente porque todavía no existe `negocio/service` (junto con `presentacion`, llega en el Módulo 5).
 
 ## 🪜 Pasos
 
@@ -43,12 +42,12 @@ repositorios directamente porque todavía no existe una capa de negocio (`servic
    Ejemplo 01.
 2. **Definir la estructura de paquetes**: descomprimí el proyecto y
    organizá las clases bajo `src/main/java/com/medisalud`: `Main` en el
-   paquete raíz, las entidades en `persistences/entities` y los
-   repositorios en `persistences/repositories`. Dejá
+   paquete raíz, las entidades en `negocio/model` y los
+   repositorios en `persistence/repository`. Dejá
    `application.properties` en `src/main/resources` apuntando a
    `jdbc:h2:mem:medisalud`.
 3. **Declarar `Factura` y `DetalleFactura`** (en
-   `com.medisalud.persistences.entities`): copiá `Paciente` del Módulo 3
+   `com.medisalud.negocio.model`): copiá `Paciente` del Módulo 3
    tal cual (sin relaciones nuevas hacia `Factura`, para no modificar una
    clase ya cerrada); creá `Factura` (`id`, `fecha`, `@ManyToOne` hacia
    `Paciente`) y `DetalleFactura` (`id`, `concepto`, `monto`, `@ManyToOne`
@@ -57,7 +56,7 @@ repositorios directamente porque todavía no existe una capa de negocio (`servic
    `Paciente`↔`Cita` en el Ejemplo 05).
 4. **Declarar `RepositorioFacturas`**: una interfaz Spring Data JPA que
    extienda `JpaRepository<Factura, Long>`, en
-   `com.medisalud.persistences.repositories` (junto con
+   `com.medisalud.persistence.repository` (junto con
    `RepositorioPacientes`, copiado del Módulo 3).
 5. **Agregar y modificar registros**: escribí un `Main` que guarde un
    `Paciente`, cree una `Factura` con al menos dos `DetalleFactura` en una
@@ -71,7 +70,7 @@ Así se ve `DetalleFactura`, para que uses el mismo estilo en el resto del
 entregable:
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
 @Entity
 public class DetalleFactura {
@@ -116,12 +115,13 @@ queda a tu cargo — la solución completa está en
 └── 📁 src/main
     ├── 📁 java/com/medisalud
     │   ├── 📄 Main.java
-    │   └── 📁 persistences
-    │       ├── 📁 entities
-    │       │   ├── 📄 Paciente.java
-    │       │   ├── 📄 Factura.java
-    │       │   └── 📄 DetalleFactura.java
-    │       └── 📁 repositories
+    │   ├── 📁 negocio                            (capa de negocio)
+    │   │   └── 📁 model
+    │   │       ├── 📄 Paciente.java
+    │   │       ├── 📄 Factura.java
+    │   │       └── 📄 DetalleFactura.java
+    │   └── 📁 persistence                        (capa de persistencia)
+    │       └── 📁 repository
     │           ├── 📄 RepositorioPacientes.java
     │           └── 📄 RepositorioFacturas.java
     └── 📁 resources
@@ -140,8 +140,8 @@ queda a tu cargo — la solución completa está en
 ## 📏 Criterios de evaluación
 
 - `Factura` y `DetalleFactura` son entidades JPA completas y compilables,
-  ubicadas en `persistences.entities`; los repositorios están en
-  `persistences.repositories` y `Main` en el paquete raíz `com.medisalud`.
+  ubicadas en `negocio.model`; los repositorios están en
+  `persistence.repository` y `Main` en el paquete raíz `com.medisalud`.
 - La relación `Factura`→`DetalleFactura` declara `cascade =
   CascadeType.ALL` y `orphanRemoval = true`.
 - El proyecto arranca correctamente contra H2 en memoria (log de arranque

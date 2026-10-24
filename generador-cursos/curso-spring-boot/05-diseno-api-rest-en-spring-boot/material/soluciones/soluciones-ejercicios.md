@@ -41,24 +41,24 @@ correctamente formada, es `5xx`.
 
 | Fragmento | Clase | Capa | Paquete | Responsabilidad |
 |---|---|---|---|---|
-| 1 | `RepositorioAutores` | `persistences` | `com.biblioteca.persistences.repositories` | Acceso a datos |
-| 2 | `ControladorAutores` | `controllers` | `com.biblioteca.controllers` | Maneja HTTP sobre `/autores` |
-| 3 | `ServicioAutores` | `services` | `com.biblioteca.services` | Lógica de negocio; delega en `RepositorioAutores` |
+| 1 | `RepositorioAutores` | `persistence` | `com.biblioteca.persistence.repository` | Acceso a datos |
+| 2 | `ControladorAutores` | `presentacion` | `com.biblioteca.presentacion.controlador` | Maneja HTTP sobre `/autores` |
+| 3 | `ServicioAutores` | `negocio` | `com.biblioteca.negocio.service` | Lógica de negocio; delega en `RepositorioAutores` |
 
 - Pregunta adicional: `ControladorAutores` debe llamar a `ServicioAutores`;
   nunca debe llamar directamente a `RepositorioAutores`, para no saltarse
-  la capa de lógica de negocio (`controllers` → `services` →
-  `persistences`).
+  la capa de lógica de negocio (`presentacion` → `negocio` →
+  `persistence`).
 
 ## 🟡 Intermedio 01 — Crear una clase de servicio
 
 **Solución propuesta**:
 
 ```java
-package com.biblioteca.services;
+package com.biblioteca.negocio.service;
 
-import com.biblioteca.persistences.entities.Autor;
-import com.biblioteca.persistences.repositories.RepositorioAutores;
+import com.biblioteca.negocio.model.Autor;
+import com.biblioteca.persistence.repository.RepositorioAutores;
 
 @Service
 public class ServicioAutores {
@@ -107,10 +107,10 @@ public class ServicioAutores {
 **Solución propuesta**:
 
 ```java
-package com.biblioteca.controllers;
+package com.biblioteca.presentacion.controlador;
 
-import com.biblioteca.persistences.entities.Autor;
-import com.biblioteca.services.ServicioAutores;
+import com.biblioteca.negocio.model.Autor;
+import com.biblioteca.negocio.service.ServicioAutores;
 
 @RestController
 @RequestMapping("/autores")
@@ -139,7 +139,7 @@ public class ControladorAutores {
 ## 🟡 Intermedio 03 — Crear los endpoints `POST`, `PUT`, `DELETE` de un controlador
 
 **Solución propuesta** (métodos agregados a `ControladorAutores`, en
-`com.biblioteca.controllers`; siguen delegando solo en `ServicioAutores`):
+`com.biblioteca.presentacion.controlador`; siguen delegando solo en `ServicioAutores`):
 
 ```java
     @PostMapping
@@ -169,7 +169,7 @@ public class ControladorAutores {
 importar si `buscarPorId` encontró algo o no. Corrección:
 
 ```java
-// ControladorLibros.java — com.biblioteca.controllers
+// ControladorLibros.java — com.biblioteca.presentacion.controlador
 @GetMapping("/{id}")
 public ResponseEntity<Libro> buscarPorId(@PathVariable Long id) {
     return servicioLibros.buscarPorId(id)
@@ -192,7 +192,7 @@ debe responder `404 Not Found`, no `200` con cuerpo `null`.
 2. Corrección: agregar `@JsonIgnore` sobre `Paciente.citas`.
 
 ```java
-// Paciente.java — com.medisalud.persistences.entities
+// Paciente.java — com.medisalud.negocio.model
 @OneToMany(mappedBy = "paciente")
 @JsonIgnore
 private List<Cita> citas = new ArrayList<>();
@@ -207,7 +207,7 @@ expusiera) ya no incluiría la lista de `citas` en su respuesta.
 **Solución propuesta** (cada clase en el paquete de su capa):
 
 ```java
-// com.medisalud.persistences.entities.Paciente
+// com.medisalud.negocio.model.Paciente
 @Entity
 public class Paciente {
 
@@ -240,7 +240,7 @@ public class Paciente {
 ```
 
 ```java
-// com.medisalud.services.ServicioCitas
+// com.medisalud.negocio.service.ServicioCitas
 @Service
 public class ServicioCitas {
 
@@ -282,7 +282,7 @@ public class ServicioCitas {
 ```
 
 ```java
-// com.medisalud.controllers.ControladorCitas
+// com.medisalud.presentacion.controlador.ControladorCitas
 @RestController
 @RequestMapping("/citas")
 public class ControladorCitas {

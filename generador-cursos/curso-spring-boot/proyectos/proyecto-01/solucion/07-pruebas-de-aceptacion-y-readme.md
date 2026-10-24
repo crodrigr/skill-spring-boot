@@ -17,46 +17,44 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 ├── 📄 .gitignore
 ├── 📄 docker-compose.yml
 ├── 📄 pom.xml
-├── 📄 README.md                                               ◀ 🆕 nuevo
-├── 📁 docs  (documentación del proyecto)
+├── 📄 README.md                                         ◀ 🆕 nuevo
+├── 📁 docs                                              (documentación del proyecto)
 │   ├── 📄 analisis.md
-│   └── 📄 insomnia-coworkhub.json                             ◀ 🆕 nuevo
+│   └── 📄 insomnia-coworkhub.json                       ◀ 🆕 nuevo
 ├── 📁 src/main/java/com/coworkhub
 │   ├── 📄 Main.java
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
 │   │   ├── 📄 CargadorReservasDemo.java
 │   │   ├── 📄 ConfiguracionBeans.java
 │   │   └── 📄 ConfiguracionOpenApi.java
-│   ├── 📁 controllers  (capa de presentación, HTTP)
-│   │   ├── 📄 ControladorDisponibilidad.java
-│   │   ├── 📄 ControladorEquipamientos.java
-│   │   ├── 📄 ControladorMiembros.java
-│   │   ├── 📄 ControladorPlanes.java
-│   │   ├── 📄 ControladorReservas.java
-│   │   ├── 📄 ControladorSalas.java
-│   │   ├── 📄 ControladorSedes.java
-│   │   └── 📄 ControladorServiciosAdicionales.java
-│   ├── 📁 dto  (solicitudes y respuestas, en records)
-│   │   ├── 📄 ItemServicio.java
-│   │   ├── 📄 RespuestaLogin.java
-│   │   ├── 📄 ResumenConsumo.java
-│   │   ├── 📄 SolicitudActualizarMiembro.java
-│   │   ├── 📄 SolicitudEquipamiento.java
-│   │   ├── 📄 SolicitudLogin.java
-│   │   ├── 📄 SolicitudMiembro.java
-│   │   ├── 📄 SolicitudPlan.java
-│   │   ├── 📄 SolicitudReserva.java
-│   │   ├── 📄 SolicitudSala.java
-│   │   ├── 📄 SolicitudSede.java
-│   │   └── 📄 SolicitudServicioAdicional.java
-│   ├── 📁 exception  (excepciones y manejador global)
-│   │   ├── 📄 ManejadorGlobalDeExcepciones.java
-│   │   ├── 📄 RecursoNoEncontradoException.java
-│   │   ├── 📄 ReglaNegocioException.java
-│   │   ├── 📄 RespuestaError.java
-│   │   └── 📄 SolicitudInvalidaException.java
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   ├── 📁 controlador
+│   │   │   ├── 📄 ControladorDisponibilidad.java
+│   │   │   ├── 📄 ControladorEquipamientos.java
+│   │   │   ├── 📄 ControladorMiembros.java
+│   │   │   ├── 📄 ControladorPlanes.java
+│   │   │   ├── 📄 ControladorReservas.java
+│   │   │   ├── 📄 ControladorSalas.java
+│   │   │   ├── 📄 ControladorSedes.java
+│   │   │   └── 📄 ControladorServiciosAdicionales.java
+│   │   ├── 📁 dto
+│   │   │   ├── 📄 ItemServicio.java
+│   │   │   ├── 📄 RespuestaError.java
+│   │   │   ├── 📄 RespuestaLogin.java
+│   │   │   ├── 📄 ResumenConsumo.java
+│   │   │   ├── 📄 SolicitudActualizarMiembro.java
+│   │   │   ├── 📄 SolicitudEquipamiento.java
+│   │   │   ├── 📄 SolicitudLogin.java
+│   │   │   ├── 📄 SolicitudMiembro.java
+│   │   │   ├── 📄 SolicitudPlan.java
+│   │   │   ├── 📄 SolicitudReserva.java
+│   │   │   ├── 📄 SolicitudSala.java
+│   │   │   ├── 📄 SolicitudSede.java
+│   │   │   └── 📄 SolicitudServicioAdicional.java
+│   │   └── 📁 excepcion
+│   │       └── 📄 ManejadorGlobalDeExcepciones.java
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   ├── 📁 model
 │   │   │   ├── 📄 DetalleReserva.java
 │   │   │   ├── 📄 Equipamiento.java
 │   │   │   ├── 📄 EstadoMiembro.java
@@ -68,7 +66,24 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 │   │   │   ├── 📄 Sede.java
 │   │   │   ├── 📄 ServicioAdicional.java
 │   │   │   └── 📄 TipoSala.java
-│   │   └── 📁 repositories  (interfaces JpaRepository)
+│   │   ├── 📁 service
+│   │   │   ├── 📄 CalculadoraCostoReserva.java
+│   │   │   ├── 📄 ServicioConsumo.java
+│   │   │   ├── 📄 ServicioDisponibilidad.java
+│   │   │   ├── 📄 ServicioEquipamientos.java
+│   │   │   ├── 📄 ServicioMiembros.java
+│   │   │   ├── 📄 ServicioPlanes.java
+│   │   │   ├── 📄 ServicioReservas.java
+│   │   │   ├── 📄 ServicioSalas.java
+│   │   │   ├── 📄 ServicioSedes.java
+│   │   │   ├── 📄 ServicioServiciosAdicionales.java
+│   │   │   └── 📄 Validaciones.java
+│   │   └── 📁 excepcion
+│   │       ├── 📄 RecursoNoEncontradoException.java
+│   │       ├── 📄 ReglaNegocioException.java
+│   │       └── 📄 SolicitudInvalidaException.java
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
 │   │       ├── 📄 RepositorioEquipamientos.java
 │   │       ├── 📄 RepositorioMiembros.java
 │   │       ├── 📄 RepositorioPlanes.java
@@ -76,43 +91,33 @@ proyecto. Con esto completás los entregables 2, 3 y 4 del enunciado.
 │   │       ├── 📄 RepositorioSalas.java
 │   │       ├── 📄 RepositorioSedes.java
 │   │       └── 📄 RepositorioServiciosAdicionales.java
-│   ├── 📁 security  (autenticación y autorización)
-│   │   ├── 📁 config  (reglas de seguridad)
-│   │   │   ├── 📄 ConfiguracionSeguridad.java
-│   │   │   ├── 📄 ManejadorAccesoDenegado.java
-│   │   │   ├── 📄 Permisos.java
-│   │   │   └── 📄 PuntoEntradaJwt.java
-│   │   ├── 📁 controllers  (login)
-│   │   │   └── 📄 ControladorAutenticacion.java
-│   │   ├── 📁 jwt  (tokens y filtro)
-│   │   │   ├── 📄 FiltroAutenticacionJwt.java
-│   │   │   └── 📄 UtilJwt.java
-│   │   ├── 📁 persistences  (capa de persistencia de seguridad)
-│   │   │   ├── 📁 entities  (Usuario y Rol)
-│   │   │   │   ├── 📄 Rol.java
-│   │   │   │   └── 📄 Usuario.java
-│   │   │   └── 📁 repositories  (RepositorioUsuarios)
-│   │   │       └── 📄 RepositorioUsuarios.java
-│   │   └── 📁 services  (usuarios y permisos)
-│   │       ├── 📄 ServicioAutorizacion.java
-│   │       └── 📄 ServicioDetallesUsuario.java
-│   └── 📁 services  (capa de negocio, reglas del dominio)
-│       ├── 📄 CalculadoraCostoReserva.java
-│       ├── 📄 ServicioConsumo.java
-│       ├── 📄 ServicioDisponibilidad.java
-│       ├── 📄 ServicioEquipamientos.java
-│       ├── 📄 ServicioMiembros.java
-│       ├── 📄 ServicioPlanes.java
-│       ├── 📄 ServicioReservas.java
-│       ├── 📄 ServicioSalas.java
-│       ├── 📄 ServicioSedes.java
-│       ├── 📄 ServicioServiciosAdicionales.java
-│       └── 📄 Validaciones.java
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 config                                    (reglas de seguridad)
+│       │   ├── 📄 ConfiguracionSeguridad.java
+│       │   ├── 📄 ManejadorAccesoDenegado.java
+│       │   ├── 📄 Permisos.java
+│       │   └── 📄 PuntoEntradaJwt.java
+│       ├── 📁 presentacion                              (capa de presentación)
+│       │   └── 📁 controlador
+│       │       └── 📄 ControladorAutenticacion.java
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   ├── 📁 model
+│       │   │   ├── 📄 Rol.java
+│       │   │   └── 📄 Usuario.java
+│       │   └── 📁 service
+│       │       ├── 📄 ServicioAutorizacion.java
+│       │       └── 📄 ServicioDetallesUsuario.java
+│       ├── 📁 persistence                               (capa de persistencia)
+│       │   └── 📁 repository
+│       │       └── 📄 RepositorioUsuarios.java
+│       └── 📁 jwt                                       (tokens y filtro)
+│           ├── 📄 FiltroAutenticacionJwt.java
+│           └── 📄 UtilJwt.java
 └── 📁 src/main/resources
     ├── 📄 application-h2.properties
     ├── 📄 application-mysql.properties
     ├── 📄 application-postgres.properties
-    ├── 📄 application.properties                              ◀ ✏️ se modifica
+    ├── 📄 application.properties                        ◀ ✏️ se modifica
     └── 📄 data.sql
 ```
 
@@ -451,13 +456,18 @@ La colección de Insomnia con los 12 escenarios está en `docs/insomnia-coworkhu
 
 ```text
 com.coworkhub
-├── controllers   → endpoints REST
-├── services      → reglas de negocio (+ CalculadoraCostoReserva)
-├── persistences  → entities y repositories (JPA)
-├── dto           → objetos de solicitud y respuesta
-├── exception     → excepciones de negocio y manejador global
-├── config        → beans, datos de ejemplo y configuración de OpenAPI
-└── security      → JWT, filtros y autorización
+├── presentacion
+│   ├── controlador → endpoints REST
+│   ├── dto         → objetos de solicitud y respuesta
+│   └── excepcion   → manejador global (@ControllerAdvice)
+├── negocio
+│   ├── model       → entidades JPA
+│   ├── service     → reglas de negocio (+ CalculadoraCostoReserva)
+│   └── excepcion   → excepciones de negocio
+├── persistence
+│   └── repository  → repositorios Spring Data JPA
+├── config          → beans, datos de ejemplo y configuración de OpenAPI
+└── security        → JWT, filtros y autorización (con sus propias capas)
 ```
 
 ## Documentación de análisis

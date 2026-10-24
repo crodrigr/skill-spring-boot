@@ -9,9 +9,9 @@ Server Error` en vez del `400 Bad Request` que esperaba".
 ## 💻 Código o contexto de partida
 
 ```java
-package com.medisalud.exception;
+package com.medisalud.negocio.excepcion;
 
-// PedidoInvalidoException.java — paquete transversal (com.pedidos.exception)
+// PedidoInvalidoException.java — capa de negocio (com.pedidos.negocio.excepcion)
 public class PedidoInvalidoException extends RuntimeException {
 
     public PedidoInvalidoException(String motivo) {
@@ -21,7 +21,7 @@ public class PedidoInvalidoException extends RuntimeException {
 ```
 
 ```java
-// Dentro de ServicioPedidos — capa de negocio (com.pedidos.services)
+// Dentro de ServicioPedidos — capa de negocio (com.pedidos.negocio.service)
 public Pedido crear(Pedido pedido) {
     if (pedido.getCantidad() <= 0) {
         throw new PedidoInvalidoException("la cantidad debe ser mayor a cero");

@@ -8,7 +8,7 @@ ordenar los eventos de su ciclo de vida.
 ## 💻 Código o contexto de partida
 
 ```java
-package com.medisalud.persistences.repositories;
+package com.medisalud.persistence.repository;
 
 public class RepositorioHistorialesEnMemoria {
 

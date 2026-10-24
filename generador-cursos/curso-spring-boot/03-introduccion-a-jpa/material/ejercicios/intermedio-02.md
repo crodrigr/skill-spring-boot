@@ -9,9 +9,9 @@ tiene ninguna anotación de JPA.
 ## 💻 Código o contexto de partida
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
-// capa de persistencia: com.biblioteca.persistences.entities
+// capa de negocio (modelo): com.biblioteca.negocio.model
 public class Categoria {
 
     private Long id;
@@ -27,9 +27,9 @@ public class Categoria {
 }
 ```
 
-**Capas**: `Categoria` va en `com.biblioteca.persistences.entities` y
-`RepositorioCategorias` en `com.biblioteca.persistences.repositories`
-(capa de persistencia, `persistences`).
+**Capas**: `Categoria` va en `com.biblioteca.negocio.model` y
+`RepositorioCategorias` en `com.biblioteca.persistence.repository`
+(capas de negocio y de persistencia).
 
 1. Convertí `Categoria` en una entidad JPA: agregá `@Entity`, `@Id` con
    `@GeneratedValue` sobre `id`, y `@Column(nullable = false)` sobre
@@ -37,7 +37,7 @@ public class Categoria {
 2. Agregá el constructor sin argumentos que JPA necesita.
 3. Escribí un repositorio `RepositorioCategorias` que extienda
    `JpaRepository<Categoria, Long>`, en el paquete
-   `com.biblioteca.persistences.repositories`.
+   `com.biblioteca.persistence.repository`.
 
 ## 📏 Criterios de evaluación de la solución
 
@@ -47,9 +47,8 @@ public class Categoria {
   constructor con `nombre`.
 - `RepositorioCategorias` extiende `JpaRepository<Categoria, Long>` sin
   declarar ningún método propio (no es necesario para este ejercicio).
-- `Categoria` y `RepositorioCategorias` viven cada una en el paquete de
-  la capa de persistencia (`persistences`) que les corresponde (`entities` y
-  `repositories`).
+- `Categoria` y `RepositorioCategorias` viven cada una en el paquete que les corresponde (`negocio/model` y
+  `persistence/repository`).
 
 ## 🚧 Restricciones
 

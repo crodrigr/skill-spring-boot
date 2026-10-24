@@ -22,15 +22,16 @@ del Módulo 5, reutilizados sin ningún cambio de código.
 
 ```text
 📁 gestion-bd-jpa (mismo proyecto de los Módulos 3-5)
-├── 📄 pom.xml                     (se agrega springdoc-openapi-starter-webmvc-ui)
-└── 📁 src/main
-    ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java              (del Módulo 3, reutilizada)
-    │   ├── 📄 RepositorioLibros.java  (del Módulo 3, reutilizada)
-    │   ├── 📄 ServicioLibros.java     (del Módulo 5, reutilizada)
-    │   └── 📄 ControladorLibros.java  (del Módulo 5, reutilizada)
-    └── 📁 resources
-        └── 📄 application.properties  (del Módulo 3, reutilizada)
+└── 📁 src/com/biblioteca
+    ├── 📄 pom.xml                         (se agrega springdoc-openapi-starter-webmvc-ui)
+    └── 📁 src/main
+        ├── 📁 java/com/biblioteca
+        │   ├── 📄 Libro.java              (del Módulo 3, reutilizada)
+        │   ├── 📄 RepositorioLibros.java  (del Módulo 3, reutilizada)
+        │   ├── 📄 ServicioLibros.java     (del Módulo 5, reutilizada)
+        │   └── 📄 ControladorLibros.java  (del Módulo 5, reutilizada)
+        └── 📁 resources
+            └── 📄 application.properties  (del Módulo 3, reutilizada)
 ```
 
 <details>
@@ -39,6 +40,8 @@ del Módulo 5, reutilizados sin ningún cambio de código.
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -69,6 +72,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -77,6 +84,11 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 ## 💻 Archivo: `ServicioLibros.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioLibros {
 
@@ -123,6 +135,11 @@ public class ServicioLibros {
 ## 💻 Archivo: `ControladorLibros.java`
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.negocio.service.ServicioLibros;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {

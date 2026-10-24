@@ -3,9 +3,9 @@
 ## 🧩 Problema
 
 Biblioteca Universitaria va a organizar su proyecto Spring Boot siguiendo la
-arquitectura por capas del curso: **presentación** (paquete `controllers`),
-**negocio** (paquete `services`) y **persistencia** (paquete `persistences`, con
-los subpaquetes `entities` y `repositories`), pero todavía no decidió en qué
+arquitectura por capas del curso: **presentación** (paquete `presentacion`),
+**negocio** (paquete `negocio`) y **persistencia** (paquete `persistence`, con
+los subpaquetes `model` y `repository`), pero todavía no decidió en qué
 capa y en qué paquete va cada clase.
 
 ## 💻 Código o contexto de partida
@@ -30,7 +30,7 @@ public class Main {
         Map<String, String> paqueteDeCadaClase = new LinkedHashMap<>();
 
         // TODO: completar, por ejemplo:
-        // paqueteDeCadaClase.put("Libro", "persistences.entities");
+        // paqueteDeCadaClase.put("Libro", "negocio.model");
 
         paqueteDeCadaClase.forEach((clase, paquete) ->
                 System.out.println(clase + " -> " + paquete));
@@ -38,20 +38,20 @@ public class Main {
 }
 ```
 
-Indicá, para cada clase, a qué capa pertenece y en qué paquete (`controllers`,
-`services`, `persistences.repositories` o `persistences.entities`) debería
+Indicá, para cada clase, a qué capa pertenece y en qué paquete (`presentacion`,
+`negocio`, `persistence.repository` o `negocio.model`) debería
 ubicarse, y justificá brevemente cada elección (podés escribir la justificación como comentario junto
 a cada `put`).
 
 ## 📏 Criterios de evaluación de la solución
 
-- `Libro` → capa de persistencia, `persistences.entities` (representa una entidad
+- `Libro` → capa de negocio (modelo), `negocio.model` (representa una entidad
   del dominio, sin lógica de negocio ni acceso a datos).
-- `ControladorCatalogo` → capa de presentación, `controllers` (recibe peticiones
+- `ControladorCatalogo` → capa de presentación, `presentacion` (recibe peticiones
   HTTP).
-- `RepositorioLibros` → capa de persistencia, `persistences.repositories`
+- `RepositorioLibros` → capa de persistencia, `persistence.repository`
   (accede a los datos).
-- `ServicioPrestamos` → capa de negocio, `services` (contiene la regla de negocio
+- `ServicioPrestamos` → capa de negocio, `negocio` (contiene la regla de negocio
   de si se puede prestar un libro).
 - Cada justificación menciona la responsabilidad de la clase, no solo el nombre.
 

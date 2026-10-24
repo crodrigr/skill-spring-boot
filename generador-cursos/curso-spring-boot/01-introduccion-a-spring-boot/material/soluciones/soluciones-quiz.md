@@ -21,7 +21,7 @@ verificar respuestas sin abrir cada bloque uno por uno).
 | 8 | Abierta | `record`: constructor/getters/equals/hashCode/toString generados, inmutable; para objetos de valor simples. | RA-4 |
 | 9 | Selección múltiple | B, C, D, E — (A está invertida: Maven es XML, Gradle es DSL). | RA-5 |
 | 10 | Abierta | Spring Boot (2014) simplifica la configuración que Spring (2003) había acumulado; mencionar ≥3 de sus 6 características. | RA-6 |
-| 11 | Selección | B — `repository` accede a los datos. | RA-13 |
+| 11 | Selección | B — `persistence/repository` accede a los datos. | RA-13 |
 | 12 | Selección múltiple | B, C, D — Spring usa el único constructor automáticamente desde 4.3; `@Service` especializa `@Component`; agregar `@Autowired` sería redundante pero válido. | RA-14 |
 | 13 | Abierta | `ApplicationContext` = contenedor IoC que escanea y administra beans; bean = objeto administrado por el contenedor, no creado con `new`. | RA-7 |
 | 14 | Selección | A — instanciación → inyección de dependencias → inicialización → destrucción. | RA-7 |

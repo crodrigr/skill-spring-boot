@@ -87,14 +87,18 @@ se vería su carpeta en VS Code:
 
 ```text
 📁 ejemplo-03-diseno-b
-└── 📁 src
-    ├── 📄 Paciente.java                      (del Módulo 1, reutilizado)
-    ├── 📄 RepositorioPacientes.java          (interfaz — del Ejemplo 01 de este módulo)
-    ├── 📄 RepositorioPacientesEnMemoria.java (del Ejemplo 01 de este módulo)
-    ├── 📄 Notificador.java                   (interfaz — del Módulo 1, Ejercicio Avanzado 01)
-    ├── 📄 NotificadorSms.java                (del Módulo 1, Ejercicio Avanzado 01)
-    ├── 📄 ServicioCitas.java                 (nuevo, para este ejemplo)
-    └── 📄 Main.java                          (nuevo — ▶️ clase con el main que se ejecuta)
+└── 📁 src/com/medisalud
+    ├── 📄 Main.java                          (nuevo — ▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                            (capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 Paciente.java              (del Módulo 1, reutilizado)
+    │   └── 📁 service
+    │       ├── 📄 Notificador.java           (interfaz — del Módulo 1, Ejercicio Avanzado 01)
+    │       ├── 📄 NotificadorSms.java        (del Módulo 1, Ejercicio Avanzado 01)
+    │       └── 📄 ServicioCitas.java         (nuevo, para este ejemplo)
+    └── 📁 persistence                        (capa de persistencia)
+        └── 📁 repository
+            └── 📄 RepositorioPacientes.java  (interfaz — del Ejemplo 01 de este módulo)
 ```
 
 <details>
@@ -103,12 +107,18 @@ se vería su carpeta en VS Code:
 ### 💻 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 public record Paciente(String codigo, String nombre) {}
 ```
 
 ### 💻 Archivo: `RepositorioPacientes.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
@@ -117,6 +127,10 @@ public interface RepositorioPacientes {
 ### 💻 Archivo: `RepositorioPacientesEnMemoria.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     private final Map<String, Paciente> pacientes = Map.of(
             "P-001", new Paciente("P-001", "Ana Gómez")
@@ -132,6 +146,8 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
 ### 💻 Archivo: `NotificadorSms.java`
 
 ```java
+package com.medisalud.negocio.service;
+
 public class NotificadorSms implements Notificador {
     @Override
     public void enviar(String destinatario, String mensaje) {
@@ -145,6 +161,8 @@ public class NotificadorSms implements Notificador {
 ### 💻 Archivo: `Notificador.java`
 
 ```java
+package com.medisalud.negocio.service;
+
 public interface Notificador {
     void enviar(String destinatario, String mensaje);
 }
@@ -153,6 +171,11 @@ public interface Notificador {
 ### 💻 Archivo: `ServicioCitas.java`
 
 ```java
+package com.medisalud.negocio.service;
+
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes; // depende de una abstracción
@@ -173,6 +196,14 @@ public class ServicioCitas {
 ### 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.service.Notificador;
+import com.medisalud.negocio.service.NotificadorSms;
+import com.medisalud.negocio.service.ServicioCitas;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+import com.medisalud.persistence.repository.RepositorioPacientesEnMemoria;
+
 public class Main {
     public static void main(String[] args) {
         RepositorioPacientes repositorioPacientes = new RepositorioPacientesEnMemoria();

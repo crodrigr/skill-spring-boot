@@ -73,8 +73,20 @@ eyJhbGciOiJIUzI1NiJ9 . eyJzdWIiOiJhbmEiLCJyb2wiOiJVU0VSIiwiZXhwIjoxOTk5OTk5OTk5f
 
 ## Intermedio 03 — Implementar el endpoint de login que emite un JWT
 
+Primero, los dos DTO de la capa de presentación (entrada y salida del login):
+
 ```java
-// com.biblioteca.security.controllers.ControladorAutenticacion — capa de presentación
+// com.biblioteca.presentacion.dto.SolicitudLogin
+public record SolicitudLogin(String nombreUsuario, String contrasena) {}
+
+// com.biblioteca.presentacion.dto.RespuestaLogin
+public record RespuestaLogin(String token) {}
+```
+
+Luego, el controlador:
+
+```java
+// com.biblioteca.security.presentacion.controlador.ControladorAutenticacion — capa de presentación
 @RestController
 @RequestMapping("/auth")
 public class ControladorAutenticacion {
@@ -92,18 +104,16 @@ public class ControladorAutenticacion {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> credenciales) {
+    public ResponseEntity<RespuestaLogin> login(@RequestBody SolicitudLogin solicitud) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        credenciales.get("nombreUsuario"),
-                        credenciales.get("contrasena")));
+                        solicitud.nombreUsuario(),
+                        solicitud.contrasena()));
 
-        UserDetails usuario = servicioDetallesUsuario.loadUserByUsername(credenciales.get("nombreUsuario"));
+        UserDetails usuario = servicioDetallesUsuario.loadUserByUsername(solicitud.nombreUsuario());
         String token = utilJwt.generarToken(usuario);
 
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("token", token);
-        return ResponseEntity.ok(cuerpo);
+        return ResponseEntity.ok(new RespuestaLogin(token));
     }
 }
 ```
@@ -217,15 +227,15 @@ Ubicación de las clases nuevas (las mismas capas, dentro de
 
 | Clase | Paquete |
 |---|---|
-| `Usuario` | `com.medisalud.security.persistences.entities` |
-| `RepositorioUsuarios` | `com.medisalud.security.persistences.repositories` |
-| `ServicioDetallesUsuario` | `com.medisalud.security.services` |
-| `ControladorAutenticacion` | `com.medisalud.security.controllers` |
+| `Usuario` | `com.medisalud.security.negocio.model` |
+| `RepositorioUsuarios` | `com.medisalud.security.persistence.repository` |
+| `ServicioDetallesUsuario` | `com.medisalud.security.negocio.service` |
+| `ControladorAutenticacion` | `com.medisalud.security.presentacion.controlador` |
 | `UtilJwt`, `FiltroAutenticacionJwt` | `com.medisalud.security.jwt` (transversal) |
 | `ConfiguracionSeguridad` | `com.medisalud.security.config` (transversal) |
 
-Las clases del dominio siguen en `com.medisalud.controllers`,
-`com.medisalud.services` y `com.medisalud.persistences`, sin cambios.
+Las clases del dominio siguen en `com.medisalud.presentacion.controlador`,
+`com.medisalud.negocio.service` y `com.medisalud.persistence`, sin cambios.
 
 Pruebas en Insomnia:
 

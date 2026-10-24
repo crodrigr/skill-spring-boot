@@ -21,6 +21,8 @@ Biblioteca Universitaria: mismo proyecto del Ejemplo 03.
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -51,6 +53,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -59,6 +65,8 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 ## 💻 Archivo: `LibroNoEncontradoException.java`
 
 ```java
+package com.biblioteca.negocio.excepcion;
+
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class LibroNoEncontradoException extends RuntimeException {
 
@@ -73,6 +81,8 @@ public class LibroNoEncontradoException extends RuntimeException {
 ## 💻 Archivo: `LibroDuplicadoException.java`
 
 ```java
+package com.biblioteca.negocio.excepcion;
+
 @ResponseStatus(HttpStatus.CONFLICT)
 public class LibroDuplicadoException extends RuntimeException {
 

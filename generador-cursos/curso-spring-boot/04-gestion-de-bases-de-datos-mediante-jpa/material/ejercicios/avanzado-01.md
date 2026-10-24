@@ -9,9 +9,9 @@ en la base de datos. ¿Qué me falta?".
 ## 💻 Código o contexto de partida
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
-// capa de persistencia: com.medisalud.persistences.entities
+// capa de negocio (modelo): com.medisalud.negocio.model
 @Entity
 public class Paciente {
 

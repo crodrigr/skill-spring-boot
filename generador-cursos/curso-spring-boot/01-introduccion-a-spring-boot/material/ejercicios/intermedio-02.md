@@ -9,18 +9,18 @@ descuento).
 
 ## 💻 Código o contexto de partida
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
 import java.util.ArrayList;
 import java.util.List;
 
-// com.medisalud.persistences.repositories.RepositorioFacturas
+// com.medisalud.persistence.repository.RepositorioFacturas
 public interface RepositorioFacturas {
     void registrar(double monto);
 }
 
-// com.medisalud.persistences.repositories.RepositorioFacturasEnMemoria
+// com.medisalud.persistence.repository.RepositorioFacturasEnMemoria
 public class RepositorioFacturasEnMemoria implements RepositorioFacturas {
     private final List<Double> facturas = new ArrayList<>();
 
@@ -31,12 +31,12 @@ public class RepositorioFacturasEnMemoria implements RepositorioFacturas {
     }
 }
 
-// com.medisalud.services.ServicioDescuentos
+// com.medisalud.negocio.service.ServicioDescuentos
 public interface ServicioDescuentos {
     double aplicar(double montoBase);
 }
 
-// com.medisalud.services.ServicioDescuentos10
+// com.medisalud.negocio.service.ServicioDescuentos10
 public class ServicioDescuentos10 implements ServicioDescuentos {
     @Override
     public double aplicar(double montoBase) {
@@ -44,7 +44,7 @@ public class ServicioDescuentos10 implements ServicioDescuentos {
     }
 }
 
-// com.medisalud.services.ServicioFacturacion
+// com.medisalud.negocio.service.ServicioFacturacion
 @Service
 public class ServicioFacturacion {
 

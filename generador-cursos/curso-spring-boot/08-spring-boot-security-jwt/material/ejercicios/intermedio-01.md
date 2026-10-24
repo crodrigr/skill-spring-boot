@@ -17,10 +17,10 @@ usuario `user` y la contraseña autogenerada que aparece en la consola.
 <details>
 <summary>📄 Ver código completo de <code>Autor.java</code>, <code>RepositorioAutores.java</code>, <code>AutorNoEncontradoException.java</code>, <code>ServicioAutores.java</code>, <code>ControladorAutores.java</code> y <code>ManejadorGlobalDeExcepciones.java</code> (reutilizados de los Módulos 5 y 7)</summary>
 
-## 💻 Archivo: `Autor.java` (`com.biblioteca.persistences.entities`)
+## 💻 Archivo: `Autor.java` (`com.biblioteca.negocio.model`)
 
 ```java
-package com.biblioteca.persistences.entities;
+package com.biblioteca.negocio.model;
 
 @Entity
 public class Autor {
@@ -48,19 +48,19 @@ public class Autor {
 }
 ```
 
-## 💻 Archivo: `RepositorioAutores.java` (`com.biblioteca.persistences.repositories`)
+## 💻 Archivo: `RepositorioAutores.java` (`com.biblioteca.persistence.repository`)
 
 ```java
-package com.biblioteca.persistences.repositories;
+package com.biblioteca.persistence.repository;
 
 public interface RepositorioAutores extends JpaRepository<Autor, Long> {
 }
 ```
 
-## 💻 Archivo: `AutorNoEncontradoException.java` (`com.biblioteca.exception`, paquete transversal)
+## 💻 Archivo: `AutorNoEncontradoException.java` (`com.biblioteca.negocio.excepcion`, capa de negocio)
 
 ```java
-package com.biblioteca.exception;
+package com.biblioteca.negocio.excepcion;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class AutorNoEncontradoException extends RuntimeException {
@@ -71,10 +71,10 @@ public class AutorNoEncontradoException extends RuntimeException {
 }
 ```
 
-## 💻 Archivo: `ServicioAutores.java` (`com.biblioteca.services`)
+## 💻 Archivo: `ServicioAutores.java` (`com.biblioteca.negocio.service`)
 
 ```java
-package com.biblioteca.services;
+package com.biblioteca.negocio.service;
 
 @Service
 public class ServicioAutores {
@@ -116,10 +116,10 @@ public class ServicioAutores {
 }
 ```
 
-## 💻 Archivo: `ControladorAutores.java` (`com.biblioteca.controllers`)
+## 💻 Archivo: `ControladorAutores.java` (`com.biblioteca.presentacion.controlador`)
 
 ```java
-package com.biblioteca.controllers;
+package com.biblioteca.presentacion.controlador;
 
 @RestController
 @RequestMapping("/autores")
@@ -162,26 +162,24 @@ public class ControladorAutores {
 }
 ```
 
-## 💻 Archivo: `ManejadorGlobalDeExcepciones.java` (`com.biblioteca.exception`, paquete transversal)
+## 💻 Archivo: `ManejadorGlobalDeExcepciones.java` (`com.biblioteca.presentacion.excepcion`, capa de presentación)
 
 ```java
-package com.biblioteca.exception;
+package com.biblioteca.presentacion.excepcion;
+
+import com.biblioteca.presentacion.dto.RespuestaError;
 
 @ControllerAdvice
 public class ManejadorGlobalDeExcepciones {
 
     @ExceptionHandler(LibroNoEncontradoException.class)
-    public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cuerpo);
+    public ResponseEntity<RespuestaError> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RespuestaError(ex.getMessage()));
     }
 
     @ExceptionHandler(AutorNoEncontradoException.class)
-    public ResponseEntity<Map<String, String>> manejarAutorNoEncontrado(AutorNoEncontradoException ex) {
-        Map<String, String> cuerpo = new HashMap<>();
-        cuerpo.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cuerpo);
+    public ResponseEntity<RespuestaError> manejarAutorNoEncontrado(AutorNoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RespuestaError(ex.getMessage()));
     }
 }
 ```
@@ -196,8 +194,8 @@ public class ManejadorGlobalDeExcepciones {
   Basic Auth (usuario `user` + contraseña de consola), aceptada.
 - No confunde la contraseña autogenerada con una contraseña fija: cada
   reinicio del proyecto genera una nueva.
-- Reconoce que las capas del proyecto (`controllers`, `services`,
-  `persistences`) no cambian: Spring Security se agrega como una
+- Reconoce que las capas del proyecto (`presentacion`, `negocio`,
+  `persistence`) no cambian: Spring Security se agrega como una
   preocupación transversal, sin tocar ninguna de esas clases.
 
 ## 🚧 Restricciones

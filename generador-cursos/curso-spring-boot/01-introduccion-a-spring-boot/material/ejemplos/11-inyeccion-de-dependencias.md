@@ -31,14 +31,18 @@ mismo nombre. Si abrieras este ejemplo como una carpeta en VS Code, el panel
 
 ```text
 📁 ejemplo-11-inyeccion-dependencias
-└── 📁 src
-    ├── 📄 RepositorioLibros.java          (interfaz)
-    ├── 📄 Libro.java                      (record)
-    ├── 📄 RepositorioLibrosEnMemoria.java (implementación del repositorio)
-    ├── 📄 ServicioPrestamosConstructor.java
-    ├── 📄 ServicioPrestamosSetter.java
-    ├── 📄 ServicioPrestamosCampo.java
-    └── 📄 Main.java                       (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/biblioteca
+    ├── 📄 Main.java                                  (▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                                    (capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 Libro.java                         (record)
+    │   └── 📁 service
+    │       ├── 📄 ServicioPrestamosConstructor.java
+    │       ├── 📄 ServicioPrestamosSetter.java
+    │       └── 📄 ServicioPrestamosCampo.java
+    └── 📁 persistence                                (capa de persistencia)
+        └── 📁 repository
+            └── 📄 RepositorioLibros.java             (interfaz)
 ```
 
 Cada bloque de código de abajo está encabezado con el nombre exacto del archivo
@@ -65,6 +69,10 @@ o en un test unitario).
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
@@ -73,12 +81,18 @@ public interface RepositorioLibros {
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 public record Libro(String isbn, String titulo) {}
 ```
 
 ## 💻 Archivo: `RepositorioLibrosEnMemoria.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 
     private final List<Libro> libros = List.of(
@@ -95,6 +109,10 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 ## 💻 Archivo: `ServicioPrestamosConstructor.java` (recomendada)
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioPrestamosConstructor {
 
@@ -113,6 +131,10 @@ public class ServicioPrestamosConstructor {
 ## 💻 Archivo: `ServicioPrestamosSetter.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioPrestamosSetter {
 
@@ -132,6 +154,10 @@ public class ServicioPrestamosSetter {
 ## 💻 Archivo: `ServicioPrestamosCampo.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service
 public class ServicioPrestamosCampo {
 
@@ -214,6 +240,14 @@ que enfrentaría un test unitario real, y la prueba concreta de la desventaja de
 esta forma señalada en el análisis comparado.
 
 ```java
+package com.biblioteca;
+
+import com.biblioteca.negocio.service.ServicioPrestamosCampo;
+import com.biblioteca.negocio.service.ServicioPrestamosConstructor;
+import com.biblioteca.negocio.service.ServicioPrestamosSetter;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+import com.biblioteca.persistence.repository.RepositorioLibrosEnMemoria;
+
 import java.lang.reflect.Field;
 
 public class Main {

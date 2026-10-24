@@ -266,7 +266,7 @@ temporal Spring (2003) → Spring Boot (2014).
 ---
 
 **11. [Selección]** "En un proyecto Spring Boot organizado por capas, ¿qué
-contiene el paquete `repository`?"
+contiene el paquete `persistence/repository`?"
 
 - **A.** Las clases que reciben peticiones HTTP.
 - **B.** Las clases o interfaces responsables de acceder a los datos.
@@ -280,9 +280,9 @@ _RA: RA-13_
 
 **Respuesta correcta: B**
 
-`repository` agrupa las clases o interfaces responsables de acceder a los datos,
-por convención de la arquitectura por capas (`controller` → `service` →
-`repository` → `model`).
+`persistence/repository` agrupa las clases o interfaces responsables de acceder a
+los datos, por convención de la arquitectura por capas (`presentacion` →
+`negocio` → `persistence`).
 
 </details>
 

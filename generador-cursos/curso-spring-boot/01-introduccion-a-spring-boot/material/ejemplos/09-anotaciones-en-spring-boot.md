@@ -52,17 +52,25 @@ clase dentro de la arquitectura por capas.
 
 ```text
 📁 biblioteca-api
-└── 📁 src
-    ├── 📄 ValidadorIsbn.java
-    ├── 📄 RepositorioLibrosEnMemoria.java
-    ├── 📄 ServicioPrestamos.java
-    ├── 📄 PrestamosController.java
-    └── 📄 BibliotecaApiApplication.java   (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/biblioteca
+    ├── 📄 BibliotecaApiApplication.java            (▶️ clase con el main que se ejecuta)
+    ├── 📁 presentacion                             (capa de presentación)
+    │   └── 📁 controlador
+    │       └── 📄 ControladorPrestamos.java
+    ├── 📁 negocio                                  (capa de negocio)
+    │   └── 📁 service
+    │       ├── 📄 ValidadorIsbn.java
+    │       └── 📄 ServicioPrestamos.java
+    └── 📁 persistence                              (capa de persistencia)
+        └── 📁 repository
+            └── 📄 RepositorioLibrosEnMemoria.java
 ```
 
 ## 💻 Archivo: `ValidadorIsbn.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
 @Component // bean genérico administrado por el contenedor
 public class ValidadorIsbn {
     public boolean esValido(String isbn) { /* ... */ return true; }
@@ -72,6 +80,8 @@ public class ValidadorIsbn {
 ## 💻 Archivo: `RepositorioLibrosEnMemoria.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
 @Repository // especialización de @Component para acceso a datos
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
@@ -82,6 +92,8 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 ## 💻 Archivo: `ServicioPrestamos.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
 @Service // especialización de @Component para lógica de negocio
 public class ServicioPrestamos {
 
@@ -97,15 +109,19 @@ public class ServicioPrestamos {
 }
 ```
 
-## 💻 Archivo: `PrestamosController.java`
+## 💻 Archivo: `ControladorPrestamos.java`
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
+import com.biblioteca.negocio.service.ServicioPrestamos;
+
 @RestController // expone endpoints HTTP
-public class PrestamosController {
+public class ControladorPrestamos {
 
     private final ServicioPrestamos servicioPrestamos;
 
-    public PrestamosController(ServicioPrestamos servicioPrestamos) {
+    public ControladorPrestamos(ServicioPrestamos servicioPrestamos) {
         this.servicioPrestamos = servicioPrestamos;
     }
 
@@ -119,6 +135,8 @@ public class PrestamosController {
 ## 💻 Archivo: `BibliotecaApiApplication.java`
 
 ```java
+package com.biblioteca;
+
 @SpringBootApplication // clase principal: arranca el contenedor y escanea los @Component de arriba
 public class BibliotecaApiApplication {
     public static void main(String[] args) {
@@ -133,14 +151,14 @@ public class BibliotecaApiApplication {
 flowchart TB
     App["BibliotecaApiApplication\n@SpringBootApplication"] -.->|"escanea el paquete"| PC & SP & RL & VI
 
-    PC["PrestamosController\n@RestController"] --> SP["ServicioPrestamos\n@Service"]
+    PC["ControladorPrestamos\n@RestController"] --> SP["ServicioPrestamos\n@Service"]
     SP --> RL["RepositorioLibrosEnMemoria\n@Repository"]
     VI["ValidadorIsbn\n@Component"]
 ```
 
 `ValidadorIsbn` queda aislado en el diagrama a propósito: es un `@Component`
 genérico que ningún otro bean de este ejemplo usa todavía, mientras que
-`PrestamosController → ServicioPrestamos → RepositorioLibrosEnMemoria` forma
+`ControladorPrestamos → ServicioPrestamos → RepositorioLibrosEnMemoria` forma
 la cadena real que atiende una petición HTTP. La flecha punteada desde
 `BibliotecaApiApplication` no es una dependencia: representa el escaneo que
 descubre y registra a los otros cuatro como beans.
@@ -154,7 +172,7 @@ descubre y registra a los otros cuatro como beans.
 2. El constructor de `ServicioPrestamos` no necesita escribir `@Autowired`
    explícitamente: desde Spring 4.3, si una clase tiene un **único** constructor,
    Spring lo usa automáticamente para inyectar sus dependencias (Ejemplo 11).
-3. `@RestController` sobre `PrestamosController` es lo que le permite a Spring
+3. `@RestController` sobre `ControladorPrestamos` es lo que le permite a Spring
    Boot invocar el método `prestar(...)` cuando llega una petición `GET` a
    `/prestamos/{isbn}` — el mismo mecanismo de inversión de control explicado en
    el Ejemplo 03: el framework llama al método, no el desarrollador.

@@ -31,25 +31,38 @@ construida en el Desafío 01 del Módulo 1.
 
 ```text
 📁 ejemplo-01-que-es-una-dependencia
-└── 📁 src
-    ├── 📄 Paciente.java                      (record — del Módulo 1, reutilizado)
-    ├── 📄 RepositorioPacientes.java          (interfaz)
-    ├── 📄 RepositorioPacientesEnMemoria.java
-    ├── 📄 ServicioNotificaciones.java
-    ├── 📄 ServicioCitas.java
-    ├── 📄 ControladorCitas.java
-    └── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/medisalud
+    ├── 📄 Main.java                                   (▶️ clase con el main que se ejecuta)
+    ├── 📁 presentacion                                (capa de presentación)
+    │   └── 📁 controlador
+    │       └── 📄 ControladorCitas.java
+    ├── 📁 negocio                                     (capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 Paciente.java                       (record — del Módulo 1, reutilizado)
+    │   └── 📁 service
+    │       ├── 📄 ServicioNotificaciones.java
+    │       └── 📄 ServicioCitas.java
+    └── 📁 persistence                                 (capa de persistencia)
+        └── 📁 repository
+            ├── 📄 RepositorioPacientes.java           (interfaz)
+            └── 📄 RepositorioPacientesEnMemoria.java
 ```
 
 ## 💻 Archivo: `Paciente.java` (record — del Módulo 1, reutilizado)
 
 ```java
+package com.medisalud.negocio.model;
+
 public record Paciente(String codigo, String nombre) {}
 ```
 
 ## 💻 Archivo: `RepositorioPacientes.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
@@ -58,6 +71,10 @@ public interface RepositorioPacientes {
 ## 💻 Archivo: `RepositorioPacientesEnMemoria.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     private final Map<String, Paciente> pacientes = Map.of(
             "P-001", new Paciente("P-001", "Ana Gómez")
@@ -73,6 +90,11 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
 ## 💻 Archivo: `ServicioNotificaciones.java`
 
 ```java
+package com.medisalud.negocio.service;
+
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 public class ServicioNotificaciones {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -92,6 +114,10 @@ public class ServicioNotificaciones {
 ## 💻 Archivo: `ServicioCitas.java`
 
 ```java
+package com.medisalud.negocio.service;
+
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 public class ServicioCitas {
 
     private final RepositorioPacientes repositorioPacientes;
@@ -114,6 +140,10 @@ public class ServicioCitas {
 ## 💻 Archivo: `ControladorCitas.java`
 
 ```java
+package com.medisalud.presentacion.controlador;
+
+import com.medisalud.negocio.service.ServicioCitas;
+
 public class ControladorCitas {
 
     private final ServicioCitas servicioCitas;
@@ -131,6 +161,14 @@ public class ControladorCitas {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.service.ServicioCitas;
+import com.medisalud.negocio.service.ServicioNotificaciones;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+import com.medisalud.persistence.repository.RepositorioPacientesEnMemoria;
+import com.medisalud.presentacion.controlador.ControladorCitas;
+
 public class Main {
     public static void main(String[] args) {
         RepositorioPacientes repositorioPacientes = new RepositorioPacientesEnMemoria();

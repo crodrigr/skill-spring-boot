@@ -25,19 +25,28 @@ datos, ni un controlador web).
 
 ```text
 📁 ejemplo-07-uso-de-component
-└── 📁 src
-    ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
-    ├── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
-    ├── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, con @Repository agregado)
-    ├── 📄 FormateadorFechaVencimiento.java (nuevo — @Component)
-    ├── 📄 ServicioPrestamos.java           (nuevo — @Service)
-    ├── 📄 ConfiguracionApp.java
-    └── 📄 Main.java                        (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/biblioteca
+    ├── 📄 Main.java                                (▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                                  (capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
+    │   └── 📁 service
+    │       └── 📄 ServicioPrestamos.java           (nuevo — @Service)
+    ├── 📁 persistence                              (capa de persistencia)
+    │   └── 📁 repository
+    │       ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
+    │       └── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, con @Repository agregado)
+    └── 📁 config
+        └── 📄 ConfiguracionApp.java
 ```
 
 ## 💻 Archivo: `RepositorioLibros.java` (interfaz — del Módulo 1, Ejemplo 11)
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
@@ -46,12 +55,16 @@ public interface RepositorioLibros {
 ## 💻 Archivo: `Libro.java` (record — del Módulo 1, Ejemplo 11)
 
 ```java
+package com.biblioteca.negocio.model;
+
 public record Libro(String isbn, String titulo) {}
 ```
 
 ## 💻 Archivo: `FormateadorFechaVencimiento.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
 @Component // registra el bean en el contenedor, sin ningún efecto adicional
 public class FormateadorFechaVencimiento {
 
@@ -64,6 +77,10 @@ public class FormateadorFechaVencimiento {
 ## 💻 Archivo: `ServicioPrestamos.java`
 
 ```java
+package com.biblioteca.negocio.service;
+
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @Service // especialización semántica de @Component: "esto es lógica de negocio"
 public class ServicioPrestamos {
 
@@ -86,6 +103,10 @@ public class ServicioPrestamos {
 ## 💻 Archivo: `RepositorioLibrosEnMemoria.java` (con `@Repository` agregado para este ejemplo)
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 @Repository
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
@@ -98,6 +119,8 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 ## 💻 Archivo: `ConfiguracionApp.java`
 
 ```java
+package com.biblioteca.config;
+
 @Configuration
 @ComponentScan(basePackages = "com.biblioteca")
 public class ConfiguracionApp {
@@ -107,6 +130,11 @@ public class ConfiguracionApp {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.biblioteca;
+
+import com.biblioteca.config.ConfiguracionApp;
+import com.biblioteca.negocio.service.ServicioPrestamos;
+
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

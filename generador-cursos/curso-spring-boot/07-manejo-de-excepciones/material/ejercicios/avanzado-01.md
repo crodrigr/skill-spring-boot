@@ -12,25 +12,21 @@ en una única clase `@ControllerAdvice`.
 ```java
 // Dentro de ControladorLibros (capa de presentación):
 @ExceptionHandler(LibroNoEncontradoException.class)
-public ResponseEntity<Map<String, String>> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
-    Map<String, String> cuerpo = new HashMap<>();
-    cuerpo.put("error", ex.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cuerpo);
+public ResponseEntity<RespuestaError> manejarLibroNoEncontrado(LibroNoEncontradoException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RespuestaError(ex.getMessage()));
 }
 ```
 
 ```java
 // Dentro de ControladorAutores (capa de presentación):
 @ExceptionHandler(AutorNoEncontradoException.class)
-public ResponseEntity<Map<String, String>> manejarAutorNoEncontrado(AutorNoEncontradoException ex) {
-    Map<String, String> cuerpo = new HashMap<>();
-    cuerpo.put("error", ex.getMessage());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(cuerpo);
+public ResponseEntity<RespuestaError> manejarAutorNoEncontrado(AutorNoEncontradoException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new RespuestaError(ex.getMessage()));
 }
 ```
 
 1. Creá una clase `ManejadorGlobalDeExcepciones` (`@ControllerAdvice`)
-   en el paquete transversal `com.biblioteca.exception` que incluya ambos
+   en el paquete `com.biblioteca.presentacion.excepcion` que incluya ambos
    métodos.
 2. Quitá los dos métodos `@ExceptionHandler` de `ControladorLibros` y
    `ControladorAutores`.

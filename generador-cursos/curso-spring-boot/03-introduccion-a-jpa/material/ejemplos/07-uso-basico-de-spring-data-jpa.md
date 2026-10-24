@@ -24,14 +24,14 @@ memoria y pasa a ser un repositorio de Spring Data JPA.
 
 ```text
 📁 ejemplo-07-uso-basico-de-spring-data-jpa
-├── 📄 pom.xml                          (dependencias Maven)
-└── 📁 src/main
-    ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java             (del Ejemplo 01, reutilizada)
-    │   ├── 📄 RepositorioPacientes.java (evoluciona: del Módulo 2 a JpaRepository)
-    │   └── 📄 Main.java                 (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties    (igual que en los Ejemplos 01-06, explicada aquí en detalle)
+└── 📁 src/com/medisalud
+    ├── 📄 pom.xml                         (dependencias Maven)
+    └── 📁 src/main
+        ├── 📁 java/com/medisalud
+        │   ├── 📄 Paciente.java           (del Ejemplo 01, reutilizada)
+        │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
+            └── 📄 application.properties  (igual que en los Ejemplos 01-06, explicada aquí en detalle)
 ```
 
 ## 💻 Archivo: `pom.xml` (dependencias relevantes)
@@ -62,6 +62,8 @@ el resto del código no cambiaría.
 ## 💻 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Paciente {
 
@@ -101,6 +103,10 @@ public class Paciente {
 ## 💻 Archivo: `RepositorioPacientes.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
 
     // Método derivado: Spring Data JPA genera la consulta a partir del nombre
@@ -159,6 +165,11 @@ spring.h2.console.enabled=true
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

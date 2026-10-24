@@ -14,23 +14,23 @@ devolución. El equipo ya escribió las clases, pero no las anotó ni resolvió
 todavía la ambigüedad entre sus dos formas de notificar.
 
 ```java
-// com.biblioteca.persistences.repositories.RepositorioLibros
+// com.biblioteca.persistence.repository.RepositorioLibros
 public interface RepositorioLibros {
     Optional<Libro> buscarPorIsbn(String isbn);
 }
 
-// com.biblioteca.persistences.repositories.RepositorioLibrosEnMemoria
+// com.biblioteca.persistence.repository.RepositorioLibrosEnMemoria
 public class RepositorioLibrosEnMemoria implements RepositorioLibros {
     @Override
     public Optional<Libro> buscarPorIsbn(String isbn) { /* ... */ return Optional.empty(); }
 }
 
-// com.biblioteca.services.CanalDeAviso
+// com.biblioteca.negocio.service.CanalDeAviso
 public interface CanalDeAviso {
     void avisar(String destinatario, String mensaje);
 }
 
-// com.biblioteca.services.AvisoPorEmail
+// com.biblioteca.negocio.service.AvisoPorEmail
 public class AvisoPorEmail implements CanalDeAviso {
     @Override
     public void avisar(String destinatario, String mensaje) {
@@ -38,7 +38,7 @@ public class AvisoPorEmail implements CanalDeAviso {
     }
 }
 
-// com.biblioteca.services.AvisoPorApp
+// com.biblioteca.negocio.service.AvisoPorApp
 public class AvisoPorApp implements CanalDeAviso {
     @Override
     public void avisar(String destinatario, String mensaje) {
@@ -46,7 +46,7 @@ public class AvisoPorApp implements CanalDeAviso {
     }
 }
 
-// com.biblioteca.services.ServicioRecordatoriosDevolucion
+// com.biblioteca.negocio.service.ServicioRecordatoriosDevolucion
 public class ServicioRecordatoriosDevolucion {
 
     private final RepositorioLibros repositorioLibros;
@@ -63,7 +63,7 @@ public class ServicioRecordatoriosDevolucion {
     }
 }
 
-// com.biblioteca.controllers.ControladorRecordatorios
+// com.biblioteca.presentacion.controlador.ControladorRecordatorios
 public class ControladorRecordatorios {
 
     private final ServicioRecordatoriosDevolucion servicioRecordatorios;
@@ -85,9 +85,9 @@ cadena de dependencias las recorre de arriba hacia abajo:
 
 | Capa | Paquete | Qué contiene | Clases de este taller |
 |---|---|---|---|
-| **Presentación** | `com.biblioteca.controllers` | Recibe las solicitudes del usuario y delega. | `ControladorRecordatorios` |
-| **Negocio** | `com.biblioteca.services` | Reglas del dominio y colaboradores de la lógica. | `ServicioRecordatoriosDevolucion`, `CanalDeAviso`, `AvisoPorEmail`, `AvisoPorApp` |
-| **Persistencia** | `com.biblioteca.persistences` | `entities` y `repositories`. | `RepositorioLibros`, `RepositorioLibrosEnMemoria` |
+| **Presentación** | `com.biblioteca.presentacion.controlador` | Recibe las solicitudes del usuario y delega. | `ControladorRecordatorios` |
+| **Negocio** | `com.biblioteca.negocio.service` | Reglas del dominio y colaboradores de la lógica. | `ServicioRecordatoriosDevolucion`, `CanalDeAviso`, `AvisoPorEmail`, `AvisoPorApp` |
+| **Persistencia** | `com.biblioteca.persistence` | `model` y `repository`. | `RepositorioLibros`, `RepositorioLibrosEnMemoria` |
 
 Regla de dependencia: presentación → negocio → persistencia. Un controlador
 nunca depende directamente de un repositorio.
@@ -134,15 +134,17 @@ el paquete de su capa:
 ```text
 📁 taller-01-biblioteca
 ├── 📁 src/com/biblioteca
-│   ├── 📁 controllers                      (capa de presentación)
-│   │   └── 📄 ControladorRecordatorios.java
-│   ├── 📁 services                         (capa de negocio)
-│   │   ├── 📄 ServicioRecordatoriosDevolucion.java
-│   │   ├── 📄 CanalDeAviso.java
-│   │   ├── 📄 AvisoPorEmail.java
-│   │   └── 📄 AvisoPorApp.java
-│   └── 📁 persistences                     (capa de persistencia)
-│       └── 📁 repositories
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   └── 📁 controlador
+│   │       └── 📄 ControladorRecordatorios.java
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   └── 📁 service
+│   │       ├── 📄 ServicioRecordatoriosDevolucion.java
+│   │       ├── 📄 CanalDeAviso.java
+│   │       ├── 📄 AvisoPorEmail.java
+│   │       └── 📄 AvisoPorApp.java
+│   └── 📁 persistence                                   (capa de persistencia)
+│       └── 📁 repository
 │           ├── 📄 RepositorioLibros.java
 │           └── 📄 RepositorioLibrosEnMemoria.java
 └── 📄 diagnostico.md

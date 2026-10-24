@@ -22,6 +22,8 @@ Biblioteca Universitaria: `ControladorLibros` completo (Ejemplos 06-07).
 ## 💻 Archivo: `ControladorLibros.java`
 
 ```java
+package com.biblioteca.presentacion.controlador;
+
 @RestController
 @RequestMapping("/libros")
 public class ControladorLibros {

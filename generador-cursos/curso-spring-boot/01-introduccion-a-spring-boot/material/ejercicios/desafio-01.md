@@ -9,33 +9,33 @@ en este mismo escenario.
 
 ## 💻 Código o contexto de partida
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
-// com.medisalud.persistences.repositories.RepositorioPacientes
+// com.medisalud.persistence.repository.RepositorioPacientes
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
 
-// com.medisalud.persistences.repositories.RepositorioPacientesEnMemoria
+// com.medisalud.persistence.repository.RepositorioPacientesEnMemoria
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     // ... implementación con una lista o mapa en memoria
 }
 
-// com.medisalud.services.ServicioNotificaciones
+// com.medisalud.negocio.service.ServicioNotificaciones
 public class ServicioNotificaciones {
     public ServicioNotificaciones(RepositorioPacientes repositorioPacientes) { /* ... */ }
     public void avisarCitaProxima(String codigoPaciente) { /* ... */ }
 }
 
-// com.medisalud.services.ServicioCitas
+// com.medisalud.negocio.service.ServicioCitas
 public class ServicioCitas {
     public ServicioCitas(RepositorioPacientes repositorioPacientes,
                           ServicioNotificaciones servicioNotificaciones) { /* ... */ }
     public void agendar(String codigoPaciente) { /* ... */ }
 }
 
-// com.medisalud.controllers.ControladorCitas
+// com.medisalud.presentacion.controlador.ControladorCitas
 public class ControladorCitas {
     public ControladorCitas(ServicioCitas servicioCitas) { /* ... */ }
     public void manejarSolicitudAgendar(String codigoPaciente) { /* ... */ }

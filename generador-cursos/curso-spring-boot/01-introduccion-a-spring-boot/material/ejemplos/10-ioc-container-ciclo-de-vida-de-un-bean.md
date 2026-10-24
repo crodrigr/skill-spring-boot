@@ -27,15 +27,20 @@ orden las fases de su ciclo de vida.
 
 ```text
 📁 ejemplo-10-ciclo-de-vida
-└── 📁 src
-    ├── 📄 ServicioCitas.java
-    ├── 📄 ConfiguracionApp.java
-    └── 📄 DemoContenedorIoC.java   (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/medisalud
+    ├── 📄 DemoContenedorIoC.java      (▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                     (capa de negocio)
+    │   └── 📁 service
+    │       └── 📄 ServicioCitas.java
+    └── 📁 config
+        └── 📄 ConfiguracionApp.java
 ```
 
 ## 💻 Archivo: `ServicioCitas.java`
 
 ```java
+package com.medisalud.negocio.service;
+
 @Component
 public class ServicioCitas {
 
@@ -62,6 +67,8 @@ public class ServicioCitas {
 ## 💻 Archivo: `ConfiguracionApp.java`
 
 ```java
+package com.medisalud.config;
+
 // Clase de configuración: le dice al contenedor en qué paquete buscar @Component
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
@@ -72,6 +79,11 @@ public class ConfiguracionApp {
 ## 💻 Archivo: `DemoContenedorIoC.java`
 
 ```java
+package com.medisalud;
+
+import com.medisalud.config.ConfiguracionApp;
+import com.medisalud.negocio.service.ServicioCitas;
+
 public class DemoContenedorIoC {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

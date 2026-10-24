@@ -8,18 +8,18 @@ sobre préstamos próximos a vencer. La clase crea sus propias dependencias con
 
 ## 💻 Código o contexto de partida
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
-// com.biblioteca.persistences.entities.Usuario
+// com.biblioteca.negocio.model.Usuario
 public record Usuario(String codigo, String email) {}
 
-// com.biblioteca.persistences.repositories.RepositorioUsuarios
+// com.biblioteca.persistence.repository.RepositorioUsuarios
 public interface RepositorioUsuarios {
     Usuario buscarPorCodigo(String codigo);
 }
 
-// com.biblioteca.persistences.repositories.RepositorioUsuariosJpa
+// com.biblioteca.persistence.repository.RepositorioUsuariosJpa
 public class RepositorioUsuariosJpa implements RepositorioUsuarios {
     @Override
     public Usuario buscarPorCodigo(String codigo) {
@@ -27,12 +27,12 @@ public class RepositorioUsuariosJpa implements RepositorioUsuarios {
     }
 }
 
-// com.biblioteca.services.ClienteEmail
+// com.biblioteca.negocio.service.ClienteEmail
 public interface ClienteEmail {
     void enviar(String destinatario, String mensaje);
 }
 
-// com.biblioteca.services.ClienteEmailSmtp
+// com.biblioteca.negocio.service.ClienteEmailSmtp
 public class ClienteEmailSmtp implements ClienteEmail {
     @Override
     public void enviar(String destinatario, String mensaje) {
@@ -40,7 +40,7 @@ public class ClienteEmailSmtp implements ClienteEmail {
     }
 }
 
-// com.biblioteca.services.ServicioNotificaciones
+// com.biblioteca.negocio.service.ServicioNotificaciones
 public class ServicioNotificaciones {
 
     private RepositorioUsuarios repositorioUsuarios = new RepositorioUsuariosJpa();

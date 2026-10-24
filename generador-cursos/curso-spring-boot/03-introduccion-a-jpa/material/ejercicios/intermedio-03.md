@@ -9,9 +9,9 @@ varias `Cita`, y cada `Cita` tiene un único `Medico`.
 ## 💻 Código o contexto de partida
 
 ```java
-package com.medisalud.persistences.entities;
+package com.medisalud.negocio.model;
 
-// capa de persistencia: com.medisalud.persistences.entities
+// capa de negocio (modelo): com.medisalud.negocio.model
 @Entity
 public class Medico {
 
@@ -37,7 +37,7 @@ public class Medico {
 ```
 
 ```java
-// Cita.java (com.medisalud.persistences.entities) ya existe (Ejemplo 08)
+// Cita.java (com.medisalud.negocio.model) ya existe (Ejemplo 08)
 // con id, fecha, motivo y su relación con Paciente.
 // TODO: agregar la relación con Medico.
 ```
@@ -52,8 +52,8 @@ public class Medico {
 
 ## 📏 Criterios de evaluación de la solución
 
-- `Medico` y `Cita` están en el mismo paquete de la capa de persistencia (`persistences`)
-  (`com.medisalud.persistences.entities`), así que no necesitan `import`
+- `Medico` y `Cita` están en el mismo paquete
+  (`com.medisalud.negocio.model`), así que no necesitan `import`
   entre sí.
 - `Cita` declara `@ManyToOne @JoinColumn(name = "medico_id")` sobre un
   campo `Medico`.

@@ -17,7 +17,7 @@ completamente mapeados en el Ejemplo 08:
 <summary>📄 Ver código completo de <code>Paciente.java</code>, <code>Cita.java</code>, <code>HistoriaClinica.java</code>, <code>RepositorioPacientes.java</code> y <code>RepositorioCitas.java</code> (reutilizados del Ejemplo 08)</summary>
 
 ```java
-// com.medisalud.persistences.entities.Paciente
+// com.medisalud.negocio.model.Paciente
 @Entity
 public class Paciente {
 
@@ -55,7 +55,7 @@ public class Paciente {
     }
 }
 
-// com.medisalud.persistences.entities.Cita
+// com.medisalud.negocio.model.Cita
 @Entity
 public class Cita {
 
@@ -87,7 +87,7 @@ public class Cita {
     // TODO (este Desafío): agregar la relación con Medico
 }
 
-// com.medisalud.persistences.entities.HistoriaClinica
+// com.medisalud.negocio.model.HistoriaClinica
 @Entity
 public class HistoriaClinica {
 
@@ -107,12 +107,12 @@ public class HistoriaClinica {
     public String getAntecedentes() { return antecedentes; }
 }
 
-// com.medisalud.persistences.repositories.RepositorioPacientes
+// com.medisalud.persistence.repository.RepositorioPacientes
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
 
-// com.medisalud.persistences.repositories.RepositorioCitas
+// com.medisalud.persistence.repository.RepositorioCitas
 public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 }
 ```
@@ -122,19 +122,19 @@ public interface RepositorioCitas extends JpaRepository<Cita, Long> {
 ## 🎯 Tu tarea
 
 **Capas**: las entidades (`Paciente`, `Cita`, `HistoriaClinica` y la
-nueva `Medico`) van en `com.medisalud.persistences.entities`; los
+nueva `Medico`) van en `com.medisalud.negocio.model`; los
 repositorios (incluido `RepositorioMedicos`) en
-`com.medisalud.persistences.repositories`; y `Main`, en el paquete raíz
-`com.medisalud`. Todavía no existen `services` ni `controllers` (Módulo 5).
+`com.medisalud.persistence.repository`; y `Main`, en el paquete raíz
+`com.medisalud`. Todavía no existen `negocio/service` ni `presentacion` (Módulo 5).
 
 1. Creá la entidad `Medico` (id, `nombre`), con el lado inverso de la
    relación con `Cita` (`@OneToMany(mappedBy = "medico")`), en
-   `com.medisalud.persistences.entities`.
+   `com.medisalud.negocio.model`.
 2. Agregá a `Cita` el campo `medico` con `@ManyToOne` y
    `@JoinColumn(name = "medico_id")`.
 3. Creá `RepositorioMedicos extends JpaRepository<Medico, Long>`, con un
    método derivado `findByNombre(String nombre)`, en
-   `com.medisalud.persistences.repositories`.
+   `com.medisalud.persistence.repository`.
 4. Escribí un `Main` (`@SpringBootApplication` + `CommandLineRunner`) que:
    - Guarde un `Paciente` con su `HistoriaClinica`.
    - Guarde un `Medico`.
@@ -148,8 +148,7 @@ repositorios (incluido `RepositorioMedicos`) en
   contra H2.
 - `Cita` es el lado propietario de la nueva relación (tiene `medico_id`);
   `Medico` es el lado inverso (`mappedBy`).
-- `Medico` y `RepositorioMedicos` están en los paquetes de la capa
-  `persistences` (`entities` y `repositories`), y los `import` entre
+- `Medico` y `RepositorioMedicos` están en los paquetes `negocio/model` y `persistence/repository`, y los `import` entre
   paquetes son correctos.
 - El `Main` verifica correctamente que el médico recargado tiene dos citas
   asociadas, sin lanzar ningún error de sesión cerrada (pensá si necesitás

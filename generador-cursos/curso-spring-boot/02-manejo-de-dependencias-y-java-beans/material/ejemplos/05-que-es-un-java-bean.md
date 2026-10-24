@@ -37,16 +37,22 @@ características de un Java Bean.
 
 ```text
 📁 ejemplo-05-que-es-un-java-bean
-└── 📁 src
-    ├── 📄 DatosContactoPaciente.java  (Java Bean clásico — Java puro, sin Spring)
-    ├── 📄 ServicioContacto.java       (bean administrado por Spring)
-    ├── 📄 ConfiguracionApp.java
-    └── 📄 Main.java                   (▶️ clase con el main que se ejecuta)
+└── 📁 src/com/medisalud
+    ├── 📄 Main.java                           (▶️ clase con el main que se ejecuta)
+    ├── 📁 negocio                             (capa de negocio)
+    │   ├── 📁 model
+    │   │   └── 📄 DatosContactoPaciente.java  (Java Bean clásico — Java puro, sin Spring)
+    │   └── 📁 service
+    │       └── 📄 ServicioContacto.java       (bean administrado por Spring)
+    └── 📁 config
+        └── 📄 ConfiguracionApp.java
 ```
 
 ## 💻 Archivo: `DatosContactoPaciente.java` (Java puro, sin Spring)
 
 ```java
+package com.medisalud.negocio.model;
+
 public class DatosContactoPaciente implements Serializable {
 
     private String telefono;
@@ -73,6 +79,10 @@ public class DatosContactoPaciente implements Serializable {
 ## 💻 Archivo: `ServicioContacto.java` (bean administrado por Spring)
 
 ```java
+package com.medisalud.negocio.service;
+
+import com.medisalud.negocio.model.DatosContactoPaciente;
+
 @Component // registra esta clase como bean en el contenedor de Spring
 public class ServicioContacto {
 
@@ -88,6 +98,8 @@ public class ServicioContacto {
 ## 💻 Archivo: `ConfiguracionApp.java`
 
 ```java
+package com.medisalud.config;
+
 @Configuration
 @ComponentScan(basePackages = "com.medisalud")
 public class ConfiguracionApp {
@@ -97,6 +109,12 @@ public class ConfiguracionApp {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.config.ConfiguracionApp;
+import com.medisalud.negocio.model.DatosContactoPaciente;
+import com.medisalud.negocio.service.ServicioContacto;
+
 public class Main {
     public static void main(String[] args) {
         ConfigurableApplicationContext contexto =

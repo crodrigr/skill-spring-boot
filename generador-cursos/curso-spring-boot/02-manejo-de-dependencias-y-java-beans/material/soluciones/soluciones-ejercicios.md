@@ -46,10 +46,10 @@ found 2: recargoFijo, recargoProgresivo`.
 
 **Solución propuesta**:
 
-> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `controllers` (capa de presentación), `services` (capa de negocio) o `persistences` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
+> 🏗️ **Capas**: el comentario `// com.…` sobre cada clase indica su paquete: `presentacion/controlador` (capa de presentación), `negocio/service` y `negocio/model` (capa de negocio) o `persistence/repository` (capa de persistencia). En un proyecto real cada clase va en su propio archivo.
 
 ```java
-// com.biblioteca.services.RecargoFijo
+// com.biblioteca.negocio.service.RecargoFijo
 @Component
 @Qualifier("fijo")
 public class RecargoFijo implements CalculadoraRecargo {
@@ -59,7 +59,7 @@ public class RecargoFijo implements CalculadoraRecargo {
     }
 }
 
-// com.biblioteca.services.RecargoProgresivo
+// com.biblioteca.negocio.service.RecargoProgresivo
 @Component
 @Qualifier("progresivo")
 public class RecargoProgresivo implements CalculadoraRecargo {
@@ -69,7 +69,7 @@ public class RecargoProgresivo implements CalculadoraRecargo {
     }
 }
 
-// com.biblioteca.services.ServicioMultas
+// com.biblioteca.negocio.service.ServicioMultas
 @Service
 public class ServicioMultas {
 
@@ -95,7 +95,7 @@ public class ServicioMultas {
 **Solución propuesta (por constructor)**:
 
 ```java
-// com.medisalud.services.ServicioRecetas
+// com.medisalud.negocio.service.ServicioRecetas
 public class ServicioRecetas {
 
     private final RepositorioMedicamentos repositorioMedicamentos;
@@ -140,12 +140,12 @@ error de estilo.
 `RepositorioPrestamos` del que ambos dependen en un solo sentido):
 
 ```java
-// com.biblioteca.persistences.repositories.RepositorioPrestamos
+// com.biblioteca.persistence.repository.RepositorioPrestamos
 public interface RepositorioPrestamos {
     boolean tienePrestamosActivos(String codigoUsuario);
 }
 
-// com.biblioteca.persistences.repositories.RepositorioPrestamosEnMemoria
+// com.biblioteca.persistence.repository.RepositorioPrestamosEnMemoria
 public class RepositorioPrestamosEnMemoria implements RepositorioPrestamos {
     @Override
     public boolean tienePrestamosActivos(String codigoUsuario) {
@@ -153,7 +153,7 @@ public class RepositorioPrestamosEnMemoria implements RepositorioPrestamos {
     }
 }
 
-// com.biblioteca.services.ServicioMultas
+// com.biblioteca.negocio.service.ServicioMultas
 public class ServicioMultas {
     private final RepositorioPrestamos repositorioPrestamos;
 
@@ -166,7 +166,7 @@ public class ServicioMultas {
     }
 }
 
-// com.biblioteca.services.ServicioPrestamos
+// com.biblioteca.negocio.service.ServicioPrestamos
 public class ServicioPrestamos {
     private final ServicioMultas servicioMultas;
     private final RepositorioPrestamos repositorioPrestamos;
@@ -214,15 +214,15 @@ errores.
 **Solución propuesta**:
 
 ```java
-// com.medisalud.persistences.entities.Paciente
+// com.medisalud.negocio.model.Paciente
 public record Paciente(String codigo, String nombre) {}
 
-// com.medisalud.persistences.repositories.RepositorioPacientes
+// com.medisalud.persistence.repository.RepositorioPacientes
 public interface RepositorioPacientes {
     Optional<Paciente> buscarPorCodigo(String codigo);
 }
 
-// com.medisalud.persistences.repositories.RepositorioPacientesEnMemoria
+// com.medisalud.persistence.repository.RepositorioPacientesEnMemoria
 @Repository
 public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     private final Map<String, Paciente> pacientes = Map.of(
@@ -235,7 +235,7 @@ public class RepositorioPacientesEnMemoria implements RepositorioPacientes {
     }
 }
 
-// com.medisalud.services.ServicioNotificaciones
+// com.medisalud.negocio.service.ServicioNotificaciones
 @Service
 public class ServicioNotificaciones {
 
@@ -252,7 +252,7 @@ public class ServicioNotificaciones {
     }
 }
 
-// com.medisalud.services.ServicioCitas
+// com.medisalud.negocio.service.ServicioCitas
 @Service
 public class ServicioCitas {
 
@@ -272,7 +272,7 @@ public class ServicioCitas {
     }
 }
 
-// com.medisalud.controllers.ControladorCitas
+// com.medisalud.presentacion.controlador.ControladorCitas
 @Component
 public class ControladorCitas {
 
@@ -287,7 +287,7 @@ public class ControladorCitas {
     }
 }
 
-// com.medisalud.services.ServicioResumenCitas
+// com.medisalud.negocio.service.ServicioResumenCitas
 @Service
 public class ServicioResumenCitas {
 
@@ -371,7 +371,7 @@ en el mismo constructor) → (c) → (b) → (a).
 **Solución propuesta**:
 
 ```java
-package com.medisalud.persistences.repositories;
+package com.medisalud.persistence.repository;
 
 @Repository
 public class RepositorioHistorialesEnMemoria {

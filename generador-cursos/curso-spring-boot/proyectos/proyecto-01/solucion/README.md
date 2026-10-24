@@ -78,13 +78,13 @@ Hacé **un commit al terminar cada fase** (cada documento sugiere el mensaje).
 | Documento | Archivos que se crean |
 |---|---|
 | [01-fase-1-proyecto-base.md](01-fase-1-proyecto-base.md) | `pom.xml` · `Main.java` · `application.properties` · `application-h2.properties` · `application-mysql.properties` · `application-postgres.properties` · `docker-compose.yml` · `config/ConfiguracionBeans.java` · `.gitignore` |
-| [02-fase-2-modelo-de-datos.md](02-fase-2-modelo-de-datos.md) | `persistences/entities/TipoSala.java` · `persistences/entities/EstadoMiembro.java` · `persistences/entities/EstadoReserva.java` · `security/persistences/entities/Rol.java` · `persistences/entities/Sede.java` · `persistences/entities/Equipamiento.java` · `persistences/entities/Sala.java` · `persistences/entities/PlanMembresia.java` · `security/persistences/entities/Usuario.java` · `persistences/entities/Miembro.java` · `persistences/entities/ServicioAdicional.java` · `persistences/entities/Reserva.java` · `persistences/entities/DetalleReserva.java` · `persistences/repositories/RepositorioSedes.java` · `persistences/repositories/RepositorioEquipamientos.java` · `persistences/repositories/RepositorioServiciosAdicionales.java` · `persistences/repositories/RepositorioPlanes.java` · `persistences/repositories/RepositorioMiembros.java` · `persistences/repositories/RepositorioSalas.java` · `persistences/repositories/RepositorioReservas.java` · `security/persistences/repositories/RepositorioUsuarios.java` · `data.sql` |
-| [03a-fase-3-catalogos.md](03a-fase-3-catalogos.md) | `exception/RecursoNoEncontradoException.java` · `exception/ReglaNegocioException.java` · `exception/SolicitudInvalidaException.java` · `dto/SolicitudSede.java` · `dto/SolicitudEquipamiento.java` · `dto/SolicitudServicioAdicional.java` · `dto/SolicitudPlan.java` · `dto/SolicitudSala.java` · `dto/SolicitudMiembro.java` · `dto/SolicitudActualizarMiembro.java` · `dto/ItemServicio.java` · `dto/SolicitudReserva.java` · `dto/ResumenConsumo.java` · `services/Validaciones.java` · `services/ServicioSedes.java` · `controllers/ControladorSedes.java` · `services/ServicioEquipamientos.java` · `controllers/ControladorEquipamientos.java` · `services/ServicioServiciosAdicionales.java` · `controllers/ControladorServiciosAdicionales.java` · `services/ServicioPlanes.java` · `controllers/ControladorPlanes.java` · `services/ServicioSalas.java` · `controllers/ControladorSalas.java` |
-| [03b-fase-3-miembros.md](03b-fase-3-miembros.md) | `services/ServicioMiembros.java` · `services/ServicioConsumo.java` · `controllers/ControladorMiembros.java` · `services/ServicioDisponibilidad.java` · `controllers/ControladorDisponibilidad.java` |
-| [03c-fase-3-reservas.md](03c-fase-3-reservas.md) | `services/CalculadoraCostoReserva.java` · `services/ServicioReservas.java` · `controllers/ControladorReservas.java` · `config/CargadorReservasDemo.java` |
-| [04-fase-4-excepciones.md](04-fase-4-excepciones.md) | `exception/RespuestaError.java` · `exception/ManejadorGlobalDeExcepciones.java` |
+| [02-fase-2-modelo-de-datos.md](02-fase-2-modelo-de-datos.md) | `negocio/model/TipoSala.java` · `negocio/model/EstadoMiembro.java` · `negocio/model/EstadoReserva.java` · `security/negocio/model/Rol.java` · `negocio/model/Sede.java` · `negocio/model/Equipamiento.java` · `negocio/model/Sala.java` · `negocio/model/PlanMembresia.java` · `security/negocio/model/Usuario.java` · `negocio/model/Miembro.java` · `negocio/model/ServicioAdicional.java` · `negocio/model/Reserva.java` · `negocio/model/DetalleReserva.java` · `persistence/repository/RepositorioSedes.java` · `persistence/repository/RepositorioEquipamientos.java` · `persistence/repository/RepositorioServiciosAdicionales.java` · `persistence/repository/RepositorioPlanes.java` · `persistence/repository/RepositorioMiembros.java` · `persistence/repository/RepositorioSalas.java` · `persistence/repository/RepositorioReservas.java` · `security/persistence/repository/RepositorioUsuarios.java` · `data.sql` |
+| [03a-fase-3-catalogos.md](03a-fase-3-catalogos.md) | `negocio/excepcion/RecursoNoEncontradoException.java` · `negocio/excepcion/ReglaNegocioException.java` · `negocio/excepcion/SolicitudInvalidaException.java` · `presentacion/dto/SolicitudSede.java` · `presentacion/dto/SolicitudEquipamiento.java` · `presentacion/dto/SolicitudServicioAdicional.java` · `presentacion/dto/SolicitudPlan.java` · `presentacion/dto/SolicitudSala.java` · `presentacion/dto/SolicitudMiembro.java` · `presentacion/dto/SolicitudActualizarMiembro.java` · `presentacion/dto/ItemServicio.java` · `presentacion/dto/SolicitudReserva.java` · `presentacion/dto/ResumenConsumo.java` · `negocio/service/Validaciones.java` · `negocio/service/ServicioSedes.java` · `presentacion/controlador/ControladorSedes.java` · `negocio/service/ServicioEquipamientos.java` · `presentacion/controlador/ControladorEquipamientos.java` · `negocio/service/ServicioServiciosAdicionales.java` · `presentacion/controlador/ControladorServiciosAdicionales.java` · `negocio/service/ServicioPlanes.java` · `presentacion/controlador/ControladorPlanes.java` · `negocio/service/ServicioSalas.java` · `presentacion/controlador/ControladorSalas.java` |
+| [03b-fase-3-miembros.md](03b-fase-3-miembros.md) | `negocio/service/ServicioMiembros.java` · `negocio/service/ServicioConsumo.java` · `presentacion/controlador/ControladorMiembros.java` · `negocio/service/ServicioDisponibilidad.java` · `presentacion/controlador/ControladorDisponibilidad.java` |
+| [03c-fase-3-reservas.md](03c-fase-3-reservas.md) | `negocio/service/CalculadoraCostoReserva.java` · `negocio/service/ServicioReservas.java` · `presentacion/controlador/ControladorReservas.java` · `config/CargadorReservasDemo.java` |
+| [04-fase-4-excepciones.md](04-fase-4-excepciones.md) | `presentacion/dto/RespuestaError.java` · `presentacion/excepcion/ManejadorGlobalDeExcepciones.java` |
 | [05-fase-5-swagger.md](05-fase-5-swagger.md) | `config/ConfiguracionOpenApi.java` |
-| [06-fase-6-seguridad-jwt.md](06-fase-6-seguridad-jwt.md) | `dto/SolicitudLogin.java` · `dto/RespuestaLogin.java` · `security/jwt/UtilJwt.java` · `security/services/ServicioDetallesUsuario.java` · `security/services/ServicioAutorizacion.java` · `security/jwt/FiltroAutenticacionJwt.java` · `security/config/PuntoEntradaJwt.java` · `security/config/ManejadorAccesoDenegado.java` · `security/config/Permisos.java` · `security/config/ConfiguracionSeguridad.java` · `security/controllers/ControladorAutenticacion.java` |
+| [06-fase-6-seguridad-jwt.md](06-fase-6-seguridad-jwt.md) | `presentacion/dto/SolicitudLogin.java` · `presentacion/dto/RespuestaLogin.java` · `security/jwt/UtilJwt.java` · `security/negocio/service/ServicioDetallesUsuario.java` · `security/negocio/service/ServicioAutorizacion.java` · `security/jwt/FiltroAutenticacionJwt.java` · `security/config/PuntoEntradaJwt.java` · `security/config/ManejadorAccesoDenegado.java` · `security/config/Permisos.java` · `security/config/ConfiguracionSeguridad.java` · `security/presentacion/controlador/ControladorAutenticacion.java` |
 
 **Total: 78 archivos.**
 
@@ -95,106 +95,111 @@ Así queda el proyecto al terminar la Fase 7. Al comienzo de **cada fase** encon
 
 ```text
 📁 coworkhub
-├── 📄 .gitignore                                              [fase 1]
-├── 📄 docker-compose.yml                                      [fase 1]
-├── 📄 pom.xml                                                 [fase 1]
-├── 📄 README.md                                               [fase 7]
-├── 📁 docs  (documentación del proyecto)
-│   ├── 📄 analisis.md                                         [fase 0]
-│   └── 📄 insomnia-coworkhub.json                             [fase 7]
+├── 📄 .gitignore                                        [fase 1]
+├── 📄 docker-compose.yml                                [fase 1]
+├── 📄 pom.xml                                           [fase 1]
+├── 📄 README.md                                         [fase 7]
+├── 📁 docs                                              (documentación del proyecto)
+│   ├── 📄 analisis.md                                   [fase 0]
+│   └── 📄 insomnia-coworkhub.json                       [fase 7]
 ├── 📁 src/main/java/com/coworkhub
-│   ├── 📄 Main.java                                           [fase 1]
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
-│   │   ├── 📄 CargadorReservasDemo.java                       [fase 3c]
-│   │   ├── 📄 ConfiguracionBeans.java                         [fase 1]
-│   │   └── 📄 ConfiguracionOpenApi.java                       [fase 5]
-│   ├── 📁 controllers  (capa de presentación, HTTP)
-│   │   ├── 📄 ControladorDisponibilidad.java                  [fase 3b]
-│   │   ├── 📄 ControladorEquipamientos.java                   [fase 3a]
-│   │   ├── 📄 ControladorMiembros.java                        [fase 3b]
-│   │   ├── 📄 ControladorPlanes.java                          [fase 3a]
-│   │   ├── 📄 ControladorReservas.java                        [fase 3c]
-│   │   ├── 📄 ControladorSalas.java                           [fase 3a]
-│   │   ├── 📄 ControladorSedes.java                           [fase 3a]
-│   │   └── 📄 ControladorServiciosAdicionales.java            [fase 3a]
-│   ├── 📁 dto  (solicitudes y respuestas, en records)
-│   │   ├── 📄 ItemServicio.java                               [fase 3a]
-│   │   ├── 📄 RespuestaLogin.java                             [fase 6]
-│   │   ├── 📄 ResumenConsumo.java                             [fase 3a]
-│   │   ├── 📄 SolicitudActualizarMiembro.java                 [fase 3a]
-│   │   ├── 📄 SolicitudEquipamiento.java                      [fase 3a]
-│   │   ├── 📄 SolicitudLogin.java                             [fase 6]
-│   │   ├── 📄 SolicitudMiembro.java                           [fase 3a]
-│   │   ├── 📄 SolicitudPlan.java                              [fase 3a]
-│   │   ├── 📄 SolicitudReserva.java                           [fase 3a]
-│   │   ├── 📄 SolicitudSala.java                              [fase 3a]
-│   │   ├── 📄 SolicitudSede.java                              [fase 3a]
-│   │   └── 📄 SolicitudServicioAdicional.java                 [fase 3a]
-│   ├── 📁 exception  (excepciones y manejador global)
-│   │   ├── 📄 ManejadorGlobalDeExcepciones.java               [fase 4]
-│   │   ├── 📄 RecursoNoEncontradoException.java               [fase 3a]
-│   │   ├── 📄 ReglaNegocioException.java                      [fase 3a]
-│   │   ├── 📄 RespuestaError.java                             [fase 4]
-│   │   └── 📄 SolicitudInvalidaException.java                 [fase 3a]
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
-│   │   │   ├── 📄 DetalleReserva.java                         [fase 2]
-│   │   │   ├── 📄 Equipamiento.java                           [fase 2]
-│   │   │   ├── 📄 EstadoMiembro.java                          [fase 2]
-│   │   │   ├── 📄 EstadoReserva.java                          [fase 2]
-│   │   │   ├── 📄 Miembro.java                                [fase 2]
-│   │   │   ├── 📄 PlanMembresia.java                          [fase 2]
-│   │   │   ├── 📄 Reserva.java                                [fase 2]
-│   │   │   ├── 📄 Sala.java                                   [fase 2]
-│   │   │   ├── 📄 Sede.java                                   [fase 2]
-│   │   │   ├── 📄 ServicioAdicional.java                      [fase 2]
-│   │   │   └── 📄 TipoSala.java                               [fase 2]
-│   │   └── 📁 repositories  (interfaces JpaRepository)
-│   │       ├── 📄 RepositorioEquipamientos.java               [fase 2]
-│   │       ├── 📄 RepositorioMiembros.java                    [fase 2]
-│   │       ├── 📄 RepositorioPlanes.java                      [fase 2]
-│   │       ├── 📄 RepositorioReservas.java                    [fase 2]
-│   │       ├── 📄 RepositorioSalas.java                       [fase 2]
-│   │       ├── 📄 RepositorioSedes.java                       [fase 2]
-│   │       └── 📄 RepositorioServiciosAdicionales.java        [fase 2]
-│   ├── 📁 security  (autenticación y autorización)
-│   │   ├── 📁 config  (reglas de seguridad)
-│   │   │   ├── 📄 ConfiguracionSeguridad.java                 [fase 6]
-│   │   │   ├── 📄 ManejadorAccesoDenegado.java                [fase 6]
-│   │   │   ├── 📄 Permisos.java                               [fase 6]
-│   │   │   └── 📄 PuntoEntradaJwt.java                        [fase 6]
-│   │   ├── 📁 controllers  (login)
-│   │   │   └── 📄 ControladorAutenticacion.java               [fase 6]
-│   │   ├── 📁 jwt  (tokens y filtro)
-│   │   │   ├── 📄 FiltroAutenticacionJwt.java                 [fase 6]
-│   │   │   └── 📄 UtilJwt.java                                [fase 6]
-│   │   ├── 📁 persistences  (capa de persistencia de seguridad)
-│   │   │   ├── 📁 entities  (Usuario y Rol)
-│   │   │   │   ├── 📄 Rol.java                                [fase 2]
-│   │   │   │   └── 📄 Usuario.java                            [fase 2]
-│   │   │   └── 📁 repositories  (RepositorioUsuarios)
-│   │   │       └── 📄 RepositorioUsuarios.java                [fase 2]
-│   │   └── 📁 services  (usuarios y permisos)
-│   │       ├── 📄 ServicioAutorizacion.java                   [fase 6]
-│   │       └── 📄 ServicioDetallesUsuario.java                [fase 6]
-│   └── 📁 services  (capa de negocio, reglas del dominio)
-│       ├── 📄 CalculadoraCostoReserva.java                    [fase 3c]
-│       ├── 📄 ServicioConsumo.java                            [fase 3b]
-│       ├── 📄 ServicioDisponibilidad.java                     [fase 3b]
-│       ├── 📄 ServicioEquipamientos.java                      [fase 3a]
-│       ├── 📄 ServicioMiembros.java                           [fase 3b]
-│       ├── 📄 ServicioPlanes.java                             [fase 3a]
-│       ├── 📄 ServicioReservas.java                           [fase 3c]
-│       ├── 📄 ServicioSalas.java                              [fase 3a]
-│       ├── 📄 ServicioSedes.java                              [fase 3a]
-│       ├── 📄 ServicioServiciosAdicionales.java               [fase 3a]
-│       └── 📄 Validaciones.java                               [fase 3a]
+│   ├── 📄 Main.java                                     [fase 1]
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
+│   │   ├── 📄 CargadorReservasDemo.java                 [fase 3c]
+│   │   ├── 📄 ConfiguracionBeans.java                   [fase 1]
+│   │   └── 📄 ConfiguracionOpenApi.java                 [fase 5]
+│   ├── 📁 presentacion                                  (capa de presentación)
+│   │   ├── 📁 controlador
+│   │   │   ├── 📄 ControladorDisponibilidad.java        [fase 3b]
+│   │   │   ├── 📄 ControladorEquipamientos.java         [fase 3a]
+│   │   │   ├── 📄 ControladorMiembros.java              [fase 3b]
+│   │   │   ├── 📄 ControladorPlanes.java                [fase 3a]
+│   │   │   ├── 📄 ControladorReservas.java              [fase 3c]
+│   │   │   ├── 📄 ControladorSalas.java                 [fase 3a]
+│   │   │   ├── 📄 ControladorSedes.java                 [fase 3a]
+│   │   │   └── 📄 ControladorServiciosAdicionales.java  [fase 3a]
+│   │   ├── 📁 dto
+│   │   │   ├── 📄 ItemServicio.java                     [fase 3a]
+│   │   │   ├── 📄 RespuestaError.java                   [fase 4]
+│   │   │   ├── 📄 RespuestaLogin.java                   [fase 6]
+│   │   │   ├── 📄 ResumenConsumo.java                   [fase 3a]
+│   │   │   ├── 📄 SolicitudActualizarMiembro.java       [fase 3a]
+│   │   │   ├── 📄 SolicitudEquipamiento.java            [fase 3a]
+│   │   │   ├── 📄 SolicitudLogin.java                   [fase 6]
+│   │   │   ├── 📄 SolicitudMiembro.java                 [fase 3a]
+│   │   │   ├── 📄 SolicitudPlan.java                    [fase 3a]
+│   │   │   ├── 📄 SolicitudReserva.java                 [fase 3a]
+│   │   │   ├── 📄 SolicitudSala.java                    [fase 3a]
+│   │   │   ├── 📄 SolicitudSede.java                    [fase 3a]
+│   │   │   └── 📄 SolicitudServicioAdicional.java       [fase 3a]
+│   │   └── 📁 excepcion
+│   │       └── 📄 ManejadorGlobalDeExcepciones.java     [fase 4]
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   ├── 📁 model
+│   │   │   ├── 📄 DetalleReserva.java                   [fase 2]
+│   │   │   ├── 📄 Equipamiento.java                     [fase 2]
+│   │   │   ├── 📄 EstadoMiembro.java                    [fase 2]
+│   │   │   ├── 📄 EstadoReserva.java                    [fase 2]
+│   │   │   ├── 📄 Miembro.java                          [fase 2]
+│   │   │   ├── 📄 PlanMembresia.java                    [fase 2]
+│   │   │   ├── 📄 Reserva.java                          [fase 2]
+│   │   │   ├── 📄 Sala.java                             [fase 2]
+│   │   │   ├── 📄 Sede.java                             [fase 2]
+│   │   │   ├── 📄 ServicioAdicional.java                [fase 2]
+│   │   │   └── 📄 TipoSala.java                         [fase 2]
+│   │   ├── 📁 service
+│   │   │   ├── 📄 CalculadoraCostoReserva.java          [fase 3c]
+│   │   │   ├── 📄 ServicioConsumo.java                  [fase 3b]
+│   │   │   ├── 📄 ServicioDisponibilidad.java           [fase 3b]
+│   │   │   ├── 📄 ServicioEquipamientos.java            [fase 3a]
+│   │   │   ├── 📄 ServicioMiembros.java                 [fase 3b]
+│   │   │   ├── 📄 ServicioPlanes.java                   [fase 3a]
+│   │   │   ├── 📄 ServicioReservas.java                 [fase 3c]
+│   │   │   ├── 📄 ServicioSalas.java                    [fase 3a]
+│   │   │   ├── 📄 ServicioSedes.java                    [fase 3a]
+│   │   │   ├── 📄 ServicioServiciosAdicionales.java     [fase 3a]
+│   │   │   └── 📄 Validaciones.java                     [fase 3a]
+│   │   └── 📁 excepcion
+│   │       ├── 📄 RecursoNoEncontradoException.java     [fase 3a]
+│   │       ├── 📄 ReglaNegocioException.java            [fase 3a]
+│   │       └── 📄 SolicitudInvalidaException.java       [fase 3a]
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
+│   │       ├── 📄 RepositorioEquipamientos.java         [fase 2]
+│   │       ├── 📄 RepositorioMiembros.java              [fase 2]
+│   │       ├── 📄 RepositorioPlanes.java                [fase 2]
+│   │       ├── 📄 RepositorioReservas.java              [fase 2]
+│   │       ├── 📄 RepositorioSalas.java                 [fase 2]
+│   │       ├── 📄 RepositorioSedes.java                 [fase 2]
+│   │       └── 📄 RepositorioServiciosAdicionales.java  [fase 2]
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 config                                    (reglas de seguridad)
+│       │   ├── 📄 ConfiguracionSeguridad.java           [fase 6]
+│       │   ├── 📄 ManejadorAccesoDenegado.java          [fase 6]
+│       │   ├── 📄 Permisos.java                         [fase 6]
+│       │   └── 📄 PuntoEntradaJwt.java                  [fase 6]
+│       ├── 📁 presentacion                              (capa de presentación)
+│       │   └── 📁 controlador
+│       │       └── 📄 ControladorAutenticacion.java     [fase 6]
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   ├── 📁 model
+│       │   │   ├── 📄 Rol.java                          [fase 2]
+│       │   │   └── 📄 Usuario.java                      [fase 2]
+│       │   └── 📁 service
+│       │       ├── 📄 ServicioAutorizacion.java         [fase 6]
+│       │       └── 📄 ServicioDetallesUsuario.java      [fase 6]
+│       ├── 📁 persistence                               (capa de persistencia)
+│       │   └── 📁 repository
+│       │       └── 📄 RepositorioUsuarios.java          [fase 2]
+│       └── 📁 jwt                                       (tokens y filtro)
+│           ├── 📄 FiltroAutenticacionJwt.java           [fase 6]
+│           └── 📄 UtilJwt.java                          [fase 6]
 └── 📁 src/main/resources
-    ├── 📄 application-h2.properties                           [fase 1]
-    ├── 📄 application-mysql.properties                        [fase 1]
-    ├── 📄 application-postgres.properties                     [fase 1]
-    ├── 📄 application.properties                              [fase 1]
-    └── 📄 data.sql                                            [fase 2]
+    ├── 📄 application-h2.properties                     [fase 1]
+    ├── 📄 application-mysql.properties                  [fase 1]
+    ├── 📄 application-postgres.properties               [fase 1]
+    ├── 📄 application.properties                        [fase 1]
+    └── 📄 data.sql                                      [fase 2]
 ```
 
 Entre corchetes, la fase en la que se crea cada archivo (`0` = análisis, `3a`, `3b` y `3c` = partes de la Fase 3).
@@ -204,13 +209,13 @@ Entre corchetes, la fase en la que se crea cada archivo (`0` = análisis, `3a`, 
 ```mermaid
 flowchart LR
     C(["Cliente<br/>Insomnia / Swagger"]) --> SEC["Seguridad<br/>FiltroAutenticacionJwt<br/>+ ConfiguracionSeguridad"]
-    SEC --> CTRL["controllers<br/>(HTTP)"]
-    CTRL --> SVC["services<br/>(reglas de negocio)<br/>+ CalculadoraCostoReserva"]
-    SVC --> REP["persistences.repositories<br/>(Spring Data JPA)"]
-    REP --> ENT["persistences.entities"]
+    SEC --> CTRL["presentacion.controlador<br/>(HTTP + dto)"]
+    CTRL --> SVC["negocio.service<br/>(reglas de negocio)<br/>+ CalculadoraCostoReserva"]
+    SVC --> REP["persistence.repository<br/>(Spring Data JPA)"]
+    REP --> ENT["negocio.model"]
     ENT --> DB[("H2 en memoria")]
-    SVC -. lanza .-> EXC["exception<br/>(reglas violadas)"]
-    EXC -. traduce a HTTP .-> ADV["ManejadorGlobalDeExcepciones<br/>@ControllerAdvice"]
+    SVC -. lanza .-> EXC["negocio.excepcion<br/>(reglas violadas)"]
+    EXC -. traduce a HTTP .-> ADV["presentacion.excepcion<br/>ManejadorGlobalDeExcepciones<br/>@ControllerAdvice"]
     ADV -.-> C
 ```
 

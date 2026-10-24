@@ -78,15 +78,16 @@ No hay Vista tradicional: el cuerpo JSON de la respuesta cumple ese rol.
 
 ```mermaid
 flowchart LR
-    Controller --> Service --> Repository --> Database
+    presentacion --> negocio --> persistence --> Database
 ```
 
-![El cliente llama al controlador, que llama al servicio, que llama al repositorio, que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
+![El cliente llama a la capa de presentación (controlador y dto), que llama a la capa de negocio (service y model), que llama a la capa de persistencia (repository), que accede a la base de datos. Cada capa solo habla con la de abajo.](../imagenes/arquitectura-capas-spring.svg)
 
 ## Slide 16 — Responsabilidad de cada capa
 
-`Controller` maneja HTTP · `Service` tiene la lógica de negocio ·
-`Repository` accede a datos · `Database` persiste.
+**Presentación**: `controlador` maneja HTTP y `dto` define los datos de la API ·
+**Negocio**: `service` tiene la lógica y `model` las entidades ·
+**Persistencia**: `repository` accede a datos.
 
 ## Slide 17 — Regla clave: cada capa habla con la de abajo
 

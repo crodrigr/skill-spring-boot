@@ -63,7 +63,7 @@ para autoevaluarte antes de entregar.
 
 ## 3. ⚙️ Reglas de negocio — 25 puntos
 
-Cada regla se otorga si está **implementada en la capa de negocio (`services`)** y hay una prueba que
+Cada regla se otorga si está **implementada en la capa de negocio (`negocio/service`)** y hay una prueba que
 la demuestra (idealmente uno de los [escenarios de aceptación](enunciado.md#10-escenarios-de-aceptación-mínimos)).
 
 | Regla | Qué se demuestra | Pts |
@@ -94,8 +94,8 @@ la demuestra (idealmente uno de los [escenarios de aceptación](enunciado.md#10-
 
 | Indicador | Pts |
 |---|---|
-| Paquetes `controllers`, `services`, `persistences` (`entities`, `repositories`); `exception`, `config` y `jwt` como paquetes transversales. Ningún controlador usa un repositorio y ningún servicio usa un controlador | 5 |
-| Toda la lógica de negocio en `services`; inyección **por constructor**; el cálculo de costos en un bean propio (`@Component`) inyectado en el servicio de reservas | 3 |
+| Paquetes `presentacion` (`controlador`, `dto`, `excepcion`), `negocio` (`model`, `service`, `excepcion`) y `persistence` (`repository`); `config` y `jwt` como paquetes transversales. Las solicitudes entran como DTO, ningún controlador usa un repositorio y ningún servicio usa un controlador | 5 |
+| Toda la lógica de negocio en `negocio`; inyección **por constructor**; el cálculo de costos en un bean propio (`@Component`) inyectado en el servicio de reservas | 3 |
 | Operaciones que escriben varias entidades son `@Transactional`; una falla no deja datos a medias (se prueba con una solicitud que falla a mitad de camino) | 3 |
 | Los listados no producen el problema N+1 (se comprueba con `spring.jpa.show-sql=true`) | 2 |
 | Nombres en español y coherentes; sin código duplicado entre servicios; cada clase con una sola responsabilidad | 2 |

@@ -23,46 +23,48 @@ terminar verás las tablas creadas por Hibernate y los datos en la base.
 ├── 📄 .gitignore
 ├── 📄 docker-compose.yml
 ├── 📄 pom.xml
-├── 📁 docs  (documentación del proyecto)
+├── 📁 docs                                              (documentación del proyecto)
 │   └── 📄 analisis.md
 ├── 📁 src/main/java/com/coworkhub
 │   ├── 📄 Main.java
-│   ├── 📁 config  (beans, datos de ejemplo y OpenAPI)
+│   ├── 📁 config                                        (beans, datos de ejemplo y OpenAPI)
 │   │   └── 📄 ConfiguracionBeans.java
-│   ├── 📁 persistences  (capa de persistencia)
-│   │   ├── 📁 entities  (clases @Entity)
-│   │   │   ├── 📄 DetalleReserva.java                         ◀ 🆕 nuevo
-│   │   │   ├── 📄 Equipamiento.java                           ◀ 🆕 nuevo
-│   │   │   ├── 📄 EstadoMiembro.java                          ◀ 🆕 nuevo
-│   │   │   ├── 📄 EstadoReserva.java                          ◀ 🆕 nuevo
-│   │   │   ├── 📄 Miembro.java                                ◀ 🆕 nuevo
-│   │   │   ├── 📄 PlanMembresia.java                          ◀ 🆕 nuevo
-│   │   │   ├── 📄 Reserva.java                                ◀ 🆕 nuevo
-│   │   │   ├── 📄 Sala.java                                   ◀ 🆕 nuevo
-│   │   │   ├── 📄 Sede.java                                   ◀ 🆕 nuevo
-│   │   │   ├── 📄 ServicioAdicional.java                      ◀ 🆕 nuevo
-│   │   │   └── 📄 TipoSala.java                               ◀ 🆕 nuevo
-│   │   └── 📁 repositories  (interfaces JpaRepository)
-│   │       ├── 📄 RepositorioEquipamientos.java               ◀ 🆕 nuevo
-│   │       ├── 📄 RepositorioMiembros.java                    ◀ 🆕 nuevo
-│   │       ├── 📄 RepositorioPlanes.java                      ◀ 🆕 nuevo
-│   │       ├── 📄 RepositorioReservas.java                    ◀ 🆕 nuevo
-│   │       ├── 📄 RepositorioSalas.java                       ◀ 🆕 nuevo
-│   │       ├── 📄 RepositorioSedes.java                       ◀ 🆕 nuevo
-│   │       └── 📄 RepositorioServiciosAdicionales.java        ◀ 🆕 nuevo
-│   └── 📁 security  (autenticación y autorización)
-│       └── 📁 persistences  (capa de persistencia de seguridad)
-│           ├── 📁 entities  (Usuario y Rol)
-│           │   ├── 📄 Rol.java                                ◀ 🆕 nuevo
-│           │   └── 📄 Usuario.java                            ◀ 🆕 nuevo
-│           └── 📁 repositories  (RepositorioUsuarios)
-│               └── 📄 RepositorioUsuarios.java                ◀ 🆕 nuevo
+│   ├── 📁 negocio                                       (capa de negocio)
+│   │   └── 📁 model
+│   │       ├── 📄 DetalleReserva.java                   ◀ 🆕 nuevo
+│   │       ├── 📄 Equipamiento.java                     ◀ 🆕 nuevo
+│   │       ├── 📄 EstadoMiembro.java                    ◀ 🆕 nuevo
+│   │       ├── 📄 EstadoReserva.java                    ◀ 🆕 nuevo
+│   │       ├── 📄 Miembro.java                          ◀ 🆕 nuevo
+│   │       ├── 📄 PlanMembresia.java                    ◀ 🆕 nuevo
+│   │       ├── 📄 Reserva.java                          ◀ 🆕 nuevo
+│   │       ├── 📄 Sala.java                             ◀ 🆕 nuevo
+│   │       ├── 📄 Sede.java                             ◀ 🆕 nuevo
+│   │       ├── 📄 ServicioAdicional.java                ◀ 🆕 nuevo
+│   │       └── 📄 TipoSala.java                         ◀ 🆕 nuevo
+│   ├── 📁 persistence                                   (capa de persistencia)
+│   │   └── 📁 repository
+│   │       ├── 📄 RepositorioEquipamientos.java         ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioMiembros.java              ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioPlanes.java                ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioReservas.java              ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioSalas.java                 ◀ 🆕 nuevo
+│   │       ├── 📄 RepositorioSedes.java                 ◀ 🆕 nuevo
+│   │       └── 📄 RepositorioServiciosAdicionales.java  ◀ 🆕 nuevo
+│   └── 📁 security                                      (autenticación y autorización)
+│       ├── 📁 negocio                                   (capa de negocio)
+│       │   └── 📁 model
+│       │       ├── 📄 Rol.java                          ◀ 🆕 nuevo
+│       │       └── 📄 Usuario.java                      ◀ 🆕 nuevo
+│       └── 📁 persistence                               (capa de persistencia)
+│           └── 📁 repository
+│               └── 📄 RepositorioUsuarios.java          ◀ 🆕 nuevo
 └── 📁 src/main/resources
     ├── 📄 application-h2.properties
     ├── 📄 application-mysql.properties
     ├── 📄 application-postgres.properties
-    ├── 📄 application.properties                              ◀ ✏️ se modifica
-    └── 📄 data.sql                                            ◀ 🆕 nuevo
+    ├── 📄 application.properties                        ◀ ✏️ se modifica
+    └── 📄 data.sql                                      ◀ 🆕 nuevo
 ```
 
 🆕 archivo nuevo en esta fase · ✏️ archivo que ya existía y se modifica en esta fase · sin marca: ya existe de fases anteriores.
@@ -82,10 +84,10 @@ existentes.
 (`PENDIENTE` y `CONFIRMADA`). Se usará en varias reglas (RN-01, RN-06, RN-12); así
 "activa" se define en un solo lugar.
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/TipoSala.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/TipoSala.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 public enum TipoSala {
     SALA_REUNION,
@@ -94,10 +96,10 @@ public enum TipoSala {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/EstadoMiembro.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/EstadoMiembro.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 public enum EstadoMiembro {
     ACTIVO,
@@ -105,10 +107,10 @@ public enum EstadoMiembro {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/EstadoReserva.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/EstadoReserva.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.util.List;
 
@@ -125,10 +127,10 @@ public enum EstadoReserva {
 
 `Rol` va en el paquete de seguridad porque pertenece al `Usuario`:
 
-**📄 `src/main/java/com/coworkhub/security/persistences/entities/Rol.java`**
+**📄 `src/main/java/com/coworkhub/security/negocio/model/Rol.java`**
 
 ```java
-package com.coworkhub.security.persistences.entities;
+package com.coworkhub.security.negocio.model;
 
 public enum Rol {
     ADMIN,
@@ -157,10 +159,10 @@ Atributos simples y la relación **inversa** con `Sala`. `@OneToMany(mappedBy = 
 significa "la clave foránea vive en `Sala.sede`, yo solo la reflejo". Es `LAZY` por
 defecto y lleva `@JsonIgnore` para no serializarla (evita recursión Sede → Sala → Sede…).
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/Sede.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/Sede.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -232,10 +234,10 @@ public class Sede {
 Lado **inverso** de la relación N↔N con `Sala` (`mappedBy = "equipamientos"`): la tabla
 intermedia la declara `Sala`.
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/Equipamiento.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/Equipamiento.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -289,10 +291,10 @@ Es el centro de tres relaciones:
 - `@Table(uniqueConstraints = ...)` sobre `(sede_id, nombre)`: dos salas pueden llamarse
   igual solo si están en sedes distintas (RN-11).
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/Sala.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/Sala.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -382,10 +384,10 @@ public class Sala {
 `descuentoExcedente` es un porcentaje entero (0 a 100). Su lista `miembros` es el lado
 inverso, ignorado en el JSON.
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/PlanMembresia.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/PlanMembresia.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -448,13 +450,13 @@ public class PlanMembresia {
 
 #### `Usuario` (paquete `security`)
 
-Guarda la contraseña **ya codificada** con BCrypt. Está en `security.persistences.entities`
+Guarda la contraseña **ya codificada** con BCrypt. Está en `security.negocio.model`
 porque es parte de la capa de persistencia del módulo de seguridad.
 
-**📄 `src/main/java/com/coworkhub/security/persistences/entities/Usuario.java`**
+**📄 `src/main/java/com/coworkhub/security/negocio/model/Usuario.java`**
 
 ```java
-package com.coworkhub.security.persistences.entities;
+package com.coworkhub.security.negocio.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -508,12 +510,12 @@ Dos relaciones para observar:
   miembro se guarde también su usuario, y al **eliminarlo**, se elimine el usuario. El
   campo lleva `@JsonIgnore`: jamás debe salir en una respuesta (tiene la contraseña).
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/Miembro.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/Miembro.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
-import com.coworkhub.security.persistences.entities.Usuario;
+import com.coworkhub.security.negocio.model.Usuario;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -590,10 +592,10 @@ public class Miembro {
 
 #### `ServicioAdicional`
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/ServicioAdicional.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/ServicioAdicional.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.math.BigDecimal;
 
@@ -648,10 +650,10 @@ La entidad más importante. Además de las relaciones con `Sala` y `Miembro`:
   [análisis](00-analisis.md#5-supuestos-y-decisiones) (S-02 y S-03).
 - Los métodos `agregarDetalle` y `quitarDetalle` mantienen la lista; el servicio los usa.
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/Reserva.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/Reserva.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -770,10 +772,10 @@ reservar (RN-07): si mañana sube el precio del catering, las reservas ya hechas
 
 `getSubtotal()` no es un campo de la base: es un cálculo que Jackson también incluye en el JSON.
 
-**📄 `src/main/java/com/coworkhub/persistences/entities/DetalleReserva.java`**
+**📄 `src/main/java/com/coworkhub/negocio/model/DetalleReserva.java`**
 
 ```java
-package com.coworkhub.persistences.entities;
+package com.coworkhub.negocio.model;
 
 import java.math.BigDecimal;
 
@@ -866,27 +868,27 @@ del método no alcanza:
   hasta que termine la transacción. Es lo que hace cumplir RN-01 aunque lleguen dos
   solicitudes a la vez (lo verás en la [Fase 3c](03c-fase-3-reservas.md)).
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioSedes.java`**
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioSedes.java`**
 
 ```java
-package com.coworkhub.persistences.repositories;
+package com.coworkhub.persistence.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.coworkhub.persistences.entities.Sede;
+import com.coworkhub.negocio.model.Sede;
 
 public interface RepositorioSedes extends JpaRepository<Sede, Long> {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioEquipamientos.java`**
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioEquipamientos.java`**
 
 ```java
-package com.coworkhub.persistences.repositories;
+package com.coworkhub.persistence.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.coworkhub.persistences.entities.Equipamiento;
+import com.coworkhub.negocio.model.Equipamiento;
 
 public interface RepositorioEquipamientos extends JpaRepository<Equipamiento, Long> {
 
@@ -896,14 +898,14 @@ public interface RepositorioEquipamientos extends JpaRepository<Equipamiento, Lo
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioServiciosAdicionales.java`**
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioServiciosAdicionales.java`**
 
 ```java
-package com.coworkhub.persistences.repositories;
+package com.coworkhub.persistence.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.coworkhub.persistences.entities.ServicioAdicional;
+import com.coworkhub.negocio.model.ServicioAdicional;
 
 public interface RepositorioServiciosAdicionales extends JpaRepository<ServicioAdicional, Long> {
 
@@ -913,14 +915,14 @@ public interface RepositorioServiciosAdicionales extends JpaRepository<ServicioA
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioPlanes.java`**
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioPlanes.java`**
 
 ```java
-package com.coworkhub.persistences.repositories;
+package com.coworkhub.persistence.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.coworkhub.persistences.entities.PlanMembresia;
+import com.coworkhub.negocio.model.PlanMembresia;
 
 public interface RepositorioPlanes extends JpaRepository<PlanMembresia, Long> {
 
@@ -930,10 +932,10 @@ public interface RepositorioPlanes extends JpaRepository<PlanMembresia, Long> {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioMiembros.java`**
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioMiembros.java`**
 
 ```java
-package com.coworkhub.persistences.repositories;
+package com.coworkhub.persistence.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -941,7 +943,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.coworkhub.persistences.entities.Miembro;
+import com.coworkhub.negocio.model.Miembro;
 
 public interface RepositorioMiembros extends JpaRepository<Miembro, Long> {
 
@@ -969,10 +971,10 @@ public interface RepositorioMiembros extends JpaRepository<Miembro, Long> {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioSalas.java`**
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioSalas.java`**
 
 ```java
-package com.coworkhub.persistences.repositories;
+package com.coworkhub.persistence.repository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -985,8 +987,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Sala;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Sala;
 
 import jakarta.persistence.LockModeType;
 
@@ -1039,10 +1041,10 @@ public interface RepositorioSalas extends JpaRepository<Sala, Long> {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/persistences/repositories/RepositorioReservas.java`**
+**📄 `src/main/java/com/coworkhub/persistence/repository/RepositorioReservas.java`**
 
 ```java
-package com.coworkhub.persistences.repositories;
+package com.coworkhub.persistence.repository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -1054,8 +1056,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.coworkhub.persistences.entities.EstadoReserva;
-import com.coworkhub.persistences.entities.Reserva;
+import com.coworkhub.negocio.model.EstadoReserva;
+import com.coworkhub.negocio.model.Reserva;
 
 public interface RepositorioReservas extends JpaRepository<Reserva, Long> {
 
@@ -1117,16 +1119,16 @@ public interface RepositorioReservas extends JpaRepository<Reserva, Long> {
 }
 ```
 
-**📄 `src/main/java/com/coworkhub/security/persistences/repositories/RepositorioUsuarios.java`**
+**📄 `src/main/java/com/coworkhub/security/persistence/repository/RepositorioUsuarios.java`**
 
 ```java
-package com.coworkhub.security.persistences.repositories;
+package com.coworkhub.security.persistence.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.coworkhub.security.persistences.entities.Usuario;
+import com.coworkhub.security.negocio.model.Usuario;
 
 public interface RepositorioUsuarios extends JpaRepository<Usuario, Long> {
 

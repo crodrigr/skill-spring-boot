@@ -22,14 +22,15 @@ Biblioteca Universitaria: `Libro`, con `RepositorioLibros` ya extendido con
 
 ```text
 📁 ejemplo-06-crud-completo
-└── 📁 src/main
-    ├── 📁 java/com/biblioteca
-    │   ├── 📄 Libro.java               (del Módulo 3, reutilizada)
-    │   └── 📄 RepositorioLibros.java   (del Módulo 3, reutilizada)
-    ├── 📁 java
-    │   └── 📄 Main.java                (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties   (igual que en el Ejemplo 01, adaptado a Biblioteca)
+└── 📁 src/com/biblioteca
+    └── 📁 src/main
+        ├── 📁 java/com/biblioteca
+        │   ├── 📄 Libro.java              (del Módulo 3, reutilizada)
+        │   └── 📄 RepositorioLibros.java  (del Módulo 3, reutilizada)
+        ├── 📁 java
+        │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
+            └── 📄 application.properties  (igual que en el Ejemplo 01, adaptado a Biblioteca)
 ```
 
 <details>
@@ -38,6 +39,8 @@ Biblioteca Universitaria: `Libro`, con `RepositorioLibros` ya extendido con
 ## 💻 Archivo: `Libro.java`
 
 ```java
+package com.biblioteca.negocio.model;
+
 @Entity
 public class Libro {
 
@@ -68,6 +71,10 @@ public class Libro {
 ## 💻 Archivo: `RepositorioLibros.java`
 
 ```java
+package com.biblioteca.persistence.repository;
+
+import com.biblioteca.negocio.model.Libro;
+
 public interface RepositorioLibros extends JpaRepository<Libro, Long> {
     Optional<Libro> findByIsbn(String isbn);
 }
@@ -89,6 +96,11 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.biblioteca;
+
+import com.biblioteca.negocio.model.Libro;
+import com.biblioteca.persistence.repository.RepositorioLibros;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 

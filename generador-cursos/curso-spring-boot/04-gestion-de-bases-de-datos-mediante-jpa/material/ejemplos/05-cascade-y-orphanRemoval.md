@@ -29,15 +29,15 @@ operaciones.
 
 ```text
 📁 ejemplo-05-cascade-orphanRemoval
-└── 📁 src/main
-    ├── 📁 java/com/medisalud
-    │   ├── 📄 Paciente.java           (del Módulo 3, extendida con cascade/orphanRemoval)
-    │   ├── 📄 Cita.java               (del Módulo 3, reutilizada)
-    │   └── 📄 RepositorioPacientes.java (del Módulo 3, reutilizada)
-    ├── 📁 java
-    │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
-    └── 📁 resources
-        └── 📄 application.properties  (igual que en el Ejemplo 01)
+└── 📁 src/com/medisalud
+    └── 📁 src/main
+        ├── 📁 java/com/medisalud
+        │   ├── 📄 Paciente.java           (del Módulo 3, extendida con cascade/orphanRemoval)
+        │   └── 📄 Cita.java               (del Módulo 3, reutilizada)
+        ├── 📁 java
+        │   └── 📄 Main.java               (▶️ clic derecho → "Run Java" en VS Code)
+        └── 📁 resources
+            └── 📄 application.properties  (igual que en el Ejemplo 01)
 ```
 
 <details>
@@ -46,6 +46,8 @@ operaciones.
 ## 💻 Archivo: `Cita.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Cita {
 
@@ -79,6 +81,10 @@ public class Cita {
 ## 💻 Archivo: `RepositorioPacientes.java`
 
 ```java
+package com.medisalud.persistence.repository;
+
+import com.medisalud.negocio.model.Paciente;
+
 public interface RepositorioPacientes extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCodigo(String codigo);
 }
@@ -100,6 +106,8 @@ spring.jpa.hibernate.ddl-auto=update
 ## 💻 Archivo: `Paciente.java`
 
 ```java
+package com.medisalud.negocio.model;
+
 @Entity
 public class Paciente {
 
@@ -141,6 +149,12 @@ public class Paciente {
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
+package com.medisalud;
+
+import com.medisalud.negocio.model.Cita;
+import com.medisalud.negocio.model.Paciente;
+import com.medisalud.persistence.repository.RepositorioPacientes;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
