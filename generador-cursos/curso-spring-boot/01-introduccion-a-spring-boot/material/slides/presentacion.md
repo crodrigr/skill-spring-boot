@@ -401,7 +401,7 @@ Al arrancar, escanea las clases anotadas y decide qué beans crear, configurar y
 entregar.
 
 ```java
-ApplicationContext contexto = new AnnotationConfigApplicationContext(Config.class);
+ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 ```
 
 ---

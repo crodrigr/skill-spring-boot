@@ -26,18 +26,17 @@ datos, ni un controlador web).
 ```text
 📁 ejemplo-07-uso-de-component
 └── 📁 src/com/biblioteca
-    ├── 📄 Main.java                                (▶️ clase con el main que se ejecuta)
+    ├── 📄 Main.java                                (@SpringBootApplication; ▶️ clase que arranca la aplicación)
     ├── 📁 negocio                                  (capa de negocio)
     │   ├── 📁 model
     │   │   └── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
     │   └── 📁 service
+    │       ├── 📄 FormateadorFechaVencimiento.java (nuevo — @Component)
     │       └── 📄 ServicioPrestamos.java           (nuevo — @Service)
-    ├── 📁 persistence                              (capa de persistencia)
-    │   └── 📁 repository
-    │       ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
-    │       └── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, con @Repository agregado)
-    └── 📁 config
-        └── 📄 ConfiguracionApp.java
+    └── 📁 persistence                              (capa de persistencia)
+        └── 📁 repository
+            ├── 📄 RepositorioLibros.java           (interfaz — del Módulo 1, Ejemplo 11)
+            └── 📄 RepositorioLibrosEnMemoria.java  (del Módulo 1, con @Repository agregado)
 ```
 
 ## 💻 Archivo: `RepositorioLibros.java` (interfaz — del Módulo 1, Ejemplo 11)
@@ -116,29 +115,21 @@ public class RepositorioLibrosEnMemoria implements RepositorioLibros {
 }
 ```
 
-## 💻 Archivo: `ConfiguracionApp.java`
-
-```java
-package com.biblioteca.config;
-
-@Configuration
-@ComponentScan(basePackages = "com.biblioteca")
-public class ConfiguracionApp {
-}
-```
-
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 package com.biblioteca;
 
-import com.biblioteca.config.ConfiguracionApp;
 import com.biblioteca.negocio.service.ServicioPrestamos;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         ServicioPrestamos servicioPrestamos = contexto.getBean(ServicioPrestamos.class);
         System.out.println(servicioPrestamos.prestarConFechaVencimiento(
@@ -183,7 +174,8 @@ que cada uno eligió para comunicar su responsabilidad.
 
 ## ✅ Resultado esperado
 
-Al ejecutar `Main.java`:
+Al ejecutar `Main.java`, la consola muestra el banner y los logs de arranque de
+Spring Boot y, entre ellos, esta línea:
 
 ```text
 Vence el 01/10/2026

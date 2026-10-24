@@ -53,17 +53,11 @@ public class ServicioPrestamos {
     }
 }
 
-// com.biblioteca.config.ConfiguracionApp
-@Configuration
-@ComponentScan(basePackages = "com.biblioteca")
-public class ConfiguracionApp {
-}
-
 // com.biblioteca.Main
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         ServicioPrestamos servicioPrestamos = contexto.getBean(ServicioPrestamos.class);
         servicioPrestamos.prestar("978-3-16-148410-0");
@@ -100,7 +94,7 @@ confirmá que el orden real coincide con tu razonamiento.
 
 ## 🚧 Restricciones
 
-- No cambies la firma de ningún método ni la clase `ConfiguracionApp`/`Main`;
+- No cambies la firma de ningún método ni la clase `Main`;
   solo agregá los mensajes impresos dentro de `ServicioPrestamos`.
 
 ## 📊 Dificultad

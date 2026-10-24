@@ -302,17 +302,11 @@ public class ServicioResumenCitas {
     }
 }
 
-// com.medisalud.config.ConfiguracionApp
-@Configuration
-@ComponentScan(basePackages = "com.medisalud")
-public class ConfiguracionApp {
-}
-
 // com.medisalud.Main
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         ServicioResumenCitas servicioResumenCitas = contexto.getBean(ServicioResumenCitas.class);
         System.out.println(servicioResumenCitas.generarResumen("P-001"));

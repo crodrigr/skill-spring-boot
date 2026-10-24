@@ -98,7 +98,8 @@ se vería su carpeta en VS Code:
     │       └── 📄 ServicioCitas.java         (nuevo, para este ejemplo)
     └── 📁 persistence                        (capa de persistencia)
         └── 📁 repository
-            └── 📄 RepositorioPacientes.java  (interfaz — del Ejemplo 01 de este módulo)
+            ├── 📄 RepositorioPacientes.java  (interfaz — del Ejemplo 01 de este módulo)
+            └── 📄 RepositorioPacientesEnMemoria.java  (del Ejemplo 01 de este módulo)
 ```
 
 <details>

@@ -39,6 +39,7 @@ vería así:
     │   │   └── 📄 Libro.java                       (record — del Módulo 1, Ejemplo 11)
     │   └── 📁 service
     │       ├── 📄 ServicioPrestamosAcoplado.java   (nuevo — versión con el problema)
+    │       ├── 📄 ServicioPrestamosConstructor.java (nuevo — inyección por constructor)
     │       └── 📄 ServicioPrestamosSetter.java     (nuevo — inyección por setter)
     └── 📁 persistence                              (capa de persistencia)
         └── 📁 repository

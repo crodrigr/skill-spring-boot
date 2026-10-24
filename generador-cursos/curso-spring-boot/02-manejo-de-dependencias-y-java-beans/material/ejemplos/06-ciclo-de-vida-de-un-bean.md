@@ -26,17 +26,16 @@ que permite observar la fase de configuración.
 ```text
 📁 ejemplo-06-ciclo-de-vida
 └── 📁 src/com/medisalud
-    ├── 📄 Main.java                          (▶️ clase con el main que se ejecuta)
+    ├── 📄 Main.java                          (@SpringBootApplication; ▶️ clase que arranca la aplicación)
     ├── 📁 negocio                            (capa de negocio)
     │   ├── 📁 model
     │   │   └── 📄 Paciente.java              (record — del Módulo 1, reutilizado)
     │   └── 📁 service
     │       └── 📄 ServicioCitas.java         (extendida respecto del Módulo 1, Ejemplo 10)
-    ├── 📁 persistence                        (capa de persistencia)
-    │   └── 📁 repository
-    │       └── 📄 RepositorioPacientes.java  (interfaz — del Ejemplo 01 de este módulo)
-    └── 📁 config
-        └── 📄 ConfiguracionApp.java
+    └── 📁 persistence                        (capa de persistencia)
+        └── 📁 repository
+            ├── 📄 RepositorioPacientes.java  (interfaz — del Ejemplo 01 de este módulo)
+            └── 📄 RepositorioPacientesEnMemoria.java  (modificada, con println en el constructor)
 ```
 
 ## 💻 Archivo: `Paciente.java`
@@ -115,29 +114,21 @@ public class ServicioCitas {
 }
 ```
 
-## 💻 Archivo: `ConfiguracionApp.java`
-
-```java
-package com.medisalud.config;
-
-@Configuration
-@ComponentScan(basePackages = "com.medisalud")
-public class ConfiguracionApp {
-}
-```
-
 ## 💻 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 package com.medisalud;
 
-import com.medisalud.config.ConfiguracionApp;
 import com.medisalud.negocio.service.ServicioCitas;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         ServicioCitas servicioCitas = contexto.getBean(ServicioCitas.class);
         servicioCitas.agendar("P-001");
@@ -185,6 +176,9 @@ ninguna dependencia que inyectar.
 6. **Destrucción**: al cerrar el contexto, se ejecuta `@PreDestroy`.
 
 ## ✅ Resultado esperado
+
+La consola muestra el banner y los logs de arranque de Spring Boot; entre ellos,
+las líneas del ciclo de vida del bean:
 
 ```text
 0) RepositorioPacientes ya instanciado (se resuelve antes de ServicioCitas)

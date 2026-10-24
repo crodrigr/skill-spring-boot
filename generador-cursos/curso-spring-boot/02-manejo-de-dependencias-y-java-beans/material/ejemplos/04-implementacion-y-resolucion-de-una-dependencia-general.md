@@ -28,15 +28,13 @@ ahora administrados por el contenedor IoC.
 ```text
 📁 ejemplo-04-resolucion-dependencia-general
 └── 📁 src/com/medisalud
-    ├── 📄 Main.java                           (▶️ clase con el main que se ejecuta)
-    ├── 📁 negocio                             (capa de negocio)
-    │   └── 📁 service
-    │       ├── 📄 Notificador.java            (interfaz)
-    │       ├── 📄 NotificadorSms.java         (con @Qualifier al final del recorrido)
-    │       ├── 📄 NotificadorEmail.java       (aparece recién en el Paso 2)
-    │       └── 📄 ServicioRecordatorios.java
-    └── 📁 config
-        └── 📄 ConfiguracionApp.java           (igual que en el Ejemplo 06 del Módulo 1)
+    ├── 📄 Main.java                           (@SpringBootApplication; ▶️ clase que arranca la aplicación)
+    └── 📁 negocio                             (capa de negocio)
+        └── 📁 service
+            ├── 📄 Notificador.java            (interfaz)
+            ├── 📄 NotificadorSms.java         (con @Qualifier al final del recorrido)
+            ├── 📄 NotificadorEmail.java       (aparece recién en el Paso 2)
+            └── 📄 ServicioRecordatorios.java
 ```
 
 Los tres pasos de abajo son la **evolución** de estos mismos archivos, no
@@ -174,29 +172,21 @@ public class ServicioRecordatorios {
 }
 ```
 
-### 📄 Archivo: `ConfiguracionApp.java`
-
-```java
-package com.medisalud.config;
-
-@Configuration
-@ComponentScan(basePackages = "com.medisalud")
-public class ConfiguracionApp {
-}
-```
-
 ### 📄 Archivo: `Main.java` (▶️ clic derecho → "Run Java" en VS Code)
 
 ```java
 package com.medisalud;
 
-import com.medisalud.config.ConfiguracionApp;
 import com.medisalud.negocio.service.ServicioRecordatorios;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         ServicioRecordatorios servicioRecordatorios = contexto.getBean(ServicioRecordatorios.class);
         servicioRecordatorios.enviarRecordatorio("+54 11 5555-0100", "Su cita es mañana.");
@@ -248,7 +238,7 @@ resuelto sin dudas.
 
 ## ✅ Resultado esperado
 
-Sin `@Qualifier` (Paso 2), `Main.java` **no llega a arrancar** el contenedor y
+Sin `@Qualifier` (Paso 2), `Main.java` **no llega a arrancar** la aplicación (Spring no logra crear el contenedor) y
 muestra el error de ambigüedad de arriba. Con `@Qualifier` (Paso 3), al
 ejecutar `Main.java`:
 

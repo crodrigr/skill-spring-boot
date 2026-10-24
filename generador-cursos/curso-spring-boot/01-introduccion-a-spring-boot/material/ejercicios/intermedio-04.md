@@ -51,17 +51,11 @@ public class ControladorCitas {
     }
 }
 
-// com.medisalud.config.ConfiguracionApp
-@Configuration
-@ComponentScan(basePackages = "com.medisalud")
-public class ConfiguracionApp {
-}
-
 // com.medisalud.Main
+@SpringBootApplication
 public class Main {
     public static void main(String[] args) {
-        ConfigurableApplicationContext contexto =
-                new AnnotationConfigApplicationContext(ConfiguracionApp.class);
+        ConfigurableApplicationContext contexto = SpringApplication.run(Main.class, args);
 
         // Si las tres clases quedaron bien anotadas, el contenedor resuelve
         // este bean sin lanzar ninguna excepción.
@@ -96,7 +90,7 @@ ejecución.
 
 ## 🚧 Restricciones
 
-- No cambies `Paciente`, `ConfiguracionApp` ni `Main`; solo agregá anotaciones
+- No cambies `Paciente` ni `Main`; solo agregá anotaciones
   (y el mapeo HTTP) sobre `RepositorioPacientes`, `ServicioCitas` y
   `ControladorCitas`.
 

@@ -114,10 +114,9 @@ public class ServicioResumenCitas {
    `ServicioNotificaciones`, `ServicioCitas`, `ControladorCitas`,
    `ServicioResumenCitas`) con `@Component`, `@Repository` o `@Service`, según
    corresponda a su capa.
-2. Escribí una clase de configuración (`@Configuration` +
-   `@ComponentScan`) y un `main` que arme un `AnnotationConfigApplicationContext`,
-   pida el bean `ServicioResumenCitas` al contenedor, y llame a
-   `generarResumen("P-001")`.
+2. Escribí un `Main` con `@SpringBootApplication` que arranque la aplicación con
+   `SpringApplication.run(...)`, pida el bean `ServicioResumenCitas` al
+   contenedor, y llame a `generarResumen("P-001")`.
 3. En un párrafo, identificá cuál es la **nueva** dependencia transitiva que
    se creó al agregar `ServicioResumenCitas` (¿de qué depende
    transitivamente, sin mencionarlo directamente?), y explicá qué pasos de tu
