@@ -5,7 +5,7 @@
 > [Módulo 02](../02-manejo-de-dependencias-y-java-beans/). Contiene código completo: no se
 > entrega a los estudiantes antes de resolver el taller.
 
-## 🎯 Objetivo.
+## 🎯 Objetivo
 
 Construir una API REST con Spring Boot que administre **estudiantes, cursos y matrículas**,
 organizada en las **tres capas del curso** (presentación, negocio y persistencia), con la
@@ -24,6 +24,78 @@ Al terminar, el estudiante:
 > lógica en el Controller». Esta guía **cambia esa restricción a propósito**: el curso trabaja
 > siempre en tres capas, y es justo lo que se aprendió en los módulos 01 y 02. Se mantienen
 > las demás restricciones: **sin base de datos ni JPA**, datos en listas en memoria.
+
+## 📝 Introducción: el problema y sus requerimientos
+
+> 🗣️ **Para abrir la sesión (5 min del tramo 0).** Se lee el problema, se subrayan los
+> requerimientos y, **antes de escribir código**, se ubica cada uno en el árbol de «Arquitectura del taller».
+> Quien entiende dónde vive cada requerimiento, sabe qué clase escribir.
+
+### 🏫 El problema
+
+Una **academia de programación** necesita una API REST sencilla para administrar sus
+**estudiantes**, sus **cursos** y las **matrículas** que los relacionan. La academia quiere
+registrar estudiantes, crear cursos, matricular estudiantes y consultar qué tan llenos están
+los cursos. El sistema se construye de forma progresiva, en cuatro fases.
+
+### 🧩 Entidades
+
+| Entidad | Atributos | Observación |
+|---|---|---|
+| **Estudiante** | `id`, `nombre`, `edad`, `correo` | El `correo` identifica de forma única a la persona. |
+| **Curso** | `id`, `nombre`, `precio`, `cupoMaximo` | `cupoMaximo` es el tope de matriculados. |
+| **Matrícula** | `id`, `estudianteId`, `cursoId` | Relaciona estudiante y curso **por identificadores**, no por objetos. |
+
+```text
+Estudiante 1 ──── * Matrícula * ──── 1 Curso
+```
+
+Un estudiante puede estar en varios cursos y un curso tiene varios estudiantes; la matrícula
+es la pieza intermedia.
+
+### ✅ Requerimientos funcionales
+
+| Código | Fase | Requerimiento | Endpoint |
+|---|:-:|---|---|
+| **RF-01** | 1 | Registrar un estudiante. | `POST /estudiantes` |
+| **RF-02** | 1 | Listar todos los estudiantes. | `GET /estudiantes` |
+| **RF-03** | 1 | Consultar un estudiante por su identificador. | `GET /estudiantes/{id}` |
+| **RF-04** | 2 | Registrar un curso. | `POST /cursos` |
+| **RF-05** | 2 | Listar los cursos. | `GET /cursos` |
+| **RF-06** | 2 | Listar los cursos económicos (precio inferior a $200.000). | `GET /cursos/economicos` |
+| **RF-07** | 3 | Matricular un estudiante en un curso. | `POST /matriculas` |
+| **RF-08** | 4 | Consultar la ocupación de un curso: nombre, cupo máximo, matriculados, cupos disponibles y porcentaje de ocupación. | `GET /cursos/{id}/ocupacion` |
+
+### 📏 Reglas de negocio
+
+| Código | Regla | Se aplica en | Si se incumple |
+|---|---|---|:-:|
+| **RN-01** | El identificador de toda entidad se genera automáticamente (1, 2, 3…). | RF-01, RF-04, RF-07 | — |
+| **RN-02** | No puede haber dos estudiantes con el mismo correo. | RF-01 | `409` |
+| **RN-03** | Un estudiante inexistente responde «no encontrado». | RF-03, RF-07 | `404` |
+| **RN-04** | El precio de un curso debe ser mayor que cero. | RF-04 | `400` |
+| **RN-05** | El cupo máximo de un curso debe ser mayor que cero. | RF-04 | `400` |
+| **RN-06** | Un curso es «económico» si su precio es **menor** que 200.000. | RF-06 | — |
+| **RN-07** | El curso de una matrícula debe existir. | RF-07 | `404` |
+| **RN-08** | Un estudiante no puede matricularse dos veces en el mismo curso. | RF-07 | `409` |
+| **RN-09** | El curso debe tener cupos disponibles (matriculados < cupo máximo). | RF-07 | `409` |
+| **RN-10** | La matrícula se registra **solo si se cumplen todas** las reglas anteriores. | RF-07 | — |
+| **RN-11** | Porcentaje de ocupación = (matrículas del curso ÷ cupo máximo) × 100. | RF-08 | — |
+
+### 🛠️ Requerimientos no funcionales y restricciones
+
+| Código | Requerimiento |
+|---|---|
+| **RNF-01** | Tecnologías: Java 17, Spring Boot 3 y Maven. |
+| **RNF-02** | **Sin base de datos ni JPA**: los datos viven en listas en memoria y se pierden al reiniciar. |
+| **RNF-03** | Organización en **tres capas** (presentación, negocio y persistencia), con la regla de dependencia presentación → negocio → persistencia. |
+| **RNF-04** | Las dependencias se resuelven con **inyección por constructor** y los repositorios se usan a través de **interfaces**. |
+| **RNF-05** | Errores con respuesta HTTP clara: `201` al crear, `400` dato inválido, `404` no existe, `409` conflicto. |
+| **RNF-06** | La API se prueba con Postman y se conservan evidencias de cada escenario. |
+| **RNF-07** | Duración: 1 h 30 min, trabajo individual. El objetivo es practicar la **lógica de programación** (listas, ciclos, condicionales, contadores) dentro de una API REST, no construir un sistema completo. |
+
+> 💡 **Alcance.** Quedan fuera: autenticación, base de datos, validación con anotaciones,
+> paginación y concurrencia. Se verán en módulos posteriores.
 
 ## ⏱️ Plan de la sesión
 
@@ -56,7 +128,10 @@ Al terminar, el estudiante:
 | Ciclo de vida: bean **singleton** | La lista vive en el repositorio y **sobrevive entre peticiones** porque hay una sola instancia | 02 | [Ciclo de vida de un bean](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/06-ciclo-de-vida-de-un-bean.md) |
 | Dependencia circular | Se menciona al armar `ServicioCursos` (usa el repositorio de matrículas, no el servicio) | 02 | [Explicación conceptual](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/explicacion-conceptual.md) |
 
-## 🏗️ Arquitectura del taller
+## 🏗️ Arquitectura del taller: el árbol de infraestructura
+
+Este es el árbol de paquetes que se construye durante la sesión. Cada carpeta tiene **una sola
+responsabilidad**, y cada requerimiento de la sección anterior cae en una de ellas (los códigos RF, RN y RNF son los de la Introducción).
 
 ```text
 📁 src/main/java/com/academia
@@ -79,6 +154,34 @@ repositorio; el servicio nunca conoce HTTP.
 HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ RepositorioEnMemoria (List)
         valida forma   reglas      contrato                  almacenamiento
 ```
+
+### 🌳 Qué hay en cada parte del árbol
+
+| Paquete | Responsabilidad | Clases | Se crea en | Anotación de Spring |
+|---|---|---|:-:|---|
+| `AcademiaApplication` | Arranca la aplicación y define desde dónde Spring **escanea** beans. | `AcademiaApplication` | Tramo 0 | `@SpringBootApplication` |
+| `presentacion.controlador` | Recibe la petición HTTP, entrega los datos al servicio y devuelve la respuesta. **Sin reglas.** | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas` | Fases 1–4 | `@RestController` |
+| `presentacion.excepcion` | Traduce los errores de negocio a códigos HTTP y a un cuerpo JSON uniforme. | `ManejadorExcepciones`, `RespuestaError` | Tramo 0 | `@RestControllerAdvice` |
+| `negocio.model` | Las entidades del dominio y el resultado del reporte. Clases Java sencillas. | `Estudiante`, `Curso`, `Matricula`, `Ocupacion` | Fases 1–4 | — |
+| `negocio.service` | **Las reglas de negocio**: duplicados, validaciones, cupos, cálculo. No conoce HTTP. | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` | Fases 1–4 | `@Service` |
+| `negocio.excepcion` | Los errores que el negocio sabe lanzar, sin código HTTP. | `RecursoNoEncontradoException`, `SolicitudInvalidaException`, `ConflictoException` | Tramo 0 | — |
+| `persistence.repository` | Guarda y busca datos. La **interfaz** es el contrato; la clase `…EnMemoria` lo cumple con una `List`. | `RepositorioEstudiantes`, `RepositorioCursos`, `RepositorioMatriculas` y sus `…EnMemoria` | Fases 1–3 | `@Repository` (solo en las implementaciones) |
+
+### 🔗 ¿Dónde vive cada requerimiento?
+
+| Requerimiento | Presentación | Negocio | Persistencia |
+|---|---|---|---|
+| **RF-01** Registrar estudiante · **RN-02** | `ControladorEstudiantes.registrar` | `ServicioEstudiantes.registrar` (rechaza el correo repetido) | `existePorCorreo`, `guardar` (asigna el id, **RN-01**) |
+| **RF-02 / RF-03** Listar y consultar · **RN-03** | `listar`, `obtener` | `ServicioEstudiantes.obtener` (lanza `RecursoNoEncontradoException`) | `listar`, `buscarPorId` |
+| **RF-04** Registrar curso · **RN-04, RN-05** | `ControladorCursos.registrar` | `ServicioCursos.registrar` (valida precio y cupo) | `RepositorioCursos.guardar` |
+| **RF-05 / RF-06** Listar y económicos · **RN-06** | `listar`, `listarEconomicos` | `ServicioCursos.listarEconomicos` (filtro con ciclo) | `RepositorioCursos.listar` |
+| **RF-07** Matricular · **RN-03, RN-07 a RN-10** | `ControladorMatriculas.matricular` | `ServicioMatriculas.matricular` (las cinco reglas, en orden) | `existe`, `contarPorCurso`, `guardar` |
+| **RF-08** Ocupación · **RN-11** | `ControladorCursos.ocupacion` | `ServicioCursos.calcularOcupacion` | `RepositorioMatriculas.contarPorCurso` |
+| **RNF-05** Códigos HTTP | `ManejadorExcepciones` | Excepciones de `negocio.excepcion` | — |
+
+> 🔎 **Lectura clave.** Todas las reglas (RN) terminan en `negocio.service`; los controladores
+> y los repositorios casi no tienen `if`. Esa es la ventaja de las capas: si una regla cambia,
+> se sabe en qué archivo buscarla.
 
 > 🗣️ **Pregunta para el grupo (1 min):** si mañana cambiamos la lista por una base de datos,
 > ¿qué capas habría que tocar? *(Respuesta: solo la de persistencia, porque el servicio depende
