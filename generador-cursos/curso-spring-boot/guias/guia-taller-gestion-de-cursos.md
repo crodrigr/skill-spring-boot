@@ -49,7 +49,7 @@ Al terminar, el estudiante:
 | Estructura de un proyecto y Maven | `pom.xml`, paquetes por capa | 01 | [Estructura de un proyecto](../01-introduccion-a-spring-boot/material/ejemplos/08-estructura-de-un-proyecto-spring-boot.md) |
 | Anotaciones | `@RestController`, `@GetMapping`, `@PostMapping`, `@PathVariable`, `@RequestBody` | 01 | [Anotaciones en Spring Boot](../01-introduccion-a-spring-boot/material/ejemplos/09-anotaciones-en-spring-boot.md) |
 | Contenedor IoC | Spring crea los objetos; nosotros nunca escribimos `new Servicio…()` | 01 | [IoC y ciclo de vida de un bean](../01-introduccion-a-spring-boot/material/ejemplos/10-ioc-container-ciclo-de-vida-de-un-bean.md) |
-| Java moderno | `record` para los DTO, `Optional` en las búsquedas | 01 | [Java moderno](../01-introduccion-a-spring-boot/material/ejemplos/05-java-moderno-streams-lambdas-optional-records.md) |
+| Java moderno | `record` (en `Ocupacion`), `Optional` en las búsquedas | 01 | [Java moderno](../01-introduccion-a-spring-boot/material/ejemplos/05-java-moderno-streams-lambdas-optional-records.md) |
 | Dependencia e inyección | Controlador → Servicio → Repositorio | 02 | [Inyección de dependencias](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/02-inyeccion-de-dependencias.md) |
 | Programar contra interfaces | `RepositorioEstudiantes` (interfaz) y `RepositorioEstudiantesEnMemoria` (clase) | 02 | [Resolución de una dependencia](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/04-implementacion-y-resolucion-de-una-dependencia-general.md) |
 | Java Bean y `@Component` (y sus estereotipos) | `@Service`, `@Repository` | 02 | [Uso de @Component](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/07-uso-de-component.md) |
@@ -63,7 +63,6 @@ Al terminar, el estudiante:
 ├── 📄 Main.java
 ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
 │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
-│   ├── 📁 dto           SolicitudEstudiante · SolicitudCurso · SolicitudMatricula
 │   └── 📁 excepcion     ManejadorExcepciones · RespuestaError
 ├── 📁 negocio                           ← 2 · las reglas
 │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
@@ -398,11 +397,11 @@ public class ServicioEstudiantes {
         this.repositorio = repositorio;
     }
 
-    public Estudiante registrar(String nombre, int edad, String correo) {
-        if (repositorio.existePorCorreo(correo)) {
-            throw new ConflictoException("Ya existe un estudiante con el correo " + correo);
+    public Estudiante registrar(Estudiante estudiante) {
+        if (repositorio.existePorCorreo(estudiante.getCorreo())) {
+            throw new ConflictoException("Ya existe un estudiante con el correo " + estudiante.getCorreo());
         }
-        return repositorio.guardar(new Estudiante(nombre, edad, correo));
+        return repositorio.guardar(estudiante);
     }
 
     public List<Estudiante> listar() {
@@ -422,16 +421,7 @@ public class ServicioEstudiantes {
 > probar pasándole cualquier implementación. Pregunta: *¿quién llama a este constructor?*
 > *(El contenedor IoC, no nosotros.)*
 
-### Paso 1.5 · DTO de solicitud y controlador (5 min) — capa de presentación
-
-**Archivo:** `src/main/java/com/academia/presentacion/dto/SolicitudEstudiante.java`
-
-```java
-package com.academia.presentacion.dto;
-
-public record SolicitudEstudiante(String nombre, int edad, String correo) {
-}
-```
+### Paso 1.5 · Controlador (5 min) — capa de presentación
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorEstudiantes.java`
 
@@ -440,7 +430,6 @@ package com.academia.presentacion.controlador;
 
 import com.academia.negocio.model.Estudiante;
 import com.academia.negocio.service.ServicioEstudiantes;
-import com.academia.presentacion.dto.SolicitudEstudiante;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -463,8 +452,8 @@ public class ControladorEstudiantes {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Estudiante registrar(@RequestBody SolicitudEstudiante solicitud) {
-        return servicio.registrar(solicitud.nombre(), solicitud.edad(), solicitud.correo());
+    public Estudiante registrar(@RequestBody Estudiante estudiante) {
+        return servicio.registrar(estudiante);
     }
 
     @GetMapping
@@ -481,8 +470,9 @@ public class ControladorEstudiantes {
 
 Puntos a resaltar:
 
-- El **DTO** (`record`, Java moderno de M1) define **qué datos acepta la API**. El cliente no
-  puede enviar un `id`: lo decide el sistema.
+- `@RequestBody` convierte el JSON de la petición en un objeto `Estudiante` (Jackson usa el
+  constructor y los nombres de sus parámetros). Si el cliente enviara un `id`, el repositorio
+  lo **sobrescribe**: lo decide el sistema.
 - El controlador solo **traduce**: lee el JSON, llama al servicio, devuelve el resultado. No
   tiene ningún `if` de negocio.
 - Se encadenan tres beans: `ControladorEstudiantes` ← `ServicioEstudiantes` ←
@@ -523,7 +513,7 @@ estudiantes escriben. Se entrega el código de referencia para cotejar.
 | 2.2 | Contrato | `RepositorioCursos` | persistencia |
 | 2.3 | Implementación | `RepositorioCursosEnMemoria` | persistencia |
 | 2.4 | Reglas | `ServicioCursos` | negocio |
-| 2.5 | API | `SolicitudCurso` + `ControladorCursos` | presentación |
+| 2.5 | API | `ControladorCursos` | presentación |
 
 ### Paso 2.1 · Modelo
 
@@ -644,14 +634,14 @@ public class ServicioCursos {
         this.repositorio = repositorio;
     }
 
-    public Curso registrar(String nombre, double precio, int cupoMaximo) {
-        if (precio <= 0) {
+    public Curso registrar(Curso curso) {
+        if (curso.getPrecio() <= 0) {
             throw new SolicitudInvalidaException("El precio debe ser mayor que cero");
         }
-        if (cupoMaximo <= 0) {
+        if (curso.getCupoMaximo() <= 0) {
             throw new SolicitudInvalidaException("El cupo máximo debe ser mayor que cero");
         }
-        return repositorio.guardar(new Curso(nombre, precio, cupoMaximo));
+        return repositorio.guardar(curso);
     }
 
     public List<Curso> listar() {
@@ -681,16 +671,7 @@ public class ServicioCursos {
 > 💡 **Reto opcional para quien termine antes:** reescribir `listarEconomicos()` con un
 > `stream().filter(...)` (ejemplo de Java moderno del M1).
 
-### Paso 2.5 · DTO y controlador
-
-**Archivo:** `src/main/java/com/academia/presentacion/dto/SolicitudCurso.java`
-
-```java
-package com.academia.presentacion.dto;
-
-public record SolicitudCurso(String nombre, double precio, int cupoMaximo) {
-}
-```
+### Paso 2.5 · Controlador
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorCursos.java`
 
@@ -699,7 +680,6 @@ package com.academia.presentacion.controlador;
 
 import com.academia.negocio.model.Curso;
 import com.academia.negocio.service.ServicioCursos;
-import com.academia.presentacion.dto.SolicitudCurso;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -721,8 +701,8 @@ public class ControladorCursos {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Curso registrar(@RequestBody SolicitudCurso solicitud) {
-        return servicio.registrar(solicitud.nombre(), solicitud.precio(), solicitud.cupoMaximo());
+    public Curso registrar(@RequestBody Curso curso) {
+        return servicio.registrar(curso);
     }
 
     @GetMapping
@@ -900,7 +880,9 @@ public class ServicioMatriculas {
         this.servicioCursos = servicioCursos;
     }
 
-    public Matricula matricular(Long estudianteId, Long cursoId) {
+    public Matricula matricular(Matricula matricula) {
+        Long estudianteId = matricula.getEstudianteId();
+        Long cursoId = matricula.getCursoId();
         servicioEstudiantes.obtener(estudianteId);
         Curso curso = servicioCursos.obtener(cursoId);
 
@@ -911,7 +893,7 @@ public class ServicioMatriculas {
         if (repositorio.contarPorCurso(cursoId) >= curso.getCupoMaximo()) {
             throw new ConflictoException("El curso " + cursoId + " no tiene cupos disponibles");
         }
-        return repositorio.guardar(new Matricula(estudianteId, cursoId));
+        return repositorio.guardar(matricula);
     }
 }
 ```
@@ -930,16 +912,7 @@ public class ServicioMatriculas {
 > la aplicación no arranca. Por eso en la Fase 4 `ServicioCursos` usará el **repositorio** de
 > matrículas, no el servicio.)*
 
-### Paso 3.4 · DTO y controlador (5 min)
-
-**Archivo:** `src/main/java/com/academia/presentacion/dto/SolicitudMatricula.java`
-
-```java
-package com.academia.presentacion.dto;
-
-public record SolicitudMatricula(Long estudianteId, Long cursoId) {
-}
-```
+### Paso 3.4 · Controlador (5 min)
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorMatriculas.java`
 
@@ -948,7 +921,6 @@ package com.academia.presentacion.controlador;
 
 import com.academia.negocio.model.Matricula;
 import com.academia.negocio.service.ServicioMatriculas;
-import com.academia.presentacion.dto.SolicitudMatricula;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -968,8 +940,8 @@ public class ControladorMatriculas {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Matricula matricular(@RequestBody SolicitudMatricula solicitud) {
-        return servicio.matricular(solicitud.estudianteId(), solicitud.cursoId());
+    public Matricula matricular(@RequestBody Matricula matricula) {
+        return servicio.matricular(matricula);
     }
 }
 ```
@@ -1040,14 +1012,14 @@ public class ServicioCursos {
         this.repositorioMatriculas = repositorioMatriculas;
     }
 
-    public Curso registrar(String nombre, double precio, int cupoMaximo) {
-        if (precio <= 0) {
+    public Curso registrar(Curso curso) {
+        if (curso.getPrecio() <= 0) {
             throw new SolicitudInvalidaException("El precio debe ser mayor que cero");
         }
-        if (cupoMaximo <= 0) {
+        if (curso.getCupoMaximo() <= 0) {
             throw new SolicitudInvalidaException("El cupo máximo debe ser mayor que cero");
         }
-        return repositorio.guardar(new Curso(nombre, precio, cupoMaximo));
+        return repositorio.guardar(curso);
     }
 
     public List<Curso> listar() {
@@ -1111,9 +1083,9 @@ Con 2 matriculados en el curso de 3 cupos, `GET /cursos/1/ocupacion` devuelve:
 }
 ```
 
-> 🔎 **Mejora a mencionar (sin hacerla):** el controlador devuelve directamente el modelo
-> `Ocupacion` y las entidades. Con DTO de respuesta se desacopla la API del dominio; esa
-> práctica se formaliza en los módulos siguientes.
+> 🔎 **A mencionar (sin hacerlo):** por ahora los controladores reciben y devuelven las
+> entidades directamente, sin DTO. Más adelante se separan los datos de la API de los del
+> dominio.
 
 ---
 
@@ -1182,7 +1154,7 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 2. **Más consultas:** `GET /cursos/{id}` y `GET /estudiantes/{id}/matriculas`.
 3. **Filtro con streams:** reescribir `listarEconomicos()` y `existePorCorreo()` con
    `stream()`.
-4. **DTO de respuesta:** crear `RespuestaCurso` y convertir el modelo en el controlador.
+4. **Adelanto de DTO:** crear `SolicitudCurso` (un `record`) y convertirlo a `Curso` en el controlador, para que el cliente nunca pueda enviar un `id`.
 5. **Cambio de almacenamiento:** crear `RepositorioEstudiantesAlternativo` (por ejemplo, con un
    `Map<Long, Estudiante>`), anotar solo una de las dos con `@Repository` y comprobar que el
    servicio **no cambia ni una línea**.
@@ -1196,8 +1168,7 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
     ├── 📄 Main.java
     ├── 📁 presentacion
     │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
-    │   ├── 📁 dto           SolicitudEstudiante · SolicitudCurso · SolicitudMatricula
-    │   └── 📁 excepcion     ManejadorExcepciones · RespuestaError
+        │   └── 📁 excepcion     ManejadorExcepciones · RespuestaError
     ├── 📁 negocio
     │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
     │   ├── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
