@@ -45,7 +45,7 @@ Al terminar, el estudiante:
 
 | Concepto | Dónde aparece en el taller | Módulo | Ejemplo de apoyo |
 |---|---|:-:|---|
-| Spring Boot y `@SpringBootApplication` | Clase `Main` | 01 | [¿Qué es Spring Boot?](../01-introduccion-a-spring-boot/material/ejemplos/07-que-es-spring-boot.md) |
+| Spring Boot y `@SpringBootApplication` | Clase `AcademiaApplication` | 01 | [¿Qué es Spring Boot?](../01-introduccion-a-spring-boot/material/ejemplos/07-que-es-spring-boot.md) |
 | Estructura de un proyecto y Maven | `pom.xml`, paquetes por capa | 01 | [Estructura de un proyecto](../01-introduccion-a-spring-boot/material/ejemplos/08-estructura-de-un-proyecto-spring-boot.md) |
 | Anotaciones | `@RestController`, `@GetMapping`, `@PostMapping`, `@PathVariable`, `@RequestBody` | 01 | [Anotaciones en Spring Boot](../01-introduccion-a-spring-boot/material/ejemplos/09-anotaciones-en-spring-boot.md) |
 | Contenedor IoC | Spring crea los objetos; nosotros nunca escribimos `new Servicio…()` | 01 | [IoC y ciclo de vida de un bean](../01-introduccion-a-spring-boot/material/ejemplos/10-ioc-container-ciclo-de-vida-de-un-bean.md) |
@@ -60,7 +60,7 @@ Al terminar, el estudiante:
 
 ```text
 📁 src/main/java/com/academia
-├── 📄 Main.java
+├── 📄 AcademiaApplication.java
 ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
 │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
 │   └── 📁 excepcion     ManejadorExcepciones · RespuestaError
@@ -88,7 +88,9 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 
 ## 🚀 Tramo 0 — Preparación (0 – 10 min)
 
-### Paso 0.1 · Crear el proyecto (3 min)
+<details>
+<summary><strong>Paso 0.1 · Crear el proyecto (3 min)</strong></summary>
+
 
 En [start.spring.io](https://start.spring.io):
 
@@ -115,12 +117,16 @@ funcional:
 > 🔎 **Concepto (M1):** `starter` = conjunto de dependencias ya compatibles entre sí. No hay
 > `spring-boot-starter-data-jpa` porque no usamos base de datos.
 
-### Paso 0.2 · Renombrar la clase principal y crear los paquetes (3 min)
+</details>
 
-Initializr genera `AcademiaApplication`. Se renombra a `Main` (convención del curso) y se
-crean los paquetes vacíos de la sección anterior.
+<details>
+<summary><strong>Paso 0.2 · Revisar la clase principal y crear los paquetes (3 min)</strong></summary>
 
-**Archivo:** `src/main/java/com/academia/Main.java`
+Initializr ya genera la clase principal, `AcademiaApplication`; **no se renombra ni se
+modifica**. Solo se crean los paquetes vacíos de la sección anterior, siempre dentro de
+`com.academia`.
+
+**Archivo (generado por Initializr, tal cual):** `src/main/java/com/academia/AcademiaApplication.java`
 
 ```java
 package com.academia;
@@ -129,10 +135,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Main {
+public class AcademiaApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(AcademiaApplication.class, args);
     }
 }
 ```
@@ -141,7 +147,11 @@ public class Main {
 > Por eso todo vive bajo `com.academia`; una clase fuera de ese árbol no sería detectada como
 > bean.
 
-### Paso 0.3 · Copiar el kit de errores (4 min)
+</details>
+
+<details>
+<summary><strong>Paso 0.3 · Copiar el kit de errores (4 min)</strong></summary>
+
 
 Cuatro clases pequeñas que se entregan hechas. Se explica **qué hacen**, no se escriben.
 
@@ -241,7 +251,9 @@ public class ManejadorExcepciones {
 | `ConflictoException` | `409` | Correo duplicado, matrícula repetida, sin cupos |
 
 ✅ **Punto de control 0:** `./mvnw spring-boot:run` arranca y muestra
-`Started Main in … seconds`. Todavía no hay endpoints.
+`Started AcademiaApplication in … seconds`. Todavía no hay endpoints.
+
+</details>
 
 ---
 
@@ -252,7 +264,9 @@ public class ManejadorExcepciones {
 Se construye **de abajo hacia arriba**: primero el dato, luego quien lo guarda, luego la regla
 y al final la puerta HTTP.
 
-### Paso 1.1 · Modelo (3 min) — capa de negocio
+<details>
+<summary><strong>Paso 1.1 · Modelo (3 min) — capa de negocio</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Estudiante.java`
 
@@ -283,7 +297,11 @@ public class Estudiante {
 > 🔎 El `id` **no** se recibe en el constructor: lo asigna el repositorio. Los getters existen
 > porque Jackson los usa para convertir el objeto en JSON.
 
-### Paso 1.2 · Contrato del repositorio (3 min) — capa de persistencia
+</details>
+
+<details>
+<summary><strong>Paso 1.2 · Contrato del repositorio (3 min) — capa de persistencia</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantes.java`
 
@@ -309,7 +327,11 @@ public interface RepositorioEstudiantes {
 > 🔎 **Concepto (M2):** el servicio dependerá de **esta interfaz**, no de la lista. Es lo que
 > permitirá cambiar el almacenamiento sin tocar las reglas.
 
-### Paso 1.3 · Implementación en memoria (5 min)
+</details>
+
+<details>
+<summary><strong>Paso 1.3 · Implementación en memoria (5 min)</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantesEnMemoria.java`
 
@@ -374,7 +396,11 @@ Puntos a resaltar:
 - `buscarPorId` y `existePorCorreo` usan un **ciclo `for`** y un **condicional**: es la
   lógica de programación que el taller quiere practicar. `Optional` evita devolver `null`.
 
-### Paso 1.4 · Servicio con las reglas (4 min) — capa de negocio
+</details>
+
+<details>
+<summary><strong>Paso 1.4 · Servicio con las reglas (4 min) — capa de negocio</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/negocio/service/ServicioEstudiantes.java`
 
@@ -421,7 +447,11 @@ public class ServicioEstudiantes {
 > probar pasándole cualquier implementación. Pregunta: *¿quién llama a este constructor?*
 > *(El contenedor IoC, no nosotros.)*
 
-### Paso 1.5 · Controlador (5 min) — capa de presentación
+</details>
+
+<details>
+<summary><strong>Paso 1.5 · Controlador (5 min) — capa de presentación</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorEstudiantes.java`
 
@@ -478,7 +508,11 @@ Puntos a resaltar:
 - Se encadenan tres beans: `ControladorEstudiantes` ← `ServicioEstudiantes` ←
   `RepositorioEstudiantesEnMemoria`. Spring los crea en el orden correcto.
 
-### ✅ Punto de control 1 (en vivo, 2 min)
+</details>
+
+<details>
+<summary><strong>✅ Punto de control 1 (en vivo, 2 min)</strong></summary>
+
 
 Reiniciar y probar con Postman o `curl`:
 
@@ -498,6 +532,8 @@ curl -i localhost:8080/estudiantes/99
 > ⚠️ **Error frecuente:** reiniciar la aplicación **borra los datos** (viven en memoria). No es
 > un fallo: es la consecuencia de no tener base de datos, y lo que motivará el Módulo 3.
 
+</details>
+
 ---
 
 ## 📚 Tramo 2 — Fase 2: Cursos (30 – 45 min)
@@ -515,7 +551,9 @@ estudiantes escriben. Se entrega el código de referencia para cotejar.
 | 2.4 | Reglas | `ServicioCursos` | negocio |
 | 2.5 | API | `ControladorCursos` | presentación |
 
-### Paso 2.1 · Modelo
+<details>
+<summary><strong>Paso 2.1 · Modelo</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Curso.java`
 
@@ -543,7 +581,11 @@ public class Curso {
 }
 ```
 
-### Paso 2.2 y 2.3 · Repositorio (interfaz e implementación)
+</details>
+
+<details>
+<summary><strong>Paso 2.2 y 2.3 · Repositorio (interfaz e implementación)</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioCursos.java`
 
@@ -605,7 +647,11 @@ public class RepositorioCursosEnMemoria implements RepositorioCursos {
 }
 ```
 
-### Paso 2.4 · Servicio: validaciones y filtro
+</details>
+
+<details>
+<summary><strong>Paso 2.4 · Servicio: validaciones y filtro</strong></summary>
+
 
 Aquí se practican los **operadores lógicos** y el **filtro con ciclo**. De momento el
 servicio solo necesita `RepositorioCursos`; el reporte de la Fase 4 agregará lo demás.
@@ -671,7 +717,11 @@ public class ServicioCursos {
 > 💡 **Reto opcional para quien termine antes:** reescribir `listarEconomicos()` con un
 > `stream().filter(...)` (ejemplo de Java moderno del M1).
 
-### Paso 2.5 · Controlador
+</details>
+
+<details>
+<summary><strong>Paso 2.5 · Controlador</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorCursos.java`
 
@@ -717,7 +767,11 @@ public class ControladorCursos {
 }
 ```
 
-### ✅ Punto de control 2
+</details>
+
+<details>
+<summary><strong>✅ Punto de control 2</strong></summary>
+
 
 ```bash
 curl -i -X POST localhost:8080/cursos -H "Content-Type: application/json" \
@@ -729,6 +783,8 @@ curl -i -X POST localhost:8080/cursos -H "Content-Type: application/json" \
 curl localhost:8080/cursos/economicos                                    # solo "Java desde cero"
 ```
 
+</details>
+
 ---
 
 ## 🎓 Tramo 3 — Fase 3: Matrículas (45 – 70 min)
@@ -738,7 +794,9 @@ curl localhost:8080/cursos/economicos                                    # solo 
 Es la fase de mayor peso en la evaluación (35 %) y la que muestra **por qué existen las
 capas**: la regla involucra tres entidades y ninguna capa la hace sola.
 
-### Paso 3.1 · Dibujar las reglas antes de programar (3 min)
+<details>
+<summary><strong>Paso 3.1 · Dibujar las reglas antes de programar (3 min)</strong></summary>
+
 
 Se pide al grupo ordenar los controles. El orden importa porque define **qué error ve el
 cliente primero**:
@@ -753,7 +811,11 @@ POST /matriculas
    └─ 5. Registrar la matrícula     ───▶ 201
 ```
 
-### Paso 3.2 · Modelo y repositorio (7 min)
+</details>
+
+<details>
+<summary><strong>Paso 3.2 · Modelo y repositorio (7 min)</strong></summary>
+
 
 Una matrícula **no guarda objetos**, guarda **identificadores**: es la forma de relacionar
 entidades sin base de datos.
@@ -849,7 +911,11 @@ public class RepositorioMatriculasEnMemoria implements RepositorioMatriculas {
 > Se compara con `.equals()` y no con `==` porque `Long` es un objeto (error clásico: `==`
 > funciona con ids pequeños y falla con ids mayores de 127).
 
-### Paso 3.3 · Servicio de matrículas (10 min)
+</details>
+
+<details>
+<summary><strong>Paso 3.3 · Servicio de matrículas (10 min)</strong></summary>
+
 
 El servicio **reutiliza** `ServicioEstudiantes` y `ServicioCursos` (que ya lanzan el 404) en
 lugar de repetir la búsqueda.
@@ -912,7 +978,11 @@ public class ServicioMatriculas {
 > la aplicación no arranca. Por eso en la Fase 4 `ServicioCursos` usará el **repositorio** de
 > matrículas, no el servicio.)*
 
-### Paso 3.4 · Controlador (5 min)
+</details>
+
+<details>
+<summary><strong>Paso 3.4 · Controlador (5 min)</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorMatriculas.java`
 
@@ -946,7 +1016,11 @@ public class ControladorMatriculas {
 }
 ```
 
-### ✅ Punto de control 3 (5 min)
+</details>
+
+<details>
+<summary><strong>✅ Punto de control 3 (5 min)</strong></summary>
+
 
 Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
 
@@ -958,6 +1032,8 @@ Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
 | `{"estudianteId":1,"cursoId":99}` | `404` no existe el curso |
 | Matricular a un 3.º y un 4.º estudiante en el curso 1 | el 3.º `201`; el 4.º `409` sin cupos |
 
+</details>
+
 ---
 
 ## 📊 Tramo 4 — Fase 4: Reporte de ocupación (70 – 80 min)
@@ -967,7 +1043,9 @@ Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
 > ⏳ Si el grupo va atrasado, esta fase se deja como **reto final** (lo permite el
 > enunciado) y se pasa directamente a las pruebas.
 
-### Paso 4.1 · Modelo del resultado (2 min) — negocio
+<details>
+<summary><strong>Paso 4.1 · Modelo del resultado (2 min) — negocio</strong></summary>
+
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Ocupacion.java`
 
@@ -979,7 +1057,11 @@ public record Ocupacion(String curso, int cupoMaximo, int matriculados,
 }
 ```
 
-### Paso 4.2 · Cálculo en el servicio (5 min)
+</details>
+
+<details>
+<summary><strong>Paso 4.2 · Cálculo en el servicio (5 min)</strong></summary>
+
 
 `ServicioCursos` incorpora una segunda dependencia: el **repositorio** de matrículas. Se
 modifican el constructor y se agrega el método.
@@ -1057,7 +1139,11 @@ public class ServicioCursos {
 > `(double) matriculados / cupoMaximo`. Se muestra el error en vivo con 2 de 3 cupos: el
 > reporte daría `0.0 %` en lugar de `66.67 %`.
 
-### Paso 4.3 · Endpoint (3 min) — presentación
+</details>
+
+<details>
+<summary><strong>Paso 4.3 · Endpoint (3 min) — presentación</strong></summary>
+
 
 Se agrega un método a `ControladorCursos` (más el `import` de `Ocupacion` y de
 `PathVariable`):
@@ -1069,7 +1155,11 @@ Se agrega un método a `ControladorCursos` (más el `import` de `Ocupacion` y de
     }
 ```
 
-### ✅ Punto de control 4
+</details>
+
+<details>
+<summary><strong>✅ Punto de control 4</strong></summary>
+
 
 Con 2 matriculados en el curso de 3 cupos, `GET /cursos/1/ocupacion` devuelve:
 
@@ -1087,11 +1177,15 @@ Con 2 matriculados en el curso de 3 cupos, `GET /cursos/1/ocupacion` devuelve:
 > entidades directamente, sin DTO. Más adelante se separan los datos de la API de los del
 > dominio.
 
+</details>
+
 ---
 
 ## 🧪 Tramo 5 — Pruebas y cierre (80 – 90 min)
 
-### Escenarios en Postman (7 min)
+<details>
+<summary><strong>Escenarios en Postman (7 min)</strong></summary>
+
 
 Crear una colección **«Academia»** y ejecutar en este orden (reiniciar la aplicación antes
 para partir con las listas vacías):
@@ -1111,7 +1205,11 @@ para partir con las listas vacías):
 
 Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como evidencia.
 
-### Cierre (3 min) — preguntas de síntesis
+</details>
+
+<details>
+<summary><strong>Cierre (3 min) — preguntas de síntesis</strong></summary>
+
 
 1. ¿Qué anotación convierte una clase en bean y cuáles usamos hoy? *(`@RestController`,
    `@Service`, `@Repository`; todas son estereotipos de `@Component`.)*
@@ -1121,13 +1219,15 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 4. ¿Qué diferencia hay entre un `404`, un `400` y un `409`? *(No existe / dato inválido /
    choca con el estado actual.)*
 
+</details>
+
 ---
 
 ## 🩺 Errores frecuentes y cómo se detectan
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
-| `404` en todas las rutas (página «Whitelabel») | Una clase quedó **fuera** de `com.academia` y el escaneo no la ve | Moverla al árbol de paquetes de `Main` |
+| `404` en todas las rutas (página «Whitelabel») | Una clase quedó **fuera** de `com.academia` y el escaneo no la ve | Moverla al árbol de paquetes de `AcademiaApplication` |
 | `No qualifying bean of type …` al arrancar | Falta `@Repository` / `@Service` | Anotar la clase |
 | `UnsatisfiedDependencyException … circular` | `ServicioCursos` y `ServicioMatriculas` se inyectan mutuamente | `ServicioCursos` usa `RepositorioMatriculas` |
 | `415 Unsupported Media Type` | Falta el encabezado `Content-Type: application/json` | Agregarlo en Postman |
@@ -1165,7 +1265,7 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 📁 academia
 ├── 📄 pom.xml
 └── 📁 src/main/java/com/academia
-    ├── 📄 Main.java
+    ├── 📄 AcademiaApplication.java
     ├── 📁 presentacion
     │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
         │   └── 📁 excepcion     ManejadorExcepciones · RespuestaError
