@@ -21,11 +21,6 @@ Al terminar, el estudiante:
 - Implementa reglas de negocio con listas, ciclos, condicionales y contadores.
 - Prueba la API con Postman y lee los códigos HTTP `201`, `400`, `404` y `409`.
 
-> ⚠️ **Diferencia con el enunciado original.** El enunciado pide «sin clases Service y toda la
-> lógica en el Controller». Esta guía **cambia esa restricción a propósito**: el curso trabaja
-> siempre en tres capas, y es justo lo que se aprendió en los módulos 01 y 02. Se mantienen
-> las demás restricciones: **sin base de datos ni JPA**, datos en listas en memoria.
-
 </details>
 
 <details>
@@ -1396,19 +1391,8 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 
 </details>
 
-## 📋 Correspondencia con la rúbrica del taller
-
-| Criterio | Peso | Dónde se logra |
-|---|--:|---|
-| Endpoints de estudiantes y cursos | 30 % | Pasos 1 y 2 |
-| Registro y validación de matrículas | 35 % | Paso 3 |
-| Cálculo del reporte de ocupación | 20 % | Paso 4 |
-| Pruebas y manejo de errores | 15 % | Kit de errores (paso 0) y paso 5 |
-
-> Con esta guía se añade, además, la **organización en tres capas** como criterio de calidad:
-> el controlador sin reglas, el servicio sin HTTP y el repositorio detrás de una interfaz.
-
-## 🏁 Retos finales (para quien termine antes)
+<details>
+<summary><strong>🏁 Retos finales (para quien termine antes)</strong></summary>
 
 1. **Sincronización:** hacer `guardar` de los repositorios `synchronized` y explicar qué
    problema evita (dos peticiones simultáneas con el mismo `siguienteId`).
@@ -1419,6 +1403,8 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 5. **Cambio de almacenamiento:** crear `RepositorioEstudiantesAlternativo` (por ejemplo, con un
    `Map<Long, Estudiante>`), anotar solo una de las dos con `@Repository` y comprobar que el
    servicio **no cambia ni una línea**.
+
+</details>
 
 ## 📁 Estructura final esperada
 
