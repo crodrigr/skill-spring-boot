@@ -31,7 +31,7 @@ Al terminar, el estudiante:
 <details>
 <summary><strong>📝 Introducción: el problema y sus requerimientos</strong></summary>
 
-> 🗣️ **Para abrir la sesión (5 min del tramo 0).** Se lee el problema, se subrayan los
+> 🗣️ **Para abrir la sesión (5 min del paso 0).** Se lee el problema, se subrayan los
 > requerimientos y, **antes de escribir código**, se ubica cada uno en el árbol de «Arquitectura del taller».
 > Quien entiende dónde vive cada requerimiento, sabe qué clase escribir.
 
@@ -119,13 +119,13 @@ es la pieza intermedia.
 <summary><strong>⏱️ Plan de la sesión</strong></summary>
 
 
-| Tramo | Minutos | Actividad | Quién escribe |
+| Paso | Minutos | Actividad | Quién escribe |
 |---|---:|---|---|
 | 0 | 0 – 10 | Preparación: proyecto, capas y plano del taller | Docente |
 | 1 | 10 – 30 | Fase 1 · Estudiantes | Docente y estudiantes, a la par |
 | 2 | 30 – 45 | Fase 2 · Cursos | Estudiantes (docente guía) |
 | 3 | 45 – 70 | Fase 3 · Matrículas | Estudiantes (docente guía) |
-| 4 | 70 – 80 | Fase 4 · Reporte de ocupación | Estudiantes; es el tramo que se recorta si falta tiempo |
+| 4 | 70 – 80 | Fase 4 · Reporte de ocupación | Estudiantes; es el paso que se recorta si falta tiempo |
 | 5 | 80 – 90 | Pruebas en Postman y cierre | Todos |
 
 > 💡 **Ritmo.** La Fase 1 se hace entera en vivo: allí se fija el patrón (modelo → repositorio →
@@ -188,12 +188,12 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 
 | Paquete | Responsabilidad | Clases | Se crea en | Anotación de Spring |
 |---|---|---|:-:|---|
-| `AcademiaApplication` | Arranca la aplicación y define desde dónde Spring **escanea** beans. | `AcademiaApplication` | Tramo 0 | `@SpringBootApplication` |
+| `AcademiaApplication` | Arranca la aplicación y define desde dónde Spring **escanea** beans. | `AcademiaApplication` | Paso 0 | `@SpringBootApplication` |
 | `presentacion.controlador` | Recibe la petición HTTP, entrega los datos al servicio y devuelve la respuesta. **Sin reglas.** | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas` | Fases 1–4 | `@RestController` |
-| `presentacion.excepcion` | Traduce los errores de negocio a códigos HTTP y a un cuerpo JSON uniforme. | `ManejadorExcepciones`, `RespuestaError` | Tramo 0 | `@RestControllerAdvice` |
+| `presentacion.excepcion` | Traduce los errores de negocio a códigos HTTP y a un cuerpo JSON uniforme. | `ManejadorExcepciones`, `RespuestaError` | Paso 0 | `@RestControllerAdvice` |
 | `negocio.model` | Las entidades del dominio y el resultado del reporte. Clases Java sencillas. | `Estudiante`, `Curso`, `Matricula`, `Ocupacion` | Fases 1–4 | — |
 | `negocio.service` | **Las reglas de negocio**: duplicados, validaciones, cupos, cálculo. No conoce HTTP. | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` | Fases 1–4 | `@Service` |
-| `negocio.excepcion` | Los errores que el negocio sabe lanzar, sin código HTTP. | `RecursoNoEncontradoException`, `SolicitudInvalidaException`, `ConflictoException` | Tramo 0 | — |
+| `negocio.excepcion` | Los errores que el negocio sabe lanzar, sin código HTTP. | `RecursoNoEncontradoException`, `SolicitudInvalidaException`, `ConflictoException` | Paso 0 | — |
 | `persistence.repository` | Guarda y busca datos. La **interfaz** es el contrato; la clase `…EnMemoria` lo cumple con una `List`. | `RepositorioEstudiantes`, `RepositorioCursos`, `RepositorioMatriculas` y sus `…EnMemoria` | Fases 1–3 | `@Repository` (solo en las implementaciones) |
 
 </details>
@@ -226,7 +226,8 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 
 ---
 
-## 🚀 Tramo 0 — Preparación (0 – 10 min)
+<details>
+<summary><strong>🚀 Paso 0 — Preparación (0 – 10 min)</strong></summary>
 
 <details>
 <summary><strong>Paso 0.1 · Crear el proyecto (3 min)</strong></summary>
@@ -395,9 +396,12 @@ public class ManejadorExcepciones {
 
 </details>
 
+</details>
+
 ---
 
-## 👤 Tramo 1 — Fase 1: Estudiantes (10 – 30 min)
+<details>
+<summary><strong>👤 Paso 1 — Fase 1: Estudiantes (10 – 30 min)</strong></summary>
 
 **Endpoints:** `POST /estudiantes` · `GET /estudiantes` · `GET /estudiantes/{id}`
 
@@ -674,9 +678,12 @@ curl -i localhost:8080/estudiantes/99
 
 </details>
 
+</details>
+
 ---
 
-## 📚 Tramo 2 — Fase 2: Cursos (30 – 45 min)
+<details>
+<summary><strong>📚 Paso 2 — Fase 2: Cursos (30 – 45 min)</strong></summary>
 
 **Endpoints:** `POST /cursos` · `GET /cursos` · `GET /cursos/economicos`
 
@@ -925,9 +932,12 @@ curl localhost:8080/cursos/economicos                                    # solo 
 
 </details>
 
+</details>
+
 ---
 
-## 🎓 Tramo 3 — Fase 3: Matrículas (45 – 70 min)
+<details>
+<summary><strong>🎓 Paso 3 — Fase 3: Matrículas (45 – 70 min)</strong></summary>
 
 **Endpoint:** `POST /matriculas` con `{"estudianteId":1,"cursoId":1}`
 
@@ -1174,9 +1184,12 @@ Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
 
 </details>
 
+</details>
+
 ---
 
-## 📊 Tramo 4 — Fase 4: Reporte de ocupación (70 – 80 min)
+<details>
+<summary><strong>📊 Paso 4 — Fase 4: Reporte de ocupación (70 – 80 min)</strong></summary>
 
 **Endpoint:** `GET /cursos/{id}/ocupacion`
 
@@ -1319,9 +1332,12 @@ Con 2 matriculados en el curso de 3 cupos, `GET /cursos/1/ocupacion` devuelve:
 
 </details>
 
+</details>
+
 ---
 
-## 🧪 Tramo 5 — Pruebas y cierre (80 – 90 min)
+<details>
+<summary><strong>🧪 Paso 5 — Pruebas y cierre (80 – 90 min)</strong></summary>
 
 <details>
 <summary><strong>Escenarios en Postman (7 min)</strong></summary>
@@ -1361,6 +1377,8 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 
 </details>
 
+</details>
+
 ---
 
 <details>
@@ -1382,10 +1400,10 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 
 | Criterio | Peso | Dónde se logra |
 |---|--:|---|
-| Endpoints de estudiantes y cursos | 30 % | Tramos 1 y 2 |
-| Registro y validación de matrículas | 35 % | Tramo 3 |
-| Cálculo del reporte de ocupación | 20 % | Tramo 4 |
-| Pruebas y manejo de errores | 15 % | Kit de errores (tramo 0) y tramo 5 |
+| Endpoints de estudiantes y cursos | 30 % | Pasos 1 y 2 |
+| Registro y validación de matrículas | 35 % | Paso 3 |
+| Cálculo del reporte de ocupación | 20 % | Paso 4 |
+| Pruebas y manejo de errores | 15 % | Kit de errores (paso 0) y paso 5 |
 
 > Con esta guía se añade, además, la **organización en tres capas** como criterio de calidad:
 > el controlador sin reglas, el servicio sin HTTP y el repositorio detrás de una interfaz.
