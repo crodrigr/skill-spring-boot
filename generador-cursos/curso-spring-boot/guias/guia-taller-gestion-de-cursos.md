@@ -53,7 +53,9 @@ Estudiante 1 ──── * Matrícula * ──── 1 Curso
 Un estudiante puede estar en varios cursos y un curso tiene varios estudiantes; la matrícula
 es la pieza intermedia.
 
-### ✅ Requerimientos funcionales
+<details>
+<summary><strong>✅ Requerimientos funcionales</strong></summary>
+
 
 | Código | Fase | Requerimiento | Endpoint |
 |---|:-:|---|---|
@@ -66,7 +68,11 @@ es la pieza intermedia.
 | **RF-07** | 3 | Matricular un estudiante en un curso. | `POST /matriculas` |
 | **RF-08** | 4 | Consultar la ocupación de un curso: nombre, cupo máximo, matriculados, cupos disponibles y porcentaje de ocupación. | `GET /cursos/{id}/ocupacion` |
 
-### 📏 Reglas de negocio
+</details>
+
+<details>
+<summary><strong>📏 Reglas de negocio</strong></summary>
+
 
 | Código | Regla | Se aplica en | Si se incumple |
 |---|---|---|:-:|
@@ -82,7 +88,11 @@ es la pieza intermedia.
 | **RN-10** | La matrícula se registra **solo si se cumplen todas** las reglas anteriores. | RF-07 | — |
 | **RN-11** | Porcentaje de ocupación = (matrículas del curso ÷ cupo máximo) × 100. | RF-08 | — |
 
-### 🛠️ Requerimientos no funcionales y restricciones
+</details>
+
+<details>
+<summary><strong>🛠️ Requerimientos no funcionales y restricciones</strong></summary>
+
 
 | Código | Requerimiento |
 |---|---|
@@ -97,7 +107,11 @@ es la pieza intermedia.
 > 💡 **Alcance.** Quedan fuera: autenticación, base de datos, validación con anotaciones,
 > paginación y concurrencia. Se verán en módulos posteriores.
 
-## ⏱️ Plan de la sesión
+</details>
+
+<details>
+<summary><strong>⏱️ Plan de la sesión</strong></summary>
+
 
 | Tramo | Minutos | Actividad | Quién escribe |
 |---|---:|---|---|
@@ -113,7 +127,11 @@ es la pieza intermedia.
 > escriben solos. Las clases de excepciones y el manejador de errores se entregan ya escritos
 > (se copian en el minuto 0) para no gastar tiempo.
 
-## 🧠 Conceptos de los módulos 01 y 02 que se resaltan
+</details>
+
+<details>
+<summary><strong>🧠 Conceptos de los módulos 01 y 02 que se resaltan</strong></summary>
+
 
 | Concepto | Dónde aparece en el taller | Módulo | Ejemplo de apoyo |
 |---|---|:-:|---|
@@ -127,6 +145,8 @@ es la pieza intermedia.
 | Java Bean y `@Component` (y sus estereotipos) | `@Service`, `@Repository` | 02 | [Uso de @Component](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/07-uso-de-component.md) |
 | Ciclo de vida: bean **singleton** | La lista vive en el repositorio y **sobrevive entre peticiones** porque hay una sola instancia | 02 | [Ciclo de vida de un bean](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/06-ciclo-de-vida-de-un-bean.md) |
 | Dependencia circular | Se menciona al armar `ServicioCursos` (usa el repositorio de matrículas, no el servicio) | 02 | [Explicación conceptual](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/explicacion-conceptual.md) |
+
+</details>
 
 ## 🏗️ Arquitectura del taller: el árbol de infraestructura
 
@@ -155,7 +175,9 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
         valida forma   reglas      contrato                  almacenamiento
 ```
 
-### 🌳 Qué hay en cada parte del árbol
+<details>
+<summary><strong>🌳 Qué hay en cada parte del árbol</strong></summary>
+
 
 | Paquete | Responsabilidad | Clases | Se crea en | Anotación de Spring |
 |---|---|---|:-:|---|
@@ -167,7 +189,11 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 | `negocio.excepcion` | Los errores que el negocio sabe lanzar, sin código HTTP. | `RecursoNoEncontradoException`, `SolicitudInvalidaException`, `ConflictoException` | Tramo 0 | — |
 | `persistence.repository` | Guarda y busca datos. La **interfaz** es el contrato; la clase `…EnMemoria` lo cumple con una `List`. | `RepositorioEstudiantes`, `RepositorioCursos`, `RepositorioMatriculas` y sus `…EnMemoria` | Fases 1–3 | `@Repository` (solo en las implementaciones) |
 
-### 🔗 ¿Dónde vive cada requerimiento?
+</details>
+
+<details>
+<summary><strong>🔗 ¿Dónde vive cada requerimiento?</strong></summary>
+
 
 | Requerimiento | Presentación | Negocio | Persistencia |
 |---|---|---|---|
@@ -182,6 +208,8 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 > 🔎 **Lectura clave.** Todas las reglas (RN) terminan en `negocio.service`; los controladores
 > y los repositorios casi no tienen `if`. Esa es la ventaja de las capas: si una regla cambia,
 > se sabe en qué archivo buscarla.
+
+</details>
 
 > 🗣️ **Pregunta para el grupo (1 min):** si mañana cambiamos la lista por una base de datos,
 > ¿qué capas habría que tocar? *(Respuesta: solo la de persistencia, porque el servicio depende
