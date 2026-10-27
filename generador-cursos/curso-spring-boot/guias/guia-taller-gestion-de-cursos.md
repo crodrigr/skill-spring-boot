@@ -5,7 +5,8 @@
 > [Módulo 02](../02-manejo-de-dependencias-y-java-beans/). Contiene código completo: no se
 > entrega a los estudiantes antes de resolver el taller.
 
-## 🎯 Objetivo
+<details>
+<summary><strong>🎯 Objetivo</strong></summary>
 
 Construir una API REST con Spring Boot que administre **estudiantes, cursos y matrículas**,
 organizada en las **tres capas del curso** (presentación, negocio y persistencia), con la
@@ -25,7 +26,10 @@ Al terminar, el estudiante:
 > siempre en tres capas, y es justo lo que se aprendió en los módulos 01 y 02. Se mantienen
 > las demás restricciones: **sin base de datos ni JPA**, datos en listas en memoria.
 
-## 📝 Introducción: el problema y sus requerimientos
+</details>
+
+<details>
+<summary><strong>📝 Introducción: el problema y sus requerimientos</strong></summary>
 
 > 🗣️ **Para abrir la sesión (5 min del tramo 0).** Se lee el problema, se subrayan los
 > requerimientos y, **antes de escribir código**, se ubica cada uno en el árbol de «Arquitectura del taller».
@@ -109,6 +113,8 @@ es la pieza intermedia.
 
 </details>
 
+</details>
+
 <details>
 <summary><strong>⏱️ Plan de la sesión</strong></summary>
 
@@ -148,7 +154,8 @@ es la pieza intermedia.
 
 </details>
 
-## 🏗️ Arquitectura del taller: el árbol de infraestructura
+<details>
+<summary><strong>🏗️ Arquitectura del taller: el árbol de infraestructura</strong></summary>
 
 Este es el árbol de paquetes que se construye durante la sesión. Cada carpeta tiene **una sola
 responsabilidad**, y cada requerimiento de la sección anterior cae en una de ellas (los códigos RF, RN y RNF son los de la Introducción).
@@ -214,6 +221,8 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 > 🗣️ **Pregunta para el grupo (1 min):** si mañana cambiamos la lista por una base de datos,
 > ¿qué capas habría que tocar? *(Respuesta: solo la de persistencia, porque el servicio depende
 > de la interfaz.)*
+
+</details>
 
 ---
 
@@ -1354,7 +1363,8 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 
 ---
 
-## 🩺 Errores frecuentes y cómo se detectan
+<details>
+<summary><strong>🩺 Errores frecuentes y cómo se detectan</strong></summary>
 
 | Síntoma | Causa probable | Solución |
 |---|---|---|
@@ -1365,6 +1375,8 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 | Los campos llegan en `0` / `null` | Nombres del JSON distintos a los del `record` | Igualarlos (`cupoMaximo`, no `cupo_maximo`) |
 | `66.67 %` sale como `0.0` | División entera | `(double) matriculados / cupoMaximo` |
 | `Port 8080 was already in use` | Otra ejecución sigue abierta | Detenerla o cambiar `server.port` |
+
+</details>
 
 ## 📋 Correspondencia con la rúbrica del taller
 
