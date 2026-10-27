@@ -5,7 +5,7 @@
 > [Módulo 02](../02-manejo-de-dependencias-y-java-beans/). Contiene código completo: no se
 > entrega a los estudiantes antes de resolver el taller.
 
-## 🎯 Objetivo
+## 🎯 Objetivo.
 
 Construir una API REST con Spring Boot que administre **estudiantes, cursos y matrículas**,
 organizada en las **tres capas del curso** (presentación, negocio y persistencia), con la
