@@ -1,4 +1,4 @@
-# 🧭 Guía paso a paso — Taller «Gestión de cursos» (1 h 30 min)
+# 🧭 Guía paso a paso — Taller «Gestión de cursos»
 
 > 👩‍🏫 **Material docente.** Guía para resolver el taller **junto con los estudiantes**, en
 > vivo, aplicando lo visto en el [Módulo 01](../01-introduccion-a-spring-boot/) y el
@@ -26,7 +26,7 @@ Al terminar, el estudiante:
 <details>
 <summary><strong>📝 Introducción: el problema y sus requerimientos</strong></summary>
 
-> 🗣️ **Para abrir la sesión (5 min del paso 0).** Se lee el problema, se subrayan los
+> 🗣️ **Para abrir la sesión.** Se lee el problema, se subrayan los
 > requerimientos y, **antes de escribir código**, se ubica cada uno en el árbol de «Arquitectura del taller».
 > Quien entiende dónde vive cada requerimiento, sabe qué clase escribir.
 
@@ -213,7 +213,7 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 
 </details>
 
-> 🗣️ **Pregunta para el grupo (1 min):** si mañana cambiamos la lista por una base de datos,
+> 🗣️ **Pregunta para el grupo:** si mañana cambiamos la lista por una base de datos,
 > ¿qué capas habría que tocar? *(Respuesta: solo la de persistencia, porque el servicio depende
 > de la interfaz.)*
 
@@ -222,10 +222,10 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 ---
 
 <details>
-<summary><strong>🚀 Paso 0 — Preparación (0 – 10 min)</strong></summary>
+<summary><strong>🚀 Paso 0 — Preparación</strong></summary>
 
 <details>
-<summary><strong>Paso 0.1 · Crear el proyecto (3 min)</strong></summary>
+<summary><strong>Paso 0.1 · Crear el proyecto</strong></summary>
 
 
 En [start.spring.io](https://start.spring.io):
@@ -256,7 +256,7 @@ funcional:
 </details>
 
 <details>
-<summary><strong>Paso 0.2 · Revisar la clase principal y crear los paquetes (3 min)</strong></summary>
+<summary><strong>Paso 0.2 · Revisar la clase principal y crear los paquetes</strong></summary>
 
 Initializr ya genera la clase principal, `AcademiaApplication`; **no se renombra ni se
 modifica**. Solo se crean los paquetes vacíos de la sección anterior, siempre dentro de
@@ -286,7 +286,7 @@ public class AcademiaApplication {
 </details>
 
 <details>
-<summary><strong>Paso 0.3 · Copiar el kit de errores (4 min)</strong></summary>
+<summary><strong>Paso 0.3 · Copiar el kit de errores</strong></summary>
 
 
 Cuatro clases pequeñas que se entregan hechas. Se explica **qué hacen**, no se escriben.
@@ -389,7 +389,7 @@ public class ManejadorExcepciones {
 </details>
 
 <details>
-<summary><strong>Paso 0.4 · Compilar y ejecutar con Maven desde la consola (3 min)</strong></summary>
+<summary><strong>Paso 0.4 · Compilar y ejecutar con Maven desde la consola</strong></summary>
 
 El proyecto de Initializr incluye el **Maven Wrapper** (`mvnw` y `mvnw.cmd`): permite
 compilar sin tener Maven instalado, solo con Java. Todos los comandos se ejecutan **en la
@@ -555,7 +555,7 @@ arranca y muestra `Started AcademiaApplication in … seconds`. Todavía no hay 
 ---
 
 <details>
-<summary><strong>👤 Paso 1 — Fase 1: Estudiantes (10 – 30 min)</strong></summary>
+<summary><strong>👤 Paso 1 — Fase 1: Estudiantes</strong></summary>
 
 **Endpoints:** `POST /estudiantes` · `GET /estudiantes` · `GET /estudiantes/{id}`
 
@@ -563,7 +563,7 @@ Se construye **de abajo hacia arriba**: primero el dato, luego quien lo guarda, 
 y al final la puerta HTTP.
 
 <details>
-<summary><strong>Paso 1.1 · Modelo (3 min) — capa de negocio</strong></summary>
+<summary><strong>Paso 1.1 · Modelo — capa de negocio</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Estudiante.java`
@@ -598,7 +598,7 @@ public class Estudiante {
 </details>
 
 <details>
-<summary><strong>Paso 1.2 · Contrato del repositorio (3 min) — capa de persistencia</strong></summary>
+<summary><strong>Paso 1.2 · Contrato del repositorio — capa de persistencia</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantes.java`
@@ -628,7 +628,7 @@ public interface RepositorioEstudiantes {
 </details>
 
 <details>
-<summary><strong>Paso 1.3 · Implementación en memoria (5 min)</strong></summary>
+<summary><strong>Paso 1.3 · Implementación en memoria</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantesEnMemoria.java`
@@ -697,7 +697,7 @@ Puntos a resaltar:
 </details>
 
 <details>
-<summary><strong>Paso 1.4 · Servicio con las reglas (4 min) — capa de negocio</strong></summary>
+<summary><strong>Paso 1.4 · Servicio con las reglas — capa de negocio</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/negocio/service/ServicioEstudiantes.java`
@@ -748,7 +748,7 @@ public class ServicioEstudiantes {
 </details>
 
 <details>
-<summary><strong>Paso 1.5 · Controlador (5 min) — capa de presentación</strong></summary>
+<summary><strong>Paso 1.5 · Controlador — capa de presentación</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorEstudiantes.java`
@@ -809,7 +809,7 @@ Puntos a resaltar:
 </details>
 
 <details>
-<summary><strong>✅ Punto de control 1 (en vivo, 2 min)</strong></summary>
+<summary><strong>✅ Punto de control 1</strong></summary>
 
 
 Reiniciar y probar con Postman o `curl`:
@@ -837,7 +837,7 @@ curl -i localhost:8080/estudiantes/99
 ---
 
 <details>
-<summary><strong>📚 Paso 2 — Fase 2: Cursos (30 – 45 min)</strong></summary>
+<summary><strong>📚 Paso 2 — Fase 2: Cursos</strong></summary>
 
 **Endpoints:** `POST /cursos` · `GET /cursos` · `GET /cursos/economicos`
 
@@ -853,7 +853,7 @@ estudiantes escriben. Se entrega el código de referencia para cotejar.
 | 2.5 | API | `ControladorCursos` | presentación |
 
 <details>
-<summary><strong>Paso 2.1 · Modelo (3 min)</strong></summary>
+<summary><strong>Paso 2.1 · Modelo</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Curso.java`
@@ -885,7 +885,7 @@ public class Curso {
 </details>
 
 <details>
-<summary><strong>Paso 2.2 y 2.3 · Repositorio (interfaz e implementación) (5 min)</strong></summary>
+<summary><strong>Paso 2.2 y 2.3 · Repositorio (interfaz e implementación)</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioCursos.java`
@@ -951,7 +951,7 @@ public class RepositorioCursosEnMemoria implements RepositorioCursos {
 </details>
 
 <details>
-<summary><strong>Paso 2.4 · Servicio: validaciones y filtro (5 min)</strong></summary>
+<summary><strong>Paso 2.4 · Servicio: validaciones y filtro</strong></summary>
 
 
 Aquí se practican los **operadores lógicos** y el **filtro con ciclo**. De momento el
@@ -1021,7 +1021,7 @@ public class ServicioCursos {
 </details>
 
 <details>
-<summary><strong>Paso 2.5 · Controlador (4 min)</strong></summary>
+<summary><strong>Paso 2.5 · Controlador</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorCursos.java`
@@ -1071,7 +1071,7 @@ public class ControladorCursos {
 </details>
 
 <details>
-<summary><strong>✅ Punto de control 2 (en vivo, 2 min)</strong></summary>
+<summary><strong>✅ Punto de control 2</strong></summary>
 
 
 ```bash
@@ -1091,7 +1091,7 @@ curl localhost:8080/cursos/economicos                                    # solo 
 ---
 
 <details>
-<summary><strong>🎓 Paso 3 — Fase 3: Matrículas (45 – 70 min)</strong></summary>
+<summary><strong>🎓 Paso 3 — Fase 3: Matrículas</strong></summary>
 
 **Endpoint:** `POST /matriculas` con `{"estudianteId":1,"cursoId":1}`
 
@@ -1099,7 +1099,7 @@ Es la fase de mayor peso en la evaluación (35 %) y la que muestra **por qué ex
 capas**: la regla involucra tres entidades y ninguna capa la hace sola.
 
 <details>
-<summary><strong>Paso 3.1 · Dibujar las reglas antes de programar (3 min)</strong></summary>
+<summary><strong>Paso 3.1 · Dibujar las reglas antes de programar</strong></summary>
 
 
 Se pide al grupo ordenar los controles. El orden importa porque define **qué error ve el
@@ -1118,7 +1118,7 @@ POST /matriculas
 </details>
 
 <details>
-<summary><strong>Paso 3.2 · Modelo y repositorio (7 min)</strong></summary>
+<summary><strong>Paso 3.2 · Modelo y repositorio</strong></summary>
 
 
 Una matrícula **no guarda objetos**, guarda **identificadores**: es la forma de relacionar
@@ -1218,7 +1218,7 @@ public class RepositorioMatriculasEnMemoria implements RepositorioMatriculas {
 </details>
 
 <details>
-<summary><strong>Paso 3.3 · Servicio de matrículas (10 min)</strong></summary>
+<summary><strong>Paso 3.3 · Servicio de matrículas</strong></summary>
 
 
 El servicio **reutiliza** `ServicioEstudiantes` y `ServicioCursos` (que ya lanzan el 404) en
@@ -1285,7 +1285,7 @@ public class ServicioMatriculas {
 </details>
 
 <details>
-<summary><strong>Paso 3.4 · Controlador (5 min)</strong></summary>
+<summary><strong>Paso 3.4 · Controlador</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorMatriculas.java`
@@ -1323,7 +1323,7 @@ public class ControladorMatriculas {
 </details>
 
 <details>
-<summary><strong>✅ Punto de control 3 (5 min)</strong></summary>
+<summary><strong>✅ Punto de control 3</strong></summary>
 
 
 Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
@@ -1343,7 +1343,7 @@ Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
 ---
 
 <details>
-<summary><strong>📊 Paso 4 — Fase 4: Reporte de ocupación (70 – 80 min)</strong></summary>
+<summary><strong>📊 Paso 4 — Fase 4: Reporte de ocupación</strong></summary>
 
 **Endpoint:** `GET /cursos/{id}/ocupacion`
 
@@ -1351,7 +1351,7 @@ Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
 > enunciado) y se pasa directamente a las pruebas.
 
 <details>
-<summary><strong>Paso 4.1 · Modelo del resultado (2 min) — negocio</strong></summary>
+<summary><strong>Paso 4.1 · Modelo del resultado — negocio</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Ocupacion.java`
@@ -1367,7 +1367,7 @@ public record Ocupacion(String curso, int cupoMaximo, int matriculados,
 </details>
 
 <details>
-<summary><strong>Paso 4.2 · Cálculo en el servicio (5 min)</strong></summary>
+<summary><strong>Paso 4.2 · Cálculo en el servicio</strong></summary>
 
 
 `ServicioCursos` incorpora una segunda dependencia: el **repositorio** de matrículas. Se
@@ -1449,7 +1449,7 @@ public class ServicioCursos {
 </details>
 
 <details>
-<summary><strong>Paso 4.3 · Endpoint (3 min) — presentación</strong></summary>
+<summary><strong>Paso 4.3 · Endpoint — presentación</strong></summary>
 
 
 Se agrega un método a `ControladorCursos` (más el `import` de `Ocupacion` y de
@@ -1465,7 +1465,7 @@ Se agrega un método a `ControladorCursos` (más el `import` de `Ocupacion` y de
 </details>
 
 <details>
-<summary><strong>✅ Punto de control 4 (en vivo, 2 min)</strong></summary>
+<summary><strong>✅ Punto de control 4</strong></summary>
 
 
 Con 2 matriculados en el curso de 3 cupos, `GET /cursos/1/ocupacion` devuelve:
@@ -1491,10 +1491,10 @@ Con 2 matriculados en el curso de 3 cupos, `GET /cursos/1/ocupacion` devuelve:
 ---
 
 <details>
-<summary><strong>🧪 Paso 5 — Pruebas y cierre (80 – 90 min)</strong></summary>
+<summary><strong>🧪 Paso 5 — Pruebas y cierre</strong></summary>
 
 <details>
-<summary><strong>Escenarios en Postman (7 min)</strong></summary>
+<summary><strong>Escenarios en Postman</strong></summary>
 
 
 Crear una colección **«Academia»** y ejecutar en este orden (reiniciar la aplicación antes
@@ -1518,7 +1518,7 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 </details>
 
 <details>
-<summary><strong>Cierre (3 min) — preguntas de síntesis</strong></summary>
+<summary><strong>Cierre — preguntas de síntesis</strong></summary>
 
 
 1. ¿Qué anotación convierte una clase en bean y cuáles usamos hoy? *(`@RestController`,
