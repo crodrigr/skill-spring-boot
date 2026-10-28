@@ -42,6 +42,25 @@ describe correctamente la diferencia entre un **JavaBean** y un **bean de Spring
 > JSON); `ServicioEstudiantes` sí es un bean de Spring y no sigue la convención JavaBean (no
 > tiene getters/setters de datos).
 >
+> **¿Por qué un constructor sin argumentos?** Porque la convención JavaBean busca que una
+> herramienta pueda **crear el objeto sin saber nada de él** y rellenarlo después. Una
+> librería (Jackson al leer un JSON, JPA al leer una fila, un editor visual, la
+> serialización) trabaja por reflexión: no conoce qué parámetros espera tu constructor ni en
+> qué orden, pero sí puede hacer `new Clase()` y luego llamar a cada `setX(...)` con el valor
+> que corresponde. Los **atributos privados** protegen el estado y los **getters/setters** son
+> la puerta pública de acceso para esas herramientas.
+>
+> ```java
+> // Lo que hace Jackson al recibir {"nombre":"Ana","edad":22}:
+> Estudiante e = new Estudiante();   // 1. constructor sin argumentos
+> e.setNombre("Ana");                // 2. un setter por cada campo del JSON
+> e.setEdad(22);
+> ```
+>
+> Sin ese constructor (y sin otra forma de que la librería sepa cómo construir el objeto, como
+> un `record` o un constructor anotado), la creación falla. Con un constructor con
+> argumentos, el programador sí sabe cómo llamarlo, pero la herramienta no.
+>
 </details>
 
 **2. [Selección múltiple]** Seleccioná **todas** las clases del taller que son **beans de
