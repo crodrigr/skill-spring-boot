@@ -1471,6 +1471,111 @@
 ---
 
 <details>
+<summary><strong>🌐 Endpoints y comandos curl</strong></summary>
+
+> Todos los comandos se ejecutan en una consola **Bash (Linux)** con la aplicación arrancada
+> (`./mvnw spring-boot:run`) en `localhost:8080`. La opción `-i` muestra también el código de
+> estado y los encabezados. Se ejecutan **en este orden**, porque los últimos usan los datos
+> creados por los primeros (los ids empiezan en 1 y los datos se pierden al reiniciar).
+>
+> **Resumen**
+>
+> | # | Método | Ruta | Para qué sirve | Éxito |
+> |:-:|:-:|---|---|:-:|
+> | 1 | `POST` | `/estudiantes` | Registrar un estudiante | `201` |
+> | 2 | `GET` | `/estudiantes` | Listar los estudiantes | `200` |
+> | 3 | `GET` | `/estudiantes/{id}` | Consultar un estudiante | `200` |
+> | 4 | `POST` | `/cursos` | Registrar un curso | `201` |
+> | 5 | `GET` | `/cursos` | Listar los cursos | `200` |
+> | 6 | `GET` | `/cursos/economicos` | Listar los cursos económicos | `200` |
+> | 7 | `POST` | `/matriculas` | Matricular un estudiante en un curso | `201` |
+> | 8 | `GET` | `/cursos/{id}/ocupacion` | Consultar la ocupación de un curso | `200` |
+>
+> **👤 Estudiantes**
+>
+> ```bash
+> # 1. Registrar estudiante  →  201 Created
+> curl -i -X POST localhost:8080/estudiantes \
+>   -H "Content-Type: application/json" \
+>   -d '{"nombre":"Ana Torres","edad":22,"correo":"ana@correo.com"}'
+>
+> curl -i -X POST localhost:8080/estudiantes \
+>   -H "Content-Type: application/json" \
+>   -d '{"nombre":"Luis Pérez","edad":25,"correo":"luis@correo.com"}'
+>
+> # 2. Listar estudiantes  →  200 OK
+> curl -i localhost:8080/estudiantes
+>
+> # 3. Consultar un estudiante por id  →  200 OK
+> curl -i localhost:8080/estudiantes/1
+> ```
+>
+> **📚 Cursos**
+>
+> ```bash
+> # 4. Registrar curso  →  201 Created
+> curl -i -X POST localhost:8080/cursos \
+>   -H "Content-Type: application/json" \
+>   -d '{"nombre":"Java desde cero","precio":150000,"cupoMaximo":3}'
+>
+> curl -i -X POST localhost:8080/cursos \
+>   -H "Content-Type: application/json" \
+>   -d '{"nombre":"Spring Boot","precio":450000,"cupoMaximo":10}'
+>
+> # 5. Listar cursos  →  200 OK
+> curl -i localhost:8080/cursos
+>
+> # 6. Listar solo los cursos económicos  →  200 OK
+> curl -i localhost:8080/cursos/economicos
+> ```
+>
+> **🎓 Matrículas**
+>
+> ```bash
+> # 7. Matricular al estudiante 1 en el curso 1  →  201 Created
+> curl -i -X POST localhost:8080/matriculas \
+>   -H "Content-Type: application/json" \
+>   -d '{"estudianteId":1,"cursoId":1}'
+> ```
+>
+> **📊 Reporte de ocupación**
+>
+> ```bash
+> # 8. Ocupación del curso 1  →  200 OK
+> curl -i localhost:8080/cursos/1/ocupacion
+> ```
+>
+> **⚠️ Casos de error** (sin manejador de errores, Spring responde `500` y el mensaje se lee en
+> la consola de la aplicación)
+>
+> ```bash
+> # Correo duplicado        → IllegalStateException
+> curl -i -X POST localhost:8080/estudiantes -H "Content-Type: application/json" \
+>   -d '{"nombre":"Otra Ana","edad":30,"correo":"ANA@correo.com"}'
+>
+> # Estudiante inexistente  → NoSuchElementException
+> curl -i localhost:8080/estudiantes/99
+>
+> # Curso con precio 0      → IllegalArgumentException
+> curl -i -X POST localhost:8080/cursos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Roto","precio":0,"cupoMaximo":5}'
+>
+> # Matrícula repetida      → IllegalStateException
+> curl -i -X POST localhost:8080/matriculas -H "Content-Type: application/json" \
+>   -d '{"estudianteId":1,"cursoId":1}'
+>
+> # Curso inexistente       → NoSuchElementException
+> curl -i -X POST localhost:8080/matriculas -H "Content-Type: application/json" \
+>   -d '{"estudianteId":1,"cursoId":99}'
+> ```
+>
+> > 💡 La barra invertida `\` al final de una línea indica que el comando continúa en la
+> > siguiente (solo en Bash). Para ver el JSON de respuesta ordenado se puede agregar
+> > `| python3 -m json.tool` al final, y sin `-i` se omiten los encabezados.
+>
+</details>
+
+<details>
 <summary><strong>🩺 Errores frecuentes y cómo se detectan</strong></summary>
 
 > | Síntoma | Causa probable | Solución |
