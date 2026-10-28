@@ -391,106 +391,162 @@ public class ManejadorExcepciones {
 <details>
 <summary><strong>Paso 0.4 · Compilar y ejecutar con Maven desde la consola (3 min)</strong></summary>
 
-El proyecto de Initializr incluye el **Maven Wrapper** (`mvnw`): un script que descarga y
-usa la versión de Maven que declara el proyecto, así que **no hace falta tener Maven
-instalado**, solo Java. Todos los comandos se ejecutan en una consola **Bash (Linux)**,
-**en la carpeta del proyecto** (donde está el `pom.xml`).
+El proyecto de Initializr incluye el **Maven Wrapper** (`mvnw` y `mvnw.cmd`): permite
+compilar sin tener Maven instalado, solo con Java. Todos los comandos se ejecutan **en la
+carpeta del proyecto** (donde está el `pom.xml`). La guía usa **`./mvnw`** (Bash en Linux)
+como forma principal; en Windows se reemplaza por `mvnw.cmd` (CMD) o `.\mvnw.cmd` (PowerShell).
 
-**1. Verificar las herramientas y dar permiso de ejecución** · ⏱️ ~30 s
+**1. Verificar las herramientas**
+
+| Consola | Comandos |
+|---|---|
+| **Bash** (Linux / macOS) | `java -version` · `chmod +x mvnw` (solo una vez) · `./mvnw -v` |
+| **CMD** (Windows) | `java -version` · `mvnw.cmd -v` |
+| **PowerShell** (Windows) | `java -version` · `.\mvnw.cmd -v` |
+
+`java -version` debe mostrar la versión **21 o superior**. Si no, se apunta `JAVA_HOME` al
+JDK correcto (solo para la sesión actual de la consola):
 
 ```bash
-java -version          # debe mostrar la versión 21 o superior
-chmod +x mvnw          # solo una vez: el script debe ser ejecutable
-./mvnw -v              # muestra la versión de Maven y el JDK que usa
-```
-
-Si `java -version` no muestra la 21 o superior, se apunta `JAVA_HOME` al JDK correcto (solo
-para la sesión actual de la consola):
-
-```bash
+# Bash (Linux)
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 export PATH="$JAVA_HOME/bin:$PATH"
 ```
 
-**2. Compilar y empaquetar** · ⏱️ ~1–2 min la primera vez (descarga Maven y dependencias); ~20–40 s después
+```bat
+:: CMD
+set "JAVA_HOME=C:\Program Files\Java\jdk-21"
+set "PATH=%JAVA_HOME%\bin;%PATH%"
+```
+
+```powershell
+# PowerShell
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+```
+
+**2. Compilar y empaquetar**
 
 ```bash
+# Bash (Linux / macOS)
 ./mvnw clean package
+```
+
+```bat
+:: CMD
+mvnw.cmd clean package
+```
+
+```powershell
+# PowerShell
+.\mvnw.cmd clean package
 ```
 
 Termina con `BUILD SUCCESS` y deja el ejecutable en la carpeta `target`.
 
-**3. Comandos de Maven y para qué sirven** · ⏱️ ~1 min de lectura (consulta; no hay que ejecutarlos todos)
+**3. Comandos de Maven y para qué sirven**
 
-Los tiempos de las tablas son **aproximados** para este proyecto en un equipo normal y ya con las dependencias descargadas; la primera ejecución siempre tarda más.
+Se muestran con `./mvnw` (Linux); en las otras consolas cambia solo el prefijo del comando.
 
 *Ciclo de vida (se ejecutan en orden; cada fase incluye las anteriores):*
 
-| Comando | Para qué sirve | ⏱️ Tiempo aprox. |
-|---|---|:-:|
-| `./mvnw validate` | Comprueba que el `pom.xml` y la estructura del proyecto sean correctos | < 5 s |
-| `./mvnw compile` | Compila el código fuente (`src/main/java`) hacia `target/classes` | 5–15 s |
-| `./mvnw test` | Compila y ejecuta las pruebas unitarias (`src/test/java`) | 10–30 s |
-| `./mvnw package` | Empaqueta la aplicación en un `.jar` dentro de `target/` | 15–40 s |
-| `./mvnw verify` | Ejecuta además las pruebas de integración y validaciones de calidad | 20–60 s |
-| `./mvnw install` | Copia el `.jar` al repositorio local (`~/.m2`) para usarlo desde otros proyectos | 20–60 s |
-| `./mvnw clean` | Borra la carpeta `target/` (compilaciones anteriores) | < 2 s |
+| Comando | Para qué sirve |
+|---|---|
+| `./mvnw validate` | Comprueba que el `pom.xml` y la estructura del proyecto sean correctos |
+| `./mvnw compile` | Compila el código fuente (`src/main/java`) hacia `target/classes` |
+| `./mvnw test` | Compila y ejecuta las pruebas unitarias (`src/test/java`) |
+| `./mvnw package` | Empaqueta la aplicación en un `.jar` dentro de `target/` |
+| `./mvnw verify` | Ejecuta además las pruebas de integración y validaciones de calidad |
+| `./mvnw install` | Copia el `.jar` al repositorio local (`~/.m2`) para usarlo desde otros proyectos |
+| `./mvnw clean` | Borra la carpeta `target/` (compilaciones anteriores) |
 
 *Combinaciones y opciones habituales:*
 
-| Comando | Para qué sirve | ⏱️ Tiempo aprox. |
-|---|---|:-:|
-| `./mvnw clean compile` | Compilar desde cero, sin empaquetar | 5–15 s |
-| `./mvnw clean package` | Compilar desde cero, probar y empaquetar (el más usado) | 20–45 s |
-| `./mvnw clean package -DskipTests` | Empaquetar **sin ejecutar** las pruebas (compila las pruebas pero no las corre) | 10–25 s |
-| `./mvnw clean package -Dmaven.test.skip=true` | Empaquetar sin compilar ni ejecutar pruebas | 10–25 s |
-| `./mvnw clean package -U` | Forzar la descarga de dependencias y actualizaciones | + 30–90 s (descargas) |
-| `./mvnw clean package -o` | Modo sin conexión (*offline*): usa solo lo ya descargado en `~/.m2` | 20–45 s (sin red) |
-| `./mvnw test -Dtest=NombreDeLaClaseTest` | Ejecuta una sola clase de pruebas | 5–15 s |
-| `./mvnw -q clean package` | Salida silenciosa (*quiet*): solo errores | igual que sin `-q` |
-| `./mvnw -X clean package` | Salida de depuración (*debug*) para diagnosticar fallos | igual, con salida extensa |
-| `./mvnw -v` | Muestra la versión de Maven, de Java y del sistema operativo | < 2 s |
+| Comando | Para qué sirve |
+|---|---|
+| `./mvnw clean compile` | Compilar desde cero, sin empaquetar |
+| `./mvnw clean package` | Compilar desde cero, probar y empaquetar (el más usado) |
+| `./mvnw clean package -DskipTests` | Empaquetar **sin ejecutar** las pruebas (compila las pruebas pero no las corre) |
+| `./mvnw clean package -Dmaven.test.skip=true` | Empaquetar sin compilar ni ejecutar pruebas |
+| `./mvnw clean package -U` | Forzar la descarga de dependencias y actualizaciones |
+| `./mvnw clean package -o` | Modo sin conexión (*offline*): usa solo lo ya descargado en `~/.m2` |
+| `./mvnw test -Dtest=NombreDeLaClaseTest` | Ejecuta una sola clase de pruebas |
+| `./mvnw -q clean package` | Salida silenciosa (*quiet*): solo errores |
+| `./mvnw -X clean package` | Salida de depuración (*debug*) para diagnosticar fallos |
+| `./mvnw -v` | Muestra la versión de Maven, de Java y del sistema operativo |
 
 *Objetivos (goals) de plugins, con formato `plugin:objetivo`:*
 
-| Comando | Para qué sirve | ⏱️ Tiempo aprox. |
-|---|---|:-:|
-| `./mvnw spring-boot:run` | Arranca la aplicación Spring Boot directamente desde el código (desarrollo) | 5–15 s hasta arrancar |
-| `./mvnw dependency:tree` | Muestra el árbol de dependencias (útil ante conflictos de versiones) | 3–10 s |
-| `./mvnw dependency:resolve` | Descarga y lista las dependencias del proyecto | 5–20 s |
-| `./mvnw help:effective-pom` | Muestra el `pom.xml` final, con lo heredado de `spring-boot-starter-parent` | 3–8 s |
-| `./mvnw versions:display-dependency-updates` | Lista las dependencias que tienen una versión más nueva | 10–30 s |
+| Comando | Para qué sirve |
+|---|---|
+| `./mvnw spring-boot:run` | Arranca la aplicación Spring Boot directamente desde el código (desarrollo) |
+| `./mvnw dependency:tree` | Muestra el árbol de dependencias (útil ante conflictos de versiones) |
+| `./mvnw dependency:resolve` | Descarga y lista las dependencias del proyecto |
+| `./mvnw help:effective-pom` | Muestra el `pom.xml` final, con lo heredado de `spring-boot-starter-parent` |
+| `./mvnw versions:display-dependency-updates` | Lista las dependencias que tienen una versión más nueva |
 
 > 💡 **Los `-D` son propiedades**: `-DskipTests` equivale a `-DskipTests=true`. Se pueden
 > encadenar varios objetivos en una línea: `./mvnw clean test spring-boot:run`.
+> En **PowerShell** escribí `.\mvnw.cmd`; si Maven está instalado en el equipo se puede usar
+> directamente `mvn clean package` en cualquiera de las tres consolas.
 
-**4. Ejecutar la aplicación** · ⏱️ ~30 s (el arranque de Spring Boot tarda de 3 a 10 s)
+**4. Ejecutar la aplicación**
 
 Dos formas equivalentes:
 
 ```bash
-# Con Maven (desarrollo)
+# Bash · con Maven (desarrollo)
 ./mvnw spring-boot:run
 
-# Con el jar generado por ./mvnw clean package
+# Bash · con el jar generado
 java -jar target/academia-0.0.1-SNAPSHOT.jar
+```
+
+```bat
+:: CMD · con Maven (desarrollo)
+mvnw.cmd spring-boot:run
+
+:: CMD · con el jar generado
+java -jar target\academia-0.0.1-SNAPSHOT.jar
+```
+
+```powershell
+# PowerShell · con Maven (desarrollo)
+.\mvnw.cmd spring-boot:run
+
+# PowerShell · con el jar generado
+java -jar target\academia-0.0.1-SNAPSHOT.jar
 ```
 
 La aplicación se detiene con `Ctrl + C`. Si el puerto 8080 está ocupado, se cambia así:
 
 ```bash
+# Bash
 java -jar target/academia-0.0.1-SNAPSHOT.jar --server.port=8081
-
 # o, con Maven
 ./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.port=8081
 ```
 
-> ⚠️ **Dos trampas habituales.** (1) Si aparece `Permission denied` al ejecutar `./mvnw`,
-> falta `chmod +x mvnw`. (2) El nombre del jar depende de `artifactId` y `version` del
-> `pom.xml`: si no coincide con el de arriba, se lista con `ls target/*.jar`.
+```bat
+:: CMD
+java -jar target\academia-0.0.1-SNAPSHOT.jar --server.port=8081
+```
 
-✅ **Punto de control 0:** `./mvnw spring-boot:run` arranca y muestra
-`Started AcademiaApplication in … seconds`. Todavía no hay endpoints.
+```powershell
+# PowerShell
+java -jar target\academia-0.0.1-SNAPSHOT.jar --server.port=8081
+```
+
+> ⚠️ **Trampas habituales.** (1) En Linux, si aparece `Permission denied` al ejecutar
+> `./mvnw`, falta `chmod +x mvnw`. (2) El nombre del jar depende de `artifactId` y `version`
+> del `pom.xml`: si no coincide con el de arriba, se lista con `ls target/*.jar` (Linux) o
+> `dir target\*.jar` (Windows). (3) En **PowerShell**, `curl` es un alias de
+> `Invoke-WebRequest` y no acepta las opciones de los ejemplos de esta guía: se usa
+> **`curl.exe`**, o directamente Postman. Además, el carácter `\` de continuación de línea
+> de Bash en PowerShell es el acento grave (`` ` ``) y en CMD es el acento circunflejo (`^`).
+
+✅ **Punto de control 0:** `./mvnw spring-boot:run` (o `mvnw.cmd spring-boot:run` en Windows)
+arranca y muestra `Started AcademiaApplication in … seconds`. Todavía no hay endpoints.
 
 </details>
 
@@ -797,7 +853,7 @@ estudiantes escriben. Se entrega el código de referencia para cotejar.
 | 2.5 | API | `ControladorCursos` | presentación |
 
 <details>
-<summary><strong>Paso 2.1 · Modelo</strong></summary>
+<summary><strong>Paso 2.1 · Modelo (3 min)</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Curso.java`
@@ -829,7 +885,7 @@ public class Curso {
 </details>
 
 <details>
-<summary><strong>Paso 2.2 y 2.3 · Repositorio (interfaz e implementación)</strong></summary>
+<summary><strong>Paso 2.2 y 2.3 · Repositorio (interfaz e implementación) (5 min)</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioCursos.java`
@@ -895,7 +951,7 @@ public class RepositorioCursosEnMemoria implements RepositorioCursos {
 </details>
 
 <details>
-<summary><strong>Paso 2.4 · Servicio: validaciones y filtro</strong></summary>
+<summary><strong>Paso 2.4 · Servicio: validaciones y filtro (5 min)</strong></summary>
 
 
 Aquí se practican los **operadores lógicos** y el **filtro con ciclo**. De momento el
@@ -965,7 +1021,7 @@ public class ServicioCursos {
 </details>
 
 <details>
-<summary><strong>Paso 2.5 · Controlador</strong></summary>
+<summary><strong>Paso 2.5 · Controlador (4 min)</strong></summary>
 
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorCursos.java`
@@ -1015,7 +1071,7 @@ public class ControladorCursos {
 </details>
 
 <details>
-<summary><strong>✅ Punto de control 2</strong></summary>
+<summary><strong>✅ Punto de control 2 (en vivo, 2 min)</strong></summary>
 
 
 ```bash
@@ -1409,7 +1465,7 @@ Se agrega un método a `ControladorCursos` (más el `import` de `Ocupacion` y de
 </details>
 
 <details>
-<summary><strong>✅ Punto de control 4</strong></summary>
+<summary><strong>✅ Punto de control 4 (en vivo, 2 min)</strong></summary>
 
 
 Con 2 matriculados en el curso de 3 cupos, `GET /cursos/1/ocupacion` devuelve:
