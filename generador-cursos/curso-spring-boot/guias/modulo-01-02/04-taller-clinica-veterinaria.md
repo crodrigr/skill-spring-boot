@@ -2,8 +2,8 @@
 
 > 📌 **Taller para hacer desde cero.** Este documento contiene **solo el enunciado**: qué
 > construir, con qué reglas y cómo se evalúa. No incluye código ni pasos de solución. Se
-> aplica todo lo visto en el [Módulo 01](../01-introduccion-a-spring-boot/) y el
-> [Módulo 02](../02-manejo-de-dependencias-y-java-beans/), y se espera trabajar con el mismo
+> aplica todo lo visto en el [Módulo 01](../../01-introduccion-a-spring-boot/) y el
+> [Módulo 02](../../02-manejo-de-dependencias-y-java-beans/), y se espera trabajar con el mismo
 > patrón del taller «Gestión de cursos».
 
 <details>

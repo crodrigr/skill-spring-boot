@@ -1,8 +1,8 @@
 # 🧭 Guía paso a paso — Taller «Gestión de cursos»
 
 > 👩‍🏫 **Material docente.** Guía para resolver el taller **junto con los estudiantes**, en
-> vivo, aplicando lo visto en el [Módulo 01](../01-introduccion-a-spring-boot/) y el
-> [Módulo 02](../02-manejo-de-dependencias-y-java-beans/). Contiene código completo: no se
+> vivo, aplicando lo visto en el [Módulo 01](../../01-introduccion-a-spring-boot/) y el
+> [Módulo 02](../../02-manejo-de-dependencias-y-java-beans/). Contiene código completo: no se
 > entrega a los estudiantes antes de resolver el taller.
 
 <details>
@@ -164,16 +164,16 @@
 >
 > | Concepto | Dónde aparece en el taller | Módulo | Ejemplo de apoyo |
 > |---|---|:-:|---|
-> | Spring Boot y `@SpringBootApplication` | Clase `AcademiaApplication` | 01 | [¿Qué es Spring Boot?](../01-introduccion-a-spring-boot/material/ejemplos/07-que-es-spring-boot.md) |
-> | Estructura de un proyecto y Maven | `pom.xml`, paquetes por capa | 01 | [Estructura de un proyecto](../01-introduccion-a-spring-boot/material/ejemplos/08-estructura-de-un-proyecto-spring-boot.md) |
-> | Anotaciones | `@RestController`, `@GetMapping`, `@PostMapping`, `@PathVariable`, `@RequestBody` | 01 | [Anotaciones en Spring Boot](../01-introduccion-a-spring-boot/material/ejemplos/09-anotaciones-en-spring-boot.md) |
-> | Contenedor IoC | Spring crea los objetos; nosotros nunca escribimos `new Servicio…()` | 01 | [IoC y ciclo de vida de un bean](../01-introduccion-a-spring-boot/material/ejemplos/10-ioc-container-ciclo-de-vida-de-un-bean.md) |
-> | Java moderno | `record` (en `Ocupacion`), `Optional` en las búsquedas | 01 | [Java moderno](../01-introduccion-a-spring-boot/material/ejemplos/05-java-moderno-streams-lambdas-optional-records.md) |
-> | Dependencia e inyección | Controlador → Servicio → Repositorio | 02 | [Inyección de dependencias](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/02-inyeccion-de-dependencias.md) |
-> | Programar contra interfaces | `RepositorioEstudiantes` (interfaz) y `RepositorioEstudiantesEnMemoria` (clase) | 02 | [Resolución de una dependencia](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/04-implementacion-y-resolucion-de-una-dependencia-general.md) |
-> | Java Bean y `@Component` (y sus estereotipos) | `@Service`, `@Repository` | 02 | [Uso de @Component](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/07-uso-de-component.md) |
-> | Ciclo de vida: bean **singleton** | La lista vive en el repositorio y **sobrevive entre peticiones** porque hay una sola instancia | 02 | [Ciclo de vida de un bean](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/06-ciclo-de-vida-de-un-bean.md) |
-> | Dependencia circular | Se menciona al armar `ServicioCursos` (usa el repositorio de matrículas, no el servicio) | 02 | [Explicación conceptual](../02-manejo-de-dependencias-y-java-beans/material/ejemplos/explicacion-conceptual.md) |
+> | Spring Boot y `@SpringBootApplication` | Clase `AcademiaApplication` | 01 | [¿Qué es Spring Boot?](../../01-introduccion-a-spring-boot/material/ejemplos/07-que-es-spring-boot.md) |
+> | Estructura de un proyecto y Maven | `pom.xml`, paquetes por capa | 01 | [Estructura de un proyecto](../../01-introduccion-a-spring-boot/material/ejemplos/08-estructura-de-un-proyecto-spring-boot.md) |
+> | Anotaciones | `@RestController`, `@GetMapping`, `@PostMapping`, `@PathVariable`, `@RequestBody` | 01 | [Anotaciones en Spring Boot](../../01-introduccion-a-spring-boot/material/ejemplos/09-anotaciones-en-spring-boot.md) |
+> | Contenedor IoC | Spring crea los objetos; nosotros nunca escribimos `new Servicio…()` | 01 | [IoC y ciclo de vida de un bean](../../01-introduccion-a-spring-boot/material/ejemplos/10-ioc-container-ciclo-de-vida-de-un-bean.md) |
+> | Java moderno | `record` (en `Ocupacion`), `Optional` en las búsquedas | 01 | [Java moderno](../../01-introduccion-a-spring-boot/material/ejemplos/05-java-moderno-streams-lambdas-optional-records.md) |
+> | Dependencia e inyección | Controlador → Servicio → Repositorio | 02 | [Inyección de dependencias](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/02-inyeccion-de-dependencias.md) |
+> | Programar contra interfaces | `RepositorioEstudiantes` (interfaz) y `RepositorioEstudiantesEnMemoria` (clase) | 02 | [Resolución de una dependencia](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/04-implementacion-y-resolucion-de-una-dependencia-general.md) |
+> | Java Bean y `@Component` (y sus estereotipos) | `@Service`, `@Repository` | 02 | [Uso de @Component](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/07-uso-de-component.md) |
+> | Ciclo de vida: bean **singleton** | La lista vive en el repositorio y **sobrevive entre peticiones** porque hay una sola instancia | 02 | [Ciclo de vida de un bean](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/06-ciclo-de-vida-de-un-bean.md) |
+> | Dependencia circular | Se menciona al armar `ServicioCursos` (usa el repositorio de matrículas, no el servicio) | 02 | [Explicación conceptual](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/explicacion-conceptual.md) |
 >
 </details>
 
