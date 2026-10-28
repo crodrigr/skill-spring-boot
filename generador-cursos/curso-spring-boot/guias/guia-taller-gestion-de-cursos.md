@@ -391,111 +391,104 @@ public class ManejadorExcepciones {
 <details>
 <summary><strong>Paso 0.4 · Compilar y ejecutar con Maven desde la consola (3 min)</strong></summary>
 
-El proyecto de Initializr incluye el **Maven Wrapper** (`mvnw` y `mvnw.cmd`): permite
-compilar sin tener Maven instalado, solo con Java. Todos los comandos se ejecutan **en la
-carpeta del proyecto** (donde está el `pom.xml`).
+El proyecto de Initializr incluye el **Maven Wrapper** (`mvnw`): un script que descarga y
+usa la versión de Maven que declara el proyecto, así que **no hace falta tener Maven
+instalado**, solo Java. Todos los comandos se ejecutan en una consola **Bash (Linux)**,
+**en la carpeta del proyecto** (donde está el `pom.xml`).
 
-**1. Verificar las herramientas**
+**1. Verificar las herramientas y dar permiso de ejecución**
 
-| Consola | Comandos |
-|---|---|
-| **CMD** (Windows) | `java -version` · `mvnw.cmd -v` |
-| **PowerShell** (Windows) | `java -version` · `.\mvnw.cmd -v` |
-| **Bash** (Linux / macOS) | `java -version` · `./mvnw -v` |
-
-`java -version` debe mostrar la versión **21 o superior**. Si no, se apunta `JAVA_HOME` al
-JDK correcto (solo para la sesión actual de la consola):
-
-```bat
-:: CMD
-set "JAVA_HOME=C:\Program Files\Java\jdk-21"
-set "PATH=%JAVA_HOME%\bin;%PATH%"
+```bash
+java -version          # debe mostrar la versión 21 o superior
+chmod +x mvnw          # solo una vez: el script debe ser ejecutable
+./mvnw -v              # muestra la versión de Maven y el JDK que usa
 ```
 
-```powershell
-# PowerShell
-$env:JAVA_HOME = "C:\Program Files\Java\jdk-21"
-$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+Si `java -version` no muestra la 21 o superior, se apunta `JAVA_HOME` al JDK correcto (solo
+para la sesión actual de la consola):
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
 ```
 
 **2. Compilar y empaquetar**
 
-```bat
-:: CMD
-mvnw.cmd clean package
-```
-
-```powershell
-# PowerShell
-.\mvnw.cmd clean package
-```
-
 ```bash
-# Bash (Linux / macOS)
 ./mvnw clean package
 ```
 
-Termina con `BUILD SUCCESS` y deja el ejecutable en la carpeta `target`. Otras variantes
-útiles (iguales en las tres consolas, cambiando solo el prefijo del comando):
+Termina con `BUILD SUCCESS` y deja el ejecutable en la carpeta `target`.
 
-| Objetivo | Comando |
+**3. Comandos de Maven y para qué sirven**
+
+*Ciclo de vida (se ejecutan en orden; cada fase incluye las anteriores):*
+
+| Comando | Para qué sirve |
 |---|---|
-| Solo compilar, sin empaquetar | `mvnw.cmd clean compile` |
-| Empaquetar sin ejecutar pruebas | `mvnw.cmd clean package -DskipTests` |
-| Descargar dependencias de nuevo | `mvnw.cmd clean package -U` |
+| `./mvnw validate` | Comprueba que el `pom.xml` y la estructura del proyecto sean correctos |
+| `./mvnw compile` | Compila el código fuente (`src/main/java`) hacia `target/classes` |
+| `./mvnw test` | Compila y ejecuta las pruebas unitarias (`src/test/java`) |
+| `./mvnw package` | Empaqueta la aplicación en un `.jar` dentro de `target/` |
+| `./mvnw verify` | Ejecuta además las pruebas de integración y validaciones de calidad |
+| `./mvnw install` | Copia el `.jar` al repositorio local (`~/.m2`) para usarlo desde otros proyectos |
+| `./mvnw clean` | Borra la carpeta `target/` (compilaciones anteriores) |
 
-> En **PowerShell** escribí `.\mvnw.cmd`; si Maven está instalado en el equipo se puede usar
-> directamente `mvn clean package` en cualquiera de las tres consolas.
+*Combinaciones y opciones habituales:*
 
-**3. Ejecutar la aplicación**
+| Comando | Para qué sirve |
+|---|---|
+| `./mvnw clean compile` | Compilar desde cero, sin empaquetar |
+| `./mvnw clean package` | Compilar desde cero, probar y empaquetar (el más usado) |
+| `./mvnw clean package -DskipTests` | Empaquetar **sin ejecutar** las pruebas (compila las pruebas pero no las corre) |
+| `./mvnw clean package -Dmaven.test.skip=true` | Empaquetar sin compilar ni ejecutar pruebas |
+| `./mvnw clean package -U` | Forzar la descarga de dependencias y actualizaciones |
+| `./mvnw clean package -o` | Modo sin conexión (*offline*): usa solo lo ya descargado en `~/.m2` |
+| `./mvnw test -Dtest=NombreDeLaClaseTest` | Ejecuta una sola clase de pruebas |
+| `./mvnw -q clean package` | Salida silenciosa (*quiet*): solo errores |
+| `./mvnw -X clean package` | Salida de depuración (*debug*) para diagnosticar fallos |
+| `./mvnw -v` | Muestra la versión de Maven, de Java y del sistema operativo |
+
+*Objetivos (goals) de plugins, con formato `plugin:objetivo`:*
+
+| Comando | Para qué sirve |
+|---|---|
+| `./mvnw spring-boot:run` | Arranca la aplicación Spring Boot directamente desde el código (desarrollo) |
+| `./mvnw dependency:tree` | Muestra el árbol de dependencias (útil ante conflictos de versiones) |
+| `./mvnw dependency:resolve` | Descarga y lista las dependencias del proyecto |
+| `./mvnw help:effective-pom` | Muestra el `pom.xml` final, con lo heredado de `spring-boot-starter-parent` |
+| `./mvnw versions:display-dependency-updates` | Lista las dependencias que tienen una versión más nueva |
+
+> 💡 **Los `-D` son propiedades**: `-DskipTests` equivale a `-DskipTests=true`. Se pueden
+> encadenar varios objetivos en una línea: `./mvnw clean test spring-boot:run`.
+
+**4. Ejecutar la aplicación**
 
 Dos formas equivalentes:
 
-```bat
-:: CMD · con Maven (desarrollo)
-mvnw.cmd spring-boot:run
-
-:: CMD · con el jar generado
-java -jar target\academia-0.0.1-SNAPSHOT.jar
-```
-
-```powershell
-# PowerShell · con Maven (desarrollo)
-.\mvnw.cmd spring-boot:run
-
-# PowerShell · con el jar generado
-java -jar target\academia-0.0.1-SNAPSHOT.jar
-```
-
 ```bash
-# Bash · con Maven (desarrollo)
+# Con Maven (desarrollo)
 ./mvnw spring-boot:run
 
-# Bash · con el jar generado
+# Con el jar generado por ./mvnw clean package
 java -jar target/academia-0.0.1-SNAPSHOT.jar
 ```
 
 La aplicación se detiene con `Ctrl + C`. Si el puerto 8080 está ocupado, se cambia así:
 
-```bat
-:: CMD
-java -jar target\academia-0.0.1-SNAPSHOT.jar --server.port=8081
+```bash
+java -jar target/academia-0.0.1-SNAPSHOT.jar --server.port=8081
+
+# o, con Maven
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.port=8081
 ```
 
-```powershell
-# PowerShell
-java -jar target\academia-0.0.1-SNAPSHOT.jar --server.port=8081
-```
+> ⚠️ **Dos trampas habituales.** (1) Si aparece `Permission denied` al ejecutar `./mvnw`,
+> falta `chmod +x mvnw`. (2) El nombre del jar depende de `artifactId` y `version` del
+> `pom.xml`: si no coincide con el de arriba, se lista con `ls target/*.jar`.
 
-> ⚠️ **Dos trampas en Windows.** (1) El nombre del jar depende de `artifactId` y `version`
-> del `pom.xml`: si no coincide con el de arriba, se lista con `dir target\*.jar`.
-> (2) En **PowerShell**, `curl` es un alias de `Invoke-WebRequest` y no acepta las opciones de
-> los ejemplos de esta guía: se usa **`curl.exe`**, o directamente Postman. Además, el
-> carácter `\` de continuación de línea de Bash en PowerShell es el acento grave (`` ` ``) y
-> en CMD es el acento circunflejo (`^`).
-
-✅ **Punto de control 0:** `mvnw.cmd spring-boot:run` (o `./mvnw spring-boot:run`) arranca y
-muestra `Started AcademiaApplication in … seconds`. Todavía no hay endpoints.
+✅ **Punto de control 0:** `./mvnw spring-boot:run` arranca y muestra
+`Started AcademiaApplication in … seconds`. Todavía no hay endpoints.
 
 </details>
 
