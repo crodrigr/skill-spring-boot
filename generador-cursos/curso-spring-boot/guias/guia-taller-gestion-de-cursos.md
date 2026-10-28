@@ -1497,7 +1497,8 @@ Una **anotación** es una etiqueta que se escribe sobre una clase, un método o 
 ejecuta nada por sí sola: le indica a **Spring** (o al compilador) qué hacer con ese elemento.
 Estas son todas las que se usaron, en el orden en que aparecen.
 
-### 1. Anotaciones de arranque y de componentes (crean los *beans*)
+<details>
+<summary><strong>1. Anotaciones de arranque y de componentes (crean los *beans*)</strong></summary>
 
 | Anotación | Dónde se usa | Por qué | Para qué sirve |
 |---|---|---|---|
@@ -1513,7 +1514,10 @@ Estas son todas las que se usaron, en el orden en que aparecen.
 > Con ellas funciona la **inyección por constructor**: el constructor declara lo que necesita y
 > Spring lo entrega, sin `@Autowired`.
 
-### 2. Anotaciones de rutas (conectan una URL con un método)
+</details>
+
+<details>
+<summary><strong>2. Anotaciones de rutas (conectan una URL con un método)</strong></summary>
 
 | Anotación | Dónde se usa | Por qué | Para qué sirve |
 |---|---|---|---|
@@ -1521,7 +1525,10 @@ Estas son todas las que se usaron, en el orden en que aparecen.
 | `@GetMapping` | Listar (`/estudiantes`, `/cursos`), `/{id}`, `/economicos`, `/{id}/ocupacion` | Consultar no modifica datos: es el verbo `GET`. | Asocia un método con las peticiones `GET`; el texto entre paréntesis se suma a la ruta base. |
 | `@PostMapping` | Registrar estudiante, registrar curso, matricular | Crear un recurso es el verbo `POST`. | Asocia un método con las peticiones `POST`. |
 
-### 3. Anotaciones de parámetros y de respuesta (leen la petición y fijan el código)
+</details>
+
+<details>
+<summary><strong>3. Anotaciones de parámetros y de respuesta (leen la petición y fijan el código)</strong></summary>
 
 | Anotación | Dónde se usa | Por qué | Para qué sirve |
 |---|---|---|---|
@@ -1529,13 +1536,19 @@ Estas son todas las que se usaron, en el orden en que aparecen.
 | `@RequestBody` | `registrar(@RequestBody Estudiante …)`, `matricular(@RequestBody SolicitudMatricula …)` | Los datos viajan en el **cuerpo JSON** de la petición. | Convierte ese JSON en un objeto Java (los nombres de los campos deben coincidir). |
 | `@ResponseStatus(HttpStatus.CREATED)` | Métodos `POST` de los tres controladores | Un `POST` que crea algo debe responder `201`, no `200`. | Fija el **código HTTP** de la respuesta cuando el método termina bien. |
 
-### 4. Anotación del lenguaje Java
+</details>
+
+<details>
+<summary><strong>4. Anotación del lenguaje Java</strong></summary>
 
 | Anotación | Dónde se usa | Por qué | Para qué sirve |
 |---|---|---|---|
 | `@Override` | Métodos de las clases `…EnMemoria` que implementan una interfaz | Indica que el método **cumple un contrato** de la interfaz. | El compilador comprueba que realmente exista ese método en la interfaz: si se escribe mal el nombre o los parámetros, falla en compilación y no en tiempo de ejecución. |
 
-### 5. Mapa rápido: qué anotación va en cada capa
+</details>
+
+<details>
+<summary><strong>5. Mapa rápido: qué anotación va en cada capa</strong></summary>
 
 ```text
 presentacion  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping
@@ -1548,5 +1561,7 @@ arranque      ──▶  @SpringBootApplication
 > 🔎 **Lectura clave.** Las anotaciones de **HTTP** (rutas, parámetros, código de estado) solo
 > aparecen en la capa de presentación. El servicio y el repositorio no las usan: por eso se
 > pueden cambiar o probar sin tocar nada web.
+
+</details>
 
 </details>
