@@ -1573,6 +1573,45 @@
 > > siguiente (solo en Bash). Para ver el JSON de respuesta ordenado se puede agregar
 > > `| python3 -m json.tool` al final, y sin `-i` se omiten los encabezados.
 >
+> **🔍 ¿Qué es `curl` y qué significa cada parte del comando?**
+>
+> `curl` (*Client URL*) es un programa de consola que **envía peticiones HTTP** y muestra la
+> respuesta. Hace lo mismo que Postman, pero escrito en una línea, y viene instalado en
+> Linux. Estructura general:
+>
+> ```text
+> curl  [opciones]  URL
+> ```
+>
+> | Elemento | Significado | Para qué se usa en el taller |
+> |---|---|---|
+> | `curl` | El programa cliente HTTP. | Hace de «navegador» o de Postman desde la consola. |
+> | `-i` | *include*: incluye en la salida la **línea de estado y los encabezados** de la respuesta. | Ver el código (`201`, `200`, `500`…) además del cuerpo. Sin `-i` solo se vería el cuerpo. |
+> | `-X POST` | *request*: indica el **método HTTP** a usar. | `POST` para crear (estudiantes, cursos, matrículas). Sin `-X`, curl hace un `GET`. |
+> | `-H "Content-Type: application/json"` | *header*: agrega un **encabezado** a la petición. | Avisa al servidor de que el cuerpo es JSON; sin él, `@RequestBody` responde `415`. |
+> | `-d '{...}'` | *data*: el **cuerpo** (*body*) de la petición. | El JSON con los datos del estudiante, curso o matrícula. Al usar `-d`, curl ya envía `POST` por defecto. |
+> | `localhost:8080/estudiantes` | La **URL**: máquina + puerto + ruta. | `localhost` es tu equipo, `8080` el puerto de Spring Boot y `/estudiantes` la ruta del controlador. |
+> | `\` (al final de la línea) | **Continuación de línea** de Bash. | Partir un comando largo en varias líneas; no forma parte de curl. |
+> | `'...'` (comillas simples) | Comillas de **Bash**, no de curl. | Evitan que Bash interprete las comillas dobles del JSON. |
+> | `\| python3 -m json.tool` | Una **tubería** (`\|`) que pasa la salida a otro programa. | Mostrar el JSON con sangría; es opcional. |
+>
+> **Ejemplo desarmado:**
+>
+> ```bash
+> curl -i -X POST localhost:8080/estudiantes \
+>   -H "Content-Type: application/json" \
+>   -d '{"nombre":"Ana Torres","edad":22,"correo":"ana@correo.com"}'
+> #  │   │  │       │                         └─ -d  : cuerpo JSON con los datos
+> #  │   │  │       └─ -H : encabezado «el cuerpo es JSON»
+> #  │   │  └─ -X POST : método para crear un recurso
+> #  │   └─ -i  : mostrar código de estado y encabezados
+> #  └─ el programa
+> ```
+>
+> **Otras opciones útiles** (no se usan en el taller): `-s` (silencioso, sin barra de
+> progreso), `-v` (muy detallado, muestra también la petición enviada) y `-o archivo` (guarda
+> la respuesta en un archivo).
+>
 </details>
 
 <details>
