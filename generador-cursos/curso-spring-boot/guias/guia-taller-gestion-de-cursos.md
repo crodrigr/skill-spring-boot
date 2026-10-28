@@ -396,7 +396,7 @@ usa la versión de Maven que declara el proyecto, así que **no hace falta tener
 instalado**, solo Java. Todos los comandos se ejecutan en una consola **Bash (Linux)**,
 **en la carpeta del proyecto** (donde está el `pom.xml`).
 
-**1. Verificar las herramientas y dar permiso de ejecución**
+**1. Verificar las herramientas y dar permiso de ejecución** · ⏱️ ~30 s
 
 ```bash
 java -version          # debe mostrar la versión 21 o superior
@@ -412,7 +412,7 @@ export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 export PATH="$JAVA_HOME/bin:$PATH"
 ```
 
-**2. Compilar y empaquetar**
+**2. Compilar y empaquetar** · ⏱️ ~1–2 min la primera vez (descarga Maven y dependencias); ~20–40 s después
 
 ```bash
 ./mvnw clean package
@@ -420,49 +420,51 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 Termina con `BUILD SUCCESS` y deja el ejecutable en la carpeta `target`.
 
-**3. Comandos de Maven y para qué sirven**
+**3. Comandos de Maven y para qué sirven** · ⏱️ ~1 min de lectura (consulta; no hay que ejecutarlos todos)
+
+Los tiempos de las tablas son **aproximados** para este proyecto en un equipo normal y ya con las dependencias descargadas; la primera ejecución siempre tarda más.
 
 *Ciclo de vida (se ejecutan en orden; cada fase incluye las anteriores):*
 
-| Comando | Para qué sirve |
-|---|---|
-| `./mvnw validate` | Comprueba que el `pom.xml` y la estructura del proyecto sean correctos |
-| `./mvnw compile` | Compila el código fuente (`src/main/java`) hacia `target/classes` |
-| `./mvnw test` | Compila y ejecuta las pruebas unitarias (`src/test/java`) |
-| `./mvnw package` | Empaqueta la aplicación en un `.jar` dentro de `target/` |
-| `./mvnw verify` | Ejecuta además las pruebas de integración y validaciones de calidad |
-| `./mvnw install` | Copia el `.jar` al repositorio local (`~/.m2`) para usarlo desde otros proyectos |
-| `./mvnw clean` | Borra la carpeta `target/` (compilaciones anteriores) |
+| Comando | Para qué sirve | ⏱️ Tiempo aprox. |
+|---|---|:-:|
+| `./mvnw validate` | Comprueba que el `pom.xml` y la estructura del proyecto sean correctos | < 5 s |
+| `./mvnw compile` | Compila el código fuente (`src/main/java`) hacia `target/classes` | 5–15 s |
+| `./mvnw test` | Compila y ejecuta las pruebas unitarias (`src/test/java`) | 10–30 s |
+| `./mvnw package` | Empaqueta la aplicación en un `.jar` dentro de `target/` | 15–40 s |
+| `./mvnw verify` | Ejecuta además las pruebas de integración y validaciones de calidad | 20–60 s |
+| `./mvnw install` | Copia el `.jar` al repositorio local (`~/.m2`) para usarlo desde otros proyectos | 20–60 s |
+| `./mvnw clean` | Borra la carpeta `target/` (compilaciones anteriores) | < 2 s |
 
 *Combinaciones y opciones habituales:*
 
-| Comando | Para qué sirve |
-|---|---|
-| `./mvnw clean compile` | Compilar desde cero, sin empaquetar |
-| `./mvnw clean package` | Compilar desde cero, probar y empaquetar (el más usado) |
-| `./mvnw clean package -DskipTests` | Empaquetar **sin ejecutar** las pruebas (compila las pruebas pero no las corre) |
-| `./mvnw clean package -Dmaven.test.skip=true` | Empaquetar sin compilar ni ejecutar pruebas |
-| `./mvnw clean package -U` | Forzar la descarga de dependencias y actualizaciones |
-| `./mvnw clean package -o` | Modo sin conexión (*offline*): usa solo lo ya descargado en `~/.m2` |
-| `./mvnw test -Dtest=NombreDeLaClaseTest` | Ejecuta una sola clase de pruebas |
-| `./mvnw -q clean package` | Salida silenciosa (*quiet*): solo errores |
-| `./mvnw -X clean package` | Salida de depuración (*debug*) para diagnosticar fallos |
-| `./mvnw -v` | Muestra la versión de Maven, de Java y del sistema operativo |
+| Comando | Para qué sirve | ⏱️ Tiempo aprox. |
+|---|---|:-:|
+| `./mvnw clean compile` | Compilar desde cero, sin empaquetar | 5–15 s |
+| `./mvnw clean package` | Compilar desde cero, probar y empaquetar (el más usado) | 20–45 s |
+| `./mvnw clean package -DskipTests` | Empaquetar **sin ejecutar** las pruebas (compila las pruebas pero no las corre) | 10–25 s |
+| `./mvnw clean package -Dmaven.test.skip=true` | Empaquetar sin compilar ni ejecutar pruebas | 10–25 s |
+| `./mvnw clean package -U` | Forzar la descarga de dependencias y actualizaciones | + 30–90 s (descargas) |
+| `./mvnw clean package -o` | Modo sin conexión (*offline*): usa solo lo ya descargado en `~/.m2` | 20–45 s (sin red) |
+| `./mvnw test -Dtest=NombreDeLaClaseTest` | Ejecuta una sola clase de pruebas | 5–15 s |
+| `./mvnw -q clean package` | Salida silenciosa (*quiet*): solo errores | igual que sin `-q` |
+| `./mvnw -X clean package` | Salida de depuración (*debug*) para diagnosticar fallos | igual, con salida extensa |
+| `./mvnw -v` | Muestra la versión de Maven, de Java y del sistema operativo | < 2 s |
 
 *Objetivos (goals) de plugins, con formato `plugin:objetivo`:*
 
-| Comando | Para qué sirve |
-|---|---|
-| `./mvnw spring-boot:run` | Arranca la aplicación Spring Boot directamente desde el código (desarrollo) |
-| `./mvnw dependency:tree` | Muestra el árbol de dependencias (útil ante conflictos de versiones) |
-| `./mvnw dependency:resolve` | Descarga y lista las dependencias del proyecto |
-| `./mvnw help:effective-pom` | Muestra el `pom.xml` final, con lo heredado de `spring-boot-starter-parent` |
-| `./mvnw versions:display-dependency-updates` | Lista las dependencias que tienen una versión más nueva |
+| Comando | Para qué sirve | ⏱️ Tiempo aprox. |
+|---|---|:-:|
+| `./mvnw spring-boot:run` | Arranca la aplicación Spring Boot directamente desde el código (desarrollo) | 5–15 s hasta arrancar |
+| `./mvnw dependency:tree` | Muestra el árbol de dependencias (útil ante conflictos de versiones) | 3–10 s |
+| `./mvnw dependency:resolve` | Descarga y lista las dependencias del proyecto | 5–20 s |
+| `./mvnw help:effective-pom` | Muestra el `pom.xml` final, con lo heredado de `spring-boot-starter-parent` | 3–8 s |
+| `./mvnw versions:display-dependency-updates` | Lista las dependencias que tienen una versión más nueva | 10–30 s |
 
 > 💡 **Los `-D` son propiedades**: `-DskipTests` equivale a `-DskipTests=true`. Se pueden
 > encadenar varios objetivos en una línea: `./mvnw clean test spring-boot:run`.
 
-**4. Ejecutar la aplicación**
+**4. Ejecutar la aplicación** · ⏱️ ~30 s (el arranque de Spring Boot tarda de 3 a 10 s)
 
 Dos formas equivalentes:
 
