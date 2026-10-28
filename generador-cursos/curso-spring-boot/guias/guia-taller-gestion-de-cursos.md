@@ -1471,7 +1471,8 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 
 </details>
 
-## 📁 Estructura final esperada
+<details>
+<summary><strong>📁 Estructura final esperada</strong></summary>
 
 ```text
 📁 academia
@@ -1487,9 +1488,10 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
         └── 📁 repository    3 interfaces · 3 implementaciones «EnMemoria»
 ```
 
----
+</details>
 
-## 🏷️ Repaso de las anotaciones del taller
+<details>
+<summary><strong>🏷️ Repaso de las anotaciones del taller</strong></summary>
 
 Una **anotación** es una etiqueta que se escribe sobre una clase, un método o un parámetro. No
 ejecuta nada por sí sola: le indica a **Spring** (o al compilador) qué hacer con ese elemento.
@@ -1546,3 +1548,5 @@ arranque      ──▶  @SpringBootApplication
 > 🔎 **Lectura clave.** Las anotaciones de **HTTP** (rutas, parámetros, código de estado) solo
 > aparecen en la capa de presentación. El servicio y el repositorio no las usan: por eso se
 > pueden cambiar o probar sin tocar nada web.
+
+</details>
