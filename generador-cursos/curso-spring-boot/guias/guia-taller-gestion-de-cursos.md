@@ -52,6 +52,35 @@
 > Un estudiante puede estar en varios cursos y un curso tiene varios estudiantes; la matrícula
 > es la pieza intermedia.
 >
+> **Diagrama de clases:**
+>
+> ```mermaid
+> classDiagram
+>     direction LR
+>     class Estudiante {
+>         -Long id
+>         -String nombre
+>         -int edad
+>         -String correo
+>     }
+>     class Matricula {
+>         -Long id
+>         -Estudiante estudiante
+>         -Curso curso
+>     }
+>     class Curso {
+>         -Long id
+>         -String nombre
+>         -double precio
+>         -int cupoMaximo
+>     }
+>     Estudiante "1" --> "*" Matricula : tiene
+>     Curso "1" --> "*" Matricula : recibe
+> ```
+>
+> Cada `Matricula` guarda un `Estudiante` y un `Curso` (relación de muchos a uno);
+> desde el lado contrario, un estudiante o un curso aparece en muchas matrículas.
+>
 > <details>
 > <summary><strong>✅ Requerimientos funcionales</strong></summary>
 >
