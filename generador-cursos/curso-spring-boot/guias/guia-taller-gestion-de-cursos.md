@@ -19,7 +19,7 @@ Al terminar, el estudiante:
 - Declara beans con `@RestController`, `@Service` y `@Repository`, y los conecta con
   **inyección por constructor** contra **interfaces** (M2).
 - Implementa reglas de negocio con listas, ciclos, condicionales y contadores.
-- Prueba la API con Postman y lee los códigos HTTP `201`, `400`, `404` y `409`.
+- Prueba la API con Postman y lee la respuesta `201` y los errores de negocio.
 
 </details>
 
@@ -73,17 +73,17 @@ es la pieza intermedia.
 <summary><strong>📏 Reglas de negocio</strong></summary>
 
 
-| Código | Regla | Se aplica en | Si se incumple |
+| Código | Regla | Se aplica en | Si se incumple lanza |
 |---|---|---|:-:|
 | **RN-01** | El identificador de toda entidad se genera automáticamente (1, 2, 3…). | RF-01, RF-04, RF-07 | — |
-| **RN-02** | No puede haber dos estudiantes con el mismo correo. | RF-01 | `409` |
-| **RN-03** | Un estudiante inexistente responde «no encontrado». | RF-03, RF-07 | `404` |
-| **RN-04** | El precio de un curso debe ser mayor que cero. | RF-04 | `400` |
-| **RN-05** | El cupo máximo de un curso debe ser mayor que cero. | RF-04 | `400` |
+| **RN-02** | No puede haber dos estudiantes con el mismo correo. | RF-01 | `IllegalStateException` |
+| **RN-03** | Un estudiante inexistente responde «no encontrado». | RF-03, RF-07 | `NoSuchElementException` |
+| **RN-04** | El precio de un curso debe ser mayor que cero. | RF-04 | `IllegalArgumentException` |
+| **RN-05** | El cupo máximo de un curso debe ser mayor que cero. | RF-04 | `IllegalArgumentException` |
 | **RN-06** | Un curso es «económico» si su precio es **menor** que 200.000. | RF-06 | — |
-| **RN-07** | El curso de una matrícula debe existir. | RF-07 | `404` |
-| **RN-08** | Un estudiante no puede matricularse dos veces en el mismo curso. | RF-07 | `409` |
-| **RN-09** | El curso debe tener cupos disponibles (matriculados < cupo máximo). | RF-07 | `409` |
+| **RN-07** | El curso de una matrícula debe existir. | RF-07 | `NoSuchElementException` |
+| **RN-08** | Un estudiante no puede matricularse dos veces en el mismo curso. | RF-07 | `IllegalStateException` |
+| **RN-09** | El curso debe tener cupos disponibles (matriculados < cupo máximo). | RF-07 | `IllegalStateException` |
 | **RN-10** | La matrícula se registra **solo si se cumplen todas** las reglas anteriores. | RF-07 | — |
 | **RN-11** | Porcentaje de ocupación = (matrículas del curso ÷ cupo máximo) × 100. | RF-08 | — |
 
@@ -99,7 +99,7 @@ es la pieza intermedia.
 | **RNF-02** | **Sin base de datos ni JPA**: los datos viven en listas en memoria y se pierden al reiniciar. |
 | **RNF-03** | Organización en **tres capas** (presentación, negocio y persistencia), con la regla de dependencia presentación → negocio → persistencia. |
 | **RNF-04** | Las dependencias se resuelven con **inyección por constructor** y los repositorios se usan a través de **interfaces**. |
-| **RNF-05** | Errores con respuesta HTTP clara: `201` al crear, `400` dato inválido, `404` no existe, `409` conflicto. |
+| **RNF-05** | Los errores de negocio se señalan con excepciones estándar de Java (`NoSuchElementException`, `IllegalArgumentException`, `IllegalStateException`) y `201` al crear. Traducirlas a `400`, `404` y `409` se estudia en el Módulo 7; mientras tanto Spring responde `500`. |
 | **RNF-06** | La API se prueba con Postman y se conservan evidencias de cada escenario. |
 | **RNF-07** | Duración: 1 h 30 min, trabajo individual. El objetivo es practicar la **lógica de programación** (listas, ciclos, condicionales, contadores) dentro de una API REST, no construir un sistema completo. |
 
@@ -125,7 +125,7 @@ es la pieza intermedia.
 
 > 💡 **Ritmo.** La Fase 1 se hace entera en vivo: allí se fija el patrón (modelo → repositorio →
 > servicio → controlador). Las fases 2 y 3 repiten el patrón y son las que los estudiantes
-> escriben solos. El manejador de errores se entrega ya escrito (se copia en el Paso 0).
+> escriben solos.
 
 </details>
 
@@ -158,8 +158,7 @@ responsabilidad**, y cada requerimiento de la sección anterior cae en una de el
 📁 src/main/java/com/academia
 ├── 📄 AcademiaApplication.java
 ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
-│   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
-│   └── 📁 excepcion     ManejadorErrores
+│   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
 ├── 📁 negocio                           ← 2 · las reglas
 │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
 │   ├── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
@@ -183,9 +182,8 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 |---|---|---|:-:|---|
 | `AcademiaApplication` | Arranca la aplicación y define desde dónde Spring **escanea** beans. | `AcademiaApplication` | Paso 0 | `@SpringBootApplication` |
 | `presentacion.controlador` | Recibe la petición HTTP, entrega los datos al servicio y devuelve la respuesta. **Sin reglas.** | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas`, `SolicitudMatricula` | Fases 1–4 | `@RestController` |
-| `presentacion.excepcion` | Traduce las excepciones del negocio a códigos HTTP y a un cuerpo JSON uniforme. | `ManejadorErrores` | Paso 0 | `@RestControllerAdvice` |
 | `negocio.model` | Las entidades del dominio y el resultado del reporte. Clases Java sencillas. | `Estudiante`, `Curso`, `Matricula`, `Ocupacion` | Fases 1–4 | — |
-| `negocio.service` | **Las reglas de negocio**: duplicados, validaciones, cupos, cálculo. Lanza excepciones estándar de Java; no conoce HTTP. | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` | Fases 1–4 | `@Service` |
+| `negocio.service` | **Las reglas de negocio**: duplicados, validaciones, cupos, cálculo. Señala los errores con excepciones estándar de Java. | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` | Fases 1–4 | `@Service` |
 | `persistence.repository` | Guarda y busca datos. La **interfaz** es el contrato; la clase `…EnMemoria` lo cumple con una `List`. | `RepositorioEstudiantes`, `RepositorioCursos`, `RepositorioMatriculas` y sus `…EnMemoria` | Fases 1–3 | `@Repository` (solo en las implementaciones) |
 
 </details>
@@ -202,7 +200,7 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 | **RF-05 / RF-06** Listar y económicos · **RN-06** | `listar`, `listarEconomicos` | `ServicioCursos.listarEconomicos` (filtro con ciclo) | `RepositorioCursos.listar` |
 | **RF-07** Matricular · **RN-03, RN-07 a RN-10** | `ControladorMatriculas.matricular` | `ServicioMatriculas.matricular` (las cinco reglas, en orden) | `existe`, `contarPorCurso`, `guardar` |
 | **RF-08** Ocupación · **RN-11** | `ControladorCursos.ocupacion` | `ServicioCursos.calcularOcupacion` | `RepositorioMatriculas.contarPorCurso` |
-| **RNF-05** Códigos HTTP | `ManejadorErrores` | Excepciones estándar de Java | — |
+| **RNF-05** Errores | — | Excepciones estándar de Java | — |
 
 > 🔎 **Lectura clave.** Todas las reglas (RN) terminan en `negocio.service`; los controladores
 > y los repositorios casi no tienen `if`. Esa es la ventaja de las capas: si una regla cambia,
@@ -283,61 +281,7 @@ public class AcademiaApplication {
 </details>
 
 <details>
-<summary><strong>Paso 0.3 · Copiar el manejador de errores</strong></summary>
-
-Una sola clase pequeña que se entrega hecha. Se explica **qué hace**, no se escribe.
-
-**Archivo:** `src/main/java/com/academia/presentacion/excepcion/ManejadorErrores.java`
-
-```java
-package com.academia.presentacion.excepcion;
-
-import java.util.Map;
-import java.util.NoSuchElementException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-@RestControllerAdvice
-public class ManejadorErrores {
-
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Map<String, Object>> noEncontrado(NoSuchElementException e) {
-        return responder(HttpStatus.NOT_FOUND, e.getMessage());
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, Object>> solicitudInvalida(IllegalArgumentException e) {
-        return responder(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, Object>> conflicto(IllegalStateException e) {
-        return responder(HttpStatus.CONFLICT, e.getMessage());
-    }
-
-    private ResponseEntity<Map<String, Object>> responder(HttpStatus estado, String mensaje) {
-        return ResponseEntity.status(estado).body(Map.of("estado", estado.value(), "mensaje", mensaje));
-    }
-}
-```
-
-> 🗣️ **Idea clave para decir en voz alta:** el servicio lanza una excepción corriente de Java
-> («no existe», «dato inválido», «conflicto»); **no sabe qué es un 404**. La capa de
-> presentación traduce a HTTP. El manejo completo de excepciones (con excepciones propias) se
-> estudia en el Módulo 7: hoy es un adelanto.
-
-| Excepción de Java | Código HTTP | Cuándo |
-|---|:-:|---|
-| `NoSuchElementException` | `404` | El estudiante o curso no existe |
-| `IllegalArgumentException` | `400` | Precio ≤ 0, cupo ≤ 0 |
-| `IllegalStateException` | `409` | Correo duplicado, matrícula repetida, sin cupos |
-
-</details>
-
-<details>
-<summary><strong>Paso 0.4 · Compilar y ejecutar con Maven desde la consola</strong></summary>
+<summary><strong>Paso 0.3 · Compilar y ejecutar con Maven desde la consola</strong></summary>
 
 El proyecto de Initializr incluye el **Maven Wrapper** (`mvnw` y `mvnw.cmd`): permite
 compilar sin tener Maven instalado, solo con Java. Todos los comandos se ejecutan **en la
@@ -686,10 +630,10 @@ public class ServicioEstudiantes {
 }
 ```
 
-> 🔎 **Errores sin HTTP en el servicio.** El servicio usa excepciones estándar de Java, sin
-> nada de HTTP: `NoSuchElementException` («no existe»), `IllegalArgumentException` («dato
-> inválido») e `IllegalStateException` («conflicto»). El `404`, `400` o `409` lo decide
-> `ManejadorErrores` (Paso 0.3), en la capa de presentación.
+> 🔎 **Errores en el servicio.** El servicio usa excepciones estándar de Java, sin nada de
+> HTTP: `NoSuchElementException` («no existe»), `IllegalArgumentException` («dato inválido»)
+> e `IllegalStateException` («conflicto»). Por ahora Spring las responde como `500`; el
+> mensaje se lee en la consola. Convertirlas en `404`, `400` y `409` es el tema del Módulo 7.
 
 > 🔎 **Concepto (M2) — el momento central de la sesión.** El servicio **declara** lo que
 > necesita (un constructor con `RepositorioEstudiantes`) y Spring **se lo entrega**. Eso es
@@ -773,10 +717,10 @@ curl -i -X POST localhost:8080/estudiantes -H "Content-Type: application/json" \
 
 curl -i -X POST localhost:8080/estudiantes -H "Content-Type: application/json" \
   -d '{"nombre":"Otra Ana","edad":30,"correo":"ANA@correo.com"}'
-# 409 Conflict  {"estado":409,"mensaje":"Ya existe un estudiante con el correo ANA@correo.com"}
+# 500  (consola: IllegalStateException: Ya existe un estudiante con el correo ANA@correo.com)
 
 curl -i localhost:8080/estudiantes/99
-# 404 Not Found {"estado":404,"mensaje":"No existe el estudiante 99"}
+# 500  (consola: NoSuchElementException: No existe el estudiante 99)
 ```
 
 > ⚠️ **Error frecuente:** reiniciar la aplicación **borra los datos** (viven en memoria). No es
@@ -1031,7 +975,7 @@ curl -i -X POST localhost:8080/cursos -H "Content-Type: application/json" \
 curl -i -X POST localhost:8080/cursos -H "Content-Type: application/json" \
   -d '{"nombre":"Spring Boot","precio":450000,"cupoMaximo":10}'         # 201
 curl -i -X POST localhost:8080/cursos -H "Content-Type: application/json" \
-  -d '{"nombre":"Roto","precio":0,"cupoMaximo":5}'                      # 400
+  -d '{"nombre":"Roto","precio":0,"cupoMaximo":5}'                      # 500 (IllegalArgumentException)
 curl localhost:8080/cursos/economicos                                    # solo "Java desde cero"
 ```
 
@@ -1059,10 +1003,10 @@ cliente primero**:
 ```text
 POST /matriculas
    │
-   ├─ 1. ¿Existe el estudiante?     no ─▶ 404
-   ├─ 2. ¿Existe el curso?          no ─▶ 404
-   ├─ 3. ¿Ya está matriculado?      sí ─▶ 409
-   ├─ 4. ¿Quedan cupos?             no ─▶ 409
+   ├─ 1. ¿Existe el estudiante?     no ─▶ NoSuchElementException
+   ├─ 2. ¿Existe el curso?          no ─▶ NoSuchElementException
+   ├─ 3. ¿Ya está matriculado?      sí ─▶ IllegalStateException
+   ├─ 4. ¿Quedan cupos?             no ─▶ IllegalStateException
    └─ 5. Registrar la matrícula     ───▶ 201
 ```
 
@@ -1174,7 +1118,7 @@ public class RepositorioMatriculasEnMemoria implements RepositorioMatriculas {
 
 
 El servicio recibe los **identificadores**, **reutiliza** `ServicioEstudiantes` y
-`ServicioCursos` (que ya lanzan el 404) para obtener los objetos y con ellos arma la
+`ServicioCursos` (que ya lanzan `NoSuchElementException`) para obtener los objetos y con ellos arma la
 `Matricula`.
 
 **Archivo:** `src/main/java/com/academia/negocio/service/ServicioMatriculas.java`
@@ -1294,10 +1238,10 @@ Con el curso de 3 cupos (`id` 1) y dos estudiantes registrados:
 | Petición | Resultado esperado |
 |---|---|
 | `{"estudianteId":1,"cursoId":1}` | `201` |
-| `{"estudianteId":1,"cursoId":1}` (repetida) | `409` ya matriculado |
-| `{"estudianteId":99,"cursoId":1}` | `404` no existe el estudiante |
-| `{"estudianteId":1,"cursoId":99}` | `404` no existe el curso |
-| Matricular a un 3.º y un 4.º estudiante en el curso 1 | el 3.º `201`; el 4.º `409` sin cupos |
+| `{"estudianteId":1,"cursoId":1}` (repetida) | `500` · `IllegalStateException` ya matriculado |
+| `{"estudianteId":99,"cursoId":1}` | `500` · `NoSuchElementException` no existe el estudiante |
+| `{"estudianteId":1,"cursoId":99}` | `500` · `NoSuchElementException` no existe el curso |
+| Matricular a un 3.º y un 4.º estudiante en el curso 1 | el 3.º `201`; el 4.º `500` · `IllegalStateException` sin cupos |
 
 </details>
 
@@ -1466,13 +1410,13 @@ para partir con las listas vacías):
 |:-:|---|---|:-:|
 | 1 | Registrar estudiante 1 | `POST /estudiantes` Ana | `201` |
 | 2 | Registrar estudiante 2 | `POST /estudiantes` Luis | `201` |
-| 3 | Correo duplicado | `POST /estudiantes` con el correo de Ana | `409` |
-| 4 | Estudiante inexistente | `GET /estudiantes/99` | `404` |
+| 3 | Correo duplicado | `POST /estudiantes` con el correo de Ana | `500` · `IllegalStateException` |
+| 4 | Estudiante inexistente | `GET /estudiantes/99` | `500` · `NoSuchElementException` |
 | 5 | Crear curso de 3 cupos | `POST /cursos` | `201` |
-| 6 | Curso inválido | `POST /cursos` con `precio: 0` | `400` |
+| 6 | Curso inválido | `POST /cursos` con `precio: 0` | `500` · `IllegalArgumentException` |
 | 7 | Matricular a Ana | `POST /matriculas` | `201` |
 | 8 | Matricular a Luis | `POST /matriculas` | `201` |
-| 9 | Matrícula repetida | `POST /matriculas` Ana otra vez | `409` |
+| 9 | Matrícula repetida | `POST /matriculas` Ana otra vez | `500` · `IllegalStateException` |
 | 10 | Ocupación | `GET /cursos/1/ocupacion` | `1` cupo disponible, `66.67 %` |
 
 Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como evidencia.
@@ -1488,8 +1432,8 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 2. ¿Por qué los datos no se pierden entre dos peticiones, pero sí al reiniciar? *(Bean
    singleton: la lista vive mientras viva el contexto.)*
 3. ¿Qué clases cambiarían si pasáramos a una base de datos? *(Solo las de `persistence`.)*
-4. ¿Qué diferencia hay entre un `404`, un `400` y un `409`? *(No existe / dato inválido /
-   choca con el estado actual.)*
+4. ¿Qué diferencia hay entre `NoSuchElementException`, `IllegalArgumentException` e
+   `IllegalStateException`? *(No existe / dato inválido / choca con el estado actual.)*
 
 </details>
 
@@ -1535,8 +1479,7 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 └── 📁 src/main/java/com/academia
     ├── 📄 AcademiaApplication.java
     ├── 📁 presentacion
-    │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
-    │   └── 📁 excepcion     ManejadorErrores
+    │   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
     ├── 📁 negocio
     │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
     │   ├── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
