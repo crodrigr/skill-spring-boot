@@ -1506,6 +1506,8 @@ Estas son todas las que se usaron, en el orden en que aparecen.
 
 > 💡 `@Repository`, `@Service` y `@RestController` son especializaciones de `@Component`: las
 > tres hacen que Spring cree el objeto; el nombre solo documenta **la capa** a la que pertenece.
+> `@Component` es **singleton** por defecto (una instancia por contenedor), y las tres lo
+> heredan: por eso todos esos beans son singleton sin escribir nada más.
 > Con ellas funciona la **inyección por constructor**: el constructor declara lo que necesita y
 > Spring lo entrega, sin `@Autowired`.
 
