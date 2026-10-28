@@ -125,8 +125,7 @@ es la pieza intermedia.
 
 > 💡 **Ritmo.** La Fase 1 se hace entera en vivo: allí se fija el patrón (modelo → repositorio →
 > servicio → controlador). Las fases 2 y 3 repiten el patrón y son las que los estudiantes
-> escriben solos. Las clases de excepciones y el manejador de errores se entregan ya escritos
-> (se copian en el minuto 0) para no gastar tiempo.
+> escriben solos.
 
 </details>
 
@@ -159,12 +158,10 @@ responsabilidad**, y cada requerimiento de la sección anterior cae en una de el
 📁 src/main/java/com/academia
 ├── 📄 AcademiaApplication.java
 ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
-│   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
-│   └── 📁 excepcion     ManejadorExcepciones · RespuestaError
+│   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
 ├── 📁 negocio                           ← 2 · las reglas
 │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
 │   ├── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
-│   └── 📁 excepcion     RecursoNoEncontradoException · SolicitudInvalidaException · ConflictoException
 └── 📁 persistence                       ← 3 · dónde viven los datos (listas en memoria)
     └── 📁 repository    Repositorio… (interfaces) · Repositorio…EnMemoria (@Repository)
 ```
@@ -185,10 +182,8 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 |---|---|---|:-:|---|
 | `AcademiaApplication` | Arranca la aplicación y define desde dónde Spring **escanea** beans. | `AcademiaApplication` | Paso 0 | `@SpringBootApplication` |
 | `presentacion.controlador` | Recibe la petición HTTP, entrega los datos al servicio y devuelve la respuesta. **Sin reglas.** | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas` | Fases 1–4 | `@RestController` |
-| `presentacion.excepcion` | Traduce los errores de negocio a códigos HTTP y a un cuerpo JSON uniforme. | `ManejadorExcepciones`, `RespuestaError` | Paso 0 | `@RestControllerAdvice` |
 | `negocio.model` | Las entidades del dominio y el resultado del reporte. Clases Java sencillas. | `Estudiante`, `Curso`, `Matricula`, `Ocupacion` | Fases 1–4 | — |
-| `negocio.service` | **Las reglas de negocio**: duplicados, validaciones, cupos, cálculo. No conoce HTTP. | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` | Fases 1–4 | `@Service` |
-| `negocio.excepcion` | Los errores que el negocio sabe lanzar, sin código HTTP. | `RecursoNoEncontradoException`, `SolicitudInvalidaException`, `ConflictoException` | Paso 0 | — |
+| `negocio.service` | **Las reglas de negocio**: duplicados, validaciones, cupos, cálculo. Señala los errores con `ResponseStatusException`. | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` | Fases 1–4 | `@Service` |
 | `persistence.repository` | Guarda y busca datos. La **interfaz** es el contrato; la clase `…EnMemoria` lo cumple con una `List`. | `RepositorioEstudiantes`, `RepositorioCursos`, `RepositorioMatriculas` y sus `…EnMemoria` | Fases 1–3 | `@Repository` (solo en las implementaciones) |
 
 </details>
@@ -200,12 +195,12 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 | Requerimiento | Presentación | Negocio | Persistencia |
 |---|---|---|---|
 | **RF-01** Registrar estudiante · **RN-02** | `ControladorEstudiantes.registrar` | `ServicioEstudiantes.registrar` (rechaza el correo repetido) | `existePorCorreo`, `guardar` (asigna el id, **RN-01**) |
-| **RF-02 / RF-03** Listar y consultar · **RN-03** | `listar`, `obtener` | `ServicioEstudiantes.obtener` (lanza `RecursoNoEncontradoException`) | `listar`, `buscarPorId` |
+| **RF-02 / RF-03** Listar y consultar · **RN-03** | `listar`, `obtener` | `ServicioEstudiantes.obtener` (responde `404` con `ResponseStatusException`) | `listar`, `buscarPorId` |
 | **RF-04** Registrar curso · **RN-04, RN-05** | `ControladorCursos.registrar` | `ServicioCursos.registrar` (valida precio y cupo) | `RepositorioCursos.guardar` |
 | **RF-05 / RF-06** Listar y económicos · **RN-06** | `listar`, `listarEconomicos` | `ServicioCursos.listarEconomicos` (filtro con ciclo) | `RepositorioCursos.listar` |
 | **RF-07** Matricular · **RN-03, RN-07 a RN-10** | `ControladorMatriculas.matricular` | `ServicioMatriculas.matricular` (las cinco reglas, en orden) | `existe`, `contarPorCurso`, `guardar` |
 | **RF-08** Ocupación · **RN-11** | `ControladorCursos.ocupacion` | `ServicioCursos.calcularOcupacion` | `RepositorioMatriculas.contarPorCurso` |
-| **RNF-05** Códigos HTTP | `ManejadorExcepciones` | Excepciones de `negocio.excepcion` | — |
+| **RNF-05** Códigos HTTP | — | `ResponseStatusException` en los servicios | — |
 
 > 🔎 **Lectura clave.** Todas las reglas (RN) terminan en `negocio.service`; los controladores
 > y los repositorios casi no tienen `if`. Esa es la ventaja de las capas: si una regla cambia,
@@ -286,110 +281,7 @@ public class AcademiaApplication {
 </details>
 
 <details>
-<summary><strong>Paso 0.3 · Copiar el kit de errores</strong></summary>
-
-
-Cuatro clases pequeñas que se entregan hechas. Se explica **qué hacen**, no se escriben.
-
-**Archivo:** `src/main/java/com/academia/negocio/excepcion/RecursoNoEncontradoException.java`
-
-```java
-package com.academia.negocio.excepcion;
-
-public class RecursoNoEncontradoException extends RuntimeException {
-
-    public RecursoNoEncontradoException(String mensaje) {
-        super(mensaje);
-    }
-}
-```
-
-**Archivo:** `src/main/java/com/academia/negocio/excepcion/SolicitudInvalidaException.java`
-
-```java
-package com.academia.negocio.excepcion;
-
-public class SolicitudInvalidaException extends RuntimeException {
-
-    public SolicitudInvalidaException(String mensaje) {
-        super(mensaje);
-    }
-}
-```
-
-**Archivo:** `src/main/java/com/academia/negocio/excepcion/ConflictoException.java`
-
-```java
-package com.academia.negocio.excepcion;
-
-public class ConflictoException extends RuntimeException {
-
-    public ConflictoException(String mensaje) {
-        super(mensaje);
-    }
-}
-```
-
-**Archivo:** `src/main/java/com/academia/presentacion/excepcion/RespuestaError.java`
-
-```java
-package com.academia.presentacion.excepcion;
-
-public record RespuestaError(int estado, String mensaje) {
-}
-```
-
-**Archivo:** `src/main/java/com/academia/presentacion/excepcion/ManejadorExcepciones.java`
-
-```java
-package com.academia.presentacion.excepcion;
-
-import com.academia.negocio.excepcion.ConflictoException;
-import com.academia.negocio.excepcion.RecursoNoEncontradoException;
-import com.academia.negocio.excepcion.SolicitudInvalidaException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-@RestControllerAdvice
-public class ManejadorExcepciones {
-
-    @ExceptionHandler(RecursoNoEncontradoException.class)
-    public ResponseEntity<RespuestaError> noEncontrado(RecursoNoEncontradoException e) {
-        return responder(HttpStatus.NOT_FOUND, e.getMessage());
-    }
-
-    @ExceptionHandler(SolicitudInvalidaException.class)
-    public ResponseEntity<RespuestaError> solicitudInvalida(SolicitudInvalidaException e) {
-        return responder(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
-
-    @ExceptionHandler(ConflictoException.class)
-    public ResponseEntity<RespuestaError> conflicto(ConflictoException e) {
-        return responder(HttpStatus.CONFLICT, e.getMessage());
-    }
-
-    private ResponseEntity<RespuestaError> responder(HttpStatus estado, String mensaje) {
-        return ResponseEntity.status(estado).body(new RespuestaError(estado.value(), mensaje));
-    }
-}
-```
-
-> 🗣️ **Idea clave para decir en voz alta:** el servicio lanza una excepción de *negocio* («no
-> existe», «duplicado»); **no sabe qué es un 404**. La capa de presentación traduce a HTTP.
-> El manejo completo de excepciones se estudia en el Módulo 7: hoy es un adelanto.
-
-| Excepción | Código HTTP | Cuándo |
-|---|:-:|---|
-| `RecursoNoEncontradoException` | `404` | El estudiante o curso no existe |
-| `SolicitudInvalidaException` | `400` | Precio ≤ 0, cupo ≤ 0 |
-| `ConflictoException` | `409` | Correo duplicado, matrícula repetida, sin cupos |
-
-</details>
-
-<details>
-<summary><strong>Paso 0.4 · Compilar y ejecutar con Maven desde la consola</strong></summary>
+<summary><strong>Paso 0.3 · Compilar y ejecutar con Maven desde la consola</strong></summary>
 
 El proyecto de Initializr incluye el **Maven Wrapper** (`mvnw` y `mvnw.cmd`): permite
 compilar sin tener Maven instalado, solo con Java. Todos los comandos se ejecutan **en la
@@ -705,12 +597,12 @@ Puntos a resaltar:
 ```java
 package com.academia.negocio.service;
 
-import com.academia.negocio.excepcion.ConflictoException;
-import com.academia.negocio.excepcion.RecursoNoEncontradoException;
 import com.academia.negocio.model.Estudiante;
 import com.academia.persistence.repository.RepositorioEstudiantes;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ServicioEstudiantes {
@@ -723,7 +615,7 @@ public class ServicioEstudiantes {
 
     public Estudiante registrar(Estudiante estudiante) {
         if (repositorio.existePorCorreo(estudiante.getCorreo())) {
-            throw new ConflictoException("Ya existe un estudiante con el correo " + estudiante.getCorreo());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un estudiante con el correo " + estudiante.getCorreo());
         }
         return repositorio.guardar(estudiante);
     }
@@ -734,10 +626,16 @@ public class ServicioEstudiantes {
 
     public Estudiante obtener(Long id) {
         return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("No existe el estudiante " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el estudiante " + id));
     }
 }
 ```
+
+> 🔎 **Errores con `ResponseStatusException`.** Spring ya trae una excepción que lleva el
+> código HTTP: `new ResponseStatusException(HttpStatus.CONFLICT, "mensaje")` responde `409`
+> sin escribir clases propias ni manejador. Se usa `NOT_FOUND` (`404`), `BAD_REQUEST` (`400`) y
+> `CONFLICT` (`409`). Para que el cuerpo JSON incluya el campo `message`, se agrega en
+> `src/main/resources/application.properties`: `server.error.include-message=always`.
 
 > 🔎 **Concepto (M2) — el momento central de la sesión.** El servicio **declara** lo que
 > necesita (un constructor con `RepositorioEstudiantes`) y Spring **se lo entrega**. Eso es
@@ -821,10 +719,10 @@ curl -i -X POST localhost:8080/estudiantes -H "Content-Type: application/json" \
 
 curl -i -X POST localhost:8080/estudiantes -H "Content-Type: application/json" \
   -d '{"nombre":"Otra Ana","edad":30,"correo":"ANA@correo.com"}'
-# 409 Conflict  {"estado":409,"mensaje":"Ya existe un estudiante con el correo ANA@correo.com"}
+# 409 Conflict  {"status":409,"error":"Conflict","message":"Ya existe un estudiante con el correo ANA@correo.com",…}
 
 curl -i localhost:8080/estudiantes/99
-# 404 Not Found {"estado":404,"mensaje":"No existe el estudiante 99"}
+# 404 Not Found {"status":404,"error":"Not Found","message":"No existe el estudiante 99",…}
 ```
 
 > ⚠️ **Error frecuente:** reiniciar la aplicación **borra los datos** (viven en memoria). No es
@@ -962,13 +860,13 @@ servicio solo necesita `RepositorioCursos`; el reporte de la Fase 4 agregará lo
 ```java
 package com.academia.negocio.service;
 
-import com.academia.negocio.excepcion.RecursoNoEncontradoException;
-import com.academia.negocio.excepcion.SolicitudInvalidaException;
 import com.academia.negocio.model.Curso;
 import com.academia.persistence.repository.RepositorioCursos;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ServicioCursos {
@@ -983,10 +881,10 @@ public class ServicioCursos {
 
     public Curso registrar(Curso curso) {
         if (curso.getPrecio() <= 0) {
-            throw new SolicitudInvalidaException("El precio debe ser mayor que cero");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio debe ser mayor que cero");
         }
         if (curso.getCupoMaximo() <= 0) {
-            throw new SolicitudInvalidaException("El cupo máximo debe ser mayor que cero");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cupo máximo debe ser mayor que cero");
         }
         return repositorio.guardar(curso);
     }
@@ -1007,7 +905,7 @@ public class ServicioCursos {
 
     public Curso obtener(Long id) {
         return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("No existe el curso " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el curso " + id));
     }
 }
 ```
@@ -1229,11 +1127,12 @@ lugar de repetir la búsqueda.
 ```java
 package com.academia.negocio.service;
 
-import com.academia.negocio.excepcion.ConflictoException;
 import com.academia.negocio.model.Curso;
 import com.academia.negocio.model.Matricula;
 import com.academia.persistence.repository.RepositorioMatriculas;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ServicioMatriculas {
@@ -1257,11 +1156,11 @@ public class ServicioMatriculas {
         Curso curso = servicioCursos.obtener(cursoId);
 
         if (repositorio.existe(estudianteId, cursoId)) {
-            throw new ConflictoException(
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "El estudiante " + estudianteId + " ya está matriculado en el curso " + cursoId);
         }
         if (repositorio.contarPorCurso(cursoId) >= curso.getCupoMaximo()) {
-            throw new ConflictoException("El curso " + cursoId + " no tiene cupos disponibles");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El curso " + cursoId + " no tiene cupos disponibles");
         }
         return repositorio.guardar(matricula);
     }
@@ -1378,15 +1277,15 @@ modifican el constructor y se agrega el método.
 ```java
 package com.academia.negocio.service;
 
-import com.academia.negocio.excepcion.RecursoNoEncontradoException;
-import com.academia.negocio.excepcion.SolicitudInvalidaException;
 import com.academia.negocio.model.Curso;
 import com.academia.negocio.model.Ocupacion;
 import com.academia.persistence.repository.RepositorioCursos;
 import com.academia.persistence.repository.RepositorioMatriculas;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ServicioCursos {
@@ -1403,10 +1302,10 @@ public class ServicioCursos {
 
     public Curso registrar(Curso curso) {
         if (curso.getPrecio() <= 0) {
-            throw new SolicitudInvalidaException("El precio debe ser mayor que cero");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio debe ser mayor que cero");
         }
         if (curso.getCupoMaximo() <= 0) {
-            throw new SolicitudInvalidaException("El cupo máximo debe ser mayor que cero");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El cupo máximo debe ser mayor que cero");
         }
         return repositorio.guardar(curso);
     }
@@ -1427,7 +1326,7 @@ public class ServicioCursos {
 
     public Curso obtener(Long id) {
         return repositorio.buscarPorId(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("No existe el curso " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No existe el curso " + id));
     }
 
     public Ocupacion calcularOcupacion(Long id) {
@@ -1573,12 +1472,10 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 └── 📁 src/main/java/com/academia
     ├── 📄 AcademiaApplication.java
     ├── 📁 presentacion
-    │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
-        │   └── 📁 excepcion     ManejadorExcepciones · RespuestaError
+    │   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
     ├── 📁 negocio
     │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
     │   ├── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
-    │   └── 📁 excepcion     RecursoNoEncontradoException · SolicitudInvalidaException · ConflictoException
     └── 📁 persistence
         └── 📁 repository    3 interfaces · 3 implementaciones «EnMemoria»
 ```
