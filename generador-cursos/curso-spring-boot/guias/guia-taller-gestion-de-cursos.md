@@ -1493,75 +1493,75 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 <details>
 <summary><strong>🏷️ Repaso de las anotaciones del taller</strong></summary>
 
-Una **anotación** es una etiqueta que se escribe sobre una clase, un método o un parámetro. No
-ejecuta nada por sí sola: le indica a **Spring** (o al compilador) qué hacer con ese elemento.
-Estas son todas las que se usaron, en el orden en que aparecen.
-
-<details>
-<summary><strong>1. Anotaciones de arranque y de componentes (crean los *beans*)</strong></summary>
-
-| Anotación | Dónde se usa | Por qué | Para qué sirve |
-|---|---|---|---|
-| `@SpringBootApplication` | `AcademiaApplication` (Paso 0.2) | Es la puerta de entrada: sin ella no hay aplicación Spring. | Agrupa tres cosas: configuración, autoconfiguración y **escaneo de componentes** del paquete `com.academia` y los de abajo. Por eso todas las clases deben vivir dentro de ese árbol. |
-| `@Repository` | `Repositorio…EnMemoria` (capa de persistencia) | Marca la clase que guarda y busca datos. | Spring la detecta, crea **un único objeto** (*singleton*) y lo deja disponible para inyectar. Se pone solo en la **implementación**, no en la interfaz. |
-| `@Service` | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` (capa de negocio) | Identifica dónde viven las reglas de negocio. | Spring la detecta, crea **un único objeto** (*singleton*) al arrancar y se lo entrega a quien lo necesite (por ejemplo, a un controlador). Como se comparte, no debe guardar estado de una petición en atributos. |
-| `@RestController` | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas` (capa de presentación) | Estas clases atienden peticiones HTTP. | Registra el bean **y** hace que lo que devuelven los métodos se escriba como **JSON** en la respuesta (equivale a `@Controller` + `@ResponseBody`). Es también un **único objeto** (*singleton*): todas las peticiones pasan por la misma instancia. |
-
-> 💡 `@Repository`, `@Service` y `@RestController` son especializaciones de `@Component`: las
-> tres hacen que Spring cree el objeto; el nombre solo documenta **la capa** a la que pertenece.
-> `@Component` es **singleton** por defecto (una instancia por contenedor), y las tres lo
-> heredan: por eso todos esos beans son singleton sin escribir nada más.
-> Con ellas funciona la **inyección por constructor**: el constructor declara lo que necesita y
-> Spring lo entrega, sin `@Autowired`.
-
-</details>
-
-<details>
-<summary><strong>2. Anotaciones de rutas (conectan una URL con un método)</strong></summary>
-
-| Anotación | Dónde se usa | Por qué | Para qué sirve |
-|---|---|---|---|
-| `@RequestMapping("/estudiantes")` | Sobre la clase de cada controlador (`/estudiantes`, `/cursos`, `/matriculas`) | Todas las rutas de un controlador comparten el mismo inicio. | Define la **ruta base** de la clase, para no repetirla en cada método. |
-| `@GetMapping` | Listar (`/estudiantes`, `/cursos`), `/{id}`, `/economicos`, `/{id}/ocupacion` | Consultar no modifica datos: es el verbo `GET`. | Asocia un método con las peticiones `GET`; el texto entre paréntesis se suma a la ruta base. |
-| `@PostMapping` | Registrar estudiante, registrar curso, matricular | Crear un recurso es el verbo `POST`. | Asocia un método con las peticiones `POST`. |
-
-</details>
-
-<details>
-<summary><strong>3. Anotaciones de parámetros y de respuesta (leen la petición y fijan el código)</strong></summary>
-
-| Anotación | Dónde se usa | Por qué | Para qué sirve |
-|---|---|---|---|
-| `@PathVariable` | `obtener(@PathVariable Long id)`, `ocupacion(@PathVariable Long id)` | El identificador viene **dentro de la URL** (`/estudiantes/1`). | Toma el valor de `{id}` de la ruta y lo entrega como parámetro del método, ya convertido a `Long`. |
-| `@RequestBody` | `registrar(@RequestBody Estudiante …)`, `matricular(@RequestBody SolicitudMatricula …)` | Los datos viajan en el **cuerpo JSON** de la petición. | Convierte ese JSON en un objeto Java (los nombres de los campos deben coincidir). |
-| `@ResponseStatus(HttpStatus.CREATED)` | Métodos `POST` de los tres controladores | Un `POST` que crea algo debe responder `201`, no `200`. | Fija el **código HTTP** de la respuesta cuando el método termina bien. |
-
-</details>
-
-<details>
-<summary><strong>4. Anotación del lenguaje Java</strong></summary>
-
-| Anotación | Dónde se usa | Por qué | Para qué sirve |
-|---|---|---|---|
-| `@Override` | Métodos de las clases `…EnMemoria` que implementan una interfaz | Indica que el método **cumple un contrato** de la interfaz. | El compilador comprueba que realmente exista ese método en la interfaz: si se escribe mal el nombre o los parámetros, falla en compilación y no en tiempo de ejecución. |
-
-</details>
-
-<details>
-<summary><strong>5. Mapa rápido: qué anotación va en cada capa</strong></summary>
-
-```text
-presentacion  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping
-                   @PathVariable · @RequestBody · @ResponseStatus
-negocio       ──▶  @Service
-persistence   ──▶  @Repository (solo en las clases «EnMemoria») · @Override
-arranque      ──▶  @SpringBootApplication
-```
-
-> 🔎 **Lectura clave.** Las anotaciones de **HTTP** (rutas, parámetros, código de estado) solo
-> aparecen en la capa de presentación. El servicio y el repositorio no las usan: por eso se
-> pueden cambiar o probar sin tocar nada web.
-
-</details>
+> Una **anotación** es una etiqueta que se escribe sobre una clase, un método o un parámetro. No
+> ejecuta nada por sí sola: le indica a **Spring** (o al compilador) qué hacer con ese elemento.
+> Estas son todas las que se usaron, en el orden en que aparecen.
+>
+> <details>
+> <summary><strong>1. Anotaciones de arranque y de componentes (crean los *beans*)</strong></summary>
+>
+> | Anotación | Dónde se usa | Por qué | Para qué sirve |
+> |---|---|---|---|
+> | `@SpringBootApplication` | `AcademiaApplication` (Paso 0.2) | Es la puerta de entrada: sin ella no hay aplicación Spring. | Agrupa tres cosas: configuración, autoconfiguración y **escaneo de componentes** del paquete `com.academia` y los de abajo. Por eso todas las clases deben vivir dentro de ese árbol. |
+> | `@Repository` | `Repositorio…EnMemoria` (capa de persistencia) | Marca la clase que guarda y busca datos. | Spring la detecta, crea **un único objeto** (*singleton*) y lo deja disponible para inyectar. Se pone solo en la **implementación**, no en la interfaz. |
+> | `@Service` | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` (capa de negocio) | Identifica dónde viven las reglas de negocio. | Spring la detecta, crea **un único objeto** (*singleton*) al arrancar y se lo entrega a quien lo necesite (por ejemplo, a un controlador). Como se comparte, no debe guardar estado de una petición en atributos. |
+> | `@RestController` | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas` (capa de presentación) | Estas clases atienden peticiones HTTP. | Registra el bean **y** hace que lo que devuelven los métodos se escriba como **JSON** en la respuesta (equivale a `@Controller` + `@ResponseBody`). Es también un **único objeto** (*singleton*): todas las peticiones pasan por la misma instancia. |
+>
+> > 💡 `@Repository`, `@Service` y `@RestController` son especializaciones de `@Component`: las
+> > tres hacen que Spring cree el objeto; el nombre solo documenta **la capa** a la que pertenece.
+> > `@Component` es **singleton** por defecto (una instancia por contenedor), y las tres lo
+> > heredan: por eso todos esos beans son singleton sin escribir nada más.
+> > Con ellas funciona la **inyección por constructor**: el constructor declara lo que necesita y
+> > Spring lo entrega, sin `@Autowired`.
+>
+> </details>
+>
+> <details>
+> <summary><strong>2. Anotaciones de rutas (conectan una URL con un método)</strong></summary>
+>
+> | Anotación | Dónde se usa | Por qué | Para qué sirve |
+> |---|---|---|---|
+> | `@RequestMapping("/estudiantes")` | Sobre la clase de cada controlador (`/estudiantes`, `/cursos`, `/matriculas`) | Todas las rutas de un controlador comparten el mismo inicio. | Define la **ruta base** de la clase, para no repetirla en cada método. |
+> | `@GetMapping` | Listar (`/estudiantes`, `/cursos`), `/{id}`, `/economicos`, `/{id}/ocupacion` | Consultar no modifica datos: es el verbo `GET`. | Asocia un método con las peticiones `GET`; el texto entre paréntesis se suma a la ruta base. |
+> | `@PostMapping` | Registrar estudiante, registrar curso, matricular | Crear un recurso es el verbo `POST`. | Asocia un método con las peticiones `POST`. |
+>
+> </details>
+>
+> <details>
+> <summary><strong>3. Anotaciones de parámetros y de respuesta (leen la petición y fijan el código)</strong></summary>
+>
+> | Anotación | Dónde se usa | Por qué | Para qué sirve |
+> |---|---|---|---|
+> | `@PathVariable` | `obtener(@PathVariable Long id)`, `ocupacion(@PathVariable Long id)` | El identificador viene **dentro de la URL** (`/estudiantes/1`). | Toma el valor de `{id}` de la ruta y lo entrega como parámetro del método, ya convertido a `Long`. |
+> | `@RequestBody` | `registrar(@RequestBody Estudiante …)`, `matricular(@RequestBody SolicitudMatricula …)` | Los datos viajan en el **cuerpo JSON** de la petición. | Convierte ese JSON en un objeto Java (los nombres de los campos deben coincidir). |
+> | `@ResponseStatus(HttpStatus.CREATED)` | Métodos `POST` de los tres controladores | Un `POST` que crea algo debe responder `201`, no `200`. | Fija el **código HTTP** de la respuesta cuando el método termina bien. |
+>
+> </details>
+>
+> <details>
+> <summary><strong>4. Anotación del lenguaje Java</strong></summary>
+>
+> | Anotación | Dónde se usa | Por qué | Para qué sirve |
+> |---|---|---|---|
+> | `@Override` | Métodos de las clases `…EnMemoria` que implementan una interfaz | Indica que el método **cumple un contrato** de la interfaz. | El compilador comprueba que realmente exista ese método en la interfaz: si se escribe mal el nombre o los parámetros, falla en compilación y no en tiempo de ejecución. |
+>
+> </details>
+>
+> <details>
+> <summary><strong>5. Mapa rápido: qué anotación va en cada capa</strong></summary>
+>
+> ```text
+> presentacion  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping
+>                    @PathVariable · @RequestBody · @ResponseStatus
+> negocio       ──▶  @Service
+> persistence   ──▶  @Repository (solo en las clases «EnMemoria») · @Override
+> arranque      ──▶  @SpringBootApplication
+> ```
+>
+> > 🔎 **Lectura clave.** Las anotaciones de **HTTP** (rutas, parámetros, código de estado) solo
+> > aparecen en la capa de presentación. El servicio y el repositorio no las usan: por eso se
+> > pueden cambiar o probar sin tocar nada web.
+>
+> </details>
 
 </details>
