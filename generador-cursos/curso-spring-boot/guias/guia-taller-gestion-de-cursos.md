@@ -1509,6 +1509,41 @@ Estas son todas las que se usaron, en el orden en que aparecen.
 > Con ellas funciona la **inyección por constructor**: el constructor declara lo que necesita y
 > Spring lo entrega, sin `@Autowired`.
 
+#### ¿`@Service` y `@RestController` son *singleton*?
+
+**Sí.** Spring crea **una sola instancia** de cada clase anotada con `@Service`,
+`@RestController` (y `@Repository`), la guarda en el contenedor y entrega **ese mismo objeto**
+a todo el que lo pida. Ese es el *scope* por defecto de un bean: `singleton`. No depende de la
+anotación, sino de que Spring es quien crea el objeto.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Cuántos `ServicioEstudiantes` hay? | **Uno** por aplicación. Lo comparten el controlador y `ServicioMatriculas`. |
+| ¿Cuántos `ControladorCursos` hay? | **Uno**. Todas las peticiones HTTP, de todos los clientes, pasan por el mismo objeto. |
+| ¿Cuándo se crean? | Al **arrancar** la aplicación, no en cada petición. |
+| ¿Cuándo se destruyen? | Al **detener** la aplicación. |
+
+**Por qué importa en este taller**
+- **Los datos no se pierden entre peticiones.** La `List` de `RepositorioEstudiantesEnMemoria`
+  vive mientras viva ese único objeto. Por eso `POST /estudiantes` y luego `GET /estudiantes`
+  ven los mismos datos, y por eso **reiniciar** la aplicación los borra.
+- **`siguienteId` es compartido.** El contador de ids pertenece al único repositorio: cada
+  petición sigue donde quedó la anterior (RN-01).
+- **No se debe guardar estado de una petición en un atributo.** Como el servicio y el
+  controlador se comparten, un atributo como `private Estudiante actual;` lo verían (y
+  pisarían) todas las peticiones a la vez. Solo deben tener atributos **de colaboración**
+  (otros beans inyectados, `final`) y trabajar con **variables locales y parámetros**.
+- **Hilos.** Varias peticiones pueden llegar al mismo tiempo sobre el mismo objeto; por eso el
+  reto final de `synchronized` tiene sentido en el repositorio, que sí guarda estado.
+
+> ⚠️ **No confundir:** *singleton de Spring* significa «una instancia por contenedor», no el
+> patrón clásico con constructor privado. Y los objetos del modelo (`Estudiante`, `Curso`…) **no
+> son beans**: se crean con `new` (o los crea Jackson al leer el JSON), así que hay uno por
+> cada estudiante, curso o matrícula.
+
+Existen otros *scopes* (por ejemplo `@Scope("prototype")`, una instancia nueva cada vez, o
+`request`, una por petición), pero no se usan en este taller.
+
 ### 2. Anotaciones de rutas (conectan una URL con un método)
 
 | Anotación | Dónde se usa | Por qué | Para qué sirve |
