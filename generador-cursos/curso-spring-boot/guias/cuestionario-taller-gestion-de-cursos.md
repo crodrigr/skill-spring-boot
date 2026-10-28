@@ -36,12 +36,12 @@ describe correctamente la diferencia entre un **JavaBean** y un **bean de Spring
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** «JavaBean» habla de **cómo está escrita** la clase; «bean de
-Spring» habla de **quién la crea y la gestiona**. En el taller, `Estudiante` se parece a un
-JavaBean pero **no es un bean de Spring** (se crea con `new` o lo crea Jackson al leer el
-JSON); `ServicioEstudiantes` sí es un bean de Spring y no sigue la convención JavaBean (no
-tiene getters/setters de datos).
-
+> **Respuesta correcta: B.** «JavaBean» habla de **cómo está escrita** la clase; «bean de
+> Spring» habla de **quién la crea y la gestiona**. En el taller, `Estudiante` se parece a un
+> JavaBean pero **no es un bean de Spring** (se crea con `new` o lo crea Jackson al leer el
+> JSON); `ServicioEstudiantes` sí es un bean de Spring y no sigue la convención JavaBean (no
+> tiene getters/setters de datos).
+>
 </details>
 
 **2. [Selección múltiple]** Seleccioná **todas** las clases del taller que son **beans de
@@ -57,11 +57,11 @@ Spring**.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuestas correctas: A, C, D.** Son beans porque tienen `@Service`, `@Repository` y
-`@RestController`. `Curso` es un objeto del modelo (se crea con `new`), `SolicitudMatricula`
-es un `record` que crea Jackson al leer el JSON, y `RepositorioCursos` es una **interfaz**:
-Spring no instancia interfaces, instancia la implementación que la cumple.
-
+> **Respuestas correctas: A, C, D.** Son beans porque tienen `@Service`, `@Repository` y
+> `@RestController`. `Curso` es un objeto del modelo (se crea con `new`), `SolicitudMatricula`
+> es un `record` que crea Jackson al leer el JSON, y `RepositorioCursos` es una **interfaz**:
+> Spring no instancia interfaces, instancia la implementación que la cumple.
+>
 </details>
 
 **3. [Selección]** Un estudiante escribe `@Service` en `ServicioEstudiantes` pero deja el
@@ -77,11 +77,11 @@ paquete como `com.otro.negocio`, fuera de `com.academia`. Al arrancar aparece
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** `@SpringBootApplication` activa el **escaneo de componentes** a
-partir de `com.academia`. Una clase anotada fuera de ese árbol no se detecta, y el
-controlador que la pide no encuentra qué inyectar. La solución es moverla dentro del árbol
-(o ampliar el escaneo, algo que el taller evita).
-
+> **Respuesta correcta: B.** `@SpringBootApplication` activa el **escaneo de componentes** a
+> partir de `com.academia`. Una clase anotada fuera de ese árbol no se detecta, y el
+> controlador que la pide no encuentra qué inyectar. La solución es moverla dentro del árbol
+> (o ampliar el escaneo, algo que el taller evita).
+>
 </details>
 
 **4. [Abierta]** Explicá con tus palabras qué es el **contenedor IoC** y qué significa
@@ -91,16 +91,16 @@ controlador que la pide no encuentra qué inyectar. La solución es moverla dent
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- El **contenedor IoC** (el `ApplicationContext` de Spring) crea los objetos anotados,
-  resuelve qué necesita cada uno y se los entrega.
-- **Inversión de control:** el programador no llama a `new` para los componentes; es el
-  **contenedor** quien decide cuándo crearlos y con qué dependencias.
-- En el taller, quien llama al constructor de `ServicioEstudiantes` es Spring, al arrancar,
-  después de crear el repositorio que le hace falta.
-- Importa porque la clase no está atada a una implementación concreta: se puede cambiar el
-  repositorio o probar el servicio con otro sin modificarlo.
-
+> **Ideas clave:**
+> - El **contenedor IoC** (el `ApplicationContext` de Spring) crea los objetos anotados,
+>   resuelve qué necesita cada uno y se los entrega.
+> - **Inversión de control:** el programador no llama a `new` para los componentes; es el
+>   **contenedor** quien decide cuándo crearlos y con qué dependencias.
+> - En el taller, quien llama al constructor de `ServicioEstudiantes` es Spring, al arrancar,
+>   después de crear el repositorio que le hace falta.
+> - Importa porque la clase no está atada a una implementación concreta: se puede cambiar el
+>   repositorio o probar el servicio con otro sin modificarlo.
+>
 </details>
 
 **5. [Selección]** `ServicioEstudiantes` y `ControladorEstudiantes` son singleton. ¿Qué
@@ -115,11 +115,11 @@ código dentro del servicio sería un **error de diseño** por esa razón?
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** Hay **una sola instancia** compartida por todas las peticiones.
-Un atributo mutable por petición sería visto y pisado por peticiones simultáneas de otros
-clientes. Los atributos de un singleton deben ser **colaboradores** (`final`, inyectados); el
-estado de cada petición va en **variables locales y parámetros**.
-
+> **Respuesta correcta: B.** Hay **una sola instancia** compartida por todas las peticiones.
+> Un atributo mutable por petición sería visto y pisado por peticiones simultáneas de otros
+> clientes. Los atributos de un singleton deben ser **colaboradores** (`final`, inyectados); el
+> estado de cada petición va en **variables locales y parámetros**.
+>
 </details>
 
 **6. [Abierta]** Los datos del taller desaparecen al reiniciar la aplicación, pero **no**
@@ -129,15 +129,15 @@ singleton, ciclo de vida del contexto y almacenamiento en memoria.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- Entre peticiones: `RepositorioEstudiantesEnMemoria` es un bean **singleton**; su
-  `List<Estudiante>` y su contador `siguienteId` viven mientras viva ese único objeto, así
-  que todas las peticiones ven la misma lista.
-- Al reiniciar: se destruye el contexto de Spring, se destruyen los beans y con ellos la
-  lista; al arrancar se crea un repositorio nuevo y vacío, y el contador vuelve a 1.
-- La causa de fondo es que los datos viven en la **memoria de la JVM**, no en un
-  almacenamiento persistente. Esa limitación motiva el módulo de base de datos.
-
+> **Ideas clave:**
+> - Entre peticiones: `RepositorioEstudiantesEnMemoria` es un bean **singleton**; su
+>   `List<Estudiante>` y su contador `siguienteId` viven mientras viva ese único objeto, así
+>   que todas las peticiones ven la misma lista.
+> - Al reiniciar: se destruye el contexto de Spring, se destruyen los beans y con ellos la
+>   lista; al arrancar se crea un repositorio nuevo y vacío, y el contador vuelve a 1.
+> - La causa de fondo es que los datos viven en la **memoria de la JVM**, no en un
+>   almacenamiento persistente. Esa limitación motiva el módulo de base de datos.
+>
 </details>
 
 ---
@@ -157,10 +157,10 @@ arquitectura del taller?
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** El controlador **solo traduce**: lee el JSON, llama al servicio y
-devuelve el resultado. Las reglas (RN-04, RN-05) van en `ServicioCursos`, de modo que se
-cumplan sin importar quién lo invoque.
-
+> **Respuesta correcta: B.** El controlador **solo traduce**: lee el JSON, llama al servicio y
+> devuelve el resultado. Las reglas (RN-04, RN-05) van en `ServicioCursos`, de modo que se
+> cumplan sin importar quién lo invoque.
+>
 </details>
 
 **8. [Selección múltiple]** ¿Qué elementos pertenecen **solo** a la capa de **presentación**?
@@ -176,10 +176,10 @@ Seleccioná todos los correctos.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuestas correctas: A, C, D, F.** Rutas, lectura del cuerpo y de la URL, y el código de
-estado son detalles de **HTTP**. La regla del correo duplicado es de **negocio** (servicio) y
-`List<Matricula>` es un detalle de **persistencia** (el repositorio en memoria).
-
+> **Respuestas correctas: A, C, D, F.** Rutas, lectura del cuerpo y de la URL, y el código de
+> estado son detalles de **HTTP**. La regla del correo duplicado es de **negocio** (servicio) y
+> `List<Matricula>` es un detalle de **persistencia** (el repositorio en memoria).
+>
 </details>
 
 **9. [Abierta]** La regla de dependencia del taller dice que las flechas van
@@ -190,15 +190,15 @@ qué problema aparecería si `RepositorioEstudiantesEnMemoria` importara y usara
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- La persistencia pasaría a depender de HTTP: no se podría reutilizar ni cambiar sin tocar la
-  capa web.
-- Se crearía una **dependencia circular** (controlador → servicio → repositorio →
-  controlador): Spring no puede construir los beans y la aplicación no arranca
-  (`UnsatisfiedDependencyException … circular`).
-- Se pierde la posibilidad de cambiar de almacenamiento o de probar el repositorio de forma
-  aislada.
-
+> **Ideas clave:**
+> - La persistencia pasaría a depender de HTTP: no se podría reutilizar ni cambiar sin tocar la
+>   capa web.
+> - Se crearía una **dependencia circular** (controlador → servicio → repositorio →
+>   controlador): Spring no puede construir los beans y la aplicación no arranca
+>   (`UnsatisfiedDependencyException … circular`).
+> - Se pierde la posibilidad de cambiar de almacenamiento o de probar el repositorio de forma
+>   aislada.
+>
 </details>
 
 **10. [Selección]** `ServicioCursos` necesita saber cuántos estudiantes hay matriculados
@@ -214,10 +214,10 @@ para calcular la ocupación, pero **no** usa `ServicioMatriculas`. ¿Por qué us
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** `ServicioMatriculas` → `ServicioCursos` ya existe (para obtener el
-curso). Agregar `ServicioCursos` → `ServicioMatriculas` cerraría un **ciclo**. Al depender
-del repositorio se mantiene un grafo sin vueltas.
-
+> **Respuesta correcta: B.** `ServicioMatriculas` → `ServicioCursos` ya existe (para obtener el
+> curso). Agregar `ServicioCursos` → `ServicioMatriculas` cerraría un **ciclo**. Al depender
+> del repositorio se mantiene un grafo sin vueltas.
+>
 </details>
 
 **11. [Abierta]** En el taller, `ServicioMatriculas.matricular` recibe dos `Long` y no un
@@ -228,16 +228,16 @@ por el cliente.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- La petición trae **identificadores**; la entidad guarda **objetos** `Estudiante` y `Curso`.
-  No son la misma forma de datos.
-- Si el cliente enviara la entidad, podría mandar un estudiante o un curso **inventado** o
-  con datos alterados, y el servicio tendría que desconfiar de ellos.
-- Con ids, el servicio busca los objetos reales (y responde «no existe» si faltan) y arma él
-  mismo la `Matricula`. El cliente solo dice **cuáles**, no **cómo son**.
-- Es la misma práctica que se usará con JPA: la solicitud lleva ids, la entidad lleva
-  relaciones.
-
+> **Ideas clave:**
+> - La petición trae **identificadores**; la entidad guarda **objetos** `Estudiante` y `Curso`.
+>   No son la misma forma de datos.
+> - Si el cliente enviara la entidad, podría mandar un estudiante o un curso **inventado** o
+>   con datos alterados, y el servicio tendría que desconfiar de ellos.
+> - Con ids, el servicio busca los objetos reales (y responde «no existe» si faltan) y arma él
+>   mismo la `Matricula`. El cliente solo dice **cuáles**, no **cómo son**.
+> - Es la misma práctica que se usará con JPA: la solicitud lleva ids, la entidad lleva
+>   relaciones.
+>
 </details>
 
 **12. [Selección]** ¿Cuál de estas ubicaciones es la correcta para la clase
@@ -252,10 +252,10 @@ por el cliente.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: C.** Describe el **formato de la petición HTTP**. El servicio recibe
-solo `estudianteId` y `cursoId`, así que la capa de negocio no depende de una clase pensada
-para el cliente web.
-
+> **Respuesta correcta: C.** Describe el **formato de la petición HTTP**. El servicio recibe
+> solo `estudianteId` y `cursoId`, así que la capa de negocio no depende de una clase pensada
+> para el cliente web.
+>
 </details>
 
 ---
@@ -286,10 +286,10 @@ public class ServicioEstudiantes {
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: A.** Es **inyección por constructor**: con un único constructor, Spring
-no necesita `@Autowired`. Resuelve el tipo de la interfaz buscando un bean que lo implemente
-(`RepositorioEstudiantesEnMemoria`) y lo entrega al construir el servicio.
-
+> **Respuesta correcta: A.** Es **inyección por constructor**: con un único constructor, Spring
+> no necesita `@Autowired`. Resuelve el tipo de la interfaz buscando un bean que lo implemente
+> (`RepositorioEstudiantesEnMemoria`) y lo entrega al construir el servicio.
+>
 </details>
 
 **14. [Selección múltiple]** ¿Qué **ventajas** da la inyección por constructor con campos
@@ -306,9 +306,9 @@ correctas.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuestas correctas: A, C, D.** La B es lo contrario de lo que se logra, y la E es falsa:
-el escaneo sigue siendo necesario para encontrar los beans.
-
+> **Respuestas correctas: A, C, D.** La B es lo contrario de lo que se logra, y la E es falsa:
+> el escaneo sigue siendo necesario para encontrar los beans.
+>
 </details>
 
 **15. [Abierta]** Si en vez de la interfaz el servicio declarara
@@ -318,15 +318,15 @@ con el caso de querer pasar a otro tipo de almacenamiento.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- El servicio quedaría **acoplado a la implementación**: nombraría una clase concreta en su
-  constructor y en su tipo.
-- Cambiar de almacenamiento obligaría a **editar el servicio**, violando el principio de
-  que la regla de negocio no debe saber dónde se guardan los datos.
-- Con la **interfaz**, el servicio depende de un contrato (`guardar`, `listar`,
-  `buscarPorId`…); Spring inyecta cualquier clase que lo cumpla.
-- Además, se pierde la facilidad de pruebas con implementaciones falsas.
-
+> **Ideas clave:**
+> - El servicio quedaría **acoplado a la implementación**: nombraría una clase concreta en su
+>   constructor y en su tipo.
+> - Cambiar de almacenamiento obligaría a **editar el servicio**, violando el principio de
+>   que la regla de negocio no debe saber dónde se guardan los datos.
+> - Con la **interfaz**, el servicio depende de un contrato (`guardar`, `listar`,
+>   `buscarPorId`…); Spring inyecta cualquier clase que lo cumpla.
+> - Además, se pierde la facilidad de pruebas con implementaciones falsas.
+>
 </details>
 
 **16. [Abierta]** Querés guardar los estudiantes en un `Map<Long, Estudiante>` en lugar de
@@ -336,17 +336,17 @@ y qué anotaciones deben cambiar. Pensá en el reto final del taller.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-1. Crear `RepositorioEstudiantesAlternativo` que **implemente** `RepositorioEstudiantes`
-   con un `Map<Long, Estudiante>` (y su propio contador de ids).
-2. Anotarla con `@Repository` y **quitar `@Repository`** de la versión con `List` (o dejar
-   solo una activa). Si ambas estuvieran anotadas, Spring no sabría cuál inyectar y fallaría
-   por ambigüedad.
-3. **No se modifican:** `RepositorioEstudiantes` (la interfaz), `ServicioEstudiantes`,
-   `ControladorEstudiantes`, `ServicioMatriculas` ni el resto de las capas superiores.
-4. Resultado: cambia solo la capa de **persistence**. Es la demostración práctica de por qué
-   se programa contra interfaces.
-
+> **Ideas clave:**
+> 1. Crear `RepositorioEstudiantesAlternativo` que **implemente** `RepositorioEstudiantes`
+>    con un `Map<Long, Estudiante>` (y su propio contador de ids).
+> 2. Anotarla con `@Repository` y **quitar `@Repository`** de la versión con `List` (o dejar
+>    solo una activa). Si ambas estuvieran anotadas, Spring no sabría cuál inyectar y fallaría
+>    por ambigüedad.
+> 3. **No se modifican:** `RepositorioEstudiantes` (la interfaz), `ServicioEstudiantes`,
+>    `ControladorEstudiantes`, `ServicioMatriculas` ni el resto de las capas superiores.
+> 4. Resultado: cambia solo la capa de **persistence**. Es la demostración práctica de por qué
+>    se programa contra interfaces.
+>
 </details>
 
 **17. [Selección]** Dos clases, `RepositorioEstudiantesEnMemoria` y
@@ -362,10 +362,10 @@ y qué anotaciones deben cambiar. Pensá en el reto final del taller.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: C.** Cuando hay varios beans de un mismo tipo, la inyección es
-ambigua. En el taller se elige dejar **una sola** anotada; los otros caminos
-(`@Primary`, `@Qualifier`) son herramientas que se verán más adelante.
-
+> **Respuesta correcta: C.** Cuando hay varios beans de un mismo tipo, la inyección es
+> ambigua. En el taller se elige dejar **una sola** anotada; los otros caminos
+> (`@Primary`, `@Qualifier`) son herramientas que se verán más adelante.
+>
 </details>
 
 **18. [Abierta]** Dibujá (con texto) el **grafo de dependencias** de
@@ -375,19 +375,19 @@ circulares. ¿Qué cambio concreto en `ServicioCursos` lo rompería?
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-```text
-ServicioMatriculas ─▶ RepositorioMatriculas
-                   ─▶ ServicioEstudiantes ─▶ RepositorioEstudiantes
-                   ─▶ ServicioCursos      ─▶ RepositorioCursos
-                                          ─▶ RepositorioMatriculas
-```
-- Todas las flechas van «hacia abajo»; ninguna vuelve a un nodo ya visitado.
-- Lo rompería inyectar `ServicioMatriculas` en `ServicioCursos` (por ejemplo, para el
-  reporte): `ServicioMatriculas → ServicioCursos → ServicioMatriculas`. Spring no podría
-  crear ninguno de los dos primero y lanzaría una excepción por dependencia circular.
-- Solución usada: `ServicioCursos` depende del **repositorio** de matrículas.
-
+> **Ideas clave:**
+> ```text
+> ServicioMatriculas ─▶ RepositorioMatriculas
+>                    ─▶ ServicioEstudiantes ─▶ RepositorioEstudiantes
+>                    ─▶ ServicioCursos      ─▶ RepositorioCursos
+>                                           ─▶ RepositorioMatriculas
+> ```
+> - Todas las flechas van «hacia abajo»; ninguna vuelve a un nodo ya visitado.
+> - Lo rompería inyectar `ServicioMatriculas` en `ServicioCursos` (por ejemplo, para el
+>   reporte): `ServicioMatriculas → ServicioCursos → ServicioMatriculas`. Spring no podría
+>   crear ninguno de los dos primero y lanzaría una excepción por dependencia circular.
+> - Solución usada: `ServicioCursos` depende del **repositorio** de matrículas.
+>
 </details>
 
 ---
@@ -407,9 +407,9 @@ por qué el taller usa la segunda?
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** El taller es una API REST: devuelve datos (objetos convertidos a
-JSON), no páginas HTML.
-
+> **Respuesta correcta: B.** El taller es una API REST: devuelve datos (objetos convertidos a
+> JSON), no páginas HTML.
+>
 </details>
 
 **20. [Selección múltiple]** `@Repository`, `@Service` y `@RestController` comparten algo.
@@ -424,10 +424,10 @@ Seleccioná **todas** las afirmaciones correctas.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuestas correctas: A, B, C, E.** La D es falsa: ninguna crea hilos. Los tres nombres
-documentan la **capa** (persistencia, negocio, presentación); la creación del bean y el
-*scope* singleton los aportan `@Component` y el contenedor.
-
+> **Respuestas correctas: A, B, C, E.** La D es falsa: ninguna crea hilos. Los tres nombres
+> documentan la **capa** (persistencia, negocio, presentación); la creación del bean y el
+> *scope* singleton los aportan `@Component` y el contenedor.
+>
 </details>
 
 **21. [Selección]** El controlador tiene `@RequestMapping("/estudiantes")` en la clase y
@@ -441,9 +441,9 @@ documentan la **capa** (persistencia, negocio, presentación); la creación del 
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** La ruta del método **se suma** a la ruta base de la clase.
-`{id}` es una variable de ruta que se recibe con `@PathVariable`.
-
+> **Respuesta correcta: B.** La ruta del método **se suma** a la ruta base de la clase.
+> `{id}` es una variable de ruta que se recibe con `@PathVariable`.
+>
 </details>
 
 **22. [Abierta]** Un `POST /cursos` con el JSON `{"nombre":"Java","precio":0,"cupoMaximo":5}`
@@ -453,18 +453,18 @@ interviene en cada paso) y en qué punto se detecta que el precio es inválido.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-1. **Presentación:** `@PostMapping` en `ControladorCursos` recibe la petición; `@RequestBody`
-   convierte el JSON en un objeto `Curso`.
-2. El controlador llama a `ServicioCursos.registrar(curso)`.
-3. **Negocio:** el servicio comprueba `precio > 0` (RN-04) y detecta el error; lanza
-   `IllegalArgumentException` y **no llega** a persistencia.
-4. Si fuera válido: el servicio llama al repositorio, que asigna el id (RN-01) y guarda en
-   la lista.
-5. De vuelta en el controlador, `@ResponseStatus(HttpStatus.CREATED)` fija `201` y el objeto
-   se devuelve como JSON.
-6. En este taller, al no haber manejador de errores, la excepción termina como `500`.
-
+> **Ideas clave:**
+> 1. **Presentación:** `@PostMapping` en `ControladorCursos` recibe la petición; `@RequestBody`
+>    convierte el JSON en un objeto `Curso`.
+> 2. El controlador llama a `ServicioCursos.registrar(curso)`.
+> 3. **Negocio:** el servicio comprueba `precio > 0` (RN-04) y detecta el error; lanza
+>    `IllegalArgumentException` y **no llega** a persistencia.
+> 4. Si fuera válido: el servicio llama al repositorio, que asigna el id (RN-01) y guarda en
+>    la lista.
+> 5. De vuelta en el controlador, `@ResponseStatus(HttpStatus.CREATED)` fija `201` y el objeto
+>    se devuelve como JSON.
+> 6. En este taller, al no haber manejador de errores, la excepción termina como `500`.
+>
 </details>
 
 **23. [Selección]** Un estudiante recibe `415 Unsupported Media Type` al hacer
@@ -479,9 +479,9 @@ interviene en cada paso) y en qué punto se detecta que el precio es inválido.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** Sin ese encabezado, Spring no sabe que el cuerpo es JSON.
-Una anotación faltante en el repositorio haría fallar el **arranque**, no devolvería `415`.
-
+> **Respuesta correcta: B.** Sin ese encabezado, Spring no sabe que el cuerpo es JSON.
+> Una anotación faltante en el repositorio haría fallar el **arranque**, no devolvería `415`.
+>
 </details>
 
 **24. [Abierta]** ¿Por qué los métodos `POST` llevan `@ResponseStatus(HttpStatus.CREATED)` y
@@ -490,13 +490,13 @@ los `GET` no? ¿Qué código devolvería un `POST` sin esa anotación y qué sig
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- Por defecto, un método que termina bien responde `200 OK`.
-- `201 Created` indica que **se creó un recurso nuevo**; es lo que corresponde a un `POST`
-  de registro.
-- Los `GET` solo consultan, así que `200 OK` es el código correcto y no necesitan la
-  anotación.
-
+> **Ideas clave:**
+> - Por defecto, un método que termina bien responde `200 OK`.
+> - `201 Created` indica que **se creó un recurso nuevo**; es lo que corresponde a un `POST`
+>   de registro.
+> - Los `GET` solo consultan, así que `200 OK` es el código correcto y no necesitan la
+>   anotación.
+>
 </details>
 
 ---
@@ -516,10 +516,10 @@ los `GET` no? ¿Qué código devolvería un `POST` sin esa anotación y qué sig
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: B.** Ambos controles lanzan `IllegalStateException`, pero con mensajes
-distintos. El orden decide el mensaje y, en general, qué información recibe el cliente
-primero.
-
+> **Respuesta correcta: B.** Ambos controles lanzan `IllegalStateException`, pero con mensajes
+> distintos. El orden decide el mensaje y, en general, qué información recibe el cliente
+> primero.
+>
 </details>
 
 **26. [Selección múltiple]** En `RepositorioMatriculasEnMemoria`, ¿qué afirmaciones sobre
@@ -534,9 +534,9 @@ primero.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuestas correctas: A, B, C.** `Long` guarda en caché los valores entre −128 y 127, por
-lo que `==` parece funcionar con ids pequeños y falla con mayores. Es un error clásico.
-
+> **Respuestas correctas: A, B, C.** `Long` guarda en caché los valores entre −128 y 127, por
+> lo que `==` parece funcionar con ids pequeños y falla con mayores. Es un error clásico.
+>
 </details>
 
 **27. [Selección]** En el taller, ¿qué ocurre cuando un servicio lanza
@@ -552,10 +552,10 @@ lo que `==` parece funcionar con ids pequeños y falla con mayores. Es un error 
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuesta correcta: C.** Las excepciones estándar de Java no llevan información HTTP; sin
-un manejador, la respuesta es un `500` genérico. La aplicación **no** se detiene: sigue
-atendiendo peticiones.
-
+> **Respuesta correcta: C.** Las excepciones estándar de Java no llevan información HTTP; sin
+> un manejador, la respuesta es un `500` genérico. La aplicación **no** se detiene: sigue
+> atendiendo peticiones.
+>
 </details>
 
 **28. [Abierta]** `Matricula` guarda objetos `Estudiante` y `Curso` en vez de ids. Explicá
@@ -565,16 +565,16 @@ nueva aparece en la respuesta de `POST /matriculas`.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- El modelo expresa la relación real: una matrícula **tiene** un estudiante y un curso; se
-  puede navegar `matricula.getCurso().getNombre()` sin buscar de nuevo.
-- Es el mismo modelo que JPA mapeará con `@ManyToOne`; al migrar solo se agregan anotaciones,
-  no se rediseña la clase.
-- La respuesta ya no trae `estudianteId` y `cursoId` sueltos: trae los objetos completos
-  anidados (`{"id":1,"estudiante":{…},"curso":{…}}`).
-- El costo: para comparar hay que usar `getEstudiante().getId()` y `getCurso().getId()`, y
-  el servicio debe obtener los objetos antes de crear la matrícula.
-
+> **Ideas clave:**
+> - El modelo expresa la relación real: una matrícula **tiene** un estudiante y un curso; se
+>   puede navegar `matricula.getCurso().getNombre()` sin buscar de nuevo.
+> - Es el mismo modelo que JPA mapeará con `@ManyToOne`; al migrar solo se agregan anotaciones,
+>   no se rediseña la clase.
+> - La respuesta ya no trae `estudianteId` y `cursoId` sueltos: trae los objetos completos
+>   anidados (`{"id":1,"estudiante":{…},"curso":{…}}`).
+> - El costo: para comparar hay que usar `getEstudiante().getId()` y `getCurso().getId()`, y
+>   el servicio debe obtener los objetos antes de crear la matrícula.
+>
 </details>
 
 **29. [Abierta]** Escribí cómo calcularías el **porcentaje de ocupación** de un curso con
@@ -584,14 +584,14 @@ nueva aparece en la respuesta de `POST /matriculas`.
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Ideas clave:**
-- Se castea uno de los operandos a `double` **antes** de dividir:
-  `(double) matriculados / cupoMaximo * 100` → `66.666…`, y se redondea a dos decimales.
-- Con dos `int`, `2 / 3` es una **división entera** que da `0`.
-- Lo calcula la capa de **negocio** (`ServicioCursos.calcularOcupacion`): es una regla
-  (RN-11) y no depende de HTTP ni de cómo se almacenan los datos; el controlador solo
-  entrega el resultado y el repositorio solo cuenta matrículas.
-
+> **Ideas clave:**
+> - Se castea uno de los operandos a `double` **antes** de dividir:
+>   `(double) matriculados / cupoMaximo * 100` → `66.666…`, y se redondea a dos decimales.
+> - Con dos `int`, `2 / 3` es una **división entera** que da `0`.
+> - Lo calcula la capa de **negocio** (`ServicioCursos.calcularOcupacion`): es una regla
+>   (RN-11) y no depende de HTTP ni de cómo se almacenan los datos; el controlador solo
+>   entrega el resultado y el repositorio solo cuenta matrículas.
+>
 </details>
 
 **30. [Selección múltiple]** Un estudiante dice: «cambié `RepositorioCursosEnMemoria` por
@@ -610,11 +610,11 @@ conclusiones son **correctas** sobre su diseño?
 <details>
 <summary>🔑 Ver respuesta</summary>
 
-**Respuestas correctas: A, C, D.** El objetivo de las tres capas y de las interfaces es que
-**cambiar el almacenamiento solo toque `persistence`**. Si el servicio tuvo que cambiar, la
-capa de negocio estaba filtrando detalles de la persistencia. El controlador no debería
-verse afectado.
-
+> **Respuestas correctas: A, C, D.** El objetivo de las tres capas y de las interfaces es que
+> **cambiar el almacenamiento solo toque `persistence`**. Si el servicio tuvo que cambiar, la
+> capa de negocio estaba filtrando detalles de la persistencia. El controlador no debería
+> verse afectado.
+>
 </details>
 
 ---
