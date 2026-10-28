@@ -43,7 +43,7 @@ los cursos. El sistema se construye de forma progresiva, en cuatro fases.
 |---|---|---|
 | **Estudiante** | `id`, `nombre`, `edad`, `correo` | El `correo` identifica de forma única a la persona. |
 | **Curso** | `id`, `nombre`, `precio`, `cupoMaximo` | `cupoMaximo` es el tope de matriculados. |
-| **Matrícula** | `id`, `estudianteId`, `cursoId` | Relaciona estudiante y curso **por identificadores**, no por objetos. |
+| **Matrícula** | `id`, `estudiante`, `curso` | Relaciona estudiante y curso **por objetos**, igual que lo hará JPA (`@ManyToOne`). |
 
 ```text
 Estudiante 1 ──── * Matrícula * ──── 1 Curso
@@ -158,7 +158,7 @@ responsabilidad**, y cada requerimiento de la sección anterior cae en una de el
 📁 src/main/java/com/academia
 ├── 📄 AcademiaApplication.java
 ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
-│   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
+│   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
 │   └── 📁 excepcion     ManejadorErrores
 ├── 📁 negocio                           ← 2 · las reglas
 │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
@@ -182,7 +182,7 @@ HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz) ◀─ Rep
 | Paquete | Responsabilidad | Clases | Se crea en | Anotación de Spring |
 |---|---|---|:-:|---|
 | `AcademiaApplication` | Arranca la aplicación y define desde dónde Spring **escanea** beans. | `AcademiaApplication` | Paso 0 | `@SpringBootApplication` |
-| `presentacion.controlador` | Recibe la petición HTTP, entrega los datos al servicio y devuelve la respuesta. **Sin reglas.** | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas` | Fases 1–4 | `@RestController` |
+| `presentacion.controlador` | Recibe la petición HTTP, entrega los datos al servicio y devuelve la respuesta. **Sin reglas.** | `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas`, `SolicitudMatricula` | Fases 1–4 | `@RestController` |
 | `presentacion.excepcion` | Traduce las excepciones del negocio a códigos HTTP y a un cuerpo JSON uniforme. | `ManejadorErrores` | Paso 0 | `@RestControllerAdvice` |
 | `negocio.model` | Las entidades del dominio y el resultado del reporte. Clases Java sencillas. | `Estudiante`, `Curso`, `Matricula`, `Ocupacion` | Fases 1–4 | — |
 | `negocio.service` | **Las reglas de negocio**: duplicados, validaciones, cupos, cálculo. Lanza excepciones estándar de Java; no conoce HTTP. | `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas` | Fases 1–4 | `@Service` |
@@ -1072,8 +1072,9 @@ POST /matriculas
 <summary><strong>Paso 3.2 · Modelo y repositorio</strong></summary>
 
 
-Una matrícula **no guarda objetos**, guarda **identificadores**: es la forma de relacionar
-entidades sin base de datos.
+Una matrícula **guarda los objetos** `Estudiante` y `Curso`, no sus identificadores: es el
+mismo modelo que se usará con JPA (`@ManyToOne`), solo que sin anotaciones. Los
+identificadores viajan únicamente en la petición HTTP.
 
 **Archivo:** `src/main/java/com/academia/negocio/model/Matricula.java`
 
@@ -1083,18 +1084,18 @@ package com.academia.negocio.model;
 public class Matricula {
 
     private Long id;
-    private Long estudianteId;
-    private Long cursoId;
+    private Estudiante estudiante;
+    private Curso curso;
 
-    public Matricula(Long estudianteId, Long cursoId) {
-        this.estudianteId = estudianteId;
-        this.cursoId = cursoId;
+    public Matricula(Estudiante estudiante, Curso curso) {
+        this.estudiante = estudiante;
+        this.curso = curso;
     }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public Long getEstudianteId() { return estudianteId; }
-    public Long getCursoId() { return cursoId; }
+    public Estudiante getEstudiante() { return estudiante; }
+    public Curso getCurso() { return curso; }
 }
 ```
 
@@ -1141,8 +1142,8 @@ public class RepositorioMatriculasEnMemoria implements RepositorioMatriculas {
     @Override
     public boolean existe(Long estudianteId, Long cursoId) {
         for (Matricula matricula : matriculas) {
-            if (matricula.getEstudianteId().equals(estudianteId)
-                    && matricula.getCursoId().equals(cursoId)) {
+            if (matricula.getEstudiante().getId().equals(estudianteId)
+                    && matricula.getCurso().getId().equals(cursoId)) {
                 return true;
             }
         }
@@ -1153,7 +1154,7 @@ public class RepositorioMatriculasEnMemoria implements RepositorioMatriculas {
     public int contarPorCurso(Long cursoId) {
         int contador = 0;
         for (Matricula matricula : matriculas) {
-            if (matricula.getCursoId().equals(cursoId)) {
+            if (matricula.getCurso().getId().equals(cursoId)) {
                 contador++;
             }
         }
@@ -1172,8 +1173,9 @@ public class RepositorioMatriculasEnMemoria implements RepositorioMatriculas {
 <summary><strong>Paso 3.3 · Servicio de matrículas</strong></summary>
 
 
-El servicio **reutiliza** `ServicioEstudiantes` y `ServicioCursos` (que ya lanzan el 404) en
-lugar de repetir la búsqueda.
+El servicio recibe los **identificadores**, **reutiliza** `ServicioEstudiantes` y
+`ServicioCursos` (que ya lanzan el 404) para obtener los objetos y con ellos arma la
+`Matricula`.
 
 **Archivo:** `src/main/java/com/academia/negocio/service/ServicioMatriculas.java`
 
@@ -1181,6 +1183,7 @@ lugar de repetir la búsqueda.
 package com.academia.negocio.service;
 
 import com.academia.negocio.model.Curso;
+import com.academia.negocio.model.Estudiante;
 import com.academia.negocio.model.Matricula;
 import com.academia.persistence.repository.RepositorioMatriculas;
 import org.springframework.stereotype.Service;
@@ -1200,10 +1203,8 @@ public class ServicioMatriculas {
         this.servicioCursos = servicioCursos;
     }
 
-    public Matricula matricular(Matricula matricula) {
-        Long estudianteId = matricula.getEstudianteId();
-        Long cursoId = matricula.getCursoId();
-        servicioEstudiantes.obtener(estudianteId);
+    public Matricula matricular(Long estudianteId, Long cursoId) {
+        Estudiante estudiante = servicioEstudiantes.obtener(estudianteId);
         Curso curso = servicioCursos.obtener(cursoId);
 
         if (repositorio.existe(estudianteId, cursoId)) {
@@ -1213,7 +1214,7 @@ public class ServicioMatriculas {
         if (repositorio.contarPorCurso(cursoId) >= curso.getCupoMaximo()) {
             throw new IllegalStateException("El curso " + cursoId + " no tiene cupos disponibles");
         }
-        return repositorio.guardar(matricula);
+        return repositorio.guardar(new Matricula(estudiante, curso));
     }
 }
 ```
@@ -1237,6 +1238,15 @@ public class ServicioMatriculas {
 <details>
 <summary><strong>Paso 3.4 · Controlador</strong></summary>
 
+
+**Archivo:** `src/main/java/com/academia/presentacion/controlador/SolicitudMatricula.java`
+
+```java
+package com.academia.presentacion.controlador;
+
+public record SolicitudMatricula(Long estudianteId, Long cursoId) {
+}
+```
 
 **Archivo:** `src/main/java/com/academia/presentacion/controlador/ControladorMatriculas.java`
 
@@ -1264,11 +1274,14 @@ public class ControladorMatriculas {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Matricula matricular(@RequestBody Matricula matricula) {
-        return servicio.matricular(matricula);
+    public Matricula matricular(@RequestBody SolicitudMatricula solicitud) {
+        return servicio.matricular(solicitud.estudianteId(), solicitud.cursoId());
     }
 }
 ```
+
+> 🔎 La petición se recibe en un `record` aparte, `SolicitudMatricula`, porque trae
+> **identificadores**; la respuesta es la `Matricula`, que contiene los objetos completos.
 
 </details>
 
@@ -1522,7 +1535,7 @@ Cada estudiante guarda **capturas** (petición, código de estado y cuerpo) como
 └── 📁 src/main/java/com/academia
     ├── 📄 AcademiaApplication.java
     ├── 📁 presentacion
-    │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas
+    │   ├── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
     │   └── 📁 excepcion     ManejadorErrores
     ├── 📁 negocio
     │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
