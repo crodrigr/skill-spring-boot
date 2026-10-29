@@ -208,36 +208,16 @@
 <details>
 <summary><strong>🗺️ Diagramas de clases: cómo encaja todo</strong></summary>
 
-> ### 1️⃣ Un recorrido completo: «Estudiante» por las tres capas
+> ### 1️⃣ La capa de persistencia de «Estudiante», desde el contrato
 >
-> Se lee de izquierda a derecha: la petición entra por el controlador y llega a la base. Las clases con `<<interface>>` son contratos; las demás son clases concretas.
+> Se parte de la interfaz `RepositorioEstudiantes`, que es lo único que el servicio conoce. Todo lo que cuelga de ella es persistencia.
 >
 > ```mermaid
 > classDiagram
->     direction LR
+>     direction TB
 >
->     class ControladorEstudiantes {
->         presentacion.controlador
->         +registrar(Estudiante)
->         +listar()
->         +obtener(Long)
->     }
->     class ServicioEstudiantes {
->         negocio.service
->         +registrar(Estudiante)
->         +listar()
->         +obtener(Long)
->     }
->     class Estudiante {
->         negocio.model
->         -Long id
->         -String nombre
->         -int edad
->         -String correo
->     }
 >     class RepositorioEstudiantes {
 >         <<interface>>
->         persistence.repository
 >         +guardar(Estudiante)
 >         +listar()
 >         +buscarPorId(Long)
@@ -245,15 +225,6 @@
 >     }
 >     class RepositorioEstudiantesEnBD {
 >         @Repository
->         +guardar(Estudiante)
->         +listar()
->         +buscarPorId(Long)
->         +existePorCorreo(String)
->     }
->     class EstudianteMapper {
->         persistence.mapper
->         +aEntity(Estudiante)$
->         +aModelo(EstudianteEntity)$
 >     }
 >     class EstudianteJpaRepository {
 >         <<interface>>
@@ -262,41 +233,39 @@
 >     class JpaRepository {
 >         <<interface>>
 >         Spring Data
->         +save() findAll() findById()
+>     }
+>     class EstudianteMapper {
+>         +aEntity(Estudiante)$
+>         +aModelo(EstudianteEntity)$
+>     }
+>     class Estudiante {
+>         modelo
 >     }
 >     class EstudianteEntity {
 >         <<Entity>>
->         persistence.entity
->         -Long id
->         -String nombre
->         -int edad
->         -String correo
 >     }
 >
->     ControladorEstudiantes --> ServicioEstudiantes : usa
->     ServicioEstudiantes --> RepositorioEstudiantes : depende del contrato
->     ServicioEstudiantes ..> Estudiante
->     RepositorioEstudiantes ..> Estudiante
->     RepositorioEstudiantesEnBD ..|> RepositorioEstudiantes : cumple
+>     RepositorioEstudiantesEnBD ..|> RepositorioEstudiantes : cumple el contrato
 >     RepositorioEstudiantesEnBD --> EstudianteJpaRepository : delega
 >     RepositorioEstudiantesEnBD ..> EstudianteMapper : traduce con
->     EstudianteMapper ..> Estudiante
->     EstudianteMapper ..> EstudianteEntity
 >     EstudianteJpaRepository --|> JpaRepository : extiende
 >     EstudianteJpaRepository ..> EstudianteEntity : gestiona
+>     EstudianteMapper ..> Estudiante
+>     EstudianteMapper ..> EstudianteEntity
+>     RepositorioEstudiantes ..> Estudiante : recibe y devuelve
 > ```
 >
-> | Zona | Clases | ¿Conoce JPA? |
-> |---|---|:-:|
-> | **Presentación** | `ControladorEstudiantes` | No |
-> | **Negocio** | `ServicioEstudiantes`, `Estudiante`, `RepositorioEstudiantes` *(el contrato)* | No |
-> | **Persistencia** | `RepositorioEstudiantesEnBD`, `EstudianteMapper`, `EstudianteJpaRepository`, `EstudianteEntity` | **Sí, solo aquí** |
+> | Pieza | Quién la escribe | Qué hace |
+> |---|---|---|
+> | `RepositorioEstudiantes` | Nosotros (ya existía) | **Contrato** que conoce el servicio. Habla en modelos. |
+> | `RepositorioEstudiantesEnBD` | Nosotros | Cumple el contrato: delega en Spring Data y traduce con el mapeador. |
+> | `EstudianteJpaRepository` | Nosotros la declaramos; **Spring Data genera la clase** | Guarda y consulta `EstudianteEntity`. |
+> | `EstudianteMapper` | Nosotros | Convierte entre `Estudiante` y `EstudianteEntity`. |
 >
-> > 🔎 **Cómo leerlo.** Hay **una sola flecha** que cruza de negocio a persistencia: `ServicioEstudiantes → RepositorioEstudiantes`, y apunta a una **interfaz**.
-> > Todo lo que está a la derecha de esa interfaz se puede cambiar sin tocar nada a su izquierda.
+> > 🔎 **Cómo leerlo.** Arriba, el contrato (habla en **modelos**); abajo, la base (habla en **entidades**). `RepositorioEstudiantesEnBD` es el puente: por eso es la única clase que
+> > toca los dos lados. Hacia arriba solo se ve la interfaz: el servicio y el controlador no aparecen porque **no dependen de nada de este diagrama** más que del contrato.
 > >
-> > 🗣️ **Pregunta:** si hubiera que cambiar H2 por MySQL, ¿qué clases del diagrama se modifican? *(Ninguna: solo `application.properties` y la dependencia del driver.)*
-> > ¿Y si se cambiara JPA por JDBC puro? *(`RepositorioEstudiantesEnBD`, `EstudianteMapper`, `EstudianteJpaRepository` y `EstudianteEntity`: todo dentro de `persistence`.)*
+> > 🗣️ **Pregunta:** si se cambiara JPA por JDBC puro, ¿qué clases del diagrama se reemplazan? *(Todas las de abajo del contrato; el contrato y el modelo se quedan.)*
 >
 > ### 2️⃣ Las relaciones de «Matrícula»: el modelo y la entidad tienen la misma forma
 >
