@@ -6,7 +6,7 @@
 <details open>
 <summary><strong>📦 Dependencias</strong></summary>
 
-> **Ninguna nueva.** Seguís con Spring Web, Spring Data JPA y H2.
+> **Ninguna nueva.** Seguís con Spring Web, Spring Data JPA, MySQL Driver y Lombok.
 
 </details>
 
@@ -104,8 +104,13 @@
 > > import java.time.LocalDate;
 > > import java.util.ArrayList;
 > > import java.util.List;
+> > import lombok.AccessLevel;
+> > import lombok.Getter;
+> > import lombok.NoArgsConstructor;
 > >
 > > @Entity
+> > @Getter
+> > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class Pedido {
 > >
 > >     @Id
@@ -121,18 +126,10 @@
 > >     @JsonIgnore
 > >     private List<DetallePedido> detalles = new ArrayList<>();
 > >
-> >     protected Pedido() {
-> >     }
-> >
 > >     public Pedido(LocalDate fecha, String estado) {
 > >         this.fecha = fecha;
 > >         this.estado = estado;
 > >     }
-> >
-> >     public Long getId() { return id; }
-> >     public LocalDate getFecha() { return fecha; }
-> >     public String getEstado() { return estado; }
-> >     public List<DetallePedido> getDetalles() { return detalles; }
 > > }
 > > ```
 > >
@@ -148,8 +145,13 @@
 > > import jakarta.persistence.Id;
 > > import jakarta.persistence.JoinColumn;
 > > import jakarta.persistence.ManyToOne;
+> > import lombok.AccessLevel;
+> > import lombok.Getter;
+> > import lombok.NoArgsConstructor;
 > >
 > > @Entity
+> > @Getter
+> > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class DetallePedido {
 > >
 > >     @Id
@@ -171,24 +173,17 @@
 > >     @JoinColumn(name = "producto_id")
 > >     private Producto producto;
 > >
-> >     protected DetallePedido() {
-> >     }
-> >
 > >     public DetallePedido(int cantidad, double precioUnitario, Pedido pedido, Producto producto) {
 > >         this.cantidad = cantidad;
 > >         this.precioUnitario = precioUnitario;
 > >         this.pedido = pedido;
 > >         this.producto = producto;
 > >     }
-> >
-> >     public Long getId() { return id; }
-> >     public int getCantidad() { return cantidad; }
-> >     public double getPrecioUnitario() { return precioUnitario; }
-> >     public Producto getProducto() { return producto; }
 > > }
 > > ```
 > >
 > > - **Lado dueño:** `DetallePedido` tiene la clave foránea (`@JoinColumn(name = "pedido_id")`). En `Pedido`, `mappedBy = "pedido"` solo dice «mirá ese atributo»: **no crea columnas**.
+> > - **Lombok:** `@Getter` genera los getters (estas entidades no necesitan setters: no se modifican después de crearse) y `@NoArgsConstructor(access = AccessLevel.PROTECTED)` el constructor vacío de JPA. `@JsonIgnore` funciona igual aunque el getter lo genere Lombok.
 > > - **`@JsonIgnore`** en `DetallePedido.pedido` y `Pedido.detalles`: sin él, el JSON entraría en un **bucle infinito** (pedido → detalles → pedido…). Es un arreglo temporal; en el Módulo 5 se resuelve con DTO.
 >
 > </details>
@@ -238,23 +233,17 @@
 > > import java.time.LocalDate;
 > > import java.util.List;
 > > import java.util.NoSuchElementException;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.stereotype.Service;
 > > import org.springframework.transaction.annotation.Transactional;
 > >
 > > @Service
+> > @RequiredArgsConstructor
 > > public class ServicioPedidos {
 > >
 > >     private final RepositorioPedidos repositorio;
 > >     private final RepositorioDetallesPedido repositorioDetalles;
 > >     private final ServicioProductos servicioProductos;
-> >
-> >     public ServicioPedidos(RepositorioPedidos repositorio,
-> >                            RepositorioDetallesPedido repositorioDetalles,
-> >                            ServicioProductos servicioProductos) {
-> >         this.repositorio = repositorio;
-> >         this.repositorioDetalles = repositorioDetalles;
-> >         this.servicioProductos = servicioProductos;
-> >     }
 > >
 > >     public Pedido crear() {
 > >         return repositorio.save(new Pedido(LocalDate.now(), "CREADO"));
@@ -280,6 +269,7 @@
 > > }
 > > ```
 > >
+> > - `@RequiredArgsConstructor` genera el constructor con los **tres** atributos `final`; Spring inyecta los tres repositorios y servicios.
 > > - `agregarDetalle` **reutiliza** `ServicioProductos` (guía 1) para validar que el producto exista y **copia su precio** al detalle: si el precio del producto cambia después, el pedido conserva el de ese día.
 > > - `listarDetalles` es `@Transactional` porque `detalles` se carga **bajo demanda** (*lazy*): solo se puede leer con la sesión abierta.
 >
@@ -306,6 +296,7 @@
 > > import com.tienda.negocio.model.Pedido;
 > > import com.tienda.negocio.service.ServicioPedidos;
 > > import java.util.List;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.web.bind.annotation.GetMapping;
 > > import org.springframework.web.bind.annotation.PathVariable;
@@ -317,13 +308,10 @@
 > >
 > > @RestController
 > > @RequestMapping("/pedidos")
+> > @RequiredArgsConstructor
 > > public class ControladorPedidos {
 > >
 > >     private final ServicioPedidos servicio;
-> >
-> >     public ControladorPedidos(ServicioPedidos servicio) {
-> >         this.servicio = servicio;
-> >     }
 > >
 > >     @PostMapping
 > >     @ResponseStatus(HttpStatus.CREATED)
@@ -420,10 +408,16 @@
 <summary><strong>🔍 Mirá las tablas</strong></summary>
 
 > ```text
-> create table pedido (id …, estado varchar(255), fecha date, primary key (id))
-> create table detalle_pedido (id …, cantidad integer not null, precio_unitario float(53) not null, pedido_id bigint, producto_id bigint, primary key (id))
-> alter table detalle_pedido add constraint … foreign key (pedido_id)   references pedido
-> alter table detalle_pedido add constraint … foreign key (producto_id) references producto
+> create table pedido (id bigint not null auto_increment, estado varchar(255), fecha date, primary key (id)) engine=InnoDB
+> create table detalle_pedido (id bigint not null auto_increment, cantidad integer not null, precio_unitario float(53) not null, pedido_id bigint, producto_id bigint, primary key (id)) engine=InnoDB
+> alter table detalle_pedido add constraint … foreign key (pedido_id)   references pedido (id)
+> alter table detalle_pedido add constraint … foreign key (producto_id) references producto (id)
+> ```
+>
+> Para ver las claves foráneas en MySQL:
+>
+> ```bash
+> docker exec mysql-tienda mysql -uroot -proot --default-character-set=utf8mb4 tienda -e "SELECT * FROM detalle_pedido;"
 > ```
 
 </details>

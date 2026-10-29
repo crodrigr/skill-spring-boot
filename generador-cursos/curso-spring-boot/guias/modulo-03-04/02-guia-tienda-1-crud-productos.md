@@ -6,15 +6,62 @@
 <details open>
 <summary><strong>📦 Dependencias</strong></summary>
 
-> El proyecto se crea en [start.spring.io](https://start.spring.io) con **Maven · Java 21 · Spring Boot 3.x · Group `com.tienda` · Artifact `tienda`** y estas tres dependencias:
+> El proyecto se crea en [start.spring.io](https://start.spring.io) con **Maven · Java 21 · Spring Boot 3.x · Group `com.tienda` · Artifact `tienda`** y estas **cuatro** dependencias:
 >
 > | Dependencia | Para qué sirve en esta guía |
 > |---|---|
 > | **Spring Web** | Los endpoints REST (`@RestController`) y la conversión a JSON. |
 > | **Spring Data JPA** | JPA + Hibernate + `JpaRepository`: guardar y consultar sin escribir SQL. |
-> | **H2 Database** | Base de datos **en memoria**: no hay que instalar nada (se borra al reiniciar). |
+> | **MySQL Driver** | El **driver JDBC** (`mysql-connector-j`): permite que la aplicación hable con MySQL. Solo se necesita al ejecutar (`runtime`). |
+> | **Lombok** | Genera **getters, setters y constructores** al compilar: menos código repetitivo. Solo se necesita al compilar (`optional`). |
+>
+> En el `pom.xml` quedan estas dos, además de las de Web y JPA:
+>
+> ```xml
+> <dependency>
+>     <groupId>com.mysql</groupId>
+>     <artifactId>mysql-connector-j</artifactId>
+>     <scope>runtime</scope>
+> </dependency>
+> <dependency>
+>     <groupId>org.projectlombok</groupId>
+>     <artifactId>lombok</artifactId>
+>     <optional>true</optional>
+> </dependency>
+> ```
 >
 > > 💡 Las dos siguientes guías **no agregan ninguna dependencia nueva**: todo lo que necesitan ya está aquí.
+> >
+> > 🔧 **Lombok en el IDE:** en IntelliJ instalá el plugin *Lombok* y activá *Enable annotation processing*; en VS Code, el *Extension Pack for Java* lo soporta. Si el IDE marca error en `getNombre()` pero Maven compila, es el IDE.
+> > Con **JDK 23 o superior**, además, Maven necesita `<proc>full</proc>` en la configuración de `maven-compiler-plugin`.
+
+</details>
+
+<details open>
+<summary><strong>🐬 Preparar MySQL</strong></summary>
+
+> Necesitás un servidor MySQL en `localhost:3306`. La forma más rápida es **Docker** (una sola línea):
+>
+> ```bash
+> docker run --name mysql-tienda -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=tienda -p 3306:3306 -d mysql:8
+> ```
+>
+> | Parte | Qué hace |
+> |---|---|
+> | `--name mysql-tienda` | Nombre del contenedor (para detenerlo y verlo después). |
+> | `-e MYSQL_ROOT_PASSWORD=root` | Contraseña del usuario `root` (**solo para desarrollo**). |
+> | `-e MYSQL_DATABASE=tienda` | Crea la base `tienda` al iniciar. |
+> | `-p 3306:3306` | Expone el puerto de MySQL en tu equipo. |
+>
+> Esperá unos segundos a que arranque y comprobalo:
+>
+> ```bash
+> docker exec mysql-tienda mysql -uroot -proot --default-character-set=utf8mb4 -e "SHOW DATABASES;"
+> ```
+>
+> Dejalo corriendo durante las tres guías. Con `docker stop mysql-tienda` se detiene y con `docker start mysql-tienda` se retoma **con los datos** (para borrarlo todo: `docker rm -f mysql-tienda`).
+>
+> > 💡 Si ya tenés MySQL instalado, no necesitás Docker: la URL de la guía crea la base `tienda` si no existe (con un usuario que pueda crear bases). Ajustá usuario y contraseña en `application.properties`.
 
 </details>
 
@@ -62,15 +109,18 @@
 > > **`src/main/resources/application.properties`**
 > >
 > > ```properties
-> > spring.datasource.url=jdbc:h2:mem:tienda;DB_CLOSE_DELAY=-1
+> > spring.datasource.url=jdbc:mysql://localhost:3306/tienda?createDatabaseIfNotExist=true
+> > spring.datasource.username=root
+> > spring.datasource.password=root
 > > spring.jpa.hibernate.ddl-auto=update
 > > spring.jpa.show-sql=true
-> > spring.h2.console.enabled=true
 > > ```
 > >
-> > - `ddl-auto=update`: Hibernate **crea la tabla** a partir de la entidad.
+> > - `spring.datasource.url`: dónde está la base: `jdbc:mysql://` + servidor (`localhost`) + puerto (`3306`) + base (`tienda`). `createDatabaseIfNotExist=true` crea la base si todavía no existe.
+> > - `username` y `password`: los mismos del `docker run` (`root` / `root`). **No subas credenciales reales a un repositorio.**
+> > - `ddl-auto=update`: Hibernate **crea las tablas** a partir de las entidades, sin borrar datos existentes.
 > > - `show-sql=true`: ves en consola el SQL que genera.
-> > - La consola de H2 queda en `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:tienda`, usuario `sa`, sin contraseña).
+> > - El driver y el dialecto de MySQL **se detectan solos**: no hace falta configurarlos.
 >
 > </details>
 >
@@ -86,12 +136,20 @@
 > > import jakarta.persistence.GeneratedValue;
 > > import jakarta.persistence.GenerationType;
 > > import jakarta.persistence.Id;
+> > import lombok.AccessLevel;
+> > import lombok.Getter;
+> > import lombok.NoArgsConstructor;
+> > import lombok.Setter;
 > >
 > > @Entity
+> > @Getter
+> > @Setter
+> > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class Producto {
 > >
 > >     @Id
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     @Setter(AccessLevel.NONE)
 > >     private Long id;
 > >
 > >     private String nombre;
@@ -100,28 +158,26 @@
 > >
 > >     private int stock;
 > >
-> >     protected Producto() {
-> >     }
-> >
 > >     public Producto(String nombre, double precio, int stock) {
 > >         this.nombre = nombre;
 > >         this.precio = precio;
 > >         this.stock = stock;
 > >     }
-> >
-> >     public Long getId() { return id; }
-> >     public String getNombre() { return nombre; }
-> >     public double getPrecio() { return precio; }
-> >     public int getStock() { return stock; }
-> >
-> >     public void setNombre(String nombre) { this.nombre = nombre; }
-> >     public void setPrecio(double precio) { this.precio = precio; }
-> >     public void setStock(int stock) { this.stock = stock; }
 > > }
 > > ```
 > >
-> > - **`@Entity`**: la clase se guarda en una tabla. **`@Id`** + **`@GeneratedValue(IDENTITY)`**: la clave primaria la genera la base.
-> > - El constructor `protected` sin argumentos lo necesita JPA para crear el objeto; los *setters* se usan al actualizar.
+> > - **`@Entity`**: la clase se guarda en una tabla. **`@Id`** + **`@GeneratedValue(IDENTITY)`**: la clave primaria la genera la base (en MySQL, una columna `auto_increment`).
+> > - **Lombok** escribe por vos el código repetitivo:
+> >
+> > | Anotación | Qué genera |
+> > |---|---|
+> > | `@Getter` | Un getter por atributo: `getId()`, `getNombre()`, `getPrecio()`, `getStock()`. |
+> > | `@Setter` | Un setter por atributo (se usan al actualizar). En `id` se desactiva con `@Setter(AccessLevel.NONE)`: **el `id` lo decide la base**. |
+> > | `@NoArgsConstructor(access = AccessLevel.PROTECTED)` | El constructor vacío `protected` que exige JPA para crear el objeto. |
+> >
+> > - El constructor con parámetros (`nombre`, `precio`, `stock`) se deja escrito: **sin `id`**, porque todavía no existe.
+> >
+> > > ⚠️ **No uses `@Data` en las entidades.** Genera `equals`, `hashCode` y `toString` que recorren **todos** los atributos, incluidas las relaciones: pueden disparar consultas o ciclos infinitos. En entidades, usá solo `@Getter` y `@Setter` (y solo donde hagan falta).
 >
 > </details>
 >
@@ -156,16 +212,14 @@
 > > import com.tienda.persistence.repository.RepositorioProductos;
 > > import java.util.List;
 > > import java.util.NoSuchElementException;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.stereotype.Service;
 > >
 > > @Service
+> > @RequiredArgsConstructor
 > > public class ServicioProductos {
 > >
 > >     private final RepositorioProductos repositorio;
-> >
-> >     public ServicioProductos(RepositorioProductos repositorio) {
-> >         this.repositorio = repositorio;
-> >     }
 > >
 > >     public Producto crear(Producto producto) {
 > >         // Se crea uno nuevo: así se ignora cualquier id que envíe el cliente
@@ -195,6 +249,8 @@
 > > }
 > > ```
 > >
+> > - **`@RequiredArgsConstructor`** genera el constructor con los atributos `final` (`repositorio`). Es la misma **inyección por constructor** de siempre: Spring lo usa para entregarle el repositorio, sin escribirlo.
+> >
 > > > ⚠️ **Detalle importante:** en `crear` se construye un `Producto` **nuevo**. Si se guardara el que llega, un `POST` con `"id": 1` **actualizaría** el producto 1 en lugar de crear uno.
 >
 > </details>
@@ -210,6 +266,7 @@
 > > import com.tienda.negocio.model.Producto;
 > > import com.tienda.negocio.service.ServicioProductos;
 > > import java.util.List;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.web.bind.annotation.DeleteMapping;
 > > import org.springframework.web.bind.annotation.GetMapping;
@@ -223,13 +280,10 @@
 > >
 > > @RestController
 > > @RequestMapping("/productos")
+> > @RequiredArgsConstructor
 > > public class ControladorProductos {
 > >
 > >     private final ServicioProductos servicio;
-> >
-> >     public ControladorProductos(ServicioProductos servicio) {
-> >         this.servicio = servicio;
-> >     }
 > >
 > >     @PostMapping
 > >     @ResponseStatus(HttpStatus.CREATED)
@@ -320,8 +374,21 @@
 <details open>
 <summary><strong>🔍 Mirá el SQL</strong></summary>
 
-> Cada operación aparece en la consola. Por ejemplo, el `POST` genera `insert into producto (nombre,precio,stock,id) values (?,?,?,default)`
-> y el `GET /productos/2`, `select … from producto where id=?`.
+> Cada operación aparece en la consola. Al arrancar, Hibernate crea la tabla (sintaxis de MySQL):
+>
+> ```text
+> create table producto (id bigint not null auto_increment, nombre varchar(255), precio float(53) not null, stock integer not null, primary key (id)) engine=InnoDB
+> ```
+>
+> Y cada operación genera su SQL: el `POST`, `insert into producto (nombre,precio,stock) values (?,?,?)` *(el `id` lo pone MySQL)*; el `PUT`, `update producto set nombre=?,precio=?,stock=? where id=?`; el `DELETE`, `delete from producto where id=?`.
+>
+> **Mirá los datos directamente en MySQL:**
+>
+> ```bash
+> docker exec mysql-tienda mysql -uroot -proot --default-character-set=utf8mb4 tienda -e "SHOW TABLES; SELECT * FROM producto;"
+> ```
+>
+> Como los datos están en MySQL, **sobreviven al reiniciar la aplicación** (a diferencia de una base en memoria).
 
 </details>
 

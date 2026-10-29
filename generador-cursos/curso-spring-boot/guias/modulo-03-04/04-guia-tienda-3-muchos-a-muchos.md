@@ -6,7 +6,7 @@
 <details open>
 <summary><strong>📦 Dependencias</strong></summary>
 
-> **Ninguna nueva.** Seguís con Spring Web, Spring Data JPA y H2.
+> **Ninguna nueva.** Seguís con Spring Web, Spring Data JPA, MySQL Driver y Lombok.
 
 </details>
 
@@ -121,8 +121,13 @@
 > > import jakarta.persistence.ManyToMany;
 > > import java.util.HashSet;
 > > import java.util.Set;
+> > import lombok.AccessLevel;
+> > import lombok.Getter;
+> > import lombok.NoArgsConstructor;
 > >
 > > @Entity
+> > @Getter
+> > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class Cliente {
 > >
 > >     @Id
@@ -141,22 +146,15 @@
 > >     @JsonIgnore
 > >     private Set<Producto> favoritos = new HashSet<>();
 > >
-> >     protected Cliente() {
-> >     }
-> >
 > >     public Cliente(String nombre, String correo) {
 > >         this.nombre = nombre;
 > >         this.correo = correo;
 > >     }
-> >
-> >     public Long getId() { return id; }
-> >     public String getNombre() { return nombre; }
-> >     public String getCorreo() { return correo; }
-> >     public Set<Producto> getFavoritos() { return favoritos; }
 > > }
 > > ```
 > >
 > > - **`@ManyToMany`** declara la relación; **`@JoinTable`** nombra la tabla intermedia y sus dos columnas: `@JoinColumn` para **este** lado y `inverseJoinColumns` para el **otro**.
+> > - **Lombok:** `@Getter` y `@NoArgsConstructor(access = AccessLevel.PROTECTED)`, igual que en la guía 2. `getFavoritos()` lo genera Lombok.
 > > - Se usa un `Set` (no una `List`): un producto **no puede repetirse** en los favoritos de un mismo cliente.
 > > - `Producto` **no se modifica**: no necesita saber qué clientes lo tienen como favorito (relación **unidireccional**).
 >
@@ -192,19 +190,16 @@
 > > import com.tienda.persistence.repository.RepositorioClientes;
 > > import java.util.List;
 > > import java.util.NoSuchElementException;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.stereotype.Service;
 > > import org.springframework.transaction.annotation.Transactional;
 > >
 > > @Service
+> > @RequiredArgsConstructor
 > > public class ServicioClientes {
 > >
 > >     private final RepositorioClientes repositorio;
 > >     private final ServicioProductos servicioProductos;
-> >
-> >     public ServicioClientes(RepositorioClientes repositorio, ServicioProductos servicioProductos) {
-> >         this.repositorio = repositorio;
-> >         this.servicioProductos = servicioProductos;
-> >     }
 > >
 > >     public Cliente crear(Cliente cliente) {
 > >         return repositorio.save(new Cliente(cliente.getNombre(), cliente.getCorreo()));
@@ -235,6 +230,7 @@
 > > }
 > > ```
 > >
+> > - `@RequiredArgsConstructor` genera el constructor con `repositorio` y `servicioProductos`.
 > > - No hay ningún `save`: dentro de `@Transactional`, el cliente está **gestionado**; al agregar un producto a `favoritos`, JPA detecta el cambio y ejecuta el `insert` en la tabla intermedia al terminar el método.
 > > - Agregar dos veces el mismo favorito **no duplica** la fila (es un `Set`).
 >
@@ -252,6 +248,7 @@
 > > import com.tienda.negocio.model.Producto;
 > > import com.tienda.negocio.service.ServicioClientes;
 > > import java.util.List;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.web.bind.annotation.DeleteMapping;
 > > import org.springframework.web.bind.annotation.GetMapping;
@@ -264,13 +261,10 @@
 > >
 > > @RestController
 > > @RequestMapping("/clientes")
+> > @RequiredArgsConstructor
 > > public class ControladorClientes {
 > >
 > >     private final ServicioClientes servicio;
-> >
-> >     public ControladorClientes(ServicioClientes servicio) {
-> >         this.servicio = servicio;
-> >     }
 > >
 > >     @PostMapping
 > >     @ResponseStatus(HttpStatus.CREATED)
@@ -368,13 +362,17 @@
 <summary><strong>🔍 Mirá las tablas</strong></summary>
 
 > ```text
-> create table cliente (id …, correo varchar(255), nombre varchar(255), primary key (id))
-> create table cliente_favorito (cliente_id bigint not null, producto_id bigint not null, primary key (cliente_id, producto_id))
-> alter table cliente_favorito add constraint … foreign key (producto_id) references producto
-> alter table cliente_favorito add constraint … foreign key (cliente_id)  references cliente
+> create table cliente (id bigint not null auto_increment, correo varchar(255), nombre varchar(255), primary key (id)) engine=InnoDB
+> create table cliente_favorito (cliente_id bigint not null, producto_id bigint not null, primary key (cliente_id, producto_id)) engine=InnoDB
+> alter table cliente_favorito add constraint … foreign key (producto_id) references producto (id)
+> alter table cliente_favorito add constraint … foreign key (cliente_id)  references cliente (id)
 > ```
 >
-> La clave primaria `(cliente_id, producto_id)` es lo que impide **a nivel de base** repetir un favorito. En la consola de H2: `SELECT * FROM cliente_favorito;`
+> La clave primaria `(cliente_id, producto_id)` es lo que impide **a nivel de base** repetir un favorito. Mirala en MySQL:
+>
+> ```bash
+> docker exec mysql-tienda mysql -uroot -proot --default-character-set=utf8mb4 tienda -e "SHOW TABLES; SELECT * FROM cliente_favorito;"
+> ```
 
 </details>
 
