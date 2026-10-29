@@ -11,69 +11,29 @@
 </details>
 
 <details open>
-<summary><strong>🗺️ Diagrama de clases (incremento 2)</strong></summary>
+<summary><strong>🗺️ Diagrama de clases (incremento 2: la relación nueva)</strong></summary>
 
 > ```mermaid
 > classDiagram
->     direction TB
->     class TiendaApplication {
->         <<SpringBootApplication>>
->     }
->     class ControladorProductos {
->         <<RestController>>
->     }
->     class ServicioProductos {
->         <<Service>>
->     }
->     class RepositorioProductos {
->         <<interface>>
->     }
->     class Producto {
->         <<Entity>>
->     }
->     class ControladorPedidos {
->         <<RestController>>
->     }
->     class SolicitudDetalle {
->         <<record>>
->     }
->     class ServicioPedidos {
->         <<Service>>
->     }
->     class RepositorioPedidos {
->         <<interface>>
->     }
->     class RepositorioDetallesPedido {
->         <<interface>>
->     }
->     class JpaRepository {
->         <<interface · Spring Data>>
->     }
+>     direction LR
 >     class Pedido {
 >         <<Entity>>
 >     }
 >     class DetallePedido {
 >         <<Entity>>
 >     }
+>     class Producto {
+>         <<Entity>>
+>     }
 >
->     ControladorProductos --> ServicioProductos
->     ServicioProductos --> RepositorioProductos
->     ControladorPedidos --> ServicioPedidos : usa
->     ControladorPedidos ..> SolicitudDetalle : recibe
->     ServicioPedidos --> RepositorioPedidos
->     ServicioPedidos --> RepositorioDetallesPedido
->     ServicioPedidos --> ServicioProductos : reutiliza
->     JpaRepository <|-- RepositorioProductos
->     JpaRepository <|-- RepositorioPedidos
->     JpaRepository <|-- RepositorioDetallesPedido
->     RepositorioProductos ..> Producto
->     RepositorioPedidos ..> Pedido
->     RepositorioDetallesPedido ..> DetallePedido
 >     Pedido "1" -- "*" DetallePedido : detalles / pedido
 >     DetallePedido "*" --> "1" Producto : producto
+>
+>     note for DetallePedido "Lado dueño: guarda las claves foráneas pedido_id y producto_id"
+>     note for Producto "Ya existe (guía 1)"
 > ```
 >
-> Están **todas** las clases del proyecto. Las **nuevas** de esta guía son `ControladorPedidos`, `SolicitudDetalle`, `ServicioPedidos`, `RepositorioPedidos`, `RepositorioDetallesPedido`, `Pedido` y `DetallePedido`; el resto viene de la guía 1. Fijate que `ServicioPedidos` **reutiliza** `ServicioProductos`.
+> Se agregan dos entidades, `Pedido` y `DetallePedido`; `Producto` viene de la guía 1. Además, en esta guía escribís `ControladorPedidos`, `SolicitudDetalle`, `ServicioPedidos`, `RepositorioPedidos` y `RepositorioDetallesPedido` (el servicio **reutiliza** `ServicioProductos`).
 >
 > | Relación | Anotaciones | Dónde está la clave foránea |
 > |---|---|---|
