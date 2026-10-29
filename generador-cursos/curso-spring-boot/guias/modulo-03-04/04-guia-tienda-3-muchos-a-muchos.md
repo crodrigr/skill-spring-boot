@@ -413,4 +413,4 @@
 
 </details>
 
-⬅️ [Guía 2](03-guia-tienda-2-uno-a-muchos.md)
+⬅️ [Guía 2](03-guia-tienda-2-uno-a-muchos.md) · ➡️ **Siguiente (opcional):** [Guía 4 — Fase II: buenas prácticas](05-guia-tienda-fase-2-buenas-practicas.md)
