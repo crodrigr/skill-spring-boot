@@ -15,25 +15,33 @@
 
 > ```mermaid
 > classDiagram
->     direction LR
+>     direction TB
 >     class Pedido {
 >         <<Entity>>
+>         -Long id
+>         -LocalDate fecha
+>         -String estado
 >     }
 >     class DetallePedido {
 >         <<Entity>>
+>         -Long id
+>         -int cantidad
+>         -double precioUnitario
 >     }
 >     class Producto {
 >         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -double precio
+>         -int stock
 >     }
 >
->     Pedido "1" -- "*" DetallePedido : detalles / pedido
+>     Pedido "1" -- "*" DetallePedido : detalles
 >     DetallePedido "*" --> "1" Producto : producto
->
->     note for DetallePedido "Lado dueño: guarda las claves foráneas pedido_id y producto_id"
->     note for Producto "Ya existe (guía 1)"
 > ```
 >
-> Se agregan dos entidades, `Pedido` y `DetallePedido`; `Producto` viene de la guía 1. Además, en esta guía escribís `ControladorPedidos`, `SolicitudDetalle`, `ServicioPedidos`, `RepositorioPedidos` y `RepositorioDetallesPedido` (el servicio **reutiliza** `ServicioProductos`).
+>
+> Se agregan dos entidades, `Pedido` y `DetallePedido`; `Producto` viene de la guía 1. `DetallePedido` es el **lado dueño**: guarda las claves foráneas `pedido_id` y `producto_id`. Además, en esta guía escribís `ControladorPedidos`, `SolicitudDetalle`, `ServicioPedidos`, `RepositorioPedidos` y `RepositorioDetallesPedido` (el servicio **reutiliza** `ServicioProductos`).
 >
 > | Relación | Anotaciones | Dónde está la clave foránea |
 > |---|---|---|
