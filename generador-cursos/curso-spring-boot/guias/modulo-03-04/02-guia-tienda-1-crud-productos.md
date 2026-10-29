@@ -137,13 +137,12 @@
 > > import jakarta.persistence.GenerationType;
 > > import jakarta.persistence.Id;
 > > import lombok.AccessLevel;
-> > import lombok.Getter;
+> > import lombok.Data;
 > > import lombok.NoArgsConstructor;
 > > import lombok.Setter;
 > >
 > > @Entity
-> > @Getter
-> > @Setter
+> > @Data
 > > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class Producto {
 > >
@@ -171,13 +170,13 @@
 > >
 > > | Anotación | Qué genera |
 > > |---|---|
-> > | `@Getter` | Un getter por atributo: `getId()`, `getNombre()`, `getPrecio()`, `getStock()`. |
-> > | `@Setter` | Un setter por atributo (se usan al actualizar). En `id` se desactiva con `@Setter(AccessLevel.NONE)`: **el `id` lo decide la base**. |
+> > | `@Data` | Todo en uno: **getters**, **setters**, `toString()`, `equals()` y `hashCode()` de todos los atributos. |
+> > | `@Setter(AccessLevel.NONE)` (sobre `id`) | Le quita a `id` el setter que `@Data` generaría: **el `id` lo decide la base**. |
 > > | `@NoArgsConstructor(access = AccessLevel.PROTECTED)` | El constructor vacío `protected` que exige JPA para crear el objeto. |
 > >
 > > - El constructor con parámetros (`nombre`, `precio`, `stock`) se deja escrito: **sin `id`**, porque todavía no existe.
 > >
-> > > ⚠️ **No uses `@Data` en las entidades.** Genera `equals`, `hashCode` y `toString` que recorren **todos** los atributos, incluidas las relaciones: pueden disparar consultas o ciclos infinitos. En entidades, usá solo `@Getter` y `@Setter` (y solo donde hagan falta).
+> > > ⚠️ **`@Data` y las relaciones.** En `Producto` no hay problema: solo tiene datos simples. Pero cuando una entidad tiene **relaciones** (guías 2 y 3), `toString()`, `equals()` y `hashCode()` también recorren la relación, y si es **bidireccional** (pedido ↔ detalle) se llaman entre sí **sin fin** y aparece un `StackOverflowError`. La solución, que vas a aplicar: excluir esos atributos con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`.
 >
 > </details>
 >

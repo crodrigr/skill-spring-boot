@@ -105,16 +105,20 @@
 > > import java.util.ArrayList;
 > > import java.util.List;
 > > import lombok.AccessLevel;
-> > import lombok.Getter;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
 > > import lombok.NoArgsConstructor;
+> > import lombok.Setter;
+> > import lombok.ToString;
 > >
 > > @Entity
-> > @Getter
+> > @Data
 > > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class Pedido {
 > >
 > >     @Id
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     @Setter(AccessLevel.NONE)
 > >     private Long id;
 > >
 > >     private LocalDate fecha;
@@ -124,6 +128,8 @@
 > >     // Lado inverso: no crea columnas; "pedido" es el atributo de DetallePedido que tiene la clave foránea
 > >     @OneToMany(mappedBy = "pedido")
 > >     @JsonIgnore
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
 > >     private List<DetallePedido> detalles = new ArrayList<>();
 > >
 > >     public Pedido(LocalDate fecha, String estado) {
@@ -146,16 +152,20 @@
 > > import jakarta.persistence.JoinColumn;
 > > import jakarta.persistence.ManyToOne;
 > > import lombok.AccessLevel;
-> > import lombok.Getter;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
 > > import lombok.NoArgsConstructor;
+> > import lombok.Setter;
+> > import lombok.ToString;
 > >
 > > @Entity
-> > @Getter
+> > @Data
 > > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class DetallePedido {
 > >
 > >     @Id
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     @Setter(AccessLevel.NONE)
 > >     private Long id;
 > >
 > >     private int cantidad;
@@ -166,6 +176,8 @@
 > >     @ManyToOne
 > >     @JoinColumn(name = "pedido_id")
 > >     @JsonIgnore
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
 > >     private Pedido pedido;
 > >
 > >     // Muchos detalles pueden apuntar al mismo producto
@@ -183,7 +195,8 @@
 > > ```
 > >
 > > - **Lado dueño:** `DetallePedido` tiene la clave foránea (`@JoinColumn(name = "pedido_id")`). En `Pedido`, `mappedBy = "pedido"` solo dice «mirá ese atributo»: **no crea columnas**.
-> > - **Lombok:** `@Getter` genera los getters (estas entidades no necesitan setters: no se modifican después de crearse) y `@NoArgsConstructor(access = AccessLevel.PROTECTED)` el constructor vacío de JPA. `@JsonIgnore` funciona igual aunque el getter lo genere Lombok.
+> > - **Lombok:** `@Data` genera getters, setters, `toString`, `equals` y `hashCode`; `@Setter(AccessLevel.NONE)` protege el `id`; `@NoArgsConstructor(access = AccessLevel.PROTECTED)` da el constructor vacío de JPA. `@JsonIgnore` funciona igual aunque el getter lo genere Lombok.
+> > - **`@ToString.Exclude` y `@EqualsAndHashCode.Exclude`** en `Pedido.detalles` y en `DetallePedido.pedido`: **cortan el ciclo**. Sin ellas, `pedido.toString()` llama a `detalle.toString()`, que llama otra vez a `pedido.toString()`… hasta un `StackOverflowError` (se probó). Además evitan que un simple `toString()` en un log cargue la lista *lazy* completa.
 > > - **`@JsonIgnore`** en `DetallePedido.pedido` y `Pedido.detalles`: sin él, el JSON entraría en un **bucle infinito** (pedido → detalles → pedido…). Es un arreglo temporal; en el Módulo 5 se resuelve con DTO.
 >
 > </details>

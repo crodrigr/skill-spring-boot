@@ -122,16 +122,20 @@
 > > import java.util.HashSet;
 > > import java.util.Set;
 > > import lombok.AccessLevel;
-> > import lombok.Getter;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
 > > import lombok.NoArgsConstructor;
+> > import lombok.Setter;
+> > import lombok.ToString;
 > >
 > > @Entity
-> > @Getter
+> > @Data
 > > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class Cliente {
 > >
 > >     @Id
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     @Setter(AccessLevel.NONE)
 > >     private Long id;
 > >
 > >     private String nombre;
@@ -144,6 +148,8 @@
 > >             joinColumns = @JoinColumn(name = "cliente_id"),
 > >             inverseJoinColumns = @JoinColumn(name = "producto_id"))
 > >     @JsonIgnore
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
 > >     private Set<Producto> favoritos = new HashSet<>();
 > >
 > >     public Cliente(String nombre, String correo) {
@@ -154,7 +160,8 @@
 > > ```
 > >
 > > - **`@ManyToMany`** declara la relación; **`@JoinTable`** nombra la tabla intermedia y sus dos columnas: `@JoinColumn` para **este** lado y `inverseJoinColumns` para el **otro**.
-> > - **Lombok:** `@Getter` y `@NoArgsConstructor(access = AccessLevel.PROTECTED)`, igual que en la guía 2. `getFavoritos()` lo genera Lombok.
+> > - **Lombok:** `@Data`, `@Setter(AccessLevel.NONE)` en `id` y `@NoArgsConstructor(access = AccessLevel.PROTECTED)`, igual que en la guía 2. `getFavoritos()` lo genera Lombok.
+> > - `favoritos` lleva `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`: aunque la relación sea unidireccional (no hay ciclo), sin ellas `toString()` y `hashCode()` **cargarían toda la colección** de la base.
 > > - Se usa un `Set` (no una `List`): un producto **no puede repetirse** en los favoritos de un mismo cliente.
 > > - `Producto` **no se modifica**: no necesita saber qué clientes lo tienen como favorito (relación **unidireccional**).
 >
