@@ -83,264 +83,264 @@ Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 tecl
 <details open>
 <summary><strong>1. Las entidades</strong></summary>
 
-> **`src/main/java/com/tienda/negocio/model/Pedido.java`**
->
-> ```java
-> package com.tienda.negocio.model;
->
-> import com.fasterxml.jackson.annotation.JsonIgnore;
-> import jakarta.persistence.Entity;
-> import jakarta.persistence.GeneratedValue;
-> import jakarta.persistence.GenerationType;
-> import jakarta.persistence.Id;
-> import jakarta.persistence.OneToMany;
-> import java.time.LocalDate;
-> import java.util.ArrayList;
-> import java.util.List;
->
-> @Entity
-> public class Pedido {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private LocalDate fecha;
->
->     private String estado;
->
->     // Lado inverso: no crea columnas; "pedido" es el atributo de DetallePedido que tiene la clave foránea
->     @OneToMany(mappedBy = "pedido")
->     @JsonIgnore
->     private List<DetallePedido> detalles = new ArrayList<>();
->
->     protected Pedido() {
->     }
->
->     public Pedido(LocalDate fecha, String estado) {
->         this.fecha = fecha;
->         this.estado = estado;
->     }
->
->     public Long getId() { return id; }
->     public LocalDate getFecha() { return fecha; }
->     public String getEstado() { return estado; }
->     public List<DetallePedido> getDetalles() { return detalles; }
-> }
-> ```
->
-> **`src/main/java/com/tienda/negocio/model/DetallePedido.java`**
->
-> ```java
-> package com.tienda.negocio.model;
->
-> import com.fasterxml.jackson.annotation.JsonIgnore;
-> import jakarta.persistence.Entity;
-> import jakarta.persistence.GeneratedValue;
-> import jakarta.persistence.GenerationType;
-> import jakarta.persistence.Id;
-> import jakarta.persistence.JoinColumn;
-> import jakarta.persistence.ManyToOne;
->
-> @Entity
-> public class DetallePedido {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private int cantidad;
->
->     private double precioUnitario;
->
->     // Lado dueño: aquí vive la clave foránea pedido_id
->     @ManyToOne
->     @JoinColumn(name = "pedido_id")
->     @JsonIgnore
->     private Pedido pedido;
->
->     // Muchos detalles pueden apuntar al mismo producto
->     @ManyToOne
->     @JoinColumn(name = "producto_id")
->     private Producto producto;
->
->     protected DetallePedido() {
->     }
->
->     public DetallePedido(int cantidad, double precioUnitario, Pedido pedido, Producto producto) {
->         this.cantidad = cantidad;
->         this.precioUnitario = precioUnitario;
->         this.pedido = pedido;
->         this.producto = producto;
->     }
->
->     public Long getId() { return id; }
->     public int getCantidad() { return cantidad; }
->     public double getPrecioUnitario() { return precioUnitario; }
->     public Producto getProducto() { return producto; }
-> }
-> ```
->
-> - **Lado dueño:** `DetallePedido` tiene la clave foránea (`@JoinColumn(name = "pedido_id")`). En `Pedido`, `mappedBy = "pedido"` solo dice «mirá ese atributo»: **no crea columnas**.
-> - **`@JsonIgnore`** en `DetallePedido.pedido` y `Pedido.detalles`: sin él, el JSON entraría en un **bucle infinito** (pedido → detalles → pedido…). Es un arreglo temporal; en el Módulo 5 se resuelve con DTO.
+> > **`src/main/java/com/tienda/negocio/model/Pedido.java`**
+> >
+> > ```java
+> > package com.tienda.negocio.model;
+> >
+> > import com.fasterxml.jackson.annotation.JsonIgnore;
+> > import jakarta.persistence.Entity;
+> > import jakarta.persistence.GeneratedValue;
+> > import jakarta.persistence.GenerationType;
+> > import jakarta.persistence.Id;
+> > import jakarta.persistence.OneToMany;
+> > import java.time.LocalDate;
+> > import java.util.ArrayList;
+> > import java.util.List;
+> >
+> > @Entity
+> > public class Pedido {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private LocalDate fecha;
+> >
+> >     private String estado;
+> >
+> >     // Lado inverso: no crea columnas; "pedido" es el atributo de DetallePedido que tiene la clave foránea
+> >     @OneToMany(mappedBy = "pedido")
+> >     @JsonIgnore
+> >     private List<DetallePedido> detalles = new ArrayList<>();
+> >
+> >     protected Pedido() {
+> >     }
+> >
+> >     public Pedido(LocalDate fecha, String estado) {
+> >         this.fecha = fecha;
+> >         this.estado = estado;
+> >     }
+> >
+> >     public Long getId() { return id; }
+> >     public LocalDate getFecha() { return fecha; }
+> >     public String getEstado() { return estado; }
+> >     public List<DetallePedido> getDetalles() { return detalles; }
+> > }
+> > ```
+> >
+> > **`src/main/java/com/tienda/negocio/model/DetallePedido.java`**
+> >
+> > ```java
+> > package com.tienda.negocio.model;
+> >
+> > import com.fasterxml.jackson.annotation.JsonIgnore;
+> > import jakarta.persistence.Entity;
+> > import jakarta.persistence.GeneratedValue;
+> > import jakarta.persistence.GenerationType;
+> > import jakarta.persistence.Id;
+> > import jakarta.persistence.JoinColumn;
+> > import jakarta.persistence.ManyToOne;
+> >
+> > @Entity
+> > public class DetallePedido {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private int cantidad;
+> >
+> >     private double precioUnitario;
+> >
+> >     // Lado dueño: aquí vive la clave foránea pedido_id
+> >     @ManyToOne
+> >     @JoinColumn(name = "pedido_id")
+> >     @JsonIgnore
+> >     private Pedido pedido;
+> >
+> >     // Muchos detalles pueden apuntar al mismo producto
+> >     @ManyToOne
+> >     @JoinColumn(name = "producto_id")
+> >     private Producto producto;
+> >
+> >     protected DetallePedido() {
+> >     }
+> >
+> >     public DetallePedido(int cantidad, double precioUnitario, Pedido pedido, Producto producto) {
+> >         this.cantidad = cantidad;
+> >         this.precioUnitario = precioUnitario;
+> >         this.pedido = pedido;
+> >         this.producto = producto;
+> >     }
+> >
+> >     public Long getId() { return id; }
+> >     public int getCantidad() { return cantidad; }
+> >     public double getPrecioUnitario() { return precioUnitario; }
+> >     public Producto getProducto() { return producto; }
+> > }
+> > ```
+> >
+> > - **Lado dueño:** `DetallePedido` tiene la clave foránea (`@JoinColumn(name = "pedido_id")`). En `Pedido`, `mappedBy = "pedido"` solo dice «mirá ese atributo»: **no crea columnas**.
+> > - **`@JsonIgnore`** en `DetallePedido.pedido` y `Pedido.detalles`: sin él, el JSON entraría en un **bucle infinito** (pedido → detalles → pedido…). Es un arreglo temporal; en el Módulo 5 se resuelve con DTO.
 
 </details>
 
 <details open>
 <summary><strong>2. Los repositorios</strong></summary>
 
-> **`src/main/java/com/tienda/persistence/repository/RepositorioPedidos.java`**
->
-> ```java
-> package com.tienda.persistence.repository;
->
-> import com.tienda.negocio.model.Pedido;
-> import org.springframework.data.jpa.repository.JpaRepository;
->
-> public interface RepositorioPedidos extends JpaRepository<Pedido, Long> {
-> }
-> ```
->
-> **`src/main/java/com/tienda/persistence/repository/RepositorioDetallesPedido.java`**
->
-> ```java
-> package com.tienda.persistence.repository;
->
-> import com.tienda.negocio.model.DetallePedido;
-> import org.springframework.data.jpa.repository.JpaRepository;
->
-> public interface RepositorioDetallesPedido extends JpaRepository<DetallePedido, Long> {
-> }
-> ```
+> > **`src/main/java/com/tienda/persistence/repository/RepositorioPedidos.java`**
+> >
+> > ```java
+> > package com.tienda.persistence.repository;
+> >
+> > import com.tienda.negocio.model.Pedido;
+> > import org.springframework.data.jpa.repository.JpaRepository;
+> >
+> > public interface RepositorioPedidos extends JpaRepository<Pedido, Long> {
+> > }
+> > ```
+> >
+> > **`src/main/java/com/tienda/persistence/repository/RepositorioDetallesPedido.java`**
+> >
+> > ```java
+> > package com.tienda.persistence.repository;
+> >
+> > import com.tienda.negocio.model.DetallePedido;
+> > import org.springframework.data.jpa.repository.JpaRepository;
+> >
+> > public interface RepositorioDetallesPedido extends JpaRepository<DetallePedido, Long> {
+> > }
+> > ```
 
 </details>
 
 <details open>
 <summary><strong>3. El servicio</strong></summary>
 
-> **`src/main/java/com/tienda/negocio/service/ServicioPedidos.java`**
->
-> ```java
-> package com.tienda.negocio.service;
->
-> import com.tienda.negocio.model.DetallePedido;
-> import com.tienda.negocio.model.Pedido;
-> import com.tienda.negocio.model.Producto;
-> import com.tienda.persistence.repository.RepositorioDetallesPedido;
-> import com.tienda.persistence.repository.RepositorioPedidos;
-> import java.time.LocalDate;
-> import java.util.List;
-> import java.util.NoSuchElementException;
-> import org.springframework.stereotype.Service;
-> import org.springframework.transaction.annotation.Transactional;
->
-> @Service
-> public class ServicioPedidos {
->
->     private final RepositorioPedidos repositorio;
->     private final RepositorioDetallesPedido repositorioDetalles;
->     private final ServicioProductos servicioProductos;
->
->     public ServicioPedidos(RepositorioPedidos repositorio,
->                            RepositorioDetallesPedido repositorioDetalles,
->                            ServicioProductos servicioProductos) {
->         this.repositorio = repositorio;
->         this.repositorioDetalles = repositorioDetalles;
->         this.servicioProductos = servicioProductos;
->     }
->
->     public Pedido crear() {
->         return repositorio.save(new Pedido(LocalDate.now(), "CREADO"));
->     }
->
->     public Pedido obtener(Long id) {
->         return repositorio.findById(id)
->                 .orElseThrow(() -> new NoSuchElementException("No existe el pedido " + id));
->     }
->
->     public DetallePedido agregarDetalle(Long pedidoId, Long productoId, int cantidad) {
->         Pedido pedido = obtener(pedidoId);
->         Producto producto = servicioProductos.obtener(productoId);
->         // El precio se copia del producto: si mañana cambia, este pedido conserva el precio de hoy
->         return repositorioDetalles.save(new DetallePedido(cantidad, producto.getPrecio(), pedido, producto));
->     }
->
->     // @Transactional: la lista "detalles" es LAZY y solo se puede leer con la sesión abierta
->     @Transactional(readOnly = true)
->     public List<DetallePedido> listarDetalles(Long pedidoId) {
->         return List.copyOf(obtener(pedidoId).getDetalles());
->     }
-> }
-> ```
->
-> - `agregarDetalle` **reutiliza** `ServicioProductos` (guía 1) para validar que el producto exista y **copia su precio** al detalle: si el precio del producto cambia después, el pedido conserva el de ese día.
-> - `listarDetalles` es `@Transactional` porque `detalles` se carga **bajo demanda** (*lazy*): solo se puede leer con la sesión abierta.
+> > **`src/main/java/com/tienda/negocio/service/ServicioPedidos.java`**
+> >
+> > ```java
+> > package com.tienda.negocio.service;
+> >
+> > import com.tienda.negocio.model.DetallePedido;
+> > import com.tienda.negocio.model.Pedido;
+> > import com.tienda.negocio.model.Producto;
+> > import com.tienda.persistence.repository.RepositorioDetallesPedido;
+> > import com.tienda.persistence.repository.RepositorioPedidos;
+> > import java.time.LocalDate;
+> > import java.util.List;
+> > import java.util.NoSuchElementException;
+> > import org.springframework.stereotype.Service;
+> > import org.springframework.transaction.annotation.Transactional;
+> >
+> > @Service
+> > public class ServicioPedidos {
+> >
+> >     private final RepositorioPedidos repositorio;
+> >     private final RepositorioDetallesPedido repositorioDetalles;
+> >     private final ServicioProductos servicioProductos;
+> >
+> >     public ServicioPedidos(RepositorioPedidos repositorio,
+> >                            RepositorioDetallesPedido repositorioDetalles,
+> >                            ServicioProductos servicioProductos) {
+> >         this.repositorio = repositorio;
+> >         this.repositorioDetalles = repositorioDetalles;
+> >         this.servicioProductos = servicioProductos;
+> >     }
+> >
+> >     public Pedido crear() {
+> >         return repositorio.save(new Pedido(LocalDate.now(), "CREADO"));
+> >     }
+> >
+> >     public Pedido obtener(Long id) {
+> >         return repositorio.findById(id)
+> >                 .orElseThrow(() -> new NoSuchElementException("No existe el pedido " + id));
+> >     }
+> >
+> >     public DetallePedido agregarDetalle(Long pedidoId, Long productoId, int cantidad) {
+> >         Pedido pedido = obtener(pedidoId);
+> >         Producto producto = servicioProductos.obtener(productoId);
+> >         // El precio se copia del producto: si mañana cambia, este pedido conserva el precio de hoy
+> >         return repositorioDetalles.save(new DetallePedido(cantidad, producto.getPrecio(), pedido, producto));
+> >     }
+> >
+> >     // @Transactional: la lista "detalles" es LAZY y solo se puede leer con la sesión abierta
+> >     @Transactional(readOnly = true)
+> >     public List<DetallePedido> listarDetalles(Long pedidoId) {
+> >         return List.copyOf(obtener(pedidoId).getDetalles());
+> >     }
+> > }
+> > ```
+> >
+> > - `agregarDetalle` **reutiliza** `ServicioProductos` (guía 1) para validar que el producto exista y **copia su precio** al detalle: si el precio del producto cambia después, el pedido conserva el de ese día.
+> > - `listarDetalles` es `@Transactional` porque `detalles` se carga **bajo demanda** (*lazy*): solo se puede leer con la sesión abierta.
 
 </details>
 
 <details open>
 <summary><strong>4. El controlador</strong></summary>
 
-> **`src/main/java/com/tienda/presentacion/controlador/SolicitudDetalle.java`**
->
-> ```java
-> package com.tienda.presentacion.controlador;
->
-> public record SolicitudDetalle(Long productoId, int cantidad) {
-> }
-> ```
->
-> **`src/main/java/com/tienda/presentacion/controlador/ControladorPedidos.java`**
->
-> ```java
-> package com.tienda.presentacion.controlador;
->
-> import com.tienda.negocio.model.DetallePedido;
-> import com.tienda.negocio.model.Pedido;
-> import com.tienda.negocio.service.ServicioPedidos;
-> import java.util.List;
-> import org.springframework.http.HttpStatus;
-> import org.springframework.web.bind.annotation.GetMapping;
-> import org.springframework.web.bind.annotation.PathVariable;
-> import org.springframework.web.bind.annotation.PostMapping;
-> import org.springframework.web.bind.annotation.RequestBody;
-> import org.springframework.web.bind.annotation.RequestMapping;
-> import org.springframework.web.bind.annotation.ResponseStatus;
-> import org.springframework.web.bind.annotation.RestController;
->
-> @RestController
-> @RequestMapping("/pedidos")
-> public class ControladorPedidos {
->
->     private final ServicioPedidos servicio;
->
->     public ControladorPedidos(ServicioPedidos servicio) {
->         this.servicio = servicio;
->     }
->
->     @PostMapping
->     @ResponseStatus(HttpStatus.CREATED)
->     public Pedido crear() {
->         return servicio.crear();
->     }
->
->     @GetMapping("/{id}")
->     public Pedido obtener(@PathVariable Long id) {
->         return servicio.obtener(id);
->     }
->
->     @PostMapping("/{id}/detalles")
->     @ResponseStatus(HttpStatus.CREATED)
->     public DetallePedido agregarDetalle(@PathVariable Long id, @RequestBody SolicitudDetalle solicitud) {
->         return servicio.agregarDetalle(id, solicitud.productoId(), solicitud.cantidad());
->     }
->
->     @GetMapping("/{id}/detalles")
->     public List<DetallePedido> listarDetalles(@PathVariable Long id) {
->         return servicio.listarDetalles(id);
->     }
-> }
-> ```
+> > **`src/main/java/com/tienda/presentacion/controlador/SolicitudDetalle.java`**
+> >
+> > ```java
+> > package com.tienda.presentacion.controlador;
+> >
+> > public record SolicitudDetalle(Long productoId, int cantidad) {
+> > }
+> > ```
+> >
+> > **`src/main/java/com/tienda/presentacion/controlador/ControladorPedidos.java`**
+> >
+> > ```java
+> > package com.tienda.presentacion.controlador;
+> >
+> > import com.tienda.negocio.model.DetallePedido;
+> > import com.tienda.negocio.model.Pedido;
+> > import com.tienda.negocio.service.ServicioPedidos;
+> > import java.util.List;
+> > import org.springframework.http.HttpStatus;
+> > import org.springframework.web.bind.annotation.GetMapping;
+> > import org.springframework.web.bind.annotation.PathVariable;
+> > import org.springframework.web.bind.annotation.PostMapping;
+> > import org.springframework.web.bind.annotation.RequestBody;
+> > import org.springframework.web.bind.annotation.RequestMapping;
+> > import org.springframework.web.bind.annotation.ResponseStatus;
+> > import org.springframework.web.bind.annotation.RestController;
+> >
+> > @RestController
+> > @RequestMapping("/pedidos")
+> > public class ControladorPedidos {
+> >
+> >     private final ServicioPedidos servicio;
+> >
+> >     public ControladorPedidos(ServicioPedidos servicio) {
+> >         this.servicio = servicio;
+> >     }
+> >
+> >     @PostMapping
+> >     @ResponseStatus(HttpStatus.CREATED)
+> >     public Pedido crear() {
+> >         return servicio.crear();
+> >     }
+> >
+> >     @GetMapping("/{id}")
+> >     public Pedido obtener(@PathVariable Long id) {
+> >         return servicio.obtener(id);
+> >     }
+> >
+> >     @PostMapping("/{id}/detalles")
+> >     @ResponseStatus(HttpStatus.CREATED)
+> >     public DetallePedido agregarDetalle(@PathVariable Long id, @RequestBody SolicitudDetalle solicitud) {
+> >         return servicio.agregarDetalle(id, solicitud.productoId(), solicitud.cantidad());
+> >     }
+> >
+> >     @GetMapping("/{id}/detalles")
+> >     public List<DetallePedido> listarDetalles(@PathVariable Long id) {
+> >         return servicio.listarDetalles(id);
+> >     }
+> > }
+> > ```
 
 </details>
 
