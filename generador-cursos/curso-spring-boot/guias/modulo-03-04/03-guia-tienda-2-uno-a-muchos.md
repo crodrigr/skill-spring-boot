@@ -20,7 +20,6 @@ classDiagram
     }
     class ServicioProductos {
         <<Service · existente>>
-        +obtener(Long)
     }
     class RepositorioProductos {
         <<interface · existente>>
@@ -34,10 +33,6 @@ classDiagram
     }
     class ControladorPedidos {
         <<RestController · NUEVA>>
-        +crear()
-        +obtener(Long)
-        +agregarDetalle(Long, SolicitudDetalle)
-        +listarDetalles(Long)
     }
     class SolicitudDetalle {
         <<record · NUEVA>>
@@ -46,10 +41,6 @@ classDiagram
     }
     class ServicioPedidos {
         <<Service · NUEVA>>
-        +crear()
-        +obtener(Long)
-        +agregarDetalle(Long, Long, int)
-        +listarDetalles(Long)
     }
     class RepositorioPedidos {
         <<interface · NUEVA>>

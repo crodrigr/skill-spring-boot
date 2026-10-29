@@ -20,7 +20,6 @@ classDiagram
     }
     class ServicioProductos {
         <<Service · existente>>
-        +obtener(Long)
     }
     class RepositorioProductos {
         <<interface · existente>>
@@ -61,18 +60,9 @@ classDiagram
     }
     class ControladorClientes {
         <<RestController · NUEVA>>
-        +crear(Cliente)
-        +agregarFavorito(Long, Long)
-        +listarFavoritos(Long)
-        +quitarFavorito(Long, Long)
     }
     class ServicioClientes {
         <<Service · NUEVA>>
-        +crear(Cliente)
-        +obtener(Long)
-        +agregarFavorito(Long, Long)
-        +listarFavoritos(Long)
-        +quitarFavorito(Long, Long)
     }
     class RepositorioClientes {
         <<interface · NUEVA>>

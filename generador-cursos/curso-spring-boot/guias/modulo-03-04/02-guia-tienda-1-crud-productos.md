@@ -22,30 +22,18 @@ classDiagram
     direction TB
     class TiendaApplication {
         <<SpringBootApplication · NUEVA>>
-        +main(String[])$
     }
     class ControladorProductos {
         <<RestController · NUEVA>>
-        +crear(Producto)
-        +listar()
-        +obtener(Long)
-        +actualizar(Long, Producto)
-        +eliminar(Long)
     }
     class ServicioProductos {
         <<Service · NUEVA>>
-        +crear(Producto)
-        +listar()
-        +obtener(Long)
-        +actualizar(Long, Producto)
-        +eliminar(Long)
     }
     class RepositorioProductos {
         <<interface · NUEVA>>
     }
     class JpaRepository {
         <<interface · Spring Data>>
-        +save() findAll() findById() delete()
     }
     class Producto {
         <<Entity · NUEVA>>
