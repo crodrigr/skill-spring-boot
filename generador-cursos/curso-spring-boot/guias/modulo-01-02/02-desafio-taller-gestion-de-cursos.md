@@ -111,33 +111,14 @@ done
 
 ---
 
-## 🧠 Preguntas de comprensión (se responden por escrito)
-
-1. ¿Por qué RN-12 y RN-13 se validan en `ServicioEstudiantes` y no en el controlador?
-2. ¿Qué mensaje vería Ana al repetir su matrícula en el curso 2 (cuando ya tiene 3) si el
-   control de **límite** se evaluara **antes** que el de «ya matriculado»? ¿Y si intentara
-   entrar en un curso **lleno** teniendo ya 3 matrículas, con el control de **cupos** antes
-   que el del límite? Explicar por qué importa el orden.
-3. ¿Por qué el escenario 10 funciona sin escribir código para RN-16? ¿Qué cambiaría si el
-   contador de matriculados fuera un atributo guardado en `Curso` en vez de calcularse?
-4. ¿Cuándo conviene `@RequestParam` y cuándo `@PathVariable`? Dar un ejemplo del taller de
-   cada uno.
-5. ¿Por qué `DELETE` responde `204` y no `200`? ¿Qué pasaría con `@ResponseStatus` si se
-   omitiera?
-6. Si se cambiara el almacenamiento a un `Map<Long, Matricula>`, ¿qué clases habría que
-   tocar para que los nuevos métodos sigan funcionando?
-
----
-
 ## 📊 Criterios de evaluación
 
 | Criterio | Peso |
 |---|:-:|
-| Las reglas RN-12 a RN-16 se cumplen (escenarios 1 a 13) | 40 % |
-| Cada regla está en la **capa correcta**; el controlador no tiene reglas | 20 % |
+| Las reglas RN-12 a RN-16 se cumplen (escenarios 1 a 13) | 45 % |
+| Cada regla está en la **capa correcta**; el controlador no tiene reglas | 25 % |
 | Repositorio: interfaz ampliada e implementación en memoria coherentes | 15 % |
-| Calidad del código: constantes con nombre, mensajes claros, nombres consistentes | 10 % |
-| Respuestas a las preguntas de comprensión | 15 % |
+| Calidad del código: constantes con nombre, mensajes claros, nombres consistentes | 15 % |
 
 ---
 
@@ -155,7 +136,7 @@ done
 ---
 
 <details>
-<summary><strong>🔑 Solución de referencia (solo para quien termine o para el docente)</strong></summary>
+<summary><strong>🔑</strong></summary>
 
 > ⚠️ Conviene intentarlo primero. Esta es **una** forma de resolverlo, no la única.
 >
