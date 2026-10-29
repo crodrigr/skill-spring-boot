@@ -52,206 +52,206 @@ Están **todas** las clases de la guía (`TiendaApplication` la genera Initializ
 <details open>
 <summary><strong>1. Configurar la base de datos</strong></summary>
 
-**`src/main/resources/application.properties`**
-
-```properties
-spring.datasource.url=jdbc:h2:mem:tienda;DB_CLOSE_DELAY=-1
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.h2.console.enabled=true
-```
-
-- `ddl-auto=update`: Hibernate **crea la tabla** a partir de la entidad.
-- `show-sql=true`: ves en consola el SQL que genera.
-- La consola de H2 queda en `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:tienda`, usuario `sa`, sin contraseña).
+> **`src/main/resources/application.properties`**
+>
+> ```properties
+> spring.datasource.url=jdbc:h2:mem:tienda;DB_CLOSE_DELAY=-1
+> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.show-sql=true
+> spring.h2.console.enabled=true
+> ```
+>
+> - `ddl-auto=update`: Hibernate **crea la tabla** a partir de la entidad.
+> - `show-sql=true`: ves en consola el SQL que genera.
+> - La consola de H2 queda en `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:tienda`, usuario `sa`, sin contraseña).
 
 </details>
 
 <details open>
 <summary><strong>2. La entidad</strong></summary>
 
-**`src/main/java/com/tienda/negocio/model/Producto.java`**
-
-```java
-package com.tienda.negocio.model;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-public class Producto {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String nombre;
-
-    private double precio;
-
-    private int stock;
-
-    protected Producto() {
-    }
-
-    public Producto(String nombre, double precio, int stock) {
-        this.nombre = nombre;
-        this.precio = precio;
-        this.stock = stock;
-    }
-
-    public Long getId() { return id; }
-    public String getNombre() { return nombre; }
-    public double getPrecio() { return precio; }
-    public int getStock() { return stock; }
-
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public void setPrecio(double precio) { this.precio = precio; }
-    public void setStock(int stock) { this.stock = stock; }
-}
-```
-
-- **`@Entity`**: la clase se guarda en una tabla. **`@Id`** + **`@GeneratedValue(IDENTITY)`**: la clave primaria la genera la base.
-- El constructor `protected` sin argumentos lo necesita JPA para crear el objeto; los *setters* se usan al actualizar.
+> **`src/main/java/com/tienda/negocio/model/Producto.java`**
+>
+> ```java
+> package com.tienda.negocio.model;
+>
+> import jakarta.persistence.Entity;
+> import jakarta.persistence.GeneratedValue;
+> import jakarta.persistence.GenerationType;
+> import jakarta.persistence.Id;
+>
+> @Entity
+> public class Producto {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     private double precio;
+>
+>     private int stock;
+>
+>     protected Producto() {
+>     }
+>
+>     public Producto(String nombre, double precio, int stock) {
+>         this.nombre = nombre;
+>         this.precio = precio;
+>         this.stock = stock;
+>     }
+>
+>     public Long getId() { return id; }
+>     public String getNombre() { return nombre; }
+>     public double getPrecio() { return precio; }
+>     public int getStock() { return stock; }
+>
+>     public void setNombre(String nombre) { this.nombre = nombre; }
+>     public void setPrecio(double precio) { this.precio = precio; }
+>     public void setStock(int stock) { this.stock = stock; }
+> }
+> ```
+>
+> - **`@Entity`**: la clase se guarda en una tabla. **`@Id`** + **`@GeneratedValue(IDENTITY)`**: la clave primaria la genera la base.
+> - El constructor `protected` sin argumentos lo necesita JPA para crear el objeto; los *setters* se usan al actualizar.
 
 </details>
 
 <details open>
 <summary><strong>3. El repositorio</strong></summary>
 
-**`src/main/java/com/tienda/persistence/repository/RepositorioProductos.java`**
-
-```java
-package com.tienda.persistence.repository;
-
-import com.tienda.negocio.model.Producto;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface RepositorioProductos extends JpaRepository<Producto, Long> {
-}
-```
-
-Sin una sola línea de código, ya tenés `save`, `findAll`, `findById`, `delete`… **Spring Data genera la clase** al arrancar.
+> **`src/main/java/com/tienda/persistence/repository/RepositorioProductos.java`**
+>
+> ```java
+> package com.tienda.persistence.repository;
+>
+> import com.tienda.negocio.model.Producto;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> public interface RepositorioProductos extends JpaRepository<Producto, Long> {
+> }
+> ```
+>
+> Sin una sola línea de código, ya tenés `save`, `findAll`, `findById`, `delete`… **Spring Data genera la clase** al arrancar.
 
 </details>
 
 <details open>
 <summary><strong>4. El servicio</strong></summary>
 
-**`src/main/java/com/tienda/negocio/service/ServicioProductos.java`**
-
-```java
-package com.tienda.negocio.service;
-
-import com.tienda.negocio.model.Producto;
-import com.tienda.persistence.repository.RepositorioProductos;
-import java.util.List;
-import java.util.NoSuchElementException;
-import org.springframework.stereotype.Service;
-
-@Service
-public class ServicioProductos {
-
-    private final RepositorioProductos repositorio;
-
-    public ServicioProductos(RepositorioProductos repositorio) {
-        this.repositorio = repositorio;
-    }
-
-    public Producto crear(Producto producto) {
-        // Se crea uno nuevo: así se ignora cualquier id que envíe el cliente
-        return repositorio.save(new Producto(producto.getNombre(), producto.getPrecio(), producto.getStock()));
-    }
-
-    public List<Producto> listar() {
-        return repositorio.findAll();
-    }
-
-    public Producto obtener(Long id) {
-        return repositorio.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No existe el producto " + id));
-    }
-
-    public Producto actualizar(Long id, Producto datos) {
-        Producto producto = obtener(id);
-        producto.setNombre(datos.getNombre());
-        producto.setPrecio(datos.getPrecio());
-        producto.setStock(datos.getStock());
-        return repositorio.save(producto);
-    }
-
-    public void eliminar(Long id) {
-        repositorio.delete(obtener(id));
-    }
-}
-```
-
-> ⚠️ **Detalle importante:** en `crear` se construye un `Producto` **nuevo**. Si se guardara el que llega, un `POST` con `"id": 1` **actualizaría** el producto 1 en lugar de crear uno.
+> **`src/main/java/com/tienda/negocio/service/ServicioProductos.java`**
+>
+> ```java
+> package com.tienda.negocio.service;
+>
+> import com.tienda.negocio.model.Producto;
+> import com.tienda.persistence.repository.RepositorioProductos;
+> import java.util.List;
+> import java.util.NoSuchElementException;
+> import org.springframework.stereotype.Service;
+>
+> @Service
+> public class ServicioProductos {
+>
+>     private final RepositorioProductos repositorio;
+>
+>     public ServicioProductos(RepositorioProductos repositorio) {
+>         this.repositorio = repositorio;
+>     }
+>
+>     public Producto crear(Producto producto) {
+>         // Se crea uno nuevo: así se ignora cualquier id que envíe el cliente
+>         return repositorio.save(new Producto(producto.getNombre(), producto.getPrecio(), producto.getStock()));
+>     }
+>
+>     public List<Producto> listar() {
+>         return repositorio.findAll();
+>     }
+>
+>     public Producto obtener(Long id) {
+>         return repositorio.findById(id)
+>                 .orElseThrow(() -> new NoSuchElementException("No existe el producto " + id));
+>     }
+>
+>     public Producto actualizar(Long id, Producto datos) {
+>         Producto producto = obtener(id);
+>         producto.setNombre(datos.getNombre());
+>         producto.setPrecio(datos.getPrecio());
+>         producto.setStock(datos.getStock());
+>         return repositorio.save(producto);
+>     }
+>
+>     public void eliminar(Long id) {
+>         repositorio.delete(obtener(id));
+>     }
+> }
+> ```
+>
+> > ⚠️ **Detalle importante:** en `crear` se construye un `Producto` **nuevo**. Si se guardara el que llega, un `POST` con `"id": 1` **actualizaría** el producto 1 en lugar de crear uno.
 
 </details>
 
 <details open>
 <summary><strong>5. El controlador (los cinco endpoints)</strong></summary>
 
-**`src/main/java/com/tienda/presentacion/controlador/ControladorProductos.java`**
-
-```java
-package com.tienda.presentacion.controlador;
-
-import com.tienda.negocio.model.Producto;
-import com.tienda.negocio.service.ServicioProductos;
-import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("/productos")
-public class ControladorProductos {
-
-    private final ServicioProductos servicio;
-
-    public ControladorProductos(ServicioProductos servicio) {
-        this.servicio = servicio;
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Producto crear(@RequestBody Producto producto) {
-        return servicio.crear(producto);
-    }
-
-    @GetMapping
-    public List<Producto> listar() {
-        return servicio.listar();
-    }
-
-    @GetMapping("/{id}")
-    public Producto obtener(@PathVariable Long id) {
-        return servicio.obtener(id);
-    }
-
-    @PutMapping("/{id}")
-    public Producto actualizar(@PathVariable Long id, @RequestBody Producto producto) {
-        return servicio.actualizar(id, producto);
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Long id) {
-        servicio.eliminar(id);
-    }
-}
-```
+> **`src/main/java/com/tienda/presentacion/controlador/ControladorProductos.java`**
+>
+> ```java
+> package com.tienda.presentacion.controlador;
+>
+> import com.tienda.negocio.model.Producto;
+> import com.tienda.negocio.service.ServicioProductos;
+> import java.util.List;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.web.bind.annotation.DeleteMapping;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PathVariable;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.PutMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.ResponseStatus;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> @RestController
+> @RequestMapping("/productos")
+> public class ControladorProductos {
+>
+>     private final ServicioProductos servicio;
+>
+>     public ControladorProductos(ServicioProductos servicio) {
+>         this.servicio = servicio;
+>     }
+>
+>     @PostMapping
+>     @ResponseStatus(HttpStatus.CREATED)
+>     public Producto crear(@RequestBody Producto producto) {
+>         return servicio.crear(producto);
+>     }
+>
+>     @GetMapping
+>     public List<Producto> listar() {
+>         return servicio.listar();
+>     }
+>
+>     @GetMapping("/{id}")
+>     public Producto obtener(@PathVariable Long id) {
+>         return servicio.obtener(id);
+>     }
+>
+>     @PutMapping("/{id}")
+>     public Producto actualizar(@PathVariable Long id, @RequestBody Producto producto) {
+>         return servicio.actualizar(id, producto);
+>     }
+>
+>     @DeleteMapping("/{id}")
+>     @ResponseStatus(HttpStatus.NO_CONTENT)
+>     public void eliminar(@PathVariable Long id) {
+>         servicio.eliminar(id);
+>     }
+> }
+> ```
 
 </details>
 

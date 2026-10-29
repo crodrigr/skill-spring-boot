@@ -99,196 +99,196 @@ Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil,
 <details open>
 <summary><strong>1. La entidad</strong></summary>
 
-**`src/main/java/com/tienda/negocio/model/Cliente.java`**
-
-```java
-package com.tienda.negocio.model;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import java.util.HashSet;
-import java.util.Set;
-
-@Entity
-public class Cliente {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String nombre;
-
-    private String correo;
-
-    // Lado dueño: JPA crea la tabla intermedia cliente_favorito con dos claves foráneas
-    @ManyToMany
-    @JoinTable(name = "cliente_favorito",
-            joinColumns = @JoinColumn(name = "cliente_id"),
-            inverseJoinColumns = @JoinColumn(name = "producto_id"))
-    @JsonIgnore
-    private Set<Producto> favoritos = new HashSet<>();
-
-    protected Cliente() {
-    }
-
-    public Cliente(String nombre, String correo) {
-        this.nombre = nombre;
-        this.correo = correo;
-    }
-
-    public Long getId() { return id; }
-    public String getNombre() { return nombre; }
-    public String getCorreo() { return correo; }
-    public Set<Producto> getFavoritos() { return favoritos; }
-}
-```
-
-- **`@ManyToMany`** declara la relación; **`@JoinTable`** nombra la tabla intermedia y sus dos columnas: `@JoinColumn` para **este** lado y `inverseJoinColumns` para el **otro**.
-- Se usa un `Set` (no una `List`): un producto **no puede repetirse** en los favoritos de un mismo cliente.
-- `Producto` **no se modifica**: no necesita saber qué clientes lo tienen como favorito (relación **unidireccional**).
+> **`src/main/java/com/tienda/negocio/model/Cliente.java`**
+>
+> ```java
+> package com.tienda.negocio.model;
+>
+> import com.fasterxml.jackson.annotation.JsonIgnore;
+> import jakarta.persistence.Entity;
+> import jakarta.persistence.GeneratedValue;
+> import jakarta.persistence.GenerationType;
+> import jakarta.persistence.Id;
+> import jakarta.persistence.JoinColumn;
+> import jakarta.persistence.JoinTable;
+> import jakarta.persistence.ManyToMany;
+> import java.util.HashSet;
+> import java.util.Set;
+>
+> @Entity
+> public class Cliente {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     private String correo;
+>
+>     // Lado dueño: JPA crea la tabla intermedia cliente_favorito con dos claves foráneas
+>     @ManyToMany
+>     @JoinTable(name = "cliente_favorito",
+>             joinColumns = @JoinColumn(name = "cliente_id"),
+>             inverseJoinColumns = @JoinColumn(name = "producto_id"))
+>     @JsonIgnore
+>     private Set<Producto> favoritos = new HashSet<>();
+>
+>     protected Cliente() {
+>     }
+>
+>     public Cliente(String nombre, String correo) {
+>         this.nombre = nombre;
+>         this.correo = correo;
+>     }
+>
+>     public Long getId() { return id; }
+>     public String getNombre() { return nombre; }
+>     public String getCorreo() { return correo; }
+>     public Set<Producto> getFavoritos() { return favoritos; }
+> }
+> ```
+>
+> - **`@ManyToMany`** declara la relación; **`@JoinTable`** nombra la tabla intermedia y sus dos columnas: `@JoinColumn` para **este** lado y `inverseJoinColumns` para el **otro**.
+> - Se usa un `Set` (no una `List`): un producto **no puede repetirse** en los favoritos de un mismo cliente.
+> - `Producto` **no se modifica**: no necesita saber qué clientes lo tienen como favorito (relación **unidireccional**).
 
 </details>
 
 <details open>
 <summary><strong>2. El repositorio</strong></summary>
 
-**`src/main/java/com/tienda/persistence/repository/RepositorioClientes.java`**
-
-```java
-package com.tienda.persistence.repository;
-
-import com.tienda.negocio.model.Cliente;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface RepositorioClientes extends JpaRepository<Cliente, Long> {
-}
-```
+> **`src/main/java/com/tienda/persistence/repository/RepositorioClientes.java`**
+>
+> ```java
+> package com.tienda.persistence.repository;
+>
+> import com.tienda.negocio.model.Cliente;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> public interface RepositorioClientes extends JpaRepository<Cliente, Long> {
+> }
+> ```
 
 </details>
 
 <details open>
 <summary><strong>3. El servicio</strong></summary>
 
-**`src/main/java/com/tienda/negocio/service/ServicioClientes.java`**
-
-```java
-package com.tienda.negocio.service;
-
-import com.tienda.negocio.model.Cliente;
-import com.tienda.negocio.model.Producto;
-import com.tienda.persistence.repository.RepositorioClientes;
-import java.util.List;
-import java.util.NoSuchElementException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-@Service
-public class ServicioClientes {
-
-    private final RepositorioClientes repositorio;
-    private final ServicioProductos servicioProductos;
-
-    public ServicioClientes(RepositorioClientes repositorio, ServicioProductos servicioProductos) {
-        this.repositorio = repositorio;
-        this.servicioProductos = servicioProductos;
-    }
-
-    public Cliente crear(Cliente cliente) {
-        return repositorio.save(new Cliente(cliente.getNombre(), cliente.getCorreo()));
-    }
-
-    public Cliente obtener(Long id) {
-        return repositorio.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("No existe el cliente " + id));
-    }
-
-    // Al terminar el método, JPA detecta el cambio en la colección y inserta la fila en cliente_favorito
-    @Transactional
-    public List<Producto> agregarFavorito(Long clienteId, Long productoId) {
-        Cliente cliente = obtener(clienteId);
-        cliente.getFavoritos().add(servicioProductos.obtener(productoId));
-        return List.copyOf(cliente.getFavoritos());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Producto> listarFavoritos(Long clienteId) {
-        return List.copyOf(obtener(clienteId).getFavoritos());
-    }
-
-    @Transactional
-    public void quitarFavorito(Long clienteId, Long productoId) {
-        obtener(clienteId).getFavoritos().remove(servicioProductos.obtener(productoId));
-    }
-}
-```
-
-- No hay ningún `save`: dentro de `@Transactional`, el cliente está **gestionado**; al agregar un producto a `favoritos`, JPA detecta el cambio y ejecuta el `insert` en la tabla intermedia al terminar el método.
-- Agregar dos veces el mismo favorito **no duplica** la fila (es un `Set`).
+> **`src/main/java/com/tienda/negocio/service/ServicioClientes.java`**
+>
+> ```java
+> package com.tienda.negocio.service;
+>
+> import com.tienda.negocio.model.Cliente;
+> import com.tienda.negocio.model.Producto;
+> import com.tienda.persistence.repository.RepositorioClientes;
+> import java.util.List;
+> import java.util.NoSuchElementException;
+> import org.springframework.stereotype.Service;
+> import org.springframework.transaction.annotation.Transactional;
+>
+> @Service
+> public class ServicioClientes {
+>
+>     private final RepositorioClientes repositorio;
+>     private final ServicioProductos servicioProductos;
+>
+>     public ServicioClientes(RepositorioClientes repositorio, ServicioProductos servicioProductos) {
+>         this.repositorio = repositorio;
+>         this.servicioProductos = servicioProductos;
+>     }
+>
+>     public Cliente crear(Cliente cliente) {
+>         return repositorio.save(new Cliente(cliente.getNombre(), cliente.getCorreo()));
+>     }
+>
+>     public Cliente obtener(Long id) {
+>         return repositorio.findById(id)
+>                 .orElseThrow(() -> new NoSuchElementException("No existe el cliente " + id));
+>     }
+>
+>     // Al terminar el método, JPA detecta el cambio en la colección y inserta la fila en cliente_favorito
+>     @Transactional
+>     public List<Producto> agregarFavorito(Long clienteId, Long productoId) {
+>         Cliente cliente = obtener(clienteId);
+>         cliente.getFavoritos().add(servicioProductos.obtener(productoId));
+>         return List.copyOf(cliente.getFavoritos());
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public List<Producto> listarFavoritos(Long clienteId) {
+>         return List.copyOf(obtener(clienteId).getFavoritos());
+>     }
+>
+>     @Transactional
+>     public void quitarFavorito(Long clienteId, Long productoId) {
+>         obtener(clienteId).getFavoritos().remove(servicioProductos.obtener(productoId));
+>     }
+> }
+> ```
+>
+> - No hay ningún `save`: dentro de `@Transactional`, el cliente está **gestionado**; al agregar un producto a `favoritos`, JPA detecta el cambio y ejecuta el `insert` en la tabla intermedia al terminar el método.
+> - Agregar dos veces el mismo favorito **no duplica** la fila (es un `Set`).
 
 </details>
 
 <details open>
 <summary><strong>4. El controlador</strong></summary>
 
-**`src/main/java/com/tienda/presentacion/controlador/ControladorClientes.java`**
-
-```java
-package com.tienda.presentacion.controlador;
-
-import com.tienda.negocio.model.Cliente;
-import com.tienda.negocio.model.Producto;
-import com.tienda.negocio.service.ServicioClientes;
-import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("/clientes")
-public class ControladorClientes {
-
-    private final ServicioClientes servicio;
-
-    public ControladorClientes(ServicioClientes servicio) {
-        this.servicio = servicio;
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Cliente crear(@RequestBody Cliente cliente) {
-        return servicio.crear(cliente);
-    }
-
-    @PostMapping("/{id}/favoritos/{productoId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public List<Producto> agregarFavorito(@PathVariable Long id, @PathVariable Long productoId) {
-        return servicio.agregarFavorito(id, productoId);
-    }
-
-    @GetMapping("/{id}/favoritos")
-    public List<Producto> listarFavoritos(@PathVariable Long id) {
-        return servicio.listarFavoritos(id);
-    }
-
-    @DeleteMapping("/{id}/favoritos/{productoId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void quitarFavorito(@PathVariable Long id, @PathVariable Long productoId) {
-        servicio.quitarFavorito(id, productoId);
-    }
-}
-```
+> **`src/main/java/com/tienda/presentacion/controlador/ControladorClientes.java`**
+>
+> ```java
+> package com.tienda.presentacion.controlador;
+>
+> import com.tienda.negocio.model.Cliente;
+> import com.tienda.negocio.model.Producto;
+> import com.tienda.negocio.service.ServicioClientes;
+> import java.util.List;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.web.bind.annotation.DeleteMapping;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PathVariable;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.ResponseStatus;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> @RestController
+> @RequestMapping("/clientes")
+> public class ControladorClientes {
+>
+>     private final ServicioClientes servicio;
+>
+>     public ControladorClientes(ServicioClientes servicio) {
+>         this.servicio = servicio;
+>     }
+>
+>     @PostMapping
+>     @ResponseStatus(HttpStatus.CREATED)
+>     public Cliente crear(@RequestBody Cliente cliente) {
+>         return servicio.crear(cliente);
+>     }
+>
+>     @PostMapping("/{id}/favoritos/{productoId}")
+>     @ResponseStatus(HttpStatus.CREATED)
+>     public List<Producto> agregarFavorito(@PathVariable Long id, @PathVariable Long productoId) {
+>         return servicio.agregarFavorito(id, productoId);
+>     }
+>
+>     @GetMapping("/{id}/favoritos")
+>     public List<Producto> listarFavoritos(@PathVariable Long id) {
+>         return servicio.listarFavoritos(id);
+>     }
+>
+>     @DeleteMapping("/{id}/favoritos/{productoId}")
+>     @ResponseStatus(HttpStatus.NO_CONTENT)
+>     public void quitarFavorito(@PathVariable Long id, @PathVariable Long productoId) {
+>         servicio.quitarFavorito(id, productoId);
+>     }
+> }
+> ```
 
 </details>
 
