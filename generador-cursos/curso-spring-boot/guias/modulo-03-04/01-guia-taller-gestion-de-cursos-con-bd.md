@@ -210,7 +210,7 @@
 
 > ### 1️⃣ La capa de persistencia de «Estudiante», desde el contrato
 >
-> Se parte de la interfaz `RepositorioEstudiantes`, que es lo único que el servicio conoce. Todo lo que cuelga de ella es persistencia.
+> Arriba está `RepositorioEstudiantes`, la **interfaz con la que interactúa `ServicioEstudiantes`** (es lo único que el servicio conoce). Todo lo que cuelga de ella es persistencia.
 >
 > ```mermaid
 > classDiagram
@@ -245,14 +245,14 @@
 >         <<Entity>>
 >     }
 >
->     RepositorioEstudiantesEnBD ..|> RepositorioEstudiantes : cumple el contrato
+>     RepositorioEstudiantes <|.. RepositorioEstudiantesEnBD : cumple el contrato
+>     RepositorioEstudiantes ..> Estudiante : recibe y devuelve
 >     RepositorioEstudiantesEnBD --> EstudianteJpaRepository : delega
 >     RepositorioEstudiantesEnBD ..> EstudianteMapper : traduce con
->     EstudianteJpaRepository --|> JpaRepository : extiende
+>     JpaRepository <|-- EstudianteJpaRepository : extiende
 >     EstudianteJpaRepository ..> EstudianteEntity : gestiona
 >     EstudianteMapper ..> Estudiante
 >     EstudianteMapper ..> EstudianteEntity
->     RepositorioEstudiantes ..> Estudiante : recibe y devuelve
 > ```
 >
 > | Pieza | Quién la escribe | Qué hace |
