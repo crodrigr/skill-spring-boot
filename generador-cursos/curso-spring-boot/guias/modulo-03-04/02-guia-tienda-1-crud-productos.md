@@ -3,55 +3,62 @@
 > 🎯 **Qué vas a hacer:** crear tu primera **entidad JPA** (`Producto`) y exponer un **CRUD completo** con cinco endpoints.
 > ⏱️ **Tiempo:** unos 30 minutos. 🧱 **Serie:** esta guía es la 1 de 3; la tienda **crece** en las guías 2 y 3.
 
-## 📦 Dependencias
+<details open>
+<summary><strong>📦 Dependencias</strong></summary>
 
-El proyecto se crea en [start.spring.io](https://start.spring.io) con **Maven · Java 21 · Spring Boot 3.x · Group `com.tienda` · Artifact `tienda`** y estas tres dependencias:
+> El proyecto se crea en [start.spring.io](https://start.spring.io) con **Maven · Java 21 · Spring Boot 3.x · Group `com.tienda` · Artifact `tienda`** y estas tres dependencias:
+>
+> | Dependencia | Para qué sirve en esta guía |
+> |---|---|
+> | **Spring Web** | Los endpoints REST (`@RestController`) y la conversión a JSON. |
+> | **Spring Data JPA** | JPA + Hibernate + `JpaRepository`: guardar y consultar sin escribir SQL. |
+> | **H2 Database** | Base de datos **en memoria**: no hay que instalar nada (se borra al reiniciar). |
+>
+> > 💡 Las dos siguientes guías **no agregan ninguna dependencia nueva**: todo lo que necesitan ya está aquí.
 
-| Dependencia | Para qué sirve en esta guía |
-|---|---|
-| **Spring Web** | Los endpoints REST (`@RestController`) y la conversión a JSON. |
-| **Spring Data JPA** | JPA + Hibernate + `JpaRepository`: guardar y consultar sin escribir SQL. |
-| **H2 Database** | Base de datos **en memoria**: no hay que instalar nada (se borra al reiniciar). |
-
-> 💡 Las dos siguientes guías **no agregan ninguna dependencia nueva**: todo lo que necesitan ya está aquí.
-
-## 🗺️ Diagrama de clases (incremento 1)
-
-```mermaid
-classDiagram
-    direction TB
-    class TiendaApplication {
-        <<SpringBootApplication · NUEVA>>
-    }
-    class ControladorProductos {
-        <<RestController · NUEVA>>
-    }
-    class ServicioProductos {
-        <<Service · NUEVA>>
-    }
-    class RepositorioProductos {
-        <<interface · NUEVA>>
-    }
-    class JpaRepository {
-        <<interface · Spring Data>>
-    }
-    class Producto {
-        <<Entity · NUEVA>>
-    }
-
-    ControladorProductos --> ServicioProductos : usa
-    ServicioProductos --> RepositorioProductos : usa
-    JpaRepository <|-- RepositorioProductos : extiende
-    RepositorioProductos ..> Producto : gestiona
-```
-
-Están **todas** las clases de la guía (`TiendaApplication` la genera Initializr; el resto lo escribís en los pasos). El flujo se lee de arriba hacia abajo: *controlador → servicio → repositorio → entidad*. Las entidades son las tablas: `Producto` → `producto` (`id`, `nombre`, `precio`, `stock`).
-
-## 🪜 Pasos
+</details>
 
 <details open>
-<summary><strong>1. Configurar la base de datos</strong></summary>
+<summary><strong>🗺️ Diagrama de clases (incremento 1)</strong></summary>
 
+> ```mermaid
+> classDiagram
+>     direction TB
+>     class TiendaApplication {
+>         <<SpringBootApplication · NUEVA>>
+>     }
+>     class ControladorProductos {
+>         <<RestController · NUEVA>>
+>     }
+>     class ServicioProductos {
+>         <<Service · NUEVA>>
+>     }
+>     class RepositorioProductos {
+>         <<interface · NUEVA>>
+>     }
+>     class JpaRepository {
+>         <<interface · Spring Data>>
+>     }
+>     class Producto {
+>         <<Entity · NUEVA>>
+>     }
+>
+>     ControladorProductos --> ServicioProductos : usa
+>     ServicioProductos --> RepositorioProductos : usa
+>     JpaRepository <|-- RepositorioProductos : extiende
+>     RepositorioProductos ..> Producto : gestiona
+> ```
+>
+> Están **todas** las clases de la guía (`TiendaApplication` la genera Initializr; el resto lo escribís en los pasos). El flujo se lee de arriba hacia abajo: *controlador → servicio → repositorio → entidad*. Las entidades son las tablas: `Producto` → `producto` (`id`, `nombre`, `precio`, `stock`).
+
+</details>
+
+<details open>
+<summary><strong>🪜 Pasos</strong></summary>
+
+> <details open>
+> <summary><strong>1. Configurar la base de datos</strong></summary>
+>
 > > **`src/main/resources/application.properties`**
 > >
 > > ```properties
@@ -64,12 +71,12 @@ Están **todas** las clases de la guía (`TiendaApplication` la genera Initializ
 > > - `ddl-auto=update`: Hibernate **crea la tabla** a partir de la entidad.
 > > - `show-sql=true`: ves en consola el SQL que genera.
 > > - La consola de H2 queda en `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:tienda`, usuario `sa`, sin contraseña).
-
-</details>
-
-<details open>
-<summary><strong>2. La entidad</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>2. La entidad</strong></summary>
+>
 > > **`src/main/java/com/tienda/negocio/model/Producto.java`**
 > >
 > > ```java
@@ -115,12 +122,12 @@ Están **todas** las clases de la guía (`TiendaApplication` la genera Initializ
 > >
 > > - **`@Entity`**: la clase se guarda en una tabla. **`@Id`** + **`@GeneratedValue(IDENTITY)`**: la clave primaria la genera la base.
 > > - El constructor `protected` sin argumentos lo necesita JPA para crear el objeto; los *setters* se usan al actualizar.
-
-</details>
-
-<details open>
-<summary><strong>3. El repositorio</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>3. El repositorio</strong></summary>
+>
 > > **`src/main/java/com/tienda/persistence/repository/RepositorioProductos.java`**
 > >
 > > ```java
@@ -134,12 +141,12 @@ Están **todas** las clases de la guía (`TiendaApplication` la genera Initializ
 > > ```
 > >
 > > Sin una sola línea de código, ya tenés `save`, `findAll`, `findById`, `delete`… **Spring Data genera la clase** al arrancar.
-
-</details>
-
-<details open>
-<summary><strong>4. El servicio</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>4. El servicio</strong></summary>
+>
 > > **`src/main/java/com/tienda/negocio/service/ServicioProductos.java`**
 > >
 > > ```java
@@ -189,12 +196,12 @@ Están **todas** las clases de la guía (`TiendaApplication` la genera Initializ
 > > ```
 > >
 > > > ⚠️ **Detalle importante:** en `crear` se construye un `Producto` **nuevo**. Si se guardara el que llega, un `POST` con `"id": 1` **actualizaría** el producto 1 en lugar de crear uno.
-
-</details>
-
-<details open>
-<summary><strong>5. El controlador (los cinco endpoints)</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>5. El controlador (los cinco endpoints)</strong></summary>
+>
 > > **`src/main/java/com/tienda/presentacion/controlador/ControladorProductos.java`**
 > >
 > > ```java
@@ -252,44 +259,58 @@ Están **todas** las clases de la guía (`TiendaApplication` la genera Initializ
 > >     }
 > > }
 > > ```
+>
+> </details>
 
 </details>
 
-## 🧪 Probar con Postman
+<details open>
+<summary><strong>🧪 Probar con Postman</strong></summary>
 
-Header en los `POST` y `PUT`: `Content-Type: application/json`.
+> Header en los `POST` y `PUT`: `Content-Type: application/json`.
+>
+> | # | Operación | Método y URL | Body | Esperado |
+> |:-:|---|---|---|:-:|
+> | 1 | Crear | `POST /productos` | `{"nombre":"Portátil","precio":2500000,"stock":10}` | `201` |
+> | 2 | Crear | `POST /productos` | `{"nombre":"Ratón","precio":45000,"stock":50}` | `201` |
+> | 3 | Listar | `GET /productos` | — | `200` con 2 productos |
+> | 4 | Consultar | `GET /productos/2` | — | `200` |
+> | 5 | Actualizar | `PUT /productos/2` | `{"nombre":"Ratón inalámbrico","precio":55000,"stock":40}` | `200` con los datos nuevos |
+> | 6 | Eliminar | `DELETE /productos/2` | — | `204` |
+> | 7 | Inexistente | `GET /productos/99` | — | `500` *(la consola muestra `NoSuchElementException`; el `404` llega en el Módulo 7)* |
+>
+> Respuesta de la operación 1:
+>
+> ```json
+> {"id":1,"nombre":"Portátil","precio":2500000.0,"stock":10}
+> ```
 
-| # | Operación | Método y URL | Body | Esperado |
-|:-:|---|---|---|:-:|
-| 1 | Crear | `POST /productos` | `{"nombre":"Portátil","precio":2500000,"stock":10}` | `201` |
-| 2 | Crear | `POST /productos` | `{"nombre":"Ratón","precio":45000,"stock":50}` | `201` |
-| 3 | Listar | `GET /productos` | — | `200` con 2 productos |
-| 4 | Consultar | `GET /productos/2` | — | `200` |
-| 5 | Actualizar | `PUT /productos/2` | `{"nombre":"Ratón inalámbrico","precio":55000,"stock":40}` | `200` con los datos nuevos |
-| 6 | Eliminar | `DELETE /productos/2` | — | `204` |
-| 7 | Inexistente | `GET /productos/99` | — | `500` *(la consola muestra `NoSuchElementException`; el `404` llega en el Módulo 7)* |
+</details>
 
-Respuesta de la operación 1:
+<details open>
+<summary><strong>🔍 Mirá el SQL</strong></summary>
 
-```json
-{"id":1,"nombre":"Portátil","precio":2500000.0,"stock":10}
-```
+> Cada operación aparece en la consola. Por ejemplo, el `POST` genera `insert into producto (nombre,precio,stock,id) values (?,?,?,default)`
+> y el `GET /productos/2`, `select … from producto where id=?`.
 
-## 🔍 Mirá el SQL
+</details>
 
-Cada operación aparece en la consola. Por ejemplo, el `POST` genera `insert into producto (nombre,precio,stock,id) values (?,?,?,default)`
-y el `GET /productos/2`, `select … from producto where id=?`.
+<details open>
+<summary><strong>✅ Qué comprobaste</strong></summary>
 
-## ✅ Qué comprobaste
+> - Una **clase Java** (`@Entity`) se convierte en una **tabla**.
+> - Una **interfaz** (`JpaRepository`) te da el CRUD sin implementarlo.
+> - Las capas: `presentacion` → `negocio` → `persistence`, cada una con su responsabilidad.
 
-- Una **clase Java** (`@Entity`) se convierte en una **tabla**.
-- Una **interfaz** (`JpaRepository`) te da el CRUD sin implementarlo.
-- Las capas: `presentacion` → `negocio` → `persistence`, cada una con su responsabilidad.
+</details>
 
-## 🚀 Reto
+<details open>
+<summary><strong>🚀 Reto</strong></summary>
 
-Agregá `GET /productos/agotados` que devuelva los productos con `stock` igual a `0`. *(Pista: método derivado `findByStock(int stock)` en el repositorio.)*
+> Agregá `GET /productos/agotados` que devuelva los productos con `stock` igual a `0`. *(Pista: método derivado `findByStock(int stock)` en el repositorio.)*
+>
+> > 📚 **Para profundizar:** [Uso básico de Spring Data JPA](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md) · [CRUD completo](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md).
 
-> 📚 **Para profundizar:** [Uso básico de Spring Data JPA](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md) · [CRUD completo](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md).
+</details>
 
 ➡️ **Siguiente:** [Guía 2 — Relación uno a muchos](03-guia-tienda-2-uno-a-muchos.md)

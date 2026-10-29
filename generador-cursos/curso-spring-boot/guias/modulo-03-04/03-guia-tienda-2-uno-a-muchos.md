@@ -3,86 +3,93 @@
 > 🎯 **Qué vas a hacer:** relacionar un **pedido** con **varios detalles** (`@OneToMany` / `@ManyToOne`) y cada detalle con un **producto** de la guía 1.
 > ⏱️ **Tiempo:** unos 30 minutos. 🧱 **Parte de:** el proyecto de la [Guía 1](02-guia-tienda-1-crud-productos.md).
 
-## 📦 Dependencias
+<details open>
+<summary><strong>📦 Dependencias</strong></summary>
 
-**Ninguna nueva.** Seguís con Spring Web, Spring Data JPA y H2.
+> **Ninguna nueva.** Seguís con Spring Web, Spring Data JPA y H2.
 
-## 🗺️ Diagrama de clases (incremento 2)
-
-```mermaid
-classDiagram
-    direction TB
-    class TiendaApplication {
-        <<SpringBootApplication · existente>>
-    }
-    class ControladorProductos {
-        <<RestController · existente>>
-    }
-    class ServicioProductos {
-        <<Service · existente>>
-    }
-    class RepositorioProductos {
-        <<interface · existente>>
-    }
-    class Producto {
-        <<Entity · existente>>
-    }
-    class ControladorPedidos {
-        <<RestController · NUEVA>>
-    }
-    class SolicitudDetalle {
-        <<record · NUEVA>>
-    }
-    class ServicioPedidos {
-        <<Service · NUEVA>>
-    }
-    class RepositorioPedidos {
-        <<interface · NUEVA>>
-    }
-    class RepositorioDetallesPedido {
-        <<interface · NUEVA>>
-    }
-    class JpaRepository {
-        <<interface · Spring Data>>
-    }
-    class Pedido {
-        <<Entity · NUEVA>>
-    }
-    class DetallePedido {
-        <<Entity · NUEVA>>
-    }
-
-    ControladorProductos --> ServicioProductos
-    ServicioProductos --> RepositorioProductos
-    ControladorPedidos --> ServicioPedidos : usa
-    ControladorPedidos ..> SolicitudDetalle : recibe
-    ServicioPedidos --> RepositorioPedidos
-    ServicioPedidos --> RepositorioDetallesPedido
-    ServicioPedidos --> ServicioProductos : reutiliza
-    JpaRepository <|-- RepositorioProductos
-    JpaRepository <|-- RepositorioPedidos
-    JpaRepository <|-- RepositorioDetallesPedido
-    RepositorioProductos ..> Producto
-    RepositorioPedidos ..> Pedido
-    RepositorioDetallesPedido ..> DetallePedido
-    Pedido "1" -- "*" DetallePedido : detalles / pedido
-    DetallePedido "*" --> "1" Producto : producto
-```
-
-Están **todas** las clases del proyecto: las de la guía 1 como `existente` y las que agregás ahora como `NUEVA`. Fijate que `ServicioPedidos` **reutiliza** `ServicioProductos`.
-
-| Relación | Anotaciones | Dónde está la clave foránea |
-|---|---|---|
-| `Pedido` 1 — N `DetallePedido` | `@OneToMany(mappedBy)` en `Pedido`, `@ManyToOne` + `@JoinColumn` en `DetallePedido` | `detalle_pedido.pedido_id` |
-| `DetallePedido` N — 1 `Producto` | `@ManyToOne` + `@JoinColumn` | `detalle_pedido.producto_id` |
-
-Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 teclados); un mismo producto puede aparecer en detalles de **muchos** pedidos.
-
-## 🪜 Pasos
+</details>
 
 <details open>
-<summary><strong>1. Las entidades</strong></summary>
+<summary><strong>🗺️ Diagrama de clases (incremento 2)</strong></summary>
 
+> ```mermaid
+> classDiagram
+>     direction TB
+>     class TiendaApplication {
+>         <<SpringBootApplication · existente>>
+>     }
+>     class ControladorProductos {
+>         <<RestController · existente>>
+>     }
+>     class ServicioProductos {
+>         <<Service · existente>>
+>     }
+>     class RepositorioProductos {
+>         <<interface · existente>>
+>     }
+>     class Producto {
+>         <<Entity · existente>>
+>     }
+>     class ControladorPedidos {
+>         <<RestController · NUEVA>>
+>     }
+>     class SolicitudDetalle {
+>         <<record · NUEVA>>
+>     }
+>     class ServicioPedidos {
+>         <<Service · NUEVA>>
+>     }
+>     class RepositorioPedidos {
+>         <<interface · NUEVA>>
+>     }
+>     class RepositorioDetallesPedido {
+>         <<interface · NUEVA>>
+>     }
+>     class JpaRepository {
+>         <<interface · Spring Data>>
+>     }
+>     class Pedido {
+>         <<Entity · NUEVA>>
+>     }
+>     class DetallePedido {
+>         <<Entity · NUEVA>>
+>     }
+>
+>     ControladorProductos --> ServicioProductos
+>     ServicioProductos --> RepositorioProductos
+>     ControladorPedidos --> ServicioPedidos : usa
+>     ControladorPedidos ..> SolicitudDetalle : recibe
+>     ServicioPedidos --> RepositorioPedidos
+>     ServicioPedidos --> RepositorioDetallesPedido
+>     ServicioPedidos --> ServicioProductos : reutiliza
+>     JpaRepository <|-- RepositorioProductos
+>     JpaRepository <|-- RepositorioPedidos
+>     JpaRepository <|-- RepositorioDetallesPedido
+>     RepositorioProductos ..> Producto
+>     RepositorioPedidos ..> Pedido
+>     RepositorioDetallesPedido ..> DetallePedido
+>     Pedido "1" -- "*" DetallePedido : detalles / pedido
+>     DetallePedido "*" --> "1" Producto : producto
+> ```
+>
+> Están **todas** las clases del proyecto: las de la guía 1 como `existente` y las que agregás ahora como `NUEVA`. Fijate que `ServicioPedidos` **reutiliza** `ServicioProductos`.
+>
+> | Relación | Anotaciones | Dónde está la clave foránea |
+> |---|---|---|
+> | `Pedido` 1 — N `DetallePedido` | `@OneToMany(mappedBy)` en `Pedido`, `@ManyToOne` + `@JoinColumn` en `DetallePedido` | `detalle_pedido.pedido_id` |
+> | `DetallePedido` N — 1 `Producto` | `@ManyToOne` + `@JoinColumn` | `detalle_pedido.producto_id` |
+>
+> Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 teclados); un mismo producto puede aparecer en detalles de **muchos** pedidos.
+
+</details>
+
+<details open>
+<summary><strong>🪜 Pasos</strong></summary>
+
+> <details open>
+> <summary><strong>1. Las entidades</strong></summary>
+>
 > > **`src/main/java/com/tienda/negocio/model/Pedido.java`**
 > >
 > > ```java
@@ -183,12 +190,12 @@ Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 tecl
 > >
 > > - **Lado dueño:** `DetallePedido` tiene la clave foránea (`@JoinColumn(name = "pedido_id")`). En `Pedido`, `mappedBy = "pedido"` solo dice «mirá ese atributo»: **no crea columnas**.
 > > - **`@JsonIgnore`** en `DetallePedido.pedido` y `Pedido.detalles`: sin él, el JSON entraría en un **bucle infinito** (pedido → detalles → pedido…). Es un arreglo temporal; en el Módulo 5 se resuelve con DTO.
-
-</details>
-
-<details open>
-<summary><strong>2. Los repositorios</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>2. Los repositorios</strong></summary>
+>
 > > **`src/main/java/com/tienda/persistence/repository/RepositorioPedidos.java`**
 > >
 > > ```java
@@ -212,12 +219,12 @@ Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 tecl
 > > public interface RepositorioDetallesPedido extends JpaRepository<DetallePedido, Long> {
 > > }
 > > ```
-
-</details>
-
-<details open>
-<summary><strong>3. El servicio</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>3. El servicio</strong></summary>
+>
 > > **`src/main/java/com/tienda/negocio/service/ServicioPedidos.java`**
 > >
 > > ```java
@@ -275,12 +282,12 @@ Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 tecl
 > >
 > > - `agregarDetalle` **reutiliza** `ServicioProductos` (guía 1) para validar que el producto exista y **copia su precio** al detalle: si el precio del producto cambia después, el pedido conserva el de ese día.
 > > - `listarDetalles` es `@Transactional` porque `detalles` se carga **bajo demanda** (*lazy*): solo se puede leer con la sesión abierta.
-
-</details>
-
-<details open>
-<summary><strong>4. El controlador</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>4. El controlador</strong></summary>
+>
 > > **`src/main/java/com/tienda/presentacion/controlador/SolicitudDetalle.java`**
 > >
 > > ```java
@@ -341,50 +348,64 @@ Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 tecl
 > >     }
 > > }
 > > ```
+>
+> </details>
 
 </details>
 
-## 🧪 Probar con Postman
+<details open>
+<summary><strong>🧪 Probar con Postman</strong></summary>
 
-Antes, creá tres productos con la guía 1 (`Portátil`, `Ratón`, `Teclado`: ids 1, 2 y 3).
+> Antes, creá tres productos con la guía 1 (`Portátil`, `Ratón`, `Teclado`: ids 1, 2 y 3).
+>
+> | # | Operación | Método y URL | Body | Esperado |
+> |:-:|---|---|---|:-:|
+> | 1 | Crear pedido | `POST /pedidos` | — | `201` · `{"id":1,"fecha":"…","estado":"CREADO"}` |
+> | 2 | Detalle 1 | `POST /pedidos/1/detalles` | `{"productoId":1,"cantidad":2}` | `201` |
+> | 3 | Detalle 2 | `POST /pedidos/1/detalles` | `{"productoId":2,"cantidad":1}` | `201` |
+> | 4 | Detalle 3 | `POST /pedidos/1/detalles` | `{"productoId":3,"cantidad":3}` | `201` |
+> | 5 | **Consultar los detalles** | `GET /pedidos/1/detalles` | — | `200` con **3** detalles |
+> | 6 | Cambiar precio | `PUT /productos/1` con `precio: 3000000` | — | `200` |
+> | 7 | Releer detalles | `GET /pedidos/1/detalles` | — | el detalle 1 sigue con `precioUnitario` **2500000**, aunque el producto ya cuesta 3.000.000 |
+> | 8 | Pedido inexistente | `GET /pedidos/9/detalles` | — | `500` *(`NoSuchElementException`)* |
+>
+> Un detalle se ve así:
+>
+> ```json
+> {"id":1,"cantidad":2,"precioUnitario":2500000.0,"producto":{"id":1,"nombre":"Portátil","precio":2500000.0,"stock":10}}
+> ```
 
-| # | Operación | Método y URL | Body | Esperado |
-|:-:|---|---|---|:-:|
-| 1 | Crear pedido | `POST /pedidos` | — | `201` · `{"id":1,"fecha":"…","estado":"CREADO"}` |
-| 2 | Detalle 1 | `POST /pedidos/1/detalles` | `{"productoId":1,"cantidad":2}` | `201` |
-| 3 | Detalle 2 | `POST /pedidos/1/detalles` | `{"productoId":2,"cantidad":1}` | `201` |
-| 4 | Detalle 3 | `POST /pedidos/1/detalles` | `{"productoId":3,"cantidad":3}` | `201` |
-| 5 | **Consultar los detalles** | `GET /pedidos/1/detalles` | — | `200` con **3** detalles |
-| 6 | Cambiar precio | `PUT /productos/1` con `precio: 3000000` | — | `200` |
-| 7 | Releer detalles | `GET /pedidos/1/detalles` | — | el detalle 1 sigue con `precioUnitario` **2500000**, aunque el producto ya cuesta 3.000.000 |
-| 8 | Pedido inexistente | `GET /pedidos/9/detalles` | — | `500` *(`NoSuchElementException`)* |
+</details>
 
-Un detalle se ve así:
+<details open>
+<summary><strong>🔍 Mirá las tablas</strong></summary>
 
-```json
-{"id":1,"cantidad":2,"precioUnitario":2500000.0,"producto":{"id":1,"nombre":"Portátil","precio":2500000.0,"stock":10}}
-```
+> ```text
+> create table pedido (id …, estado varchar(255), fecha date, primary key (id))
+> create table detalle_pedido (id …, cantidad integer not null, precio_unitario float(53) not null, pedido_id bigint, producto_id bigint, primary key (id))
+> alter table detalle_pedido add constraint … foreign key (pedido_id)   references pedido
+> alter table detalle_pedido add constraint … foreign key (producto_id) references producto
+> ```
 
-## 🔍 Mirá las tablas
+</details>
 
-```text
-create table pedido (id …, estado varchar(255), fecha date, primary key (id))
-create table detalle_pedido (id …, cantidad integer not null, precio_unitario float(53) not null, pedido_id bigint, producto_id bigint, primary key (id))
-alter table detalle_pedido add constraint … foreign key (pedido_id)   references pedido
-alter table detalle_pedido add constraint … foreign key (producto_id) references producto
-```
+<details open>
+<summary><strong>✅ Qué comprobaste</strong></summary>
 
-## ✅ Qué comprobaste
+> - En **uno a muchos**, la clave foránea vive del lado **«muchos»** (`DetallePedido`).
+> - `@ManyToOne` + `@JoinColumn` define la clave; `@OneToMany(mappedBy = …)` permite navegar en el otro sentido.
+> - Un detalle apunta a **un** producto, y un producto puede estar en **muchos** detalles.
 
-- En **uno a muchos**, la clave foránea vive del lado **«muchos»** (`DetallePedido`).
-- `@ManyToOne` + `@JoinColumn` define la clave; `@OneToMany(mappedBy = …)` permite navegar en el otro sentido.
-- Un detalle apunta a **un** producto, y un producto puede estar en **muchos** detalles.
+</details>
 
-## 🚀 Reto
+<details open>
+<summary><strong>🚀 Reto</strong></summary>
 
-Agregá `cascade = CascadeType.ALL` y `orphanRemoval = true` a `Pedido.detalles` y creá `DELETE /pedidos/{id}`. ¿Qué pasa con sus detalles?
-*([Cascade y orphanRemoval](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/05-cascade-y-orphanRemoval.md).)*
+> Agregá `cascade = CascadeType.ALL` y `orphanRemoval = true` a `Pedido.detalles` y creá `DELETE /pedidos/{id}`. ¿Qué pasa con sus detalles?
+> *([Cascade y orphanRemoval](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/05-cascade-y-orphanRemoval.md).)*
+>
+> > 📚 **Para profundizar:** [OneToMany, ManyToOne y fetch](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md).
 
-> 📚 **Para profundizar:** [OneToMany, ManyToOne y fetch](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md).
+</details>
 
 ⬅️ [Guía 1](02-guia-tienda-1-crud-productos.md) · ➡️ **Siguiente:** [Guía 3 — Relación muchos a muchos](04-guia-tienda-3-muchos-a-muchos.md)

@@ -3,102 +3,109 @@
 > 🎯 **Qué vas a hacer:** permitir que los **clientes** guarden **productos favoritos** con `@ManyToMany` y `@JoinTable`.
 > ⏱️ **Tiempo:** unos 30 minutos. 🧱 **Parte de:** el proyecto de las guías 1 y 2.
 
-## 📦 Dependencias
+<details open>
+<summary><strong>📦 Dependencias</strong></summary>
 
-**Ninguna nueva.** Seguís con Spring Web, Spring Data JPA y H2.
+> **Ninguna nueva.** Seguís con Spring Web, Spring Data JPA y H2.
 
-## 🗺️ Diagrama de clases (incremento 3)
-
-```mermaid
-classDiagram
-    direction TB
-    class TiendaApplication {
-        <<SpringBootApplication · existente>>
-    }
-    class ControladorProductos {
-        <<RestController · existente>>
-    }
-    class ServicioProductos {
-        <<Service · existente>>
-    }
-    class RepositorioProductos {
-        <<interface · existente>>
-    }
-    class Producto {
-        <<Entity · existente>>
-    }
-    class ControladorPedidos {
-        <<RestController · existente>>
-    }
-    class SolicitudDetalle {
-        <<record · existente>>
-    }
-    class ServicioPedidos {
-        <<Service · existente>>
-    }
-    class RepositorioPedidos {
-        <<interface · existente>>
-    }
-    class RepositorioDetallesPedido {
-        <<interface · existente>>
-    }
-    class Pedido {
-        <<Entity · existente>>
-    }
-    class DetallePedido {
-        <<Entity · existente>>
-    }
-    class ControladorClientes {
-        <<RestController · NUEVA>>
-    }
-    class ServicioClientes {
-        <<Service · NUEVA>>
-    }
-    class RepositorioClientes {
-        <<interface · NUEVA>>
-    }
-    class JpaRepository {
-        <<interface · Spring Data>>
-    }
-    class Cliente {
-        <<Entity · NUEVA>>
-    }
-
-    ControladorProductos --> ServicioProductos
-    ServicioProductos --> RepositorioProductos
-    ControladorPedidos --> ServicioPedidos
-    ControladorPedidos ..> SolicitudDetalle
-    ServicioPedidos --> RepositorioPedidos
-    ServicioPedidos --> RepositorioDetallesPedido
-    ServicioPedidos --> ServicioProductos
-    ControladorClientes --> ServicioClientes : usa
-    ServicioClientes --> RepositorioClientes
-    ServicioClientes --> ServicioProductos : reutiliza
-    JpaRepository <|-- RepositorioProductos
-    JpaRepository <|-- RepositorioPedidos
-    JpaRepository <|-- RepositorioDetallesPedido
-    JpaRepository <|-- RepositorioClientes
-    RepositorioProductos ..> Producto
-    RepositorioPedidos ..> Pedido
-    RepositorioDetallesPedido ..> DetallePedido
-    RepositorioClientes ..> Cliente
-    Pedido "1" -- "*" DetallePedido : detalles / pedido
-    DetallePedido "*" --> "1" Producto : producto
-    Cliente "*" --> "*" Producto : favoritos
-    note for Cliente "Tabla intermedia cliente_favorito (cliente_id, producto_id)"
-```
-
-Están **todas** las clases del proyecto; las de las guías 1 y 2 aparecen como `existente`. Fijate que `ServicioClientes` también **reutiliza** `ServicioProductos`.
-
-Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil, Ratón y Teclado*; los de Carlos, *Ratón y Teclado*. El *Ratón* está en las listas de **varios** clientes, y cada cliente tiene **varios** productos.
-
-> 💡 Un muchos a muchos **no se guarda en dos tablas**: hace falta una **tabla intermedia** con las dos claves foráneas. JPA la crea por vos.
-
-## 🪜 Pasos
+</details>
 
 <details open>
-<summary><strong>1. La entidad</strong></summary>
+<summary><strong>🗺️ Diagrama de clases (incremento 3)</strong></summary>
 
+> ```mermaid
+> classDiagram
+>     direction TB
+>     class TiendaApplication {
+>         <<SpringBootApplication · existente>>
+>     }
+>     class ControladorProductos {
+>         <<RestController · existente>>
+>     }
+>     class ServicioProductos {
+>         <<Service · existente>>
+>     }
+>     class RepositorioProductos {
+>         <<interface · existente>>
+>     }
+>     class Producto {
+>         <<Entity · existente>>
+>     }
+>     class ControladorPedidos {
+>         <<RestController · existente>>
+>     }
+>     class SolicitudDetalle {
+>         <<record · existente>>
+>     }
+>     class ServicioPedidos {
+>         <<Service · existente>>
+>     }
+>     class RepositorioPedidos {
+>         <<interface · existente>>
+>     }
+>     class RepositorioDetallesPedido {
+>         <<interface · existente>>
+>     }
+>     class Pedido {
+>         <<Entity · existente>>
+>     }
+>     class DetallePedido {
+>         <<Entity · existente>>
+>     }
+>     class ControladorClientes {
+>         <<RestController · NUEVA>>
+>     }
+>     class ServicioClientes {
+>         <<Service · NUEVA>>
+>     }
+>     class RepositorioClientes {
+>         <<interface · NUEVA>>
+>     }
+>     class JpaRepository {
+>         <<interface · Spring Data>>
+>     }
+>     class Cliente {
+>         <<Entity · NUEVA>>
+>     }
+>
+>     ControladorProductos --> ServicioProductos
+>     ServicioProductos --> RepositorioProductos
+>     ControladorPedidos --> ServicioPedidos
+>     ControladorPedidos ..> SolicitudDetalle
+>     ServicioPedidos --> RepositorioPedidos
+>     ServicioPedidos --> RepositorioDetallesPedido
+>     ServicioPedidos --> ServicioProductos
+>     ControladorClientes --> ServicioClientes : usa
+>     ServicioClientes --> RepositorioClientes
+>     ServicioClientes --> ServicioProductos : reutiliza
+>     JpaRepository <|-- RepositorioProductos
+>     JpaRepository <|-- RepositorioPedidos
+>     JpaRepository <|-- RepositorioDetallesPedido
+>     JpaRepository <|-- RepositorioClientes
+>     RepositorioProductos ..> Producto
+>     RepositorioPedidos ..> Pedido
+>     RepositorioDetallesPedido ..> DetallePedido
+>     RepositorioClientes ..> Cliente
+>     Pedido "1" -- "*" DetallePedido : detalles / pedido
+>     DetallePedido "*" --> "1" Producto : producto
+>     Cliente "*" --> "*" Producto : favoritos
+>     note for Cliente "Tabla intermedia cliente_favorito (cliente_id, producto_id)"
+> ```
+>
+> Están **todas** las clases del proyecto; las de las guías 1 y 2 aparecen como `existente`. Fijate que `ServicioClientes` también **reutiliza** `ServicioProductos`.
+>
+> Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil, Ratón y Teclado*; los de Carlos, *Ratón y Teclado*. El *Ratón* está en las listas de **varios** clientes, y cada cliente tiene **varios** productos.
+>
+> > 💡 Un muchos a muchos **no se guarda en dos tablas**: hace falta una **tabla intermedia** con las dos claves foráneas. JPA la crea por vos.
+
+</details>
+
+<details open>
+<summary><strong>🪜 Pasos</strong></summary>
+
+> <details open>
+> <summary><strong>1. La entidad</strong></summary>
+>
 > > **`src/main/java/com/tienda/negocio/model/Cliente.java`**
 > >
 > > ```java
@@ -152,12 +159,12 @@ Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil,
 > > - **`@ManyToMany`** declara la relación; **`@JoinTable`** nombra la tabla intermedia y sus dos columnas: `@JoinColumn` para **este** lado y `inverseJoinColumns` para el **otro**.
 > > - Se usa un `Set` (no una `List`): un producto **no puede repetirse** en los favoritos de un mismo cliente.
 > > - `Producto` **no se modifica**: no necesita saber qué clientes lo tienen como favorito (relación **unidireccional**).
-
-</details>
-
-<details open>
-<summary><strong>2. El repositorio</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>2. El repositorio</strong></summary>
+>
 > > **`src/main/java/com/tienda/persistence/repository/RepositorioClientes.java`**
 > >
 > > ```java
@@ -169,12 +176,12 @@ Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil,
 > > public interface RepositorioClientes extends JpaRepository<Cliente, Long> {
 > > }
 > > ```
-
-</details>
-
-<details open>
-<summary><strong>3. El servicio</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>3. El servicio</strong></summary>
+>
 > > **`src/main/java/com/tienda/negocio/service/ServicioClientes.java`**
 > >
 > > ```java
@@ -230,12 +237,12 @@ Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil,
 > >
 > > - No hay ningún `save`: dentro de `@Transactional`, el cliente está **gestionado**; al agregar un producto a `favoritos`, JPA detecta el cambio y ejecuta el `insert` en la tabla intermedia al terminar el método.
 > > - Agregar dos veces el mismo favorito **no duplica** la fila (es un `Set`).
-
-</details>
-
-<details open>
-<summary><strong>4. El controlador</strong></summary>
-
+>
+> </details>
+>
+> <details open>
+> <summary><strong>4. El controlador</strong></summary>
+>
 > > **`src/main/java/com/tienda/presentacion/controlador/ControladorClientes.java`**
 > >
 > > ```java
@@ -289,56 +296,73 @@ Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil,
 > >     }
 > > }
 > > ```
+>
+> </details>
 
 </details>
 
-## 🧪 Probar con Postman
+<details open>
+<summary><strong>🧪 Probar con Postman</strong></summary>
 
-Con los productos 1, 2 y 3 de la guía 1 creados:
+> Con los productos 1, 2 y 3 de la guía 1 creados:
+>
+> | # | Operación | Método y URL | Esperado |
+> |:-:|---|---|:-:|
+> | 1 | Crear a Ana | `POST /clientes` · `{"nombre":"Ana","correo":"ana@correo.com"}` | `201` |
+> | 2 | Crear a Carlos | `POST /clientes` · `{"nombre":"Carlos","correo":"carlos@correo.com"}` | `201` |
+> | 3 | Ana guarda Portátil, Ratón y Teclado | `POST /clientes/1/favoritos/1`, `…/2`, `…/3` | `201` cada una |
+> | 4 | Carlos guarda Ratón y Teclado | `POST /clientes/2/favoritos/2`, `…/3` | `201` cada una |
+> | 5 | **Favoritos de Ana** | `GET /clientes/1/favoritos` | `200` con **3** productos |
+> | 6 | **Favoritos de Carlos** | `GET /clientes/2/favoritos` | `200` con **2** productos |
+> | 7 | Repetir un favorito | `POST /clientes/1/favoritos/2` | `201`, y Ana **sigue** con 3 |
+> | 8 | Quitar un favorito | `DELETE /clientes/1/favoritos/3` | `204`; Ana queda con 2 |
+>
+> > ℹ️ El **orden** de los productos en la respuesta no está garantizado (es un `Set`).
 
-| # | Operación | Método y URL | Esperado |
-|:-:|---|---|:-:|
-| 1 | Crear a Ana | `POST /clientes` · `{"nombre":"Ana","correo":"ana@correo.com"}` | `201` |
-| 2 | Crear a Carlos | `POST /clientes` · `{"nombre":"Carlos","correo":"carlos@correo.com"}` | `201` |
-| 3 | Ana guarda Portátil, Ratón y Teclado | `POST /clientes/1/favoritos/1`, `…/2`, `…/3` | `201` cada una |
-| 4 | Carlos guarda Ratón y Teclado | `POST /clientes/2/favoritos/2`, `…/3` | `201` cada una |
-| 5 | **Favoritos de Ana** | `GET /clientes/1/favoritos` | `200` con **3** productos |
-| 6 | **Favoritos de Carlos** | `GET /clientes/2/favoritos` | `200` con **2** productos |
-| 7 | Repetir un favorito | `POST /clientes/1/favoritos/2` | `201`, y Ana **sigue** con 3 |
-| 8 | Quitar un favorito | `DELETE /clientes/1/favoritos/3` | `204`; Ana queda con 2 |
+</details>
 
-> ℹ️ El **orden** de los productos en la respuesta no está garantizado (es un `Set`).
+<details open>
+<summary><strong>🔍 Mirá las tablas</strong></summary>
 
-## 🔍 Mirá las tablas
+> ```text
+> create table cliente (id …, correo varchar(255), nombre varchar(255), primary key (id))
+> create table cliente_favorito (cliente_id bigint not null, producto_id bigint not null, primary key (cliente_id, producto_id))
+> alter table cliente_favorito add constraint … foreign key (producto_id) references producto
+> alter table cliente_favorito add constraint … foreign key (cliente_id)  references cliente
+> ```
+>
+> La clave primaria `(cliente_id, producto_id)` es lo que impide **a nivel de base** repetir un favorito. En la consola de H2: `SELECT * FROM cliente_favorito;`
 
-```text
-create table cliente (id …, correo varchar(255), nombre varchar(255), primary key (id))
-create table cliente_favorito (cliente_id bigint not null, producto_id bigint not null, primary key (cliente_id, producto_id))
-alter table cliente_favorito add constraint … foreign key (producto_id) references producto
-alter table cliente_favorito add constraint … foreign key (cliente_id)  references cliente
-```
+</details>
 
-La clave primaria `(cliente_id, producto_id)` es lo que impide **a nivel de base** repetir un favorito. En la consola de H2: `SELECT * FROM cliente_favorito;`
+<details open>
+<summary><strong>✅ Qué comprobaste</strong></summary>
 
-## ✅ Qué comprobaste
+> - `@ManyToMany` + `@JoinTable` crean una **tabla intermedia** sin que tengas que escribir una clase para ella.
+> - El lado que declara `@JoinTable` es el **dueño** de la relación.
+> - Las colecciones *lazy* (`favoritos`) necesitan `@Transactional` para leerse.
 
-- `@ManyToMany` + `@JoinTable` crean una **tabla intermedia** sin que tengas que escribir una clase para ella.
-- El lado que declara `@JoinTable` es el **dueño** de la relación.
-- Las colecciones *lazy* (`favoritos`) necesitan `@Transactional` para leerse.
+</details>
 
-## 🚀 Reto
+<details open>
+<summary><strong>🚀 Reto</strong></summary>
 
-Imaginá que además querés guardar **la fecha** en que el cliente marcó cada favorito. Con `@ManyToMany` simple **no hay dónde ponerla**. ¿Qué entidad habría que crear? *(Pista: una entidad intermedia `Favorito`, con dos `@ManyToOne` y el atributo `fecha`: el
-[Ejemplo 04 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).)*
+> Imaginá que además querés guardar **la fecha** en que el cliente marcó cada favorito. Con `@ManyToMany` simple **no hay dónde ponerla**. ¿Qué entidad habría que crear? *(Pista: una entidad intermedia `Favorito`, con dos `@ManyToOne` y el atributo `fecha`: el
+> [Ejemplo 04 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).)*
 
-## 🧩 Así quedó la tienda
+</details>
 
-| Etapa | Entidades nuevas | Concepto |
-|:-:|---|---|
-| 1 | `Producto` | CRUD |
-| 2 | `Pedido`, `DetallePedido` | Uno a muchos y muchos a uno |
-| 3 | `Cliente` | Muchos a muchos con `Producto` |
+<details open>
+<summary><strong>🧩 Así quedó la tienda</strong></summary>
 
-> 📚 **Para profundizar:** [Relacionamiento entre clases](../../03-introduccion-a-jpa/material/ejemplos/03-relacionamiento-entre-clases.md) · [ManyToMany y entidad intermedia](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).
+> | Etapa | Entidades nuevas | Concepto |
+> |:-:|---|---|
+> | 1 | `Producto` | CRUD |
+> | 2 | `Pedido`, `DetallePedido` | Uno a muchos y muchos a uno |
+> | 3 | `Cliente` | Muchos a muchos con `Producto` |
+>
+> > 📚 **Para profundizar:** [Relacionamiento entre clases](../../03-introduccion-a-jpa/material/ejemplos/03-relacionamiento-entre-clases.md) · [ManyToMany y entidad intermedia](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).
+
+</details>
 
 ⬅️ [Guía 2](03-guia-tienda-2-uno-a-muchos.md)
