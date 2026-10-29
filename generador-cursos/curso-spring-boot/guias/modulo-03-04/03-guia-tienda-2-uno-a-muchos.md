@@ -26,18 +26,12 @@ classDiagram
     }
     class Producto {
         <<Entity · existente>>
-        -Long id
-        -String nombre
-        -double precio
-        -int stock
     }
     class ControladorPedidos {
         <<RestController · NUEVA>>
     }
     class SolicitudDetalle {
         <<record · NUEVA>>
-        Long productoId
-        int cantidad
     }
     class ServicioPedidos {
         <<Service · NUEVA>>
@@ -53,15 +47,9 @@ classDiagram
     }
     class Pedido {
         <<Entity · NUEVA>>
-        -Long id
-        -LocalDate fecha
-        -String estado
     }
     class DetallePedido {
         <<Entity · NUEVA>>
-        -Long id
-        -int cantidad
-        -double precioUnitario
     }
 
     ControladorProductos --> ServicioProductos

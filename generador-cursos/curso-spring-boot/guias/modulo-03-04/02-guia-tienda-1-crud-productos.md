@@ -37,10 +37,6 @@ classDiagram
     }
     class Producto {
         <<Entity · NUEVA>>
-        -Long id
-        -String nombre
-        -double precio
-        -int stock
     }
 
     ControladorProductos --> ServicioProductos : usa
@@ -49,7 +45,7 @@ classDiagram
     RepositorioProductos ..> Producto : gestiona
 ```
 
-Están **todas** las clases de la guía (`TiendaApplication` la genera Initializr; el resto lo escribís en los pasos). El flujo se lee de arriba hacia abajo: *controlador → servicio → repositorio → entidad*. La entidad `Producto` es la tabla `producto` (`id`, `nombre`, `precio`, `stock`).
+Están **todas** las clases de la guía (`TiendaApplication` la genera Initializr; el resto lo escribís en los pasos). El flujo se lee de arriba hacia abajo: *controlador → servicio → repositorio → entidad*. Las entidades son las tablas: `Producto` → `producto` (`id`, `nombre`, `precio`, `stock`).
 
 ## 🪜 Pasos
 
