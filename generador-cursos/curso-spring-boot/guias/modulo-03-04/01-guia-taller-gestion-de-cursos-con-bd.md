@@ -7,23 +7,26 @@
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
 > ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Java 21+, Spring Boot 3.3 y
-> H2: los escenarios, las respuestas y el SQL que se muestran son salidas reales.
+> H2: los escenarios, las respuestas, el SQL y los errores que se muestran son salidas reales.
+>
+> 🧭 **Idea central.** El **modelo del negocio no se toca**. Las clases que se guardan en la base
+> (`…Entity`) viven en la capa de persistencia y el repositorio **traduce** entre ellas y el modelo.
 
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
 
 > Migrar la API REST de **estudiantes, cursos y matrículas** de listas en memoria a una
-> **base de datos relacional** con **Spring Data JPA**, manteniendo las **tres capas** y **las mismas
-> reglas de negocio**.
+> **base de datos relacional** con **Spring Data JPA**, manteniendo las **tres capas**, **las mismas reglas de
+> negocio** y **sin modificar** el modelo, los servicios ni los controladores.
 >
 > Al terminar, el estudiante:
 >
-> - Declara entidades JPA (`@Entity`, `@Id`, `@GeneratedValue`, `@Column`) y la relación de
->   `Matricula` con `Estudiante` y `Curso` (`@ManyToOne`) (M3 y M4).
+> - Declara **entidades JPA** (`@Entity`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`) en `persistence.entity`,
+>   separadas del modelo del negocio (M3 y M4).
 > - Configura la conexión a **H2** en `application.properties` y lee el SQL que genera Hibernate (M3 y M4).
-> - Reemplaza los repositorios «EnMemoria» por interfaces `JpaRepository` con **métodos derivados**
->   (`existsBy…`, `countBy…`, `findBy…LessThan`) (M3).
-> - Comprueba qué capas cambiaron y cuáles **no** (controladores y reglas) al cambiar el almacenamiento.
+> - Crea interfaces `JpaRepository` con **métodos derivados** (`existsBy…`, `countBy…`) (M3).
+> - Escribe **mapeadores** entre entidad y modelo y los usa en una implementación `…EnBD` del contrato de repositorio (M2 y M3).
+> - Comprueba qué capas **no** cambiaron al cambiar el almacenamiento y por qué (programar contra interfaces).
 > - Verifica que los datos **sobreviven al reinicio** usando H2 en archivo.
 
 </details>
@@ -31,27 +34,28 @@
 <details>
 <summary><strong>📝 Introducción: el problema y qué cambia</strong></summary>
 
-> > 🗣️ **Para abrir la sesión.** En la versión anterior, reiniciar la aplicación borraba todo. Se
-> > retoma esa frase como punto de partida: *«hoy los datos dejan de vivir en una `List` y pasan a
-> > una base de datos»*. Antes de escribir código se revisa la tabla «Qué cambia y qué no».
+> > 🗣️ **Para abrir la sesión.** En la versión anterior, reiniciar la aplicación borraba todo, y al cerrar
+> > se preguntó *«si cambiamos la lista por una base de datos, ¿qué capas hay que tocar?»*. Hoy se **comprueba la
+> > respuesta con código**: solo la de persistencia.
 >
 > ### 🏫 El problema (el mismo)
 >
-> Una **academia de programación** necesita una API REST para administrar **estudiantes**,
-> **cursos** y **matrículas**: registrar estudiantes, crear cursos, matricular estudiantes y consultar
-> qué tan llenos están los cursos. Los requerimientos funcionales (RF-01 a RF-08) y las reglas de
-> negocio (RN-01 a RN-11) **son los de la guía anterior**; no se agregan ni se quitan.
+> Una **academia de programación** necesita una API REST para administrar **estudiantes**, **cursos** y
+> **matrículas**. Los requerimientos funcionales (RF-01 a RF-08) y las reglas de negocio (RN-01 a RN-11) **son los
+> de la [guía anterior](../modulo-01-02/01-guia-taller-gestion-de-cursos.md)**; no se agregan ni se quitan.
 >
-> ### 🧩 Entidades y tablas
+> ### 🧩 Dos clases por concepto: modelo y entidad
 >
-> | Entidad (clase) | Tabla | Atributos | Observación |
+> | Concepto | Modelo (capa de negocio) | Entidad (capa de persistencia) | Tabla |
 > |---|---|---|---|
-> | **Estudiante** | `estudiante` | `id`, `nombre`, `edad`, `correo` | `correo` es **único** (`@Column(unique = true)`). |
-> | **Curso** | `curso` | `id`, `nombre`, `precio`, `cupoMaximo` | La columna se llama `cupo_maximo`. |
-> | **Matrícula** | `matricula` | `id`, `estudiante`, `curso` | Dos **claves foráneas**: `estudiante_id` y `curso_id`. |
+> | Estudiante | `Estudiante` — **sin cambios** | `EstudianteEntity` | `estudiante` |
+> | Curso | `Curso` — **sin cambios** | `CursoEntity` | `curso` |
+> | Matrícula | `Matricula` — **sin cambios** | `MatriculaEntity` | `matricula` (FK `estudiante_id` y `curso_id`) |
+> | Ocupación (reporte) | `Ocupacion` — **sin cambios** | *(no se guarda)* | — |
 >
-> `Matricula` es la **entidad intermedia** de la relación muchos a muchos entre `Estudiante` y `Curso`
-> ([Ejemplo 04 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md)): cada una de sus dos relaciones es un `@ManyToOne`.
+> El modelo describe **qué es** un estudiante para el negocio; la entidad describe **cómo se guarda** en una tabla.
+> `MatriculaEntity` es la **entidad intermedia** de la relación muchos a muchos entre `EstudianteEntity` y
+> `CursoEntity` ([Ejemplo 04 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md)): cada una de sus dos relaciones es un `@ManyToOne`.
 >
 > ```mermaid
 > erDiagram
@@ -78,35 +82,50 @@
 >
 > ### 🔄 Qué cambia y qué no
 >
-> | Pieza | ¿Cambia? | Qué cambia |
+> | Pieza | ¿Cambia? | Detalle |
 > |---|:-:|---|
-> | `presentacion.controlador` (3 controladores y `SolicitudMatricula`) | ❌ No | Nada: no conocen cómo se guardan los datos. |
-> | `negocio.model.Ocupacion` | ❌ No | Sigue siendo un `record` que no se guarda. |
-> | `negocio.model` (`Estudiante`, `Curso`, `Matricula`) | ✅ Sí | Pasan a ser **entidades JPA**: anotaciones y constructor `protected`. Se quita `setId`. |
-> | `persistence.repository` | ✅ Sí | Las 3 clases «EnMemoria» **desaparecen**; las 3 interfaces extienden `JpaRepository` y Spring Data genera la implementación. |
-> | `negocio.service` | ⚠️ Poco | Las **reglas son las mismas**; solo cambian los nombres de las llamadas al repositorio (`guardar` → `save`, `listar` → `findAll`…) y `listarEconomicos` deja el ciclo para usar una consulta. |
-> | `pom.xml` y `application.properties` | ✅ Sí | Nueva dependencia (`spring-boot-starter-data-jpa`), driver H2 y la conexión. |
+> | `presentacion.controlador` (3 controladores y `SolicitudMatricula`) | ❌ No | No conocen cómo se guardan los datos. |
+> | `negocio.model` (`Estudiante`, `Curso`, `Matricula`, `Ocupacion`) | ❌ No | Siguen siendo clases Java sencillas, **sin anotaciones de JPA**. |
+> | `negocio.service` (3 servicios) | ❌ No | **Ni una línea**: dependen de las interfaces de repositorio, que no cambian. |
+> | `persistence.repository` — las 3 **interfaces** (el contrato) | ❌ No | `guardar`, `listar`, `buscarPorId`… igual que antes. |
+> | `persistence.repository` — las 3 clases `…EnMemoria` | 🗑️ Se borran | Las reemplazan las clases `…EnBD`. |
+> | `persistence.entity` | ➕ Nuevo | `EstudianteEntity`, `CursoEntity`, `MatriculaEntity` (las `@Entity`). |
+> | `persistence.mapper` | ➕ Nuevo | Convierten **entidad ↔ modelo**. |
+> | `persistence.repository` — `…JpaRepository` y `…EnBD` | ➕ Nuevo | Las interfaces de Spring Data y las clases que cumplen el contrato usándolas. |
+> | `pom.xml` y `application.properties` | ✅ Sí | Dependencias `spring-boot-starter-data-jpa` y `h2`; conexión a la base. |
 >
-> > 🔎 **Lectura clave.** En la guía anterior se afirmó que, al pasar a una base de datos, *«solo cambia
-> > la persistencia»*. Es casi cierto: como ahora usamos la interfaz de Spring Data (`JpaRepository`) en
-> > lugar de nuestro propio contrato, **los servicios cambian los nombres de las llamadas**, pero no una sola
-> > regla. Si se quisiera conservar los nombres antiguos (`guardar`, `listar`…) y no tocar los servicios,
-> > se necesita una clase adaptadora: es uno de los retos finales.
+> > 🔎 **Lectura clave.** Esta es la respuesta a la pregunta del cierre anterior: **solo cambió `persistence`**. Es posible
+> > porque el servicio depende de una **interfaz** (M2) y porque el modelo no está atado a JPA.
+>
+> <details>
+> <summary><strong>⚖️ ¿Por qué separar entidad y modelo? Qué se gana y qué cuesta</strong></summary>
+>
+> > | Se gana | Cuesta |
+> > |---|---|
+> > | `negocio` **no importa nada de JPA**: las reglas se pueden probar sin base de datos. | **Más clases**: 3 entidades y 3 mapeadores. |
+> > | Cambiar de tecnología de persistencia (JPA, JDBC, MongoDB…) solo toca `persistence`. | Los atributos están **duplicados** (modelo y entidad) y hay que mantenerlos alineados. |
+> > | La regla de dependencia se cumple de verdad: `negocio` no conoce `persistence`. | Hay que **escribir el mapeo** (a mano aquí; en proyectos grandes se usan librerías como MapStruct). |
+> > | **Desaparece una trampa:** el cliente ya no puede sobrescribir un registro enviando un `id` (ver Paso 4.2). | Si el modelo crece (relaciones bidireccionales), el mapeo se complica. |
+> >
+> > En un proyecto pequeño, anotar el modelo directamente es válido (es lo que hacen los ejemplos de los módulos 3 y 4).
+> > Esta guía elige la separación porque **refleja la arquitectura del curso** y enseña a diseñar capas independientes.
+>
+> </details>
 >
 > ### 🛠️ Requerimientos no funcionales y restricciones
 >
 > | Código | Requerimiento |
 > |---|---|
 > | **RNF-01** | Java 21 o superior, Spring Boot 3 y Maven. |
-> | **RNF-02** | Persistencia con **Spring Data JPA** y **H2**. Primero en memoria; al final, en **archivo** para que los datos sobrevivan al reinicio. |
-> | **RNF-03** | Se mantienen las **tres capas** y la regla de dependencia presentación → negocio → persistencia. |
+> | **RNF-02** | Persistencia con **Spring Data JPA** y **H2**. Primero en memoria; al final, en **archivo**. |
+> | **RNF-03** | Se mantienen las **tres capas**: presentación → negocio → persistencia. Las anotaciones de JPA **solo** en `persistence.entity`. |
 > | **RNF-04** | Inyección por constructor. Los servicios dependen de **interfaces** de repositorio. |
-> | **RNF-05** | Los errores de negocio siguen siendo excepciones estándar de Java; sin manejador, Spring responde `500` (se resuelve en el Módulo 7). |
+> | **RNF-05** | Los errores de negocio siguen siendo excepciones estándar de Java; sin manejador, Spring responde `500` (Módulo 7). |
 > | **RNF-06** | La API se prueba con Postman o `curl`, con evidencia de cada escenario. |
 > | **RNF-07** | Duración: 1 h 30 min. |
 >
-> > 💡 **Alcance.** Quedan fuera: relaciones bidireccionales, `cascade`, migraciones (Flyway), otros
-> > motores (MySQL/PostgreSQL), DTO y manejo de errores con `404`/`400`/`409`.
+> > 💡 **Alcance.** Quedan fuera: relaciones bidireccionales, `cascade`, migraciones (Flyway), otros motores
+> > (MySQL/PostgreSQL), DTO y manejo de errores con `404`/`400`/`409`.
 
 </details>
 
@@ -116,15 +135,17 @@
 > | Paso | Minutos | Actividad | Quién escribe |
 > |---|---:|---|---|
 > | 0 | 0 – 10 | Preparación: dependencias, `application.properties` y arranque | Docente |
-> | 1 | 10 – 30 | Entidades JPA (`Estudiante` en vivo; `Curso` y `Matricula` los estudiantes) | Docente y estudiantes |
-> | 2 | 30 – 45 | Repositorios: de la clase «EnMemoria» a `JpaRepository` | Estudiantes (docente guía) |
-> | 3 | 45 – 60 | Ajustar los servicios (mismas reglas) | Estudiantes |
-> | 4 | 60 – 80 | Pruebas con `curl`/Postman, SQL en consola y consola de H2 | Todos |
-> | 5 | 80 – 90 | Persistencia real (H2 en archivo) y cierre | Todos |
+> | 1 | 10 – 25 | Entidades JPA en `persistence.entity` (`EstudianteEntity` en vivo) | Docente y estudiantes |
+> | 2 | 25 – 32 | Interfaces de Spring Data (`…JpaRepository`) | Estudiantes |
+> | 3 | 32 – 42 | Mapeadores entidad ↔ modelo | Estudiantes (docente guía) |
+> | 4 | 42 – 57 | Implementaciones `…EnBD` y retiro de `…EnMemoria` | Estudiantes |
+> | 5 | 57 – 62 | Comprobar que modelo, servicios y controladores **no cambiaron** | Todos |
+> | 6 | 62 – 80 | Pruebas con `curl`/Postman, SQL en consola y consola de H2 | Todos |
+> | 7 | 80 – 90 | Persistencia real (H2 en archivo) y cierre | Todos |
 >
-> > 💡 **Ritmo.** El Paso 1 con `Estudiante` fija el patrón de anotaciones; los pasos 2 y 3 son
-> > mecánicos y los resuelven los estudiantes con la tabla «antes → ahora» a la vista. Si falta
-> > tiempo, el Paso 5 se hace como demostración del docente.
+> > 💡 **Ritmo.** Los pasos 1 y 3 con `Estudiante` fijan el patrón; con `Curso` y `Matricula` los estudiantes lo repiten.
+> > **Servicios y controladores no se abren hasta el Paso 5:** que nadie tenga que tocarlos es parte de la lección. Si falta tiempo, el
+> > Paso 7 se hace como demostración del docente.
 
 </details>
 
@@ -133,17 +154,19 @@
 
 > | Concepto | Dónde aparece en el taller | Módulo | Ejemplo de apoyo |
 > |---|---|:-:|---|
-> | JPA y ORM | Las clases del modelo se guardan **sin escribir SQL** | 03 | [¿Qué es JPA?](../../03-introduccion-a-jpa/material/ejemplos/01-que-es-jpa.md) · [¿Qué es ORM?](../../03-introduccion-a-jpa/material/ejemplos/04-que-es-orm.md) |
+> | JPA y ORM | Las clases se guardan **sin escribir SQL** | 03 | [¿Qué es JPA?](../../03-introduccion-a-jpa/material/ejemplos/01-que-es-jpa.md) · [¿Qué es ORM?](../../03-introduccion-a-jpa/material/ejemplos/04-que-es-orm.md) |
 > | Arquitectura de JPA e Hibernate | Hibernate genera las tablas y el SQL (visible con `show-sql`) | 03 | [Arquitectura de JPA](../../03-introduccion-a-jpa/material/ejemplos/02-arquitectura-de-jpa.md) · [Hibernate y JPA](../../03-introduccion-a-jpa/material/ejemplos/05-hibernate-y-su-relacion-con-jpa.md) |
-> | Relacionamiento entre clases | `Matricula` apunta a `Estudiante` y a `Curso` | 03 | [Relacionamiento entre clases](../../03-introduccion-a-jpa/material/ejemplos/03-relacionamiento-entre-clases.md) |
+> | Relacionamiento entre clases | `MatriculaEntity` apunta a `EstudianteEntity` y a `CursoEntity` | 03 | [Relacionamiento entre clases](../../03-introduccion-a-jpa/material/ejemplos/03-relacionamiento-entre-clases.md) |
 > | Spring Data JPA | `JpaRepository` y **métodos derivados** (`existsBy…`, `countBy…`) | 03 | [¿Qué es Spring Data JPA?](../../03-introduccion-a-jpa/material/ejemplos/06-que-es-spring-data-jpa.md) · [Uso básico](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md) |
-> | Anotaciones de JPA | `@Entity`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn` | 03 | [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md) |
+> | Anotaciones de JPA | `@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn` | 03 | [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md) |
 > | Proyecto y conexión a la base de datos | `pom.xml`, `application.properties`, H2 | 04 | [Creación de un proyecto](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/01-creacion-de-un-proyecto-spring-boot.md) |
-> | Lado dueño de la relación y `fetch` | `Matricula` es dueña de las dos claves foráneas | 04 | [OneToMany/ManyToOne y fetch](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md) |
-> | Entidad intermedia | `Matricula` une `Estudiante` y `Curso` | 04 | [ManyToMany y entidad intermedia](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md) |
+> | Lado dueño de la relación y `fetch` | `MatriculaEntity` es dueña de las dos claves foráneas | 04 | [OneToMany/ManyToOne y fetch](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md) |
+> | Entidad intermedia | `MatriculaEntity` une estudiante y curso | 04 | [ManyToMany y entidad intermedia](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md) |
 > | CRUD | `save`, `findAll`, `findById` | 04 | [CRUD completo](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md) |
 > | Inicialización del servidor | Hibernate crea las tablas al arrancar (`ddl-auto=update`) | 04 | [Inicialización del servidor](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/07-inicializacion-del-servidor.md) |
-> | Interfaces e inyección (repaso M2) | Spring crea **el bean del repositorio** a partir de una interfaz | 02 | [Resolución de una dependencia](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/04-implementacion-y-resolucion-de-una-dependencia-general.md) |
+> | Programar contra interfaces (repaso M2) | Los servicios **no cambian** porque dependen del contrato | 02 | [Resolución de una dependencia](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/04-implementacion-y-resolucion-de-una-dependencia-general.md) |
+> | Un solo bean por tipo (repaso M2) | Dejar `…EnMemoria` y `…EnBD` a la vez rompe el arranque | 02 | [Explicación conceptual del M2](../../02-manejo-de-dependencias-y-java-beans/material/ejemplos/explicacion-conceptual.md) |
+> | **Mapeo entidad ↔ modelo** *(concepto nuevo de esta guía)* | `persistence.mapper` | — | Se explica en el Paso 3 |
 
 </details>
 
@@ -155,25 +178,30 @@
 > ├── 📄 AcademiaApplication.java                  (sin cambios)
 > ├── 📁 presentacion                              ← 1 · sin cambios
 > │   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
-> ├── 📁 negocio                                   ← 2 · las mismas reglas
-> │   ├── 📁 model         Estudiante · Curso · Matricula  (ahora @Entity)  ·  Ocupacion (record)
-> │   └── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas  (cambian las llamadas)
-> └── 📁 persistence                               ← 3 · aquí está el cambio grande
->     └── 📁 repository    RepositorioEstudiantes · RepositorioCursos · RepositorioMatriculas  (extienden JpaRepository)
+> ├── 📁 negocio                                   ← 2 · sin cambios
+> │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
+> │   └── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
+> └── 📁 persistence                               ← 3 · aquí ocurre todo el cambio
+>     ├── 📁 entity        EstudianteEntity · CursoEntity · MatriculaEntity            (➕ las @Entity)
+>     ├── 📁 mapper        EstudianteMapper · CursoMapper · MatriculaMapper            (➕ entidad ↔ modelo)
+>     └── 📁 repository    Repositorio… (3 interfaces = el contrato, sin cambios)
+>                          …JpaRepository (3, ➕ Spring Data) · Repositorio…EnBD (3, ➕ @Repository)
 > 📁 src/main/resources
-> └── 📄 application.properties                    (NUEVO: conexión a H2 y JPA)
+> └── 📄 application.properties                    (➕ conexión a H2 y JPA)
 > ```
 >
 > ```text
-> Antes:  HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz propia) ◀─ RepositorioEnMemoria (List)
->
-> Ahora:  HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (JpaRepository) ◀─ implementación que Spring Data genera
->                                                                               │
->                                                                               ▼  Hibernate ─▶ JDBC ─▶ H2
+> HTTP ─▶ Controlador ─▶ Servicio ─▶ Repositorio (interfaz)  ◀─ RepositorioEnBD ─▶ Mapper ─▶ …JpaRepository ─▶ Hibernate ─▶ H2
+>                                    contrato (sin cambios)    cumple el contrato   modelo ↔ entidad   Spring Data lo genera
+>         └──────── no se tocan ────────┘                      └─────────────────── persistence (todo lo nuevo) ───────────────────┘
 > ```
 >
-> > 🗣️ **Pregunta para el grupo:** ¿quién escribe ahora la clase que implementa el repositorio?
-> > *(Nadie: Spring Data la crea en tiempo de ejecución a partir de la interfaz y la registra como bean.)*
+> > 🔎 **Regla de dependencia.** `persistence` **conoce** a `negocio.model` (el repositorio devuelve y recibe modelos),
+> > pero `negocio` **no conoce** a `persistence.entity`. Si algún `import com.academia.persistence.entity…` aparece en un
+> > servicio o un controlador, la separación se rompió.
+> >
+> > 🗣️ **Pregunta para el grupo:** ¿quién escribe la clase que implementa `…JpaRepository`? *(Nadie: Spring Data la crea
+> > al arrancar y la registra como bean. Lo que sí escribimos es `…EnBD`, que cumple **nuestro** contrato.)*
 
 </details>
 
@@ -183,22 +211,12 @@
 <summary><strong>🚀 Paso 0 — Preparación</strong></summary>
 
 > <details>
-> <summary><strong>Paso 0.1 · Partir del proyecto y agregar las dependencias</strong></summary>
+> <summary><strong>Paso 0.1 · Partir del taller terminado y agregar dos dependencias</strong></summary>
 >
-> > Hay dos caminos equivalentes; el docente elige uno:
-> >
-> > | Camino | Cómo |
-> > |---|---|
-> > | **A. Proyecto nuevo** (recomendado) | En [start.spring.io](https://start.spring.io): Maven · Java 21 · Spring Boot 3.x · Group `com.academia` · Artifact `academia` · dependencias **Spring Web**, **Spring Data JPA** y **H2 Database**. |
-> > | **B. Continuar el taller anterior** | Copiar el proyecto `academia` terminado (puntos de control 0 a 4) y agregar a mano las dos dependencias nuevas. |
-> >
-> > El `pom.xml` queda con tres dependencias funcionales:
+> > El punto de partida es el proyecto `academia` **terminado** en la [guía de los módulos 01 y 02](../modulo-01-02/01-guia-taller-gestion-de-cursos.md) (puntos de control 0 a 4).
+> > Se agregan al `pom.xml` las dos dependencias nuevas; la de Spring Web ya estaba:
 > >
 > > ```xml
-> > <dependency>
-> >     <groupId>org.springframework.boot</groupId>
-> >     <artifactId>spring-boot-starter-web</artifactId>
-> > </dependency>
 > > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
 > >     <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -210,10 +228,12 @@
 > > </dependency>
 > > ```
 > >
-> > > 🔎 **Concepto (M3 y M4):** `spring-boot-starter-data-jpa` trae JPA, **Hibernate** y Spring Data;
-> > > `h2` es el **driver** de la base de datos, y `runtime` indica que solo hace falta al ejecutar.
-> > > Si se copió el proyecto anterior (camino B), los paquetes `presentacion`, `negocio` y `persistence`
-> > > ya existen; los pasos 1 a 3 modifican lo que allí haya.
+> > > 💡 **Alternativa:** crear un proyecto nuevo en [start.spring.io](https://start.spring.io) (Maven · Java 21 · Group `com.academia` ·
+> > > Artifact `academia` · **Spring Web**, **Spring Data JPA**, **H2 Database**) y copiarle los paquetes `presentacion`, `negocio` y
+> > > `persistence` del taller anterior.
+> > >
+> > > 🔎 **Concepto (M3 y M4):** `spring-boot-starter-data-jpa` trae JPA, **Hibernate** y Spring Data; `h2` es el **driver** de la base,
+> > > y `runtime` indica que solo hace falta al ejecutar.
 >
 > </details>
 >
@@ -241,31 +261,28 @@
 > > |---|---|
 > > | `spring.datasource.url` | Dirección de la base. `jdbc:h2:mem:academia` crea una base H2 **en memoria** llamada `academia`; `DB_CLOSE_DELAY=-1` evita que se borre al cerrarse la primera conexión. |
 > > | `spring.datasource.driver-class-name`, `username`, `password` | Driver y credenciales por defecto de H2 (`sa` y sin contraseña). |
-> > | `spring.jpa.hibernate.ddl-auto=update` | Hibernate **crea o actualiza las tablas** al arrancar, sin borrar datos existentes ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
-> > | `spring.jpa.show-sql=true` | Imprime en la consola **el SQL** que Hibernate ejecuta: sirve para ver el ORM trabajando. |
-> > | `spring.h2.console.enabled=true` | Habilita la consola web de H2 en `/h2-console` para mirar las tablas. |
+> > | `spring.jpa.hibernate.ddl-auto=update` | Hibernate **crea o actualiza las tablas** al arrancar, sin borrar datos ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
+> > | `spring.jpa.show-sql=true` | Imprime en la consola **el SQL** que ejecuta Hibernate: sirve para ver el ORM trabajando. |
+> > | `spring.h2.console.enabled=true` | Habilita la consola web de H2 en `/h2-console`. |
 > >
-> > > 💡 **Diferencia con el Módulo 3.** Allí se declaraba `spring.jpa.database-platform=…H2Dialect`.
-> > > Con Hibernate 6 (Spring Boot 3) el dialecto se **detecta solo**, por lo que aquí se omite; dejarlo
-> > > no rompe nada, pero produce un aviso en el arranque.
+> > > 💡 **Diferencia con el Módulo 3.** Allí se declaraba `spring.jpa.database-platform=…H2Dialect`. Con Hibernate 6 (Spring Boot 3)
+> > > el dialecto se **detecta solo**, así que aquí se omite; dejarlo no rompe nada, pero produce un aviso en el arranque.
 >
 > </details>
 >
 > <details>
-> <summary><strong>Paso 0.3 · Arrancar «vacío»</strong></summary>
+> <summary><strong>Paso 0.3 · Arrancar y comprobar que nada se rompió</strong></summary>
 >
-> > Todavía no hay entidades. Se ejecuta la aplicación (`./mvnw spring-boot:run`, o `mvnw.cmd spring-boot:run`
-> > en Windows) y se comprueba:
+> > Se ejecuta la aplicación (`./mvnw spring-boot:run`; en Windows, `mvnw.cmd spring-boot:run`):
 > >
 > > - Aparece `Started AcademiaApplication in … seconds`.
-> > - En el registro hay líneas de **HikariPool** y de **Hibernate** (la conexión a H2 quedó abierta).
-> > - **No** se crean tablas: sin `@Entity`, Hibernate no tiene nada que mapear.
+> > - **No** se crea ninguna tabla (sin `@Entity`, Hibernate no tiene qué mapear).
+> > - Los escenarios de la guía anterior **siguen funcionando**: todavía se guardan en las listas.
 > >
-> > > ⚠️ **Trampa habitual.** Si aparece `Failed to configure a DataSource: 'url' attribute is not
-> > > specified`, falta la dependencia `h2` o el archivo `application.properties` no está en
-> > > `src/main/resources`.
+> > > ⚠️ **Trampa habitual.** `Failed to configure a DataSource: 'url' attribute is not specified` indica que falta la dependencia `h2`
+> > > o que `application.properties` no está en `src/main/resources`.
 > >
-> > ✅ **Punto de control 0:** arranca sin errores y sin tablas. Todavía no hay datos.
+> > ✅ **Punto de control 0:** arranca sin errores, sin tablas, y la API sigue respondiendo con las listas.
 >
 > </details>
 
@@ -274,26 +291,26 @@
 ---
 
 <details>
-<summary><strong>🧱 Paso 1 — Entidades JPA (capa de negocio)</strong></summary>
+<summary><strong>🧱 Paso 1 — Entidades JPA (capa de persistencia)</strong></summary>
 
 > <details>
-> <summary><strong>Paso 1.1 · <code>Estudiante</code> como entidad — capa de negocio</strong></summary>
+> <summary><strong>Paso 1.1 · <code>EstudianteEntity</code> — capa de persistencia</strong></summary>
 >
-> > Se parte de la clase de la guía anterior y se le agregan anotaciones. **En vivo, comparando.**
-> >
-> > **Archivo:** `src/main/java/com/academia/negocio/model/Estudiante.java`
+> > **Archivo:** `src/main/java/com/academia/persistence/entity/EstudianteEntity.java`
 > >
 > > ```java
-> > package com.academia.negocio.model;
+> > package com.academia.persistence.entity;
 > >
 > > import jakarta.persistence.Column;
 > > import jakarta.persistence.Entity;
 > > import jakarta.persistence.GeneratedValue;
 > > import jakarta.persistence.GenerationType;
 > > import jakarta.persistence.Id;
+> > import jakarta.persistence.Table;
 > >
 > > @Entity
-> > public class Estudiante {
+> > @Table(name = "estudiante")
+> > public class EstudianteEntity {
 > >
 > >     @Id
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -306,10 +323,10 @@
 > >     @Column(unique = true)
 > >     private String correo;
 > >
-> >     protected Estudiante() {
+> >     protected EstudianteEntity() {
 > >     }
 > >
-> >     public Estudiante(String nombre, int edad, String correo) {
+> >     public EstudianteEntity(String nombre, int edad, String correo) {
 > >         this.nombre = nombre;
 > >         this.edad = edad;
 > >         this.correo = correo;
@@ -322,38 +339,42 @@
 > > }
 > > ```
 > >
-> > | Cambio respecto a la versión en memoria | Por qué |
-> > |---|---|
-> > | `@Entity` | Le dice a JPA que la clase se guarda en una tabla (`estudiante`). |
-> > | `@Id` + `@GeneratedValue(strategy = GenerationType.IDENTITY)` | `id` es la **clave primaria** y la **genera la base de datos** (autoincremental). Reemplaza al contador `siguienteId` del repositorio (**RN-01**). |
-> > | `@Column(unique = true)` en `correo` | La base **también** rechaza correos repetidos (red de seguridad de **RN-02**). |
-> > | Constructor `protected Estudiante()` | JPA crea el objeto con el constructor **sin argumentos** y luego rellena los campos por reflexión (misma idea del JavaBean del M2). |
-> > | Se **elimina** `setId` | El `id` lo decide la base, no el código. |
+> > > 🗣️ **Se muestra el modelo `Estudiante` al lado**: es el mismo de siempre (sin anotaciones, con `setId`). Dos clases, dos responsabilidades.
 > >
-> > > 🔎 **Concepto (M3):** `@Entity` es lo que hace que Hibernate cree la tabla. El nombre de la
-> > > columna `edad` o `nombre` sale del nombre del atributo; `cupoMaximo` se convertirá en `cupo_maximo`.
-> > > Todos los tipos se mapean solos: `String` → `varchar`, `int` → `integer`, `Long` → `bigint`.
+> > | Elemento | Por qué |
+> > |---|---|
+> > | `@Entity` | Le dice a JPA que la clase se guarda en una tabla. |
+> > | `@Table(name = "estudiante")` | **Necesario:** sin él, la tabla se llamaría `estudiante_entity` (el nombre de la clase). |
+> > | `@Id` + `@GeneratedValue(strategy = GenerationType.IDENTITY)` | `id` es la **clave primaria** y la **genera la base** (autoincremental). Reemplaza al contador `siguienteId` (**RN-01**). |
+> > | `@Column(unique = true)` en `correo` | La base **también** rechaza correos repetidos (red de seguridad de **RN-02**). |
+> > | Constructor `protected` sin argumentos | JPA crea el objeto vacío y rellena los campos por reflexión (misma idea del JavaBean del M2). |
+> > | **Sin `setId`** | El `id` lo decide la base, no el código. |
+> >
+> > > 🔎 **Concepto (M3):** el nombre de cada columna sale del atributo (`edad`, `nombre`); `cupoMaximo` se convertirá en `cupo_maximo`.
+> > > Los tipos se mapean solos: `String` → `varchar`, `int` → `integer`, `Long` → `bigint`.
 >
 > </details>
 >
 > <details>
-> <summary><strong>Paso 1.2 · <code>Curso</code> y <code>Matricula</code></strong></summary>
+> <summary><strong>Paso 1.2 · <code>CursoEntity</code> y <code>MatriculaEntity</code></strong></summary>
 >
-> > Los estudiantes aplican el mismo patrón. La diferencia está en `Matricula`: en la versión anterior
-> > guardaba **objetos** `Estudiante` y `Curso`, y ahora esos objetos se vuelven **claves foráneas**.
+> > Los estudiantes aplican el mismo patrón. La diferencia está en `MatriculaEntity`: el modelo `Matricula` guarda **objetos** `Estudiante` y `Curso`, y la
+> > entidad los guarda como **claves foráneas**.
 > >
-> > **Archivo:** `src/main/java/com/academia/negocio/model/Curso.java`
+> > **Archivo:** `src/main/java/com/academia/persistence/entity/CursoEntity.java`
 > >
 > > ```java
-> > package com.academia.negocio.model;
+> > package com.academia.persistence.entity;
 > >
 > > import jakarta.persistence.Entity;
 > > import jakarta.persistence.GeneratedValue;
 > > import jakarta.persistence.GenerationType;
 > > import jakarta.persistence.Id;
+> > import jakarta.persistence.Table;
 > >
 > > @Entity
-> > public class Curso {
+> > @Table(name = "curso")
+> > public class CursoEntity {
 > >
 > >     @Id
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -365,10 +386,10 @@
 > >
 > >     private int cupoMaximo;
 > >
-> >     protected Curso() {
+> >     protected CursoEntity() {
 > >     }
 > >
-> >     public Curso(String nombre, double precio, int cupoMaximo) {
+> >     public CursoEntity(String nombre, double precio, int cupoMaximo) {
 > >         this.nombre = nombre;
 > >         this.precio = precio;
 > >         this.cupoMaximo = cupoMaximo;
@@ -381,10 +402,10 @@
 > > }
 > > ```
 > >
-> > **Archivo:** `src/main/java/com/academia/negocio/model/Matricula.java`
+> > **Archivo:** `src/main/java/com/academia/persistence/entity/MatriculaEntity.java`
 > >
 > > ```java
-> > package com.academia.negocio.model;
+> > package com.academia.persistence.entity;
 > >
 > > import jakarta.persistence.Entity;
 > > import jakarta.persistence.GeneratedValue;
@@ -392,9 +413,11 @@
 > > import jakarta.persistence.Id;
 > > import jakarta.persistence.JoinColumn;
 > > import jakarta.persistence.ManyToOne;
+> > import jakarta.persistence.Table;
 > >
 > > @Entity
-> > public class Matricula {
+> > @Table(name = "matricula")
+> > public class MatriculaEntity {
 > >
 > >     @Id
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -402,43 +425,38 @@
 > >
 > >     @ManyToOne
 > >     @JoinColumn(name = "estudiante_id")
-> >     private Estudiante estudiante;
+> >     private EstudianteEntity estudiante;
 > >
 > >     @ManyToOne
 > >     @JoinColumn(name = "curso_id")
-> >     private Curso curso;
+> >     private CursoEntity curso;
 > >
-> >     protected Matricula() {
+> >     protected MatriculaEntity() {
 > >     }
 > >
-> >     public Matricula(Estudiante estudiante, Curso curso) {
+> >     public MatriculaEntity(EstudianteEntity estudiante, CursoEntity curso) {
 > >         this.estudiante = estudiante;
 > >         this.curso = curso;
 > >     }
 > >
 > >     public Long getId() { return id; }
-> >     public Estudiante getEstudiante() { return estudiante; }
-> >     public Curso getCurso() { return curso; }
+> >     public EstudianteEntity getEstudiante() { return estudiante; }
+> >     public CursoEntity getCurso() { return curso; }
 > > }
 > > ```
 > >
-> > Puntos a resaltar:
-> >
-> > - **`@ManyToOne`**: *muchas matrículas* pertenecen a **un** estudiante (y a **un** curso). Es el mismo
-> >   modelo de objetos que ya se tenía; solo se le agregan las anotaciones ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md)).
-> > - **`@JoinColumn(name = "estudiante_id")`** nombra la **columna de clave foránea** en la tabla `matricula`.
-> >   `Matricula` es el **lado dueño**: es quien guarda las dos claves foráneas ([Ejemplo 02 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/02-oneToOne-y-el-lado-dueno.md)).
-> > - La relación es **unidireccional** (`Estudiante` y `Curso` no conocen sus matrículas): basta para todas las
-> >   reglas del taller y evita ciclos al convertir a JSON.
-> > - `Ocupacion` **no se toca**: es un `record` que solo transporta el resultado del reporte; no se guarda.
+> > - **`@ManyToOne`**: *muchas matrículas* pertenecen a **un** estudiante y a **un** curso ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md)).
+> > - **`@JoinColumn(name = "estudiante_id")`** nombra la **columna de clave foránea**. `MatriculaEntity` es el **lado dueño**: guarda las dos claves
+> >   ([Ejemplo 02 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/02-oneToOne-y-el-lado-dueno.md)).
+> > - Las entidades **se relacionan entre sí** (`EstudianteEntity`, `CursoEntity`), no con los modelos: `persistence.entity` es un mundo cerrado.
+> > - La relación es **unidireccional**: basta para todas las reglas y simplifica el mapeo.
 >
 > </details>
 >
 > <details>
 > <summary><strong>Paso 1.3 · Ver las tablas que crea Hibernate</strong></summary>
 >
-> > Con las tres entidades escritas, se reinicia la aplicación. Gracias a `show-sql=true` aparece en la consola
-> > (abreviado):
+> > Se reinicia la aplicación. Con `show-sql=true` aparece en la consola (abreviado):
 > >
 > > ```text
 > > Hibernate: create table curso (id bigint generated by default as identity, cupo_maximo integer not null, nombre varchar(255), precio float(53) not null, primary key (id))
@@ -449,18 +467,17 @@
 > > Hibernate: alter table if exists matricula add constraint FK… foreign key (estudiante_id) references estudiante
 > > ```
 > >
-> > Para mirarlas con el navegador: abrir `http://localhost:8080/h2-console` y entrar con
+> > Para mirarlas en el navegador: `http://localhost:8080/h2-console`
 > >
 > > | Campo | Valor |
 > > |---|---|
 > > | JDBC URL | `jdbc:h2:mem:academia` |
 > > | User Name / Password | `sa` / *(vacío)* |
 > >
-> > > 🗣️ **Preguntas:** ¿quién escribió ese `create table`? *(Hibernate, a partir de las anotaciones.)*
-> > > ¿Qué columnas de `matricula` salen de `@JoinColumn`? *(`estudiante_id` y `curso_id`.)*
+> > > 🗣️ **Preguntas:** ¿quién escribió ese `create table`? *(Hibernate, a partir de las anotaciones.)* ¿Qué pasa con la API en este momento?
+> > > *(Sigue funcionando con las listas: las tablas existen, pero **nadie las usa todavía**.)*
 > >
-> > ✅ **Punto de control 1:** la aplicación arranca, aparecen **tres** `create table` y la consola de H2 muestra
-> > las tablas `ESTUDIANTE`, `CURSO` y `MATRICULA`. *Aún no compilan los repositorios antiguos: se arreglan en el paso siguiente.*
+> > ✅ **Punto de control 1:** aparecen **tres** `create table`, la consola de H2 muestra `ESTUDIANTE`, `CURSO` y `MATRICULA`, y la API de la guía anterior sigue respondiendo igual.
 >
 > </details>
 
@@ -469,308 +486,376 @@
 ---
 
 <details>
-<summary><strong>🗃️ Paso 2 — Repositorios con Spring Data JPA (capa de persistencia)</strong></summary>
+<summary><strong>🗃️ Paso 2 — Interfaces de Spring Data (<code>…JpaRepository</code>)</strong></summary>
 
-> <details>
-> <summary><strong>Paso 2.1 · Borrar las implementaciones «EnMemoria»</strong></summary>
+> Se crean **tres interfaces**, una por entidad, en `persistence.repository`. `JpaRepository<Entidad, TipoDelId>` ya trae `save`, `findAll`, `findById`, `count`…
+> ([Ejemplo 06 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md)). Lo único que se escribe son las consultas propias, como **métodos derivados**: Spring Data lee el nombre y genera la
+> consulta ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)).
 >
-> > Se eliminan las **tres clases** `RepositorioEstudiantesEnMemoria`, `RepositorioCursosEnMemoria` y
-> > `RepositorioMatriculasEnMemoria`. Ya no hay listas, ni contadores `siguienteId`, ni ciclos `for` para buscar.
-> >
-> > > 🗣️ **Pregunta:** ¿qué pasaría si se dejaran, aunque sin usarse? *(Compilarían mal: implementan una
-> > > interfaz con métodos que ya no existen y, además, dos beans del mismo tipo causarían ambigüedad.)*
+> **Archivo:** `src/main/java/com/academia/persistence/repository/EstudianteJpaRepository.java`
 >
-> </details>
+> ```java
+> package com.academia.persistence.repository;
 >
-> <details>
-> <summary><strong>Paso 2.2 · Las interfaces ahora extienden <code>JpaRepository</code></strong></summary>
+> import com.academia.persistence.entity.EstudianteEntity;
+> import org.springframework.data.jpa.repository.JpaRepository;
 >
-> > Cada repositorio es solo una **interfaz**. `JpaRepository<Entidad, TipoDelId>` ya trae `save`, `findAll`, `findById`,
-> > `deleteById`, `count`… ([Ejemplo 06 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md)). Lo único que se escribe son las consultas propias, como
-> > **métodos derivados**: Spring Data lee el nombre y genera la consulta ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)).
-> >
-> > **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantes.java`
-> >
-> > ```java
-> > package com.academia.persistence.repository;
-> >
-> > import com.academia.negocio.model.Estudiante;
-> > import org.springframework.data.jpa.repository.JpaRepository;
-> >
-> > public interface RepositorioEstudiantes extends JpaRepository<Estudiante, Long> {
-> >
-> >     boolean existsByCorreoIgnoreCase(String correo);
-> > }
-> > ```
-> >
-> > **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioCursos.java`
-> >
-> > ```java
-> > package com.academia.persistence.repository;
-> >
-> > import com.academia.negocio.model.Curso;
-> > import java.util.List;
-> > import org.springframework.data.jpa.repository.JpaRepository;
-> >
-> > public interface RepositorioCursos extends JpaRepository<Curso, Long> {
-> >
-> >     List<Curso> findByPrecioLessThan(double precio);
-> > }
-> > ```
-> >
-> > **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioMatriculas.java`
-> >
-> > ```java
-> > package com.academia.persistence.repository;
-> >
-> > import com.academia.negocio.model.Matricula;
-> > import org.springframework.data.jpa.repository.JpaRepository;
-> >
-> > public interface RepositorioMatriculas extends JpaRepository<Matricula, Long> {
-> >
-> >     boolean existsByEstudianteIdAndCursoId(Long estudianteId, Long cursoId);
-> >
-> >     long countByCursoId(Long cursoId);
-> > }
-> > ```
-> >
-> > **De la guía anterior a esta: cómo se traduce cada método**
-> >
-> > | Antes (clase «EnMemoria») | Ahora (Spring Data) | Consulta generada |
-> > |---|---|---|
-> > | `guardar(x)` | `save(x)` *(heredado)* | `insert into …` |
-> > | `listar()` | `findAll()` *(heredado)* | `select … from …` |
-> > | `buscarPorId(id)` | `findById(id)` *(heredado)* | `select … where id=?` |
-> > | `existePorCorreo(correo)` | `existsByCorreoIgnoreCase(correo)` | `… where upper(correo)=upper(?)` |
-> > | ciclo `for` + `if (precio < 200000)` | `findByPrecioLessThan(precio)` | `… where precio < ?` |
-> > | `existe(estudianteId, cursoId)` | `existsByEstudianteIdAndCursoId(…)` | `… where estudiante_id=? and curso_id=?` |
-> > | `contarPorCurso(cursoId)` | `countByCursoId(cursoId)` | `select count(id) … where curso_id=?` |
-> >
-> > > 🔎 **Concepto (M3):** el nombre del método **es** la consulta. `existsBy` + `Correo` + `IgnoreCase`;
-> > > `countBy` + `CursoId` recorre la relación (`curso.id`); `And` combina dos condiciones.
-> > >
-> > > 🔎 **Concepto (M2, repaso):** el servicio sigue dependiendo de una **interfaz**; la diferencia es que
-> > > la implementación ya no la escribe una persona: Spring Data la crea al arrancar y la registra como
-> > > **bean singleton**, igual que antes con `@Repository`. Por eso aquí **no** hay `@Repository`.
-> > >
-> > > ⚠️ **Trampa:** si el nombre no coincide con un atributo (`existsByCorreos…`), la aplicación **no arranca**:
-> > > `PropertyReferenceException: No property 'correos' found for type 'Estudiante'`.
+> public interface EstudianteJpaRepository extends JpaRepository<EstudianteEntity, Long> {
 >
-> </details>
+>     boolean existsByCorreoIgnoreCase(String correo);
+> }
+> ```
 >
-> <details>
-> <summary><strong>Paso 2.3 · ¿Por qué <code>findByPrecioLessThan</code> y no un <code>for</code>?</strong></summary>
+> **Archivo:** `src/main/java/com/academia/persistence/repository/CursoJpaRepository.java`
 >
-> > La **regla** (*«económico = precio menor que 200.000»*, **RN-06**) sigue viviendo en el servicio, como la constante
-> > `PRECIO_ECONOMICO`. Lo que se delega a la base es **el trabajo de filtrar**: en lugar de traer todos los cursos a
-> > memoria y recorrerlos, la base devuelve solo los que cumplen. Con miles de filas, la diferencia es enorme.
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.persistence.entity.CursoEntity;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> public interface CursoJpaRepository extends JpaRepository<CursoEntity, Long> {
+> }
+> ```
+>
+> **Archivo:** `src/main/java/com/academia/persistence/repository/MatriculaJpaRepository.java`
+>
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.persistence.entity.MatriculaEntity;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> public interface MatriculaJpaRepository extends JpaRepository<MatriculaEntity, Long> {
+>
+>     boolean existsByEstudianteIdAndCursoId(Long estudianteId, Long cursoId);
+>
+>     long countByCursoId(Long cursoId);
+> }
+> ```
+>
+> | Método | Consulta generada | Lo usará |
+> |---|---|---|
+> | `existsByCorreoIgnoreCase(correo)` | `… where upper(correo)=upper(?)` | `existePorCorreo` (**RN-02**) |
+> | `existsByEstudianteIdAndCursoId(…)` | `… where estudiante_id=? and curso_id=?` | `existe` (**RN-08**) |
+> | `countByCursoId(cursoId)` | `select count(id) … where curso_id=?` | `contarPorCurso` (**RN-09**, **RN-11**) |
+> | `save`, `findAll`, `findById` *(heredados)* | `insert`, `select`, `select … where id=?` | `guardar`, `listar`, `buscarPorId` |
+>
+> > 🔎 **Concepto (M3):** el nombre del método **es** la consulta: `existsBy` + `Correo` + `IgnoreCase`; `countBy` + `CursoId` recorre la relación
+> > (`curso.id`); `And` une dos condiciones.
 > >
-> > > 🗣️ **Pregunta:** ¿dónde está la regla y dónde está la mecánica? *(Regla: el número 200.000, en el servicio.
-> > > Mecánica: filtrar, en el repositorio.)*
+> > 🔎 **Concepto (M2, repaso):** estas interfaces **no** llevan `@Repository` ni tienen clase: Spring Data crea la implementación al arrancar
+> > y la registra como **bean singleton**.
 > >
-> > ✅ **Punto de control 2:** el proyecto **compila** una vez actualizados los servicios (paso siguiente). Si el
-> > IDE marca errores en los servicios, es lo esperado: llaman a métodos que ya no existen.
+> > ⚠️ **Trampa:** si el nombre no coincide con un atributo de la **entidad**, la aplicación **no arranca**:
+> > `PropertyReferenceException: No property 'correos' found for type 'EstudianteEntity'`.
 >
-> </details>
+> ✅ **Punto de control 2:** el proyecto compila y arranca; `CursoJpaRepository` queda vacía de métodos propios y está bien: solo necesita lo heredado.
 
 </details>
 
 ---
 
 <details>
-<summary><strong>⚙️ Paso 3 — Servicios y controladores (mismas reglas)</strong></summary>
+<summary><strong>🔁 Paso 3 — Mapeadores: de entidad a modelo y de vuelta (<code>persistence.mapper</code>)</strong></summary>
+
+> El repositorio recibe y devuelve **modelos** (así lo exige el contrato), pero la base guarda **entidades**. Alguien debe traducir; esa
+> tarea vive en una clase pequeña por concepto, sin Spring y sin estado (métodos `static`).
+>
+> **Archivo:** `src/main/java/com/academia/persistence/mapper/EstudianteMapper.java`
+>
+> ```java
+> package com.academia.persistence.mapper;
+>
+> import com.academia.negocio.model.Estudiante;
+> import com.academia.persistence.entity.EstudianteEntity;
+>
+> public final class EstudianteMapper {
+>
+>     private EstudianteMapper() {
+>     }
+>
+>     // El id no se copia: lo genera la base al guardar (RN-01)
+>     public static EstudianteEntity aEntity(Estudiante estudiante) {
+>         return new EstudianteEntity(estudiante.getNombre(), estudiante.getEdad(), estudiante.getCorreo());
+>     }
+>
+>     public static Estudiante aModelo(EstudianteEntity entity) {
+>         Estudiante estudiante = new Estudiante(entity.getNombre(), entity.getEdad(), entity.getCorreo());
+>         estudiante.setId(entity.getId());
+>         return estudiante;
+>     }
+> }
+> ```
+>
+> **Archivo:** `src/main/java/com/academia/persistence/mapper/CursoMapper.java`
+>
+> ```java
+> package com.academia.persistence.mapper;
+>
+> import com.academia.negocio.model.Curso;
+> import com.academia.persistence.entity.CursoEntity;
+>
+> public final class CursoMapper {
+>
+>     private CursoMapper() {
+>     }
+>
+>     public static CursoEntity aEntity(Curso curso) {
+>         return new CursoEntity(curso.getNombre(), curso.getPrecio(), curso.getCupoMaximo());
+>     }
+>
+>     public static Curso aModelo(CursoEntity entity) {
+>         Curso curso = new Curso(entity.getNombre(), entity.getPrecio(), entity.getCupoMaximo());
+>         curso.setId(entity.getId());
+>         return curso;
+>     }
+> }
+> ```
+>
+> **Archivo:** `src/main/java/com/academia/persistence/mapper/MatriculaMapper.java`
+>
+> ```java
+> package com.academia.persistence.mapper;
+>
+> import com.academia.negocio.model.Matricula;
+> import com.academia.persistence.entity.MatriculaEntity;
+>
+> public final class MatriculaMapper {
+>
+>     private MatriculaMapper() {
+>     }
+>
+>     public static Matricula aModelo(MatriculaEntity entity) {
+>         Matricula matricula = new Matricula(
+>                 EstudianteMapper.aModelo(entity.getEstudiante()),
+>                 CursoMapper.aModelo(entity.getCurso()));
+>         matricula.setId(entity.getId());
+>         return matricula;
+>     }
+> }
+> ```
+>
+> | Dirección | Método | Qué hace |
+> |---|---|---|
+> | modelo → entidad | `aEntity(estudiante)` | Crea una `EstudianteEntity` **nueva** con los datos del negocio y **sin `id`**. |
+> | entidad → modelo | `aModelo(entity)` | Crea el `Estudiante`, le pone el `id` con el `setId` que el modelo ya tenía y lo devuelve. |
+>
+> - `MatriculaMapper` **solo** tiene `aModelo`: reutiliza los otros dos para convertir los objetos anidados. El camino inverso lo hace
+>   `RepositorioMatriculasEnBD` en el paso siguiente, con referencias a filas existentes.
+> - **`aEntity` no copia el `id`.** Esa línea que no está es la que resuelve el problema del `id` enviado por el cliente (Paso 4.2).
+> - `final` + constructor `private`: es una clase de utilidades; nadie la instancia.
+>
+> > 🗣️ **Pregunta:** ¿por qué los mapeadores están en `persistence` y no en `negocio`? *(Porque conocen **ambos** mundos; y `negocio` no debe conocer las
+> > entidades. La regla de dependencia solo permite que `persistence` mire hacia `negocio`.)*
+
+</details>
+
+---
+
+<details>
+<summary><strong>🏛️ Paso 4 — Implementaciones <code>…EnBD</code> del contrato</strong></summary>
 
 > <details>
-> <summary><strong>Paso 3.1 · <code>ServicioEstudiantes</code></strong></summary>
+> <summary><strong>Paso 4.1 · El contrato no cambia</strong></summary>
 >
-> > **Archivo:** `src/main/java/com/academia/negocio/service/ServicioEstudiantes.java`
+> > Las tres interfaces de la guía anterior **se dejan tal cual**. Ese es el contrato que los servicios conocen:
 > >
 > > ```java
-> > package com.academia.negocio.service;
+> > public interface RepositorioEstudiantes {
+> >     Estudiante guardar(Estudiante estudiante);
+> >     List<Estudiante> listar();
+> >     Optional<Estudiante> buscarPorId(Long id);
+> >     boolean existePorCorreo(String correo);
+> > }
+> >
+> > public interface RepositorioCursos {
+> >     Curso guardar(Curso curso);
+> >     List<Curso> listar();
+> >     Optional<Curso> buscarPorId(Long id);
+> > }
+> >
+> > public interface RepositorioMatriculas {
+> >     Matricula guardar(Matricula matricula);
+> >     boolean existe(Long estudianteId, Long cursoId);
+> >     int contarPorCurso(Long cursoId);
+> > }
+> > ```
+> >
+> > > 🔎 Trabajan con **modelos** (`Estudiante`, `Curso`, `Matricula`), nunca con entidades.
+>
+> </details>
+>
+> <details>
+> <summary><strong>Paso 4.2 · Las clases <code>…EnBD</code> (reemplazan a <code>…EnMemoria</code>)</strong></summary>
+>
+> > Cada una **cumple el contrato** delegando en Spring Data y traduciendo con el mapeador.
+> >
+> > **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantesEnBD.java`
+> >
+> > ```java
+> > package com.academia.persistence.repository;
 > >
 > > import com.academia.negocio.model.Estudiante;
-> > import com.academia.persistence.repository.RepositorioEstudiantes;
+> > import com.academia.persistence.entity.EstudianteEntity;
+> > import com.academia.persistence.mapper.EstudianteMapper;
 > > import java.util.List;
-> > import java.util.NoSuchElementException;
-> > import org.springframework.stereotype.Service;
+> > import java.util.Optional;
+> > import org.springframework.stereotype.Repository;
 > >
-> > @Service
-> > public class ServicioEstudiantes {
+> > @Repository
+> > public class RepositorioEstudiantesEnBD implements RepositorioEstudiantes {
 > >
-> >     private final RepositorioEstudiantes repositorio;
+> >     private final EstudianteJpaRepository jpa;
 > >
-> >     public ServicioEstudiantes(RepositorioEstudiantes repositorio) {
-> >         this.repositorio = repositorio;
+> >     public RepositorioEstudiantesEnBD(EstudianteJpaRepository jpa) {
+> >         this.jpa = jpa;
 > >     }
 > >
-> >     public Estudiante registrar(Estudiante estudiante) {
-> >         if (repositorio.existsByCorreoIgnoreCase(estudiante.getCorreo())) {
-> >             throw new IllegalStateException("Ya existe un estudiante con el correo " + estudiante.getCorreo());
-> >         }
-> >         // Se crea una copia nueva: así se descarta cualquier id enviado por el cliente (RN-01)
-> >         return repositorio.save(new Estudiante(estudiante.getNombre(), estudiante.getEdad(), estudiante.getCorreo()));
+> >     @Override
+> >     public Estudiante guardar(Estudiante estudiante) {
+> >         EstudianteEntity guardado = jpa.save(EstudianteMapper.aEntity(estudiante));
+> >         estudiante.setId(guardado.getId());
+> >         return estudiante;
 > >     }
 > >
+> >     @Override
 > >     public List<Estudiante> listar() {
-> >         return repositorio.findAll();
+> >         return jpa.findAll().stream().map(EstudianteMapper::aModelo).toList();
 > >     }
 > >
-> >     public Estudiante obtener(Long id) {
-> >         return repositorio.findById(id)
-> >                 .orElseThrow(() -> new NoSuchElementException("No existe el estudiante " + id));
+> >     @Override
+> >     public Optional<Estudiante> buscarPorId(Long id) {
+> >         return jpa.findById(id).map(EstudianteMapper::aModelo);
+> >     }
+> >
+> >     @Override
+> >     public boolean existePorCorreo(String correo) {
+> >         return jpa.existsByCorreoIgnoreCase(correo);
 > >     }
 > > }
 > > ```
 > >
-> > | Línea | Antes | Ahora |
-> > |---|---|---|
-> > | Regla RN-02 | `repositorio.existePorCorreo(…)` | `repositorio.existsByCorreoIgnoreCase(…)` |
-> > | Guardar | `repositorio.guardar(estudiante)` | `repositorio.save(new Estudiante(…))` |
-> > | Listar | `repositorio.listar()` | `repositorio.findAll()` |
-> > | Obtener | `buscarPorId` | `findById` (devuelve `Optional`, igual que antes) |
-> >
-> > > ⚠️ **El detalle que más importa: el `id` que envía el cliente.** Con JPA, `save` de un objeto que **ya trae
-> > > `id`** no inserta: **actualiza** (hace un *merge*). Probado sin la copia: un `POST /estudiantes` con
-> > > `{"id":1,"nombre":"Intruso",…}` **sobrescribía a Ana**. En la versión en memoria el repositorio descartaba ese
-> > > `id`; ahora lo hace el servicio **creando un objeto nuevo** con solo los datos permitidos. Así se
-> > > cumple **RN-01** (*el identificador lo decide el sistema*). La solución de fondo —un objeto de entrada
-> > > que ni siquiera tenga `id`— son los DTO, que llegan más adelante.
->
-> </details>
->
-> <details>
-> <summary><strong>Paso 3.2 · <code>ServicioCursos</code></strong></summary>
->
-> > **Archivo:** `src/main/java/com/academia/negocio/service/ServicioCursos.java`
+> > **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioCursosEnBD.java`
 > >
 > > ```java
-> > package com.academia.negocio.service;
+> > package com.academia.persistence.repository;
 > >
 > > import com.academia.negocio.model.Curso;
-> > import com.academia.negocio.model.Ocupacion;
-> > import com.academia.persistence.repository.RepositorioCursos;
-> > import com.academia.persistence.repository.RepositorioMatriculas;
+> > import com.academia.persistence.entity.CursoEntity;
+> > import com.academia.persistence.mapper.CursoMapper;
 > > import java.util.List;
-> > import java.util.NoSuchElementException;
-> > import org.springframework.stereotype.Service;
+> > import java.util.Optional;
+> > import org.springframework.stereotype.Repository;
 > >
-> > @Service
-> > public class ServicioCursos {
+> > @Repository
+> > public class RepositorioCursosEnBD implements RepositorioCursos {
 > >
-> >     private static final double PRECIO_ECONOMICO = 200_000;
+> >     private final CursoJpaRepository jpa;
 > >
-> >     private final RepositorioCursos repositorio;
-> >     private final RepositorioMatriculas repositorioMatriculas;
-> >
-> >     public ServicioCursos(RepositorioCursos repositorio, RepositorioMatriculas repositorioMatriculas) {
-> >         this.repositorio = repositorio;
-> >         this.repositorioMatriculas = repositorioMatriculas;
+> >     public RepositorioCursosEnBD(CursoJpaRepository jpa) {
+> >         this.jpa = jpa;
 > >     }
 > >
-> >     public Curso registrar(Curso curso) {
-> >         if (curso.getPrecio() <= 0) {
-> >             throw new IllegalArgumentException("El precio debe ser mayor que cero");
-> >         }
-> >         if (curso.getCupoMaximo() <= 0) {
-> >             throw new IllegalArgumentException("El cupo máximo debe ser mayor que cero");
-> >         }
-> >         // Se crea una copia nueva: así se descarta cualquier id enviado por el cliente (RN-01)
-> >         return repositorio.save(new Curso(curso.getNombre(), curso.getPrecio(), curso.getCupoMaximo()));
+> >     @Override
+> >     public Curso guardar(Curso curso) {
+> >         CursoEntity guardado = jpa.save(CursoMapper.aEntity(curso));
+> >         curso.setId(guardado.getId());
+> >         return curso;
 > >     }
 > >
+> >     @Override
 > >     public List<Curso> listar() {
-> >         return repositorio.findAll();
+> >         return jpa.findAll().stream().map(CursoMapper::aModelo).toList();
 > >     }
 > >
-> >     public List<Curso> listarEconomicos() {
-> >         return repositorio.findByPrecioLessThan(PRECIO_ECONOMICO);
-> >     }
-> >
-> >     public Curso obtener(Long id) {
-> >         return repositorio.findById(id)
-> >                 .orElseThrow(() -> new NoSuchElementException("No existe el curso " + id));
-> >     }
-> >
-> >     public Ocupacion calcularOcupacion(Long id) {
-> >         Curso curso = obtener(id);
-> >         int matriculados = (int) repositorioMatriculas.countByCursoId(id);
-> >         int disponibles = curso.getCupoMaximo() - matriculados;
-> >         double porcentaje = (double) matriculados / curso.getCupoMaximo() * 100;
-> >         porcentaje = Math.round(porcentaje * 100.0) / 100.0;
-> >         return new Ocupacion(curso.getNombre(), curso.getCupoMaximo(), matriculados, disponibles, porcentaje);
+> >     @Override
+> >     public Optional<Curso> buscarPorId(Long id) {
+> >         return jpa.findById(id).map(CursoMapper::aModelo);
 > >     }
 > > }
 > > ```
 > >
-> > > 🔎 Cambios: `save`, `findAll`, `findById`; `listarEconomicos()` ahora delega en
-> > > `findByPrecioLessThan(PRECIO_ECONOMICO)`; el conteo usa `countByCursoId`, que devuelve `long`
-> > > (por eso el *cast* `(int)` al armar la `Ocupacion`). El cálculo del porcentaje **no cambia** y conserva
-> > > el *cast* a `double` **antes** de dividir (RN-11).
->
-> </details>
->
-> <details>
-> <summary><strong>Paso 3.3 · <code>ServicioMatriculas</code></strong></summary>
->
-> > **Archivo:** `src/main/java/com/academia/negocio/service/ServicioMatriculas.java`
+> > **Archivo:** `src/main/java/com/academia/persistence/repository/RepositorioMatriculasEnBD.java`
 > >
 > > ```java
-> > package com.academia.negocio.service;
+> > package com.academia.persistence.repository;
 > >
-> > import com.academia.negocio.model.Curso;
-> > import com.academia.negocio.model.Estudiante;
 > > import com.academia.negocio.model.Matricula;
-> > import com.academia.persistence.repository.RepositorioMatriculas;
-> > import org.springframework.stereotype.Service;
+> > import com.academia.persistence.entity.CursoEntity;
+> > import com.academia.persistence.entity.EstudianteEntity;
+> > import com.academia.persistence.entity.MatriculaEntity;
+> > import org.springframework.stereotype.Repository;
 > >
-> > @Service
-> > public class ServicioMatriculas {
+> > @Repository
+> > public class RepositorioMatriculasEnBD implements RepositorioMatriculas {
 > >
-> >     private final RepositorioMatriculas repositorio;
-> >     private final ServicioEstudiantes servicioEstudiantes;
-> >     private final ServicioCursos servicioCursos;
+> >     private final MatriculaJpaRepository jpa;
+> >     private final EstudianteJpaRepository estudiantesJpa;
+> >     private final CursoJpaRepository cursosJpa;
 > >
-> >     public ServicioMatriculas(RepositorioMatriculas repositorio,
-> >                               ServicioEstudiantes servicioEstudiantes,
-> >                               ServicioCursos servicioCursos) {
-> >         this.repositorio = repositorio;
-> >         this.servicioEstudiantes = servicioEstudiantes;
-> >         this.servicioCursos = servicioCursos;
+> >     public RepositorioMatriculasEnBD(MatriculaJpaRepository jpa,
+> >                                      EstudianteJpaRepository estudiantesJpa,
+> >                                      CursoJpaRepository cursosJpa) {
+> >         this.jpa = jpa;
+> >         this.estudiantesJpa = estudiantesJpa;
+> >         this.cursosJpa = cursosJpa;
 > >     }
 > >
-> >     public Matricula matricular(Long estudianteId, Long cursoId) {
-> >         Estudiante estudiante = servicioEstudiantes.obtener(estudianteId);
-> >         Curso curso = servicioCursos.obtener(cursoId);
+> >     @Override
+> >     public Matricula guardar(Matricula matricula) {
+> >         // Solo se necesita la referencia (la clave foránea): no hace falta cargar las filas completas
+> >         EstudianteEntity estudiante = estudiantesJpa.getReferenceById(matricula.getEstudiante().getId());
+> >         CursoEntity curso = cursosJpa.getReferenceById(matricula.getCurso().getId());
+> >         MatriculaEntity guardada = jpa.save(new MatriculaEntity(estudiante, curso));
+> >         matricula.setId(guardada.getId());
+> >         return matricula;
+> >     }
 > >
-> >         if (repositorio.existsByEstudianteIdAndCursoId(estudianteId, cursoId)) {
-> >             throw new IllegalStateException(
-> >                     "El estudiante " + estudianteId + " ya está matriculado en el curso " + cursoId);
-> >         }
-> >         if (repositorio.countByCursoId(cursoId) >= curso.getCupoMaximo()) {
-> >             throw new IllegalStateException("El curso " + cursoId + " no tiene cupos disponibles");
-> >         }
-> >         return repositorio.save(new Matricula(estudiante, curso));
+> >     @Override
+> >     public boolean existe(Long estudianteId, Long cursoId) {
+> >         return jpa.existsByEstudianteIdAndCursoId(estudianteId, cursoId);
+> >     }
+> >
+> >     @Override
+> >     public int contarPorCurso(Long cursoId) {
+> >         return (int) jpa.countByCursoId(cursoId);
 > >     }
 > > }
 > > ```
 > >
-> > > 🔎 **El orden de los cinco controles es exactamente el mismo** (estudiante existe → curso existe → ya
-> > > matriculado → quedan cupos → guardar): define qué error ve el cliente primero. Cambian solo las
-> > > dos consultas y el `save`. La dependencia de `ServicioMatriculas` sigue siendo la misma de tres
-> > > beans y **sigue sin haber ciclos**: `ServicioCursos` usa el **repositorio** de matrículas, no el servicio.
+> > Puntos a resaltar:
+> >
+> > - **`@Repository`** va aquí, en la clase que **cumple el contrato** (igual que en `…EnMemoria`); no en las interfaces de Spring Data.
+> > - **`guardar`:** se convierte el modelo en entidad, se guarda y se le asigna al modelo el `id` generado (`estudiante.setId(…)`), igual que hacía la
+> >   versión en memoria con `siguienteId++`. El servicio recibe de vuelta **su mismo objeto**, ya con `id`.
+> > - **`listar` / `buscarPorId`:** `findAll()` y `findById()` devuelven entidades; `.map(Mapper::aModelo)` las convierte. `Optional` se conserva.
+> > - **`getReferenceById`** (en matrículas): entrega una **referencia** a la fila por su `id`, sin leerla. Alcanza para escribir la clave foránea, y evita
+> >   dos consultas innecesarias (el servicio ya validó que existen).
+> > - **`(int) countByCursoId`:** Spring Data cuenta con `long`; el contrato (y el resto del código) usa `int`.
+> >
+> > > ⚠️ **El problema del `id` enviado por el cliente.** Si un `POST /estudiantes` trae `{"id":1,…}`, Jackson lo deja en el modelo (por `setId`). Pero
+> > > `aEntity` **no lo copia**, así que la base siempre inserta una fila nueva. Se probó: el estudiante «Intruso» recibió el `id` 3 y **Ana no se modificó**.
+> > > (Si en cambio se anotara el modelo con `@Entity` y se hiciera `save` con ese `id`, JPA lo tomaría como una **actualización** y sobrescribiría a Ana.)
 >
 > </details>
 >
 > <details>
-> <summary><strong>Paso 3.4 · Los controladores no cambian</strong></summary>
+> <summary><strong>Paso 4.3 · Retirar las clases <code>…EnMemoria</code></strong></summary>
 >
-> > `ControladorEstudiantes`, `ControladorCursos`, `ControladorMatriculas` y `SolicitudMatricula` quedan **idénticos** a los
-> > de la guía anterior. Se puede comprobar con el docente proyectando ambos proyectos lado a lado.
+> > Se **eliminan** `RepositorioEstudiantesEnMemoria`, `RepositorioCursosEnMemoria` y `RepositorioMatriculasEnMemoria`. Se pide primero al grupo **no** borrarlas, para ver el error:
 > >
-> > > 🗣️ **Pregunta para el grupo:** ¿por qué el controlador no se entera de que ahora hay una base de datos?
-> > > *(Solo habla con el servicio; el servicio habla con la interfaz del repositorio; nadie más conoce H2.)*
+> > ```text
+> > Parameter 0 of constructor in com.academia.negocio.service.ServicioEstudiantes required a single bean, but 2 were found:
+> >     - repositorioEstudiantesEnMemoria: defined in …
+> >     - repositorioEstudiantesEnBD: defined in …
+> > ```
 > >
-> > ✅ **Punto de control 3:** el proyecto compila y arranca. Los datos aún no se han probado: eso sigue.
+> > > 🔎 **Concepto (M2, repaso):** hay dos beans que cumplen `RepositorioEstudiantes` y Spring **no sabe cuál inyectar**: es la ambigüedad de la pregunta 17 del
+> > > cuestionario del M2 y el «reto final» de la guía anterior (*cambiar de almacenamiento dejando una sola clase anotada*). Aquí se resuelve **borrando** la
+> > > versión en memoria. Con `@Primary` o `@Qualifier` convivirían, pero es otro tema.
+> >
+> > ✅ **Punto de control 4:** el proyecto compila y arranca; en el registro **no** aparece ningún error de beans.
 >
 > </details>
 
@@ -779,13 +864,47 @@
 ---
 
 <details>
-<summary><strong>🧪 Paso 4 — Pruebas de la API y de la base de datos</strong></summary>
+<summary><strong>✋ Paso 5 — Lo que NO se toca: modelo, servicios y controladores</strong></summary>
+
+> Se abren, **sin modificarlos**, `ServicioEstudiantes`, `ServicioCursos`, `ServicioMatriculas`, los tres controladores y las clases del modelo, y se confirma:
+>
+> | Archivo | ¿Menciona JPA, entidades o la base? | Cambios |
+> |---|:-:|:-:|
+> | `negocio.model.*` | No (sin una anotación de JPA) | 0 líneas |
+> | `negocio.service.*` | No (solo conocen `RepositorioXxx`, el contrato) | 0 líneas |
+> | `presentacion.controlador.*` | No (solo conocen los servicios) | 0 líneas |
+>
+> Ejemplo, el corazón de la regla de matrícula, **idéntico** al de la guía anterior:
+>
+> ```java
+> if (repositorio.existe(estudianteId, cursoId)) {
+>     throw new IllegalStateException("El estudiante " + estudianteId + " ya está matriculado en el curso " + cursoId);
+> }
+> if (repositorio.contarPorCurso(cursoId) >= curso.getCupoMaximo()) {
+>     throw new IllegalStateException("El curso " + cursoId + " no tiene cupos disponibles");
+> }
+> ```
+>
+> > 🗣️ **Pregunta para el grupo:** ¿qué habría pasado si los servicios dependieran de `JpaRepository` en lugar del contrato? *(Habría que cambiar `guardar` por `save`,
+> > `listar` por `findAll`… en **cada** servicio, y el negocio quedaría atado a Spring Data. Con el contrato, el cambio se queda dentro de `persistence`.)*
+> >
+> > 🔎 **Concepto (M2):** por esto se programa contra **interfaces**: el servicio pide «alguien que cumpla `RepositorioEstudiantes`» y no sabe si detrás hay una `List` o
+> > una base de datos.
+>
+> ✅ **Punto de control 5:** la comparación de carpetas del IDE (o `git diff`, si el proyecto está en Git) muestra **cero** cambios en `negocio` y `presentacion` respecto del taller anterior.
+
+</details>
+
+---
+
+<details>
+<summary><strong>🧪 Paso 6 — Pruebas de la API y de la base de datos</strong></summary>
 
 > <details>
-> <summary><strong>Paso 4.1 · Escenarios (los mismos de la guía anterior)</strong></summary>
+> <summary><strong>Paso 6.1 · Escenarios (los mismos de la guía anterior)</strong></summary>
 >
-> > Se reinicia la aplicación (la base en memoria parte vacía) y se ejecutan **en este orden**. Los resultados son
-> > **idénticos** a los de la versión en memoria: esa es la prueba de que la migración respetó las reglas.
+> > Se reinicia la aplicación (la base en memoria parte vacía) y se ejecutan **en este orden**. Los resultados son **idénticos** a los de la versión con listas, incluidas las
+> > excepciones de la consola: esa es la prueba de que la migración respetó las reglas.
 > >
 > > | # | Escenario | Petición | Esperado |
 > > |:-:|---|---|:-:|
@@ -799,7 +918,7 @@
 > > | 8 | Matricular a Luis | `POST /matriculas` | `201` |
 > > | 9 | Matrícula repetida | `POST /matriculas` Ana otra vez | `500` · `IllegalStateException` |
 > > | 10 | Ocupación | `GET /cursos/1/ocupacion` | `1` cupo disponible y `66.67 %` |
-> > | 11 | `id` enviado por el cliente | `POST /estudiantes` con `{"id":1,…}` | `201`, pero **con un `id` nuevo**; Ana no se modifica |
+> > | 11 | `id` enviado por el cliente | `POST /estudiantes` con `{"id":1,"nombre":"Intruso",…}` | `201` con un **`id` nuevo**; Ana **no** se modifica |
 > >
 > > Respuesta del escenario 10:
 > >
@@ -807,7 +926,7 @@
 > > {"curso":"Java desde cero","cupoMaximo":3,"matriculados":2,"cuposDisponibles":1,"porcentajeOcupacion":66.67}
 > > ```
 > >
-> > Respuesta del escenario 7 (la matrícula ya no trae `estudianteId` y `cursoId` sueltos, sino los objetos completos):
+> > Respuesta del escenario 7 (la matrícula trae los objetos completos, no `estudianteId` y `cursoId` sueltos):
 > >
 > > ```json
 > > {"id":1,"estudiante":{"id":1,"nombre":"Ana Torres","edad":22,"correo":"ana@correo.com"},
@@ -817,32 +936,31 @@
 > </details>
 >
 > <details>
-> <summary><strong>Paso 4.2 · Leer el SQL que genera cada petición</strong></summary>
+> <summary><strong>Paso 6.2 · Leer el SQL que genera cada petición</strong></summary>
 >
-> > Con `show-sql=true`, **una misma matrícula** produce estas consultas (reales, abreviadas). Se proyectan junto al código del servicio:
+> > Con `show-sql=true`, **una misma matrícula** produce estas consultas (reales, abreviadas). Se proyectan junto al código de `ServicioMatriculas`:
 > >
 > > ```text
 > > POST /matriculas  {"estudianteId":1,"cursoId":1}
-> > Hibernate: select … from estudiante e1_0 where e1_0.id=?                              ← servicioEstudiantes.obtener  (findById)
-> > Hibernate: select … from curso c1_0 where c1_0.id=?                                   ← servicioCursos.obtener       (findById)
-> > Hibernate: select m1_0.id from matricula m1_0 where m1_0.estudiante_id=? and m1_0.curso_id=? fetch first ? rows only
-> >                                                                                       ← existsByEstudianteIdAndCursoId
-> > Hibernate: select count(m1_0.id) from matricula m1_0 where m1_0.curso_id=?            ← countByCursoId
-> > Hibernate: insert into matricula (curso_id,estudiante_id,id) values (?,?,default)     ← save
+> > Hibernate: select … from estudiante ee1_0 where ee1_0.id=?                              ← servicioEstudiantes.obtener  → findById
+> > Hibernate: select … from curso ce1_0 where ce1_0.id=?                                   ← servicioCursos.obtener       → findById
+> > Hibernate: select me1_0.id from matricula me1_0 where me1_0.estudiante_id=? and me1_0.curso_id=? fetch first ? rows only
+> >                                                                                         ← existe → existsByEstudianteIdAndCursoId
+> > Hibernate: select count(me1_0.id) from matricula me1_0 where me1_0.curso_id=?           ← contarPorCurso → countByCursoId
+> > Hibernate: insert into matricula (curso_id,estudiante_id,id) values (?,?,default)       ← guardar → save
 > > ```
 > >
-> > > 🗣️ **Pregunta:** ¿en qué orden están las consultas y a qué regla corresponde cada una?
-> > > *(Mismo orden que los controles: RN-03, RN-07, RN-08, RN-09 y, si todo pasa, RN-10.)*
+> > > 🗣️ **Preguntas:** ¿en qué orden están las consultas y a qué regla corresponde cada una? *(El mismo orden de los controles: RN-03, RN-07, RN-08, RN-09 y, si todo
+> > > pasa, RN-10.)* ¿Por qué **no** hay `select` de las filas antes del `insert`? *(`getReferenceById` solo toma el `id`: no lee la fila.)*
 > > >
-> > > 🔎 **Concepto (M3):** esto es el **ORM**: el código solo habla de objetos (`Estudiante`, `Curso`) y
-> > > Hibernate lo traduce a SQL ([Ejemplo 04 del M3](../../03-introduccion-a-jpa/material/ejemplos/04-que-es-orm.md)).
+> > > 🔎 **Concepto (M3):** esto es el **ORM**: el código solo habla de objetos y Hibernate lo traduce a SQL ([Ejemplo 04 del M3](../../03-introduccion-a-jpa/material/ejemplos/04-que-es-orm.md)).
 >
 > </details>
 >
 > <details>
-> <summary><strong>Paso 4.3 · Mirar los datos en la consola de H2</strong></summary>
+> <summary><strong>Paso 6.3 · Mirar los datos en la consola de H2</strong></summary>
 >
-> > En `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:academia`, usuario `sa`) se ejecutan:
+> > En `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:academia`, usuario `sa`):
 > >
 > > ```sql
 > > SELECT * FROM estudiante;
@@ -855,9 +973,8 @@
 > > JOIN curso c      ON c.id = m.curso_id;
 > > ```
 > >
-> > ✅ **Punto de control 4:** los escenarios 1 a 11 dan el resultado esperado y las filas de `MATRICULA` coinciden con
-> > lo enviado por la API. **Se detiene la aplicación y se vuelve a arrancar: la base en memoria vuelve a estar vacía.**
-> > Ese es el problema que resuelve el paso siguiente.
+> > ✅ **Punto de control 6:** los escenarios 1 a 11 dan el resultado esperado y las filas de `MATRICULA` coinciden con lo enviado a la API. **Se detiene la aplicación y se vuelve a
+> > arrancar: la base en memoria vuelve a estar vacía.** Ese es el problema que resuelve el paso siguiente.
 >
 > </details>
 
@@ -866,10 +983,9 @@
 ---
 
 <details>
-<summary><strong>💾 Paso 5 — Que los datos sobrevivan al reinicio (H2 en archivo)</strong></summary>
+<summary><strong>💾 Paso 7 — Que los datos sobrevivan al reinicio (H2 en archivo)</strong></summary>
 
-> Hasta aquí la base está **en memoria**: es una base de datos de verdad, pero vive dentro de la JVM y muere con ella.
-> Cambiando **solo una línea** se guarda en un archivo del disco.
+> Hasta aquí la base está **en memoria**: es una base de datos de verdad, pero vive dentro de la JVM y muere con ella. Cambiando **solo una línea** se guarda en un archivo del disco.
 >
 > **1. Cambiar la URL en `application.properties`:**
 >
@@ -897,12 +1013,11 @@
 > | ¿Cómo se empieza de cero? | Se detiene la aplicación y se borra la carpeta `data/`. |
 > | ¿Dónde se crea `data/`? | **Donde se ejecuta Java** (la carpeta del proyecto con `mvnw`). |
 >
-> > 🔎 **Cierre de la historia.** En el taller de los módulos 01 y 02 reiniciar borraba todo y se dijo que era
-> > *«lo que motivará el Módulo 3»*. Ahora el mismo escenario conserva los datos **sin cambiar ni una regla**.
+> > 🔎 **Cierre de la historia.** En el taller de los módulos 01 y 02 reiniciar borraba todo y se dijo que era *«lo que motivará el Módulo 3»*. Ahora el mismo escenario conserva los
+> > datos **sin cambiar ni una regla**, ni un servicio, ni un controlador.
 > >
-> > 💡 **Y en producción:** H2 en archivo es una comodidad de desarrollo. Contra MySQL o PostgreSQL cambian el
-> > **driver** (dependencia) y las propiedades `spring.datasource.*`; el código de las tres capas **no se toca**.
-> > Es uno de los retos finales.
+> > 💡 **Y en producción:** H2 en archivo es una comodidad de desarrollo. Contra MySQL o PostgreSQL cambian el **driver** (dependencia) y las propiedades `spring.datasource.*`; el código de
+> > las tres capas **no se toca**. Es uno de los retos finales.
 
 </details>
 
@@ -911,16 +1026,12 @@
 <details>
 <summary><strong>🏁 Cierre — preguntas de síntesis</strong></summary>
 
-> 1. ¿Qué anotación convierte una clase en tabla y cuál marca la clave primaria? *(`@Entity` y `@Id`; con
->    `@GeneratedValue` la base genera el valor.)*
-> 2. ¿Quién escribe la implementación de `RepositorioEstudiantes`? *(Nadie: Spring Data la genera al arrancar.)*
-> 3. ¿Qué clases **no** cambiaron al pasar de listas a base de datos y por qué? *(Los controladores y las reglas:
->    dependen de interfaces y no saben cómo se guardan los datos.)*
-> 4. ¿Qué diferencia hay entre una base **en memoria** y una **en archivo**? *(Ambas son bases de datos reales; solo la
->    segunda sobrevive al reinicio de la aplicación.)*
-> 5. ¿Por qué se crea un objeto nuevo en `registrar` en lugar de guardar el que llega? *(Para ignorar el `id` del
->    cliente: con JPA, `save` de un objeto con `id` actualiza en lugar de insertar.)*
-> 6. ¿Qué consulta SQL corresponde a `countByCursoId`? *(`select count(id) from matricula where curso_id=?`.)*
+> 1. ¿Qué capas cambiaron al pasar de listas a base de datos? *(Solo `persistence`: entidades, mapeadores, interfaces de Spring Data y las clases `…EnBD`.)*
+> 2. ¿Por qué el servicio **no cambió** ni una línea? *(Depende del contrato `RepositorioEstudiantes`, que sigue igual; no sabe si detrás hay una lista o una base.)*
+> 3. ¿Qué diferencia hay entre el modelo `Estudiante` y `EstudianteEntity`? *(El modelo es el concepto del negocio y no conoce JPA; la entidad describe cómo se guarda en una tabla.)*
+> 4. ¿Quién escribe la implementación de `EstudianteJpaRepository`? ¿Y la de `RepositorioEstudiantesEnBD`? *(Spring Data genera la primera; la segunda la escribimos nosotros para cumplir el contrato.)*
+> 5. ¿Por qué `aEntity` no copia el `id`? *(Para que la base siempre genere uno nuevo: el cliente no puede sobrescribir registros enviando un `id`.)*
+> 6. ¿Qué diferencia hay entre una base **en memoria** y una **en archivo**? *(Ambas son bases reales; solo la segunda sobrevive al reinicio.)*
 
 </details>
 
@@ -962,10 +1073,13 @@
 >   -d '{"nombre":"Otra Ana","edad":30,"correo":"ANA@correo.com"}'                         # IllegalStateException
 > curl -i -X POST localhost:8080/cursos -H "Content-Type: application/json" \
 >   -d '{"nombre":"Roto","precio":0,"cupoMaximo":5}'                                       # IllegalArgumentException
+>
+> # El id que envía el cliente se ignora
+> curl -i -X POST localhost:8080/estudiantes -H "Content-Type: application/json" \
+>   -d '{"id":1,"nombre":"Intruso","edad":40,"correo":"intruso@correo.com"}'               # 201 con id nuevo; Ana no cambia
 > ```
 >
-> > 💡 Qué significa cada opción de `curl` está explicado en la
-> > [guía de los módulos 01 y 02](../modulo-01-02/01-guia-taller-gestion-de-cursos.md). En PowerShell se usa `curl.exe`.
+> > 💡 Qué significa cada opción de `curl` está explicado en la [guía de los módulos 01 y 02](../modulo-01-02/01-guia-taller-gestion-de-cursos.md). En PowerShell se usa `curl.exe`.
 
 </details>
 
@@ -975,14 +1089,16 @@
 > | Síntoma | Causa probable | Solución |
 > |---|---|---|
 > | `Failed to configure a DataSource: 'url' attribute is not specified` | Falta la dependencia `h2` o `application.properties` | Agregar el driver; revisar que esté en `src/main/resources` |
-> | `Not a managed type: class …Estudiante` o repositorios sin entidad | Falta `@Entity`, o la clase quedó **fuera** de `com.academia` (el escaneo no la ve) | Anotar la clase y dejarla bajo el paquete de `AcademiaApplication` |
-> | `No default constructor for entity` / `InstantiationException` | La entidad no tiene constructor **sin argumentos** | Agregar `protected Estudiante() {}` |
-> | `PropertyReferenceException: No property 'x' found for type 'Estudiante'` | El nombre del método derivado no coincide con un atributo | Escribirlo con el nombre exacto del atributo: `existsByCorreoIgnoreCase`, `countByCursoId` |
+> | `required a single bean, but 2 were found` (`…EnMemoria` y `…EnBD`) | Quedaron las dos implementaciones del mismo contrato | Borrar las clases `…EnMemoria` (Paso 4.3) |
+> | La tabla se llama `estudiante_entity` | Falta `@Table(name = "estudiante")` en la entidad | Agregar `@Table` |
+> | `Not a managed type: class …EstudianteEntity` | Falta `@Entity`, o la clase quedó **fuera** de `com.academia` (el escaneo no la ve) | Anotar la clase y dejarla bajo el paquete de `AcademiaApplication` |
+> | `No default constructor for entity` | La entidad no tiene constructor **sin argumentos** | Agregar `protected EstudianteEntity() {}` |
+> | `PropertyReferenceException: No property 'x' found for type 'EstudianteEntity'` | El nombre del método derivado no coincide con un atributo de la **entidad** | Usar el nombre exacto: `existsByCorreoIgnoreCase`, `countByCursoId` |
 > | `Table "ESTUDIANTE" not found` | `ddl-auto=none`, o se apuntó a otra base (`mem` vs `file`) | Usar `update` y revisar la URL |
-> | `Port 8080 was already in use` | Otra ejecución sigue abierta | Detenerla o cambiar `server.port` |
+> | `NullPointerException` en un mapeador al leer una matrícula | La fila tiene `estudiante_id` o `curso_id` nulos | Revisar los datos; las matrículas siempre se crean con ambos |
 > | Los datos desaparecen al reiniciar | La URL es `jdbc:h2:mem:…` | Cambiar a `jdbc:h2:file:./data/academia` |
-> | Un `POST` con `id` **modifica** un registro existente | Se guardó el objeto recibido en lugar de uno nuevo | Crear el objeto nuevo en el servicio (Paso 3.1) |
-> | `Database may be already in use` al abrir el archivo | Dos procesos usan el mismo `data/academia.mv.db` | Cerrar la otra ejecución |
+> | `Database may be already in use` | Dos procesos usan el mismo `data/academia.mv.db` | Cerrar la otra ejecución |
+> | `Port 8080 was already in use` | Otra ejecución sigue abierta | Detenerla o cambiar `server.port` |
 > | `415 Unsupported Media Type` | Falta `Content-Type: application/json` | Agregarlo en Postman o `curl` |
 
 </details>
@@ -990,19 +1106,19 @@
 <details>
 <summary><strong>🚀 Retos finales (para quien termine antes)</strong></summary>
 
-> 1. **Restricción en la base:** en `Matricula`, agregar `@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"estudiante_id", "curso_id"}))`
+> 1. **Restricción en la base:** en `MatriculaEntity`, agregar `@Table(name = "matricula", uniqueConstraints = @UniqueConstraint(columnNames = {"estudiante_id", "curso_id"}))`
 >    y comprobar en la consola de H2 que la base **también** impide la matrícula repetida (RN-08). ¿Para qué sirve si el servicio ya lo valida?
 >    *(Dos peticiones simultáneas podrían pasar ambas la validación; la restricción es la última defensa.)*
-> 2. **Transacción:** anotar `matricular` con `@Transactional` y explicar qué ventaja da cuando se hacen varias operaciones
->    ([Ejemplo 08 del M3](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md)).
-> 3. **Consulta con JPQL:** reescribir `countByCursoId` con `@Query("SELECT COUNT(m) FROM Matricula m WHERE m.curso.id = :cursoId")`.
-> 4. **Más consultas:** `GET /estudiantes/{id}/matriculas` con un método derivado `findByEstudianteId`.
-> 5. **Adaptador:** conservar los nombres antiguos (`guardar`, `listar`, `buscarPorId`…) creando una clase `RepositorioEstudiantesJpa`
->    que implemente la interfaz antigua y delegue en `JpaRepository`; así los servicios **no cambian ni una línea**.
-> 6. **Otro motor:** reemplazar H2 por **MySQL** o **PostgreSQL** (dependencia del driver + `spring.datasource.*`) y comprobar que ninguna
->    clase de las tres capas cambia.
-> 7. **Relación bidireccional:** agregar `List<Matricula>` en `Curso` con `@OneToMany(mappedBy = "curso")` y explicar por qué hay que
->    evitar el ciclo al convertir a JSON ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md)).
+> 2. **Filtro en la base:** `listarEconomicos()` recorre **todos** los cursos con un ciclo. Agregar `listarConPrecioMenorA(double)` al contrato `RepositorioCursos`,
+>    implementarlo con `findByPrecioLessThan` en `CursoJpaRepository` y usarlo en el servicio. ¿Qué capas se tocan ahora? *(Contrato, `…EnBD` y el servicio:
+>    es un **cambio del contrato**, no solo de almacenamiento.)*
+> 3. **Transacción:** anotar `matricular` con `@Transactional` y explicar qué ventaja da ([Ejemplo 08 del M3](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md)). ¿Dónde conviene ponerla: en el servicio o en el repositorio?
+> 4. **Consulta con JPQL:** reescribir `countByCursoId` con `@Query("SELECT COUNT(m) FROM MatriculaEntity m WHERE m.curso.id = :cursoId")`.
+> 5. **Otro motor:** reemplazar H2 por **MySQL** o **PostgreSQL** (dependencia del driver + `spring.datasource.*`) y comprobar que **ninguna** clase de las tres capas cambia.
+> 6. **Automatizar el mapeo:** reemplazar los mapeadores manuales por **MapStruct** y comparar cuánto código desaparece.
+> 7. **Probar el mapeo:** escribir una prueba unitaria de `EstudianteMapper` (ida y vuelta: modelo → entidad → modelo conserva `nombre`, `edad` y `correo`, y `aEntity` no copia el `id`).
+> 8. **Relación bidireccional:** agregar `List<MatriculaEntity>` en `CursoEntity` con `@OneToMany(mappedBy = "curso")` y explicar por qué complica el mapeo y el JSON
+>    ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md)).
 
 </details>
 
@@ -1013,7 +1129,7 @@
 > 📁 academia
 > ├── 📄 pom.xml
 > ├── 📄 .gitignore                         ← incluye  data/
-> ├── 📁 data                               ← lo crea H2 en el Paso 5 (no se versiona)
+> ├── 📁 data                               ← lo crea H2 en el Paso 7 (no se versiona)
 > │   └── 📄 academia.mv.db
 > └── 📁 src/main
 >     ├── 📁 java/com/academia
@@ -1021,39 +1137,44 @@
 >     │   ├── 📁 presentacion
 >     │   │   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
 >     │   ├── 📁 negocio
->     │   │   ├── 📁 model         Estudiante · Curso · Matricula (@Entity)  ·  Ocupacion (record)
+>     │   │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
 >     │   │   └── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
 >     │   └── 📁 persistence
->     │       └── 📁 repository    3 interfaces que extienden JpaRepository  (sin clases «EnMemoria»)
+>     │       ├── 📁 entity        EstudianteEntity · CursoEntity · MatriculaEntity
+>     │       ├── 📁 mapper        EstudianteMapper · CursoMapper · MatriculaMapper
+>     │       └── 📁 repository    3 interfaces (contrato) · 3 …JpaRepository (Spring Data) · 3 …EnBD (@Repository)
 >     └── 📁 resources
 >         └── 📄 application.properties
 > ```
+>
+> > 🔎 Comparado con la guía anterior: **sin cambios** en `presentacion` y `negocio`; en `persistence` desaparecen las 3 clases `…EnMemoria` y se suman `entity`, `mapper`, las 3 `…JpaRepository` y las 3 `…EnBD`.
 
 </details>
 
 <details>
 <summary><strong>🏷️ Repaso de las anotaciones nuevas (JPA)</strong></summary>
 
-> Se **suman** a las del taller anterior (`@RestController`, `@Service`, `@GetMapping`, `@PostMapping`, `@PathVariable`,
-> `@RequestBody`, `@ResponseStatus`, `@SpringBootApplication`). Se **dejan de usar** `@Repository` y las clases `…EnMemoria`.
+> Se **suman** a las del taller anterior (`@RestController`, `@Service`, `@Repository`, `@GetMapping`, `@PostMapping`, `@PathVariable`, `@RequestBody`, `@ResponseStatus`,
+> `@SpringBootApplication`). `@Repository` se mantiene, ahora en las clases `…EnBD`. Las nuevas viven **solo** en `persistence.entity`.
 >
 > | Anotación | Dónde se usa | Por qué | Para qué sirve |
 > |---|---|---|---|
-> | `@Entity` | `Estudiante`, `Curso`, `Matricula` | La clase representa una **tabla**. | Hibernate la mapea y crea la tabla (`ddl-auto`). |
+> | `@Entity` | `EstudianteEntity`, `CursoEntity`, `MatriculaEntity` | La clase representa una **tabla**. | Hibernate la mapea y crea la tabla (`ddl-auto`). |
+> | `@Table(name = "…")` | Las tres entidades | El nombre de la clase termina en `Entity`; la tabla no. | Fija el nombre de la tabla (`estudiante`, `curso`, `matricula`). |
 > | `@Id` | Atributo `id` de cada entidad | Toda entidad necesita **clave primaria**. | Marca la columna que identifica cada fila. |
-> | `@GeneratedValue(strategy = IDENTITY)` | Atributo `id` | El valor lo debe decidir el sistema (**RN-01**). | La base lo genera de forma autoincremental. |
-> | `@Column(unique = true)` | `Estudiante.correo` | Un correo no puede repetirse (**RN-02**). | Crea una restricción `UNIQUE` en la columna. |
-> | `@ManyToOne` | `Matricula.estudiante`, `Matricula.curso` | Muchas matrículas apuntan a **un** estudiante o curso. | Declara la relación de muchos a uno. |
-> | `@JoinColumn(name = "…")` | Esos mismos dos atributos | Hay que nombrar la **clave foránea**. | Define la columna `estudiante_id` / `curso_id`; `Matricula` es el **lado dueño**. |
+> | `@GeneratedValue(strategy = IDENTITY)` | Atributo `id` | El valor lo decide el sistema (**RN-01**). | La base lo genera de forma autoincremental. |
+> | `@Column(unique = true)` | `EstudianteEntity.correo` | Un correo no puede repetirse (**RN-02**). | Crea una restricción `UNIQUE` en la columna. |
+> | `@ManyToOne` | `MatriculaEntity.estudiante`, `.curso` | Muchas matrículas apuntan a **un** estudiante o curso. | Declara la relación de muchos a uno. |
+> | `@JoinColumn(name = "…")` | Esos mismos dos atributos | Hay que nombrar la **clave foránea**. | Define `estudiante_id` / `curso_id`; `MatriculaEntity` es el **lado dueño**. |
 >
 > ```text
 > presentacion  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping · @PathVariable · @RequestBody · @ResponseStatus
-> negocio       ──▶  @Service  ·  @Entity · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn   (en negocio.model)
-> persistence   ──▶  (ninguna)  interfaces que extienden JpaRepository; Spring Data crea el bean
+> negocio       ──▶  @Service                                  (model: ninguna anotación de JPA)
+> persistence   ──▶  @Entity · @Table · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn     (en persistence.entity)
+>                    @Repository                               (en las clases …EnBD; las …JpaRepository no llevan)
 > arranque      ──▶  @SpringBootApplication
 > ```
 >
-> > 🔎 **Lectura clave.** Las anotaciones de JPA viven en `negocio.model` porque describen **cómo se guarda el dato**, pero
-> > **no aparecen** en servicios ni en controladores. Más ejemplos de cada una: [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md).
+> > 🔎 **Lectura clave.** Las anotaciones de JPA **no aparecen** ni en `negocio` ni en `presentacion`: por eso esas capas no cambiaron. Más ejemplos de cada una: [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md).
 
 </details>
