@@ -369,6 +369,45 @@
 > | 7 | Releer detalles | `GET /pedidos/1/detalles` | — | el detalle 1 sigue con `precioUnitario` **2500000**, aunque el producto ya cuesta 3.000.000 |
 > | 8 | Pedido inexistente | `GET /pedidos/9/detalles` | — | `500` *(`NoSuchElementException`)* |
 >
+> ### 💻 Los mismos pasos con `curl`
+>
+> ```bash
+> # Antes: los tres productos de la guía 1  →  201
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Portátil","precio":2500000,"stock":10}'
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Ratón","precio":45000,"stock":50}'
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Teclado","precio":90000,"stock":20}'
+>
+> # 1. Crear el pedido  →  201
+> curl -i -X POST localhost:8080/pedidos
+>
+> # 2-4. Agregar los tres detalles  →  201
+> curl -i -X POST localhost:8080/pedidos/1/detalles -H "Content-Type: application/json" \
+>   -d '{"productoId":1,"cantidad":2}'
+> curl -i -X POST localhost:8080/pedidos/1/detalles -H "Content-Type: application/json" \
+>   -d '{"productoId":2,"cantidad":1}'
+> curl -i -X POST localhost:8080/pedidos/1/detalles -H "Content-Type: application/json" \
+>   -d '{"productoId":3,"cantidad":3}'
+>
+> # 5. Consultar los detalles del pedido  →  200 (3 detalles)
+> curl -i localhost:8080/pedidos/1/detalles
+>
+> # (Consultar el pedido  →  200)
+> curl -i localhost:8080/pedidos/1
+>
+> # 6. Cambiar el precio del producto 1  →  200
+> curl -i -X PUT localhost:8080/productos/1 -H "Content-Type: application/json" \
+>   -d '{"nombre":"Portátil","precio":3000000,"stock":10}'
+>
+> # 7. Releer los detalles: el detalle 1 conserva precioUnitario 2500000  →  200
+> curl -i localhost:8080/pedidos/1/detalles
+>
+> # 8. Pedido inexistente  →  500
+> curl -i localhost:8080/pedidos/9/detalles
+> ```
+>
 > Un detalle se ve así:
 >
 > ```json

@@ -279,6 +279,36 @@
 > | 6 | Eliminar | `DELETE /productos/2` | — | `204` |
 > | 7 | Inexistente | `GET /productos/99` | — | `500` *(la consola muestra `NoSuchElementException`; el `404` llega en el Módulo 7)* |
 >
+> ### 💻 Los mismos pasos con `curl`
+>
+> Con la aplicación en marcha (`./mvnw spring-boot:run`), ejecutalos **en este orden** en una consola Bash. `-i` muestra el código de estado.
+>
+> ```bash
+> # 1-2. Crear productos  →  201
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Portátil","precio":2500000,"stock":10}'
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Ratón","precio":45000,"stock":50}'
+>
+> # 3. Listar  →  200
+> curl -i localhost:8080/productos
+>
+> # 4. Consultar uno  →  200
+> curl -i localhost:8080/productos/2
+>
+> # 5. Actualizar  →  200
+> curl -i -X PUT localhost:8080/productos/2 -H "Content-Type: application/json" \
+>   -d '{"nombre":"Ratón inalámbrico","precio":55000,"stock":40}'
+>
+> # 6. Eliminar  →  204
+> curl -i -X DELETE localhost:8080/productos/2
+>
+> # 7. Producto inexistente  →  500
+> curl -i localhost:8080/productos/99
+> ```
+>
+> > 💡 En PowerShell usá `curl.exe` en lugar de `curl`, y el acento grave (`` ` ``) en lugar de `\` para continuar la línea.
+>
 > Respuesta de la operación 1:
 >
 > ```json

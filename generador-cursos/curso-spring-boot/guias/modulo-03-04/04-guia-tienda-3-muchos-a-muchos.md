@@ -317,6 +317,49 @@
 > | 7 | Repetir un favorito | `POST /clientes/1/favoritos/2` | `201`, y Ana **sigue** con 3 |
 > | 8 | Quitar un favorito | `DELETE /clientes/1/favoritos/3` | `204`; Ana queda con 2 |
 >
+> ### 💻 Los mismos pasos con `curl`
+>
+> ```bash
+> # Antes: los tres productos de la guía 1  →  201
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Portátil","precio":2500000,"stock":10}'
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Ratón","precio":45000,"stock":50}'
+> curl -i -X POST localhost:8080/productos -H "Content-Type: application/json" \
+>   -d '{"nombre":"Teclado","precio":90000,"stock":20}'
+>
+> # 1-2. Crear los clientes  →  201
+> curl -i -X POST localhost:8080/clientes -H "Content-Type: application/json" \
+>   -d '{"nombre":"Ana","correo":"ana@correo.com"}'
+> curl -i -X POST localhost:8080/clientes -H "Content-Type: application/json" \
+>   -d '{"nombre":"Carlos","correo":"carlos@correo.com"}'
+>
+> # 3. Ana guarda Portátil, Ratón y Teclado  →  201 cada una
+> curl -i -X POST localhost:8080/clientes/1/favoritos/1
+> curl -i -X POST localhost:8080/clientes/1/favoritos/2
+> curl -i -X POST localhost:8080/clientes/1/favoritos/3
+>
+> # 4. Carlos guarda Ratón y Teclado  →  201 cada una
+> curl -i -X POST localhost:8080/clientes/2/favoritos/2
+> curl -i -X POST localhost:8080/clientes/2/favoritos/3
+>
+> # 5. Favoritos de Ana  →  200 (3 productos)
+> curl -i localhost:8080/clientes/1/favoritos
+>
+> # 6. Favoritos de Carlos  →  200 (2 productos)
+> curl -i localhost:8080/clientes/2/favoritos
+>
+> # 7. Repetir un favorito  →  201
+> curl -i -X POST localhost:8080/clientes/1/favoritos/2
+> # ...y comprobar que Ana sigue con 3  →  200
+> curl -i localhost:8080/clientes/1/favoritos
+>
+> # 8. Quitar un favorito  →  204
+> curl -i -X DELETE localhost:8080/clientes/1/favoritos/3
+> # ...y comprobar que Ana queda con 2  →  200
+> curl -i localhost:8080/clientes/1/favoritos
+> ```
+>
 > > ℹ️ El **orden** de los productos en la respuesta no está garantizado (es un `Set`).
 
 </details>
