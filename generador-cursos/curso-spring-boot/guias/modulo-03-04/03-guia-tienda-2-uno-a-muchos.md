@@ -11,6 +11,55 @@
 
 ```mermaid
 classDiagram
+    direction TB
+    class TiendaApplication {
+        <<SpringBootApplication · existente>>
+    }
+    class ControladorProductos {
+        <<RestController · existente>>
+    }
+    class ServicioProductos {
+        <<Service · existente>>
+        +obtener(Long)
+    }
+    class RepositorioProductos {
+        <<interface · existente>>
+    }
+    class Producto {
+        <<Entity · existente>>
+        -Long id
+        -String nombre
+        -double precio
+        -int stock
+    }
+    class ControladorPedidos {
+        <<RestController · NUEVA>>
+        +crear()
+        +obtener(Long)
+        +agregarDetalle(Long, SolicitudDetalle)
+        +listarDetalles(Long)
+    }
+    class SolicitudDetalle {
+        <<record · NUEVA>>
+        Long productoId
+        int cantidad
+    }
+    class ServicioPedidos {
+        <<Service · NUEVA>>
+        +crear()
+        +obtener(Long)
+        +agregarDetalle(Long, Long, int)
+        +listarDetalles(Long)
+    }
+    class RepositorioPedidos {
+        <<interface · NUEVA>>
+    }
+    class RepositorioDetallesPedido {
+        <<interface · NUEVA>>
+    }
+    class JpaRepository {
+        <<interface · Spring Data>>
+    }
     class Pedido {
         <<Entity · NUEVA>>
         -Long id
@@ -23,16 +72,25 @@ classDiagram
         -int cantidad
         -double precioUnitario
     }
-    class Producto {
-        <<Entity · existente>>
-        -Long id
-        -String nombre
-        -double precio
-        -int stock
-    }
+
+    ControladorProductos --> ServicioProductos
+    ServicioProductos --> RepositorioProductos
+    ControladorPedidos --> ServicioPedidos : usa
+    ControladorPedidos ..> SolicitudDetalle : recibe
+    ServicioPedidos --> RepositorioPedidos
+    ServicioPedidos --> RepositorioDetallesPedido
+    ServicioPedidos --> ServicioProductos : reutiliza
+    JpaRepository <|-- RepositorioProductos
+    JpaRepository <|-- RepositorioPedidos
+    JpaRepository <|-- RepositorioDetallesPedido
+    RepositorioProductos ..> Producto
+    RepositorioPedidos ..> Pedido
+    RepositorioDetallesPedido ..> DetallePedido
     Pedido "1" -- "*" DetallePedido : detalles / pedido
     DetallePedido "*" --> "1" Producto : producto
 ```
+
+Están **todas** las clases del proyecto: las de la guía 1 como `existente` y las que agregás ahora como `NUEVA`. Fijate que `ServicioPedidos` **reutiliza** `ServicioProductos`.
 
 | Relación | Anotaciones | Dónde está la clave foránea |
 |---|---|---|

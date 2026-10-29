@@ -19,6 +19,34 @@ El proyecto se crea en [start.spring.io](https://start.spring.io) con **Maven ·
 
 ```mermaid
 classDiagram
+    direction TB
+    class TiendaApplication {
+        <<SpringBootApplication · NUEVA>>
+        +main(String[])$
+    }
+    class ControladorProductos {
+        <<RestController · NUEVA>>
+        +crear(Producto)
+        +listar()
+        +obtener(Long)
+        +actualizar(Long, Producto)
+        +eliminar(Long)
+    }
+    class ServicioProductos {
+        <<Service · NUEVA>>
+        +crear(Producto)
+        +listar()
+        +obtener(Long)
+        +actualizar(Long, Producto)
+        +eliminar(Long)
+    }
+    class RepositorioProductos {
+        <<interface · NUEVA>>
+    }
+    class JpaRepository {
+        <<interface · Spring Data>>
+        +save() findAll() findById() delete()
+    }
     class Producto {
         <<Entity · NUEVA>>
         -Long id
@@ -26,9 +54,14 @@ classDiagram
         -double precio
         -int stock
     }
+
+    ControladorProductos --> ServicioProductos : usa
+    ServicioProductos --> RepositorioProductos : usa
+    JpaRepository <|-- RepositorioProductos : extiende
+    RepositorioProductos ..> Producto : gestiona
 ```
 
-Una sola entidad: la tabla `producto` con las columnas `id`, `nombre`, `precio`, `stock`.
+Están **todas** las clases de la guía (`TiendaApplication` la genera Initializr; el resto lo escribís en los pasos). El flujo se lee de arriba hacia abajo: *controlador → servicio → repositorio → entidad*. La entidad `Producto` es la tabla `producto` (`id`, `nombre`, `precio`, `stock`).
 
 ## 🪜 Pasos
 

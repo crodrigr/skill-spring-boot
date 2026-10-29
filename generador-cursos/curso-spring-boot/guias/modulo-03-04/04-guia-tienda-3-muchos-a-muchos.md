@@ -11,11 +11,19 @@
 
 ```mermaid
 classDiagram
-    class Cliente {
-        <<Entity · NUEVA>>
-        -Long id
-        -String nombre
-        -String correo
+    direction TB
+    class TiendaApplication {
+        <<SpringBootApplication · existente>>
+    }
+    class ControladorProductos {
+        <<RestController · existente>>
+    }
+    class ServicioProductos {
+        <<Service · existente>>
+        +obtener(Long)
+    }
+    class RepositorioProductos {
+        <<interface · existente>>
     }
     class Producto {
         <<Entity · existente>>
@@ -24,17 +32,86 @@ classDiagram
         -double precio
         -int stock
     }
+    class ControladorPedidos {
+        <<RestController · existente>>
+    }
+    class SolicitudDetalle {
+        <<record · existente>>
+    }
+    class ServicioPedidos {
+        <<Service · existente>>
+    }
+    class RepositorioPedidos {
+        <<interface · existente>>
+    }
+    class RepositorioDetallesPedido {
+        <<interface · existente>>
+    }
     class Pedido {
         <<Entity · existente>>
+        -Long id
+        -LocalDate fecha
+        -String estado
     }
     class DetallePedido {
         <<Entity · existente>>
+        -Long id
+        -int cantidad
+        -double precioUnitario
     }
+    class ControladorClientes {
+        <<RestController · NUEVA>>
+        +crear(Cliente)
+        +agregarFavorito(Long, Long)
+        +listarFavoritos(Long)
+        +quitarFavorito(Long, Long)
+    }
+    class ServicioClientes {
+        <<Service · NUEVA>>
+        +crear(Cliente)
+        +obtener(Long)
+        +agregarFavorito(Long, Long)
+        +listarFavoritos(Long)
+        +quitarFavorito(Long, Long)
+    }
+    class RepositorioClientes {
+        <<interface · NUEVA>>
+    }
+    class JpaRepository {
+        <<interface · Spring Data>>
+    }
+    class Cliente {
+        <<Entity · NUEVA>>
+        -Long id
+        -String nombre
+        -String correo
+    }
+
+    ControladorProductos --> ServicioProductos
+    ServicioProductos --> RepositorioProductos
+    ControladorPedidos --> ServicioPedidos
+    ControladorPedidos ..> SolicitudDetalle
+    ServicioPedidos --> RepositorioPedidos
+    ServicioPedidos --> RepositorioDetallesPedido
+    ServicioPedidos --> ServicioProductos
+    ControladorClientes --> ServicioClientes : usa
+    ServicioClientes --> RepositorioClientes
+    ServicioClientes --> ServicioProductos : reutiliza
+    JpaRepository <|-- RepositorioProductos
+    JpaRepository <|-- RepositorioPedidos
+    JpaRepository <|-- RepositorioDetallesPedido
+    JpaRepository <|-- RepositorioClientes
+    RepositorioProductos ..> Producto
+    RepositorioPedidos ..> Pedido
+    RepositorioDetallesPedido ..> DetallePedido
+    RepositorioClientes ..> Cliente
+    Pedido "1" -- "*" DetallePedido : detalles / pedido
+    DetallePedido "*" --> "1" Producto : producto
     Cliente "*" --> "*" Producto : favoritos
-    Pedido "1" -- "*" DetallePedido
-    DetallePedido "*" --> "1" Producto
     note for Cliente "Tabla intermedia cliente_favorito (cliente_id, producto_id)"
 ```
+
+Están **todas** las clases del proyecto; las de las guías 1 y 2 aparecen como `existente`. Fijate que `ServicioClientes` también **reutiliza** `ServicioProductos`.
 
 Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil, Ratón y Teclado*; los de Carlos, *Ratón y Teclado*. El *Ratón* está en las listas de **varios** clientes, y cada cliente tiene **varios** productos.
 
