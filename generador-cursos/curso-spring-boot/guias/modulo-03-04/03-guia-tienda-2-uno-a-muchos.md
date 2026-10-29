@@ -17,43 +17,43 @@
 > classDiagram
 >     direction TB
 >     class TiendaApplication {
->         <<SpringBootApplication · existente>>
+>         <<SpringBootApplication>>
 >     }
 >     class ControladorProductos {
->         <<RestController · existente>>
+>         <<RestController>>
 >     }
 >     class ServicioProductos {
->         <<Service · existente>>
+>         <<Service>>
 >     }
 >     class RepositorioProductos {
->         <<interface · existente>>
+>         <<interface>>
 >     }
 >     class Producto {
->         <<Entity · existente>>
+>         <<Entity>>
 >     }
 >     class ControladorPedidos {
->         <<RestController · NUEVA>>
+>         <<RestController>>
 >     }
 >     class SolicitudDetalle {
->         <<record · NUEVA>>
+>         <<record>>
 >     }
 >     class ServicioPedidos {
->         <<Service · NUEVA>>
+>         <<Service>>
 >     }
 >     class RepositorioPedidos {
->         <<interface · NUEVA>>
+>         <<interface>>
 >     }
 >     class RepositorioDetallesPedido {
->         <<interface · NUEVA>>
+>         <<interface>>
 >     }
 >     class JpaRepository {
 >         <<interface · Spring Data>>
 >     }
 >     class Pedido {
->         <<Entity · NUEVA>>
+>         <<Entity>>
 >     }
 >     class DetallePedido {
->         <<Entity · NUEVA>>
+>         <<Entity>>
 >     }
 >
 >     ControladorProductos --> ServicioProductos
@@ -73,7 +73,7 @@
 >     DetallePedido "*" --> "1" Producto : producto
 > ```
 >
-> Están **todas** las clases del proyecto: las de la guía 1 como `existente` y las que agregás ahora como `NUEVA`. Fijate que `ServicioPedidos` **reutiliza** `ServicioProductos`.
+> Están **todas** las clases del proyecto. Las **nuevas** de esta guía son `ControladorPedidos`, `SolicitudDetalle`, `ServicioPedidos`, `RepositorioPedidos`, `RepositorioDetallesPedido`, `Pedido` y `DetallePedido`; el resto viene de la guía 1. Fijate que `ServicioPedidos` **reutiliza** `ServicioProductos`.
 >
 > | Relación | Anotaciones | Dónde está la clave foránea |
 > |---|---|---|

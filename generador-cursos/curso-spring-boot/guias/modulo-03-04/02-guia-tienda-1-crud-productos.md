@@ -25,22 +25,22 @@
 > classDiagram
 >     direction TB
 >     class TiendaApplication {
->         <<SpringBootApplication · NUEVA>>
+>         <<SpringBootApplication>>
 >     }
 >     class ControladorProductos {
->         <<RestController · NUEVA>>
+>         <<RestController>>
 >     }
 >     class ServicioProductos {
->         <<Service · NUEVA>>
+>         <<Service>>
 >     }
 >     class RepositorioProductos {
->         <<interface · NUEVA>>
+>         <<interface>>
 >     }
 >     class JpaRepository {
 >         <<interface · Spring Data>>
 >     }
 >     class Producto {
->         <<Entity · NUEVA>>
+>         <<Entity>>
 >     }
 >
 >     ControladorProductos --> ServicioProductos : usa

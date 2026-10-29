@@ -17,55 +17,55 @@
 > classDiagram
 >     direction TB
 >     class TiendaApplication {
->         <<SpringBootApplication · existente>>
+>         <<SpringBootApplication>>
 >     }
 >     class ControladorProductos {
->         <<RestController · existente>>
+>         <<RestController>>
 >     }
 >     class ServicioProductos {
->         <<Service · existente>>
+>         <<Service>>
 >     }
 >     class RepositorioProductos {
->         <<interface · existente>>
+>         <<interface>>
 >     }
 >     class Producto {
->         <<Entity · existente>>
+>         <<Entity>>
 >     }
 >     class ControladorPedidos {
->         <<RestController · existente>>
+>         <<RestController>>
 >     }
 >     class SolicitudDetalle {
->         <<record · existente>>
+>         <<record>>
 >     }
 >     class ServicioPedidos {
->         <<Service · existente>>
+>         <<Service>>
 >     }
 >     class RepositorioPedidos {
->         <<interface · existente>>
+>         <<interface>>
 >     }
 >     class RepositorioDetallesPedido {
->         <<interface · existente>>
+>         <<interface>>
 >     }
 >     class Pedido {
->         <<Entity · existente>>
+>         <<Entity>>
 >     }
 >     class DetallePedido {
->         <<Entity · existente>>
+>         <<Entity>>
 >     }
 >     class ControladorClientes {
->         <<RestController · NUEVA>>
+>         <<RestController>>
 >     }
 >     class ServicioClientes {
->         <<Service · NUEVA>>
+>         <<Service>>
 >     }
 >     class RepositorioClientes {
->         <<interface · NUEVA>>
+>         <<interface>>
 >     }
 >     class JpaRepository {
 >         <<interface · Spring Data>>
 >     }
 >     class Cliente {
->         <<Entity · NUEVA>>
+>         <<Entity>>
 >     }
 >
 >     ControladorProductos --> ServicioProductos
@@ -92,7 +92,7 @@
 >     note for Cliente "Tabla intermedia cliente_favorito (cliente_id, producto_id)"
 > ```
 >
-> Están **todas** las clases del proyecto; las de las guías 1 y 2 aparecen como `existente`. Fijate que `ServicioClientes` también **reutiliza** `ServicioProductos`.
+> Están **todas** las clases del proyecto. Las **nuevas** de esta guía son `ControladorClientes`, `ServicioClientes`, `RepositorioClientes` y `Cliente`; el resto viene de las guías 1 y 2. Fijate que `ServicioClientes` también **reutiliza** `ServicioProductos`.
 >
 > Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil, Ratón y Teclado*; los de Carlos, *Ratón y Teclado*. El *Ratón* está en las listas de **varios** clientes, y cada cliente tiene **varios** productos.
 >
