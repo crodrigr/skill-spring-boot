@@ -71,23 +71,33 @@
 > ```mermaid
 > classDiagram
 >     direction TB
+>
 >     class TiendaApplication {
 >         <<SpringBootApplication>>
 >     }
->     class ControladorProductos {
->         <<RestController>>
+>
+>     namespace presentacion {
+>         class ControladorProductos {
+>             <<RestController>>
+>         }
 >     }
->     class ServicioProductos {
->         <<Service>>
+>
+>     namespace negocio {
+>         class ServicioProductos {
+>             <<Service>>
+>         }
+>         class Producto {
+>             <<Entity>>
+>         }
 >     }
->     class RepositorioProductos {
->         <<interface>>
->     }
->     class JpaRepository {
->         <<interface · Spring Data>>
->     }
->     class Producto {
->         <<Entity>>
+>
+>     namespace persistence {
+>         class RepositorioProductos {
+>             <<interface>>
+>         }
+>         class JpaRepository {
+>             <<interface · Spring Data>>
+>         }
 >     }
 >
 >     ControladorProductos --> ServicioProductos : usa
@@ -96,7 +106,16 @@
 >     RepositorioProductos ..> Producto : gestiona
 > ```
 >
-> Están **todas** las clases de la guía (`TiendaApplication` la genera Initializr; el resto lo escribís en los pasos). El flujo se lee de arriba hacia abajo: *controlador → servicio → repositorio → entidad*. Las entidades son las tablas: `Producto` → `producto` (`id`, `nombre`, `precio`, `stock`).
+> Cada recuadro del diagrama es una **capa**; el flujo se lee de arriba hacia abajo y **nunca al revés**: *presentación → negocio → persistencia*.
+>
+> | Capa | Paquete | Clases de esta guía |
+> |---|---|---|
+> | **Presentación** (lo que ve el cliente HTTP) | `presentacion.controlador` | `ControladorProductos` |
+> | **Negocio** (reglas y modelo) | `negocio.service`, `negocio.model` | `ServicioProductos`, `Producto` |
+> | **Persistencia** (dónde viven los datos) | `persistence.repository` | `RepositorioProductos` (+ `JpaRepository`, de Spring Data) |
+> | *(fuera de las capas)* | `com.tienda` | `TiendaApplication`: la genera Initializr |
+>
+> `Producto` es la entidad: la tabla `producto` (`id`, `nombre`, `precio`, `stock`).
 
 </details>
 
