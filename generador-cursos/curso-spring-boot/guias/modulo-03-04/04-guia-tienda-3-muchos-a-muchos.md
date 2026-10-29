@@ -101,6 +101,45 @@
 </details>
 
 <details open>
+<summary><strong>🌳 Estructura del proyecto</strong></summary>
+
+> ```text
+> 📁 tienda
+> ├── 📁 src/main
+> │   ├── 📁 java/com/tienda
+> │   │   ├── 📁 presentacion                             (capa de presentación)
+> │   │   │   └── 📁 controlador
+> │   │   │       ├── 📄 ControladorClientes.java         ← NUEVO
+> │   │   │       ├── 📄 ControladorPedidos.java
+> │   │   │       ├── 📄 ControladorProductos.java
+> │   │   │       └── 📄 SolicitudDetalle.java
+> │   │   ├── 📁 negocio                                  (capa de negocio)
+> │   │   │   ├── 📁 model
+> │   │   │   │   ├── 📄 Cliente.java                     ← NUEVO
+> │   │   │   │   ├── 📄 DetallePedido.java
+> │   │   │   │   ├── 📄 Pedido.java
+> │   │   │   │   └── 📄 Producto.java
+> │   │   │   └── 📁 service
+> │   │   │       ├── 📄 ServicioClientes.java            ← NUEVO
+> │   │   │       ├── 📄 ServicioPedidos.java
+> │   │   │       └── 📄 ServicioProductos.java
+> │   │   ├── 📁 persistence                              (capa de persistencia)
+> │   │   │   └── 📁 repository
+> │   │   │       ├── 📄 RepositorioClientes.java         ← NUEVO
+> │   │   │       ├── 📄 RepositorioDetallesPedido.java
+> │   │   │       ├── 📄 RepositorioPedidos.java
+> │   │   │       └── 📄 RepositorioProductos.java
+> │   │   └── 📄 TiendaApplication.java
+> │   └── 📁 resources
+> │       └── 📄 application.properties
+> └── 📄 pom.xml
+> ```
+>
+> **← NUEVO**: archivo que escribís en esta guía.
+
+</details>
+
+<details open>
 <summary><strong>🪜 Pasos</strong></summary>
 
 > <details open>

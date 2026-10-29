@@ -101,6 +101,34 @@
 </details>
 
 <details open>
+<summary><strong>🌳 Estructura del proyecto</strong></summary>
+
+> ```text
+> 📁 tienda
+> ├── 📁 src/main
+> │   ├── 📁 java/com/tienda
+> │   │   ├── 📁 presentacion                        (capa de presentación)
+> │   │   │   └── 📁 controlador
+> │   │   │       └── 📄 ControladorProductos.java   ← NUEVO
+> │   │   ├── 📁 negocio                             (capa de negocio)
+> │   │   │   ├── 📁 model
+> │   │   │   │   └── 📄 Producto.java               ← NUEVO
+> │   │   │   └── 📁 service
+> │   │   │       └── 📄 ServicioProductos.java      ← NUEVO
+> │   │   ├── 📁 persistence                         (capa de persistencia)
+> │   │   │   └── 📁 repository
+> │   │   │       └── 📄 RepositorioProductos.java   ← NUEVO
+> │   │   └── 📄 TiendaApplication.java              ← generado por Initializr
+> │   └── 📁 resources
+> │       └── 📄 application.properties              ← NUEVO
+> └── 📄 pom.xml                                     ← generado por Initializr
+> ```
+>
+> Los archivos marcados «generado por Initializr» no se escriben: los crea [start.spring.io](https://start.spring.io).
+
+</details>
+
+<details open>
 <summary><strong>🪜 Pasos</strong></summary>
 
 > <details open>
