@@ -49,7 +49,8 @@ Están **todas** las clases de la guía (`TiendaApplication` la genera Initializ
 
 ## 🪜 Pasos
 
-### 1. Configurar la base de datos
+<details open>
+<summary><strong>1. Configurar la base de datos</strong></summary>
 
 **`src/main/resources/application.properties`**
 
@@ -64,7 +65,10 @@ spring.h2.console.enabled=true
 - `show-sql=true`: ves en consola el SQL que genera.
 - La consola de H2 queda en `http://localhost:8080/h2-console` (JDBC URL `jdbc:h2:mem:tienda`, usuario `sa`, sin contraseña).
 
-### 2. La entidad
+</details>
+
+<details open>
+<summary><strong>2. La entidad</strong></summary>
 
 **`src/main/java/com/tienda/negocio/model/Producto.java`**
 
@@ -112,7 +116,10 @@ public class Producto {
 - **`@Entity`**: la clase se guarda en una tabla. **`@Id`** + **`@GeneratedValue(IDENTITY)`**: la clave primaria la genera la base.
 - El constructor `protected` sin argumentos lo necesita JPA para crear el objeto; los *setters* se usan al actualizar.
 
-### 3. El repositorio
+</details>
+
+<details open>
+<summary><strong>3. El repositorio</strong></summary>
 
 **`src/main/java/com/tienda/persistence/repository/RepositorioProductos.java`**
 
@@ -128,7 +135,10 @@ public interface RepositorioProductos extends JpaRepository<Producto, Long> {
 
 Sin una sola línea de código, ya tenés `save`, `findAll`, `findById`, `delete`… **Spring Data genera la clase** al arrancar.
 
-### 4. El servicio
+</details>
+
+<details open>
+<summary><strong>4. El servicio</strong></summary>
 
 **`src/main/java/com/tienda/negocio/service/ServicioProductos.java`**
 
@@ -180,7 +190,10 @@ public class ServicioProductos {
 
 > ⚠️ **Detalle importante:** en `crear` se construye un `Producto` **nuevo**. Si se guardara el que llega, un `POST` con `"id": 1` **actualizaría** el producto 1 en lugar de crear uno.
 
-### 5. El controlador (los cinco endpoints)
+</details>
+
+<details open>
+<summary><strong>5. El controlador (los cinco endpoints)</strong></summary>
 
 **`src/main/java/com/tienda/presentacion/controlador/ControladorProductos.java`**
 
@@ -239,6 +252,8 @@ public class ControladorProductos {
     }
 }
 ```
+
+</details>
 
 ## 🧪 Probar con Postman
 

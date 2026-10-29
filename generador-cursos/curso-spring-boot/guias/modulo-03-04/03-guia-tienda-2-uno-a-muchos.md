@@ -80,7 +80,8 @@ Ejemplo: el **pedido #100** tiene tres detalles (2 portátiles, 1 ratón, 3 tecl
 
 ## 🪜 Pasos
 
-### 1. Las entidades
+<details open>
+<summary><strong>1. Las entidades</strong></summary>
 
 **`src/main/java/com/tienda/negocio/model/Pedido.java`**
 
@@ -183,7 +184,10 @@ public class DetallePedido {
 - **Lado dueño:** `DetallePedido` tiene la clave foránea (`@JoinColumn(name = "pedido_id")`). En `Pedido`, `mappedBy = "pedido"` solo dice «mirá ese atributo»: **no crea columnas**.
 - **`@JsonIgnore`** en `DetallePedido.pedido` y `Pedido.detalles`: sin él, el JSON entraría en un **bucle infinito** (pedido → detalles → pedido…). Es un arreglo temporal; en el Módulo 5 se resuelve con DTO.
 
-### 2. Los repositorios
+</details>
+
+<details open>
+<summary><strong>2. Los repositorios</strong></summary>
 
 **`src/main/java/com/tienda/persistence/repository/RepositorioPedidos.java`**
 
@@ -209,7 +213,10 @@ public interface RepositorioDetallesPedido extends JpaRepository<DetallePedido, 
 }
 ```
 
-### 3. El servicio
+</details>
+
+<details open>
+<summary><strong>3. El servicio</strong></summary>
 
 **`src/main/java/com/tienda/negocio/service/ServicioPedidos.java`**
 
@@ -269,7 +276,10 @@ public class ServicioPedidos {
 - `agregarDetalle` **reutiliza** `ServicioProductos` (guía 1) para validar que el producto exista y **copia su precio** al detalle: si el precio del producto cambia después, el pedido conserva el de ese día.
 - `listarDetalles` es `@Transactional` porque `detalles` se carga **bajo demanda** (*lazy*): solo se puede leer con la sesión abierta.
 
-### 4. El controlador
+</details>
+
+<details open>
+<summary><strong>4. El controlador</strong></summary>
 
 **`src/main/java/com/tienda/presentacion/controlador/SolicitudDetalle.java`**
 
@@ -331,6 +341,8 @@ public class ControladorPedidos {
     }
 }
 ```
+
+</details>
 
 ## 🧪 Probar con Postman
 

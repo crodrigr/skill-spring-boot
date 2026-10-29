@@ -96,7 +96,8 @@ Ejemplo: **Ana** y **Carlos** son clientes; los favoritos de Ana son *Portátil,
 
 ## 🪜 Pasos
 
-### 1. La entidad
+<details open>
+<summary><strong>1. La entidad</strong></summary>
 
 **`src/main/java/com/tienda/negocio/model/Cliente.java`**
 
@@ -152,7 +153,10 @@ public class Cliente {
 - Se usa un `Set` (no una `List`): un producto **no puede repetirse** en los favoritos de un mismo cliente.
 - `Producto` **no se modifica**: no necesita saber qué clientes lo tienen como favorito (relación **unidireccional**).
 
-### 2. El repositorio
+</details>
+
+<details open>
+<summary><strong>2. El repositorio</strong></summary>
 
 **`src/main/java/com/tienda/persistence/repository/RepositorioClientes.java`**
 
@@ -166,7 +170,10 @@ public interface RepositorioClientes extends JpaRepository<Cliente, Long> {
 }
 ```
 
-### 3. El servicio
+</details>
+
+<details open>
+<summary><strong>3. El servicio</strong></summary>
 
 **`src/main/java/com/tienda/negocio/service/ServicioClientes.java`**
 
@@ -224,7 +231,10 @@ public class ServicioClientes {
 - No hay ningún `save`: dentro de `@Transactional`, el cliente está **gestionado**; al agregar un producto a `favoritos`, JPA detecta el cambio y ejecuta el `insert` en la tabla intermedia al terminar el método.
 - Agregar dos veces el mismo favorito **no duplica** la fila (es un `Set`).
 
-### 4. El controlador
+</details>
+
+<details open>
+<summary><strong>4. El controlador</strong></summary>
 
 **`src/main/java/com/tienda/presentacion/controlador/ControladorClientes.java`**
 
@@ -279,6 +289,8 @@ public class ControladorClientes {
     }
 }
 ```
+
+</details>
 
 ## 🧪 Probar con Postman
 
