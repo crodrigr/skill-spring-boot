@@ -184,6 +184,20 @@
 > alter table estudiante add constraint FK… foreign key (carnet_id) references carnet (id)
 > ```
 >
+> **Así queda en las tablas** (datos del escenario «Probalo»):
+>
+> ```text
+> carnet                      estudiante
+> +----+--------+             +----------+----+--------+
+> | id | codigo |             | carnet_id| id | nombre |
+> +----+--------+             +----------+----+--------+
+> |  1 | C-001  |  <────────  |        1 |  1 | Ana    |
+> +----+--------+             |     NULL |  2 | Luis   |   ← Luis no tiene carnet
+>                             +----------+----+--------+
+> ```
+>
+> La clave `carnet_id` está en `estudiante`; `UNIQUE` impide que otro estudiante use el carnet 1.
+>
 > > 🔎 La restricción **`UNIQUE`** sobre `carnet_id` es lo que impide que dos estudiantes compartan el mismo carnet: eso **es** el «uno a uno».
 
 </details>
@@ -322,6 +336,21 @@
 > create table curso (docente_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
 > alter table curso add constraint FK… foreign key (docente_id) references docente (id)
 > ```
+>
+> **Así queda en las tablas:**
+>
+> ```text
+> docente                     curso
+> +----+--------+             +-----------+----+--------+
+> | id | nombre |             | docente_id| id | nombre |
+> +----+--------+             +-----------+----+--------+
+> |  1 | Marta  |  <────────  |         1 |  1 | Java   |
+> +----+--------+             |         1 |  2 | Spring |
+>                             |      NULL |  3 | HTML   |   ← se agregó solo a docente.getCursos()
+>                             +-----------+----+--------+
+> ```
+>
+> La clave `docente_id` está en `curso` (lado «muchos»); `docente` **no** tiene ninguna columna de cursos.
 >
 > > ⚠️ **Se asigna del lado dueño.** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, mantené **los dos lados sincronizados** con el método `agregarCurso` de `DocenteEntity` (ya incluido arriba).
 
@@ -462,6 +491,21 @@
 > alter table estudiante_curso add constraint FK… foreign key (curso_id)      references curso (id)
 > alter table estudiante_curso add constraint FK… foreign key (estudiante_id) references estudiante (id)
 > ```
+>
+> **Así queda en las tablas:**
+>
+> ```text
+> estudiante            estudiante_curso (tabla intermedia)      curso
+> +----+--------+       +---------------+----------+             +----+--------+
+> | id | nombre |       | estudiante_id | curso_id |             | id | nombre |
+> +----+--------+       +---------------+----------+             +----+--------+
+> |  1 | Ana    | <──── |             1 |        1 | ────>       |  1 | Java   |
+> |  2 | Luis   | <──── |             1 |        2 | ────>       |  2 | Spring |
+> +----+--------+       |             2 |        1 |             +----+--------+
+>                       +---------------+----------+
+> ```
+>
+> Ana cursa Java y Spring; Luis, solo Java. Ninguna de las dos tablas principales guarda la relación: solo la tabla intermedia.
 >
 > > 🔎 La **clave primaria compuesta** `(curso_id, estudiante_id)` impide repetir un par a nivel de base.
 > >
