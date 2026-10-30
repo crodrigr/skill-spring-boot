@@ -534,6 +534,31 @@
 <details open>
 <summary><strong>↔️ Un sentido o doble sentido: ¿cuál elegir?</strong></summary>
 
+> ### 🔄 ¿Qué hace el doble sentido? (ejemplo Estudiante ↔ Carnet)
+>
+> ```java
+> estudiante.getCarnet()   // ✅ un sentido: el dueño tiene la clave carnet_id
+> carnet.getEstudiante()   // ❌ no existe... hasta que se agrega el lado inverso
+> ```
+>
+> Con el lado inverso (`@OneToOne(mappedBy = "carnet")` en `CarnetEntity`) las dos líneas funcionan.
+>
+> | | |
+> |---|---|
+> | **Qué hace** | Permite **navegar en sentido contrario**: al pedir `carnet.getEstudiante()`, JPA busca al estudiante cuyo `carnet_id` sea el de ese carnet. |
+> | **Qué NO hace** | No crea columnas ni tablas, y **no escribe**: `carnet.setEstudiante(ana)` no cambia la base. Siempre se asigna con `estudiante.setCarnet(carnet)`. |
+> | **Para qué sirve** | Evitar una consulta extra. Ejemplo: se escanea un carnet y se muestra de quién es → `carnet.getEstudiante().getNombre()` → `"Ana"`. |
+>
+> **¿Cuándo es necesario?** Casi nunca; es una comodidad.
+>
+> | Situación | ¿Doble sentido? |
+> |---|---|
+> | Solo preguntás «¿cuál es el carnet de este estudiante?» | **No** |
+> | Preguntás «¿de quién es este carnet?» pocas veces | **No**: usá un método del repositorio, por ejemplo `findByCarnetCodigo("C-001")` en `EstudianteJpaRepository` |
+> | Recorrés **siempre en las dos direcciones** y querés `carnet.getEstudiante()` directo | **Sí** |
+>
+> > ⚠️ **Costo:** hay que mantener los dos lados coherentes, excluir el inverso de `toString`/`equals` (con `@Data`) y evitar el bucle infinito en JSON.
+>
 > | | **Un sentido** (solo el dueño) | **Doble sentido** (dueño + inverso) |
 > |---|---|---|
 > | Qué agregás | Solo la notación del dueño | Además, la del inverso con `mappedBy` |
