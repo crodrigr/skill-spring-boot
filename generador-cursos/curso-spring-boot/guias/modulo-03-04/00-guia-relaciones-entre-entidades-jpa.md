@@ -52,7 +52,7 @@
 > | Relación | Ejemplo | Lado **dueño** (tiene la clave) | Qué crea en MySQL |
 > |---|---|---|---|
 > | **Uno a uno** | Un estudiante tiene **un** carnet | `EstudianteEntity.carnet` | columna `estudiante.carnet_id` (con `UNIQUE`) |
-> | **Uno a muchos** | Un docente dicta **varios** cursos | `CursoEntity.docente` (el lado «muchos») | columna `curso.docente_id` |
+> | **Uno a muchos** | Un docente dicta **varios** cursos | un sentido: `DocenteEntity.cursos`; doble sentido: `CursoEntity.docente` | columna `curso.docente_id` |
 > | **Muchos a muchos** | Estudiantes y cursos | `EstudianteEntity.cursos` | tabla intermedia `estudiante_curso` |
 >
 > > 🔎 En el taller, el muchos a muchos entre estudiantes y cursos se resuelve con una **entidad intermedia** (`MatriculaEntity`), porque la matrícula necesita sus propios datos. Aquí se muestra la forma **directa**, sin datos propios.
@@ -243,14 +243,46 @@
 >     DocenteEntity "1" -- "*" CursoEntity : docente_id
 > ```
 >
-> > El atributo `cursos` de `DocenteEntity` existe **solo** en el doble sentido.
+> > En un sentido solo existe `DocenteEntity.cursos`; en doble sentido se agrega también `CursoEntity.docente`.
 >
-> Aquí el **dueño es el lado «muchos»**: la clave foránea (`docente_id`) va en la tabla `curso`.
+> Un docente dicta **varios** cursos. Se muestra primero **desde el docente** (un sentido) y después se agrega el curso → docente (doble sentido). La clave foránea siempre queda en la tabla `curso` (el lado «muchos»), pero **quién la escribe** depende del sentido.
 >
 > <details open>
 > <summary><strong>➡️ Un sentido</strong></summary>
 >
-> > **Un sentido** — solo el curso conoce a su docente (`@ManyToOne`). Clases completas:
+> > **Un sentido** — **desde el docente**: un docente tiene **varios** cursos y el curso no sabe de quién es. Clases completas:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import java.util.ArrayList;
+> > import java.util.List;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "docente")
+> > @Data
+> > @NoArgsConstructor
+> > public class DocenteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado DUEÑO (un sentido): tiene @JoinColumn. La columna docente_id se crea en la tabla curso
+> >     @OneToMany(cascade = CascadeType.ALL)
+> >     @JoinColumn(name = "docente_id")
+> >     private List<CursoEntity> cursos = new ArrayList<>();
+> >
+> >     public DocenteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
 > >
 > > ```java
 > > package com.academia.persistence.entity;
@@ -271,7 +303,45 @@
 > >
 > >     private String nombre;
 > >
-> >     // Lado DUEÑO: la clave foránea docente_id vive en la tabla curso (el lado «muchos»)
+> >     // CursoEntity no sabe quién es su docente
+> >
+> >     public CursoEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > - `@OneToMany` + `@JoinColumn(name = "docente_id")`: la clave `docente_id` se crea en la tabla `curso`, aunque `CursoEntity` no tenga ese atributo. Como `@JoinColumn` está aquí, **el dueño es `DocenteEntity`**.
+> > - `cascade = ALL`: al guardar el docente se guardan también sus cursos.
+> > - Se comprobó en MySQL: Hibernate hace primero un `insert into curso` por cada curso y después un `update curso set docente_id=?` por cada uno. Es normal en esta variante.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>↔️ Doble sentido</strong></summary>
+>
+> > **Doble sentido** — se agrega `@ManyToOne` en el curso y **el dueño pasa a ser `CursoEntity`**. El docente deja de tener `@JoinColumn` y queda como lado **inverso** (`mappedBy`). Clases completas:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "curso")
+> > @Data
+> > @NoArgsConstructor
+> > public class CursoEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado DUEÑO (doble sentido): ahora la clave la escribe el curso
 > >     @ManyToOne
 > >     @JoinColumn(name = "docente_id")
 > >     private DocenteEntity docente;
@@ -287,40 +357,8 @@
 > >
 > > import jakarta.persistence.*;
 > > import lombok.Data;
-> > import lombok.NoArgsConstructor;
-> >
-> > @Entity
-> > @Table(name = "docente")
-> > @Data
-> > @NoArgsConstructor
-> > public class DocenteEntity {
-> >
-> >     @Id
-> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
-> >     private Long id;
-> >
-> >     private String nombre;
-> >
-> >     public DocenteEntity(String nombre) {
-> >         this.nombre = nombre;
-> >     }
-> > }
-> > ```
->
-> </details>
->
-> <details open>
-> <summary><strong>↔️ Doble sentido</strong></summary>
->
-> > **Doble sentido** — `CursoEntity` **no cambia**; el docente también ve su lista de cursos (`@OneToMany`, lado **inverso**). Clase completa:
-> >
-> > ```java
-> > package com.academia.persistence.entity;
-> >
-> > import jakarta.persistence.*;
 > > import java.util.ArrayList;
 > > import java.util.List;
-> > import lombok.Data;
 > > import lombok.EqualsAndHashCode;
 > > import lombok.NoArgsConstructor;
 > > import lombok.ToString;
@@ -337,7 +375,7 @@
 > >
 > >     private String nombre;
 > >
-> >     // Lado INVERSO (opcional): no crea columnas
+> >     // Lado INVERSO (opcional): ya no lleva @JoinColumn, solo mappedBy
 > >     @OneToMany(mappedBy = "docente")
 > >     @ToString.Exclude
 > >     @EqualsAndHashCode.Exclude
@@ -354,6 +392,8 @@
 > >     }
 > > }
 > > ```
+> >
+> > > ⚠️ Al pasar a doble sentido **cambia el dueño**: hay que quitar `@JoinColumn` y `cascade` del `@OneToMany` y poner `mappedBy = "docente"`. Si los dos lados llevaran `@JoinColumn`, los dos intentarían escribir `docente_id`. Una ventaja: sin el `UPDATE` extra, el curso se guarda ya con su `docente_id`.
 >
 > </details>
 >
@@ -382,11 +422,11 @@
 > >                             +-----------+----+--------+
 > > ```
 > >
-> > La clave `docente_id` está en `curso` (lado «muchos»); `docente` **no** tiene ninguna columna de cursos.
+> > La clave `docente_id` está en `curso` (lado «muchos»); `docente` **no** tiene ninguna columna de cursos. Es igual en un sentido y en doble sentido.
 >
 > </details>
 >
-> > ⚠️ **Se asigna del lado dueño.** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, mantené **los dos lados sincronizados** con el método `agregarCurso` de `DocenteEntity` (ya incluido arriba).
+> > ⚠️ **En doble sentido se asigna del lado dueño (el curso).** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, mantené **los dos lados sincronizados** con el método `agregarCurso` de `DocenteEntity` (ya incluido arriba).
 
 </details>
 
@@ -629,7 +669,7 @@
 > estudiantes.save(ana);
 > EstudianteEntity luis = estudiantes.save(new EstudianteEntity("Luis"));
 >
-> // 1:N — el lado dueño es el curso
+> // 1:N (doble sentido) — el lado dueño es el curso
 > DocenteEntity marta = docentes.save(new DocenteEntity("Marta"));
 > CursoEntity java = new CursoEntity("Java");
 > java.setDocente(marta);
@@ -684,7 +724,8 @@
 > |---|---|---|
 > | Que **un** objeto tenga **un** objeto | `@OneToOne` + `@JoinColumn` | Quien tiene `@JoinColumn` |
 > | Que **muchos** objetos apunten a **uno** | `@ManyToOne` + `@JoinColumn` | El lado «muchos» |
-> | Que **uno** vea su **lista** de muchos | `@OneToMany(mappedBy = "…")` | **Inverso** (opcional) |
+> | Que **uno** tenga su **lista** de muchos, sin que ellos lo sepan (un sentido) | `@OneToMany` + `@JoinColumn` | El lado «uno» |
+> | Que **uno** vea su **lista** de muchos, con `@ManyToOne` en el otro lado | `@OneToMany(mappedBy = "…")` | **Inverso** (opcional) |
 > | Que **muchos** se relacionen con **muchos** | `@ManyToMany` + `@JoinTable` | Quien tiene `@JoinTable` |
 > | Ver la relación desde el otro lado | `mappedBy = "atributoDelDueño"` | **Inverso** |
 > | Que guardar uno guarde el relacionado | `cascade = CascadeType.ALL` | — |
