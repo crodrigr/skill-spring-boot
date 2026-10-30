@@ -162,67 +162,73 @@
 > > <details open>
 > > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Guardar datos**
+> > > <details open>
+> > > <summary><strong>1️⃣ Guardar datos</strong></summary>
 > > >
-> > > ```java
-> > > ana.setCarnet(new CarnetEntity("C-001"));   // se asigna en el dueño
-> > > estudiantes.save(ana);                       // cascade guarda también el carnet
-> > > ```
-> > >
-> > > **Así queda en la base de datos:**
-> > >
-> > > ```text
-> > > carnet                     estudiante
-> > > +----+--------+            +-----------+----+--------+
-> > > | id | codigo |            | carnet_id | id | nombre |
-> > > +----+--------+            +-----------+----+--------+
-> > > |  1 | C-001  |  <───────  |         1 |  1 | Ana    |
-> > > +----+--------+            +-----------+----+--------+
-> > > ```
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL del guardado</summary>
-> > >
-> > > ```text
-> > > insert into carnet (codigo) values ('C-001');
-> > > insert into estudiante (carnet_id, nombre) values (1, 'Ana');   -- el carnet se guarda primero para tener su id
-> > > ```
+> > > > ```java
+> > > > ana.setCarnet(new CarnetEntity("C-001"));   // se asigna en el dueño
+> > > > estudiantes.save(ana);                       // cascade guarda también el carnet
+> > > > ```
+> > > >
+> > > > **Así queda en la base de datos:**
+> > > >
+> > > > ```text
+> > > > carnet                     estudiante
+> > > > +----+--------+            +-----------+----+--------+
+> > > > | id | codigo |            | carnet_id | id | nombre |
+> > > > +----+--------+            +-----------+----+--------+
+> > > > |  1 | C-001  |  <───────  |         1 |  1 | Ana    |
+> > > > +----+--------+            +-----------+----+--------+
+> > > > ```
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL del guardado</summary>
+> > > >
+> > > > ```text
+> > > > insert into carnet (codigo) values ('C-001');
+> > > > insert into estudiante (carnet_id, nombre) values (1, 'Ana');   -- el carnet se guarda primero para tener su id
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar datos** (en otra transacción)
+> > > <details open>
+> > > <summary><strong>2️⃣ Consultar datos (en otra transacción)</strong></summary>
 > > >
-> > > | Pregunta | Código | Resultado |
-> > > |---|---|---|
-> > > | ¿Cuál es el carnet de Ana? | `ana.getCarnet().getCodigo()` | **C-001** |
-> > > | ¿De quién es el carnet C-001? | `estudiantes.findByCarnetCodigo("C-001")` | **Ana** |
-> > >
-> > > > 💡 **La primera pregunta se resuelve navegando**: el estudiante tiene el atributo `carnet`.
+> > > > | Pregunta | Código | Resultado |
+> > > > |---|---|---|
+> > > > | ¿Cuál es el carnet de Ana? | `ana.getCarnet().getCodigo()` | **C-001** |
+> > > > | ¿De quién es el carnet C-001? | `estudiantes.findByCarnetCodigo("C-001")` | **Ana** |
 > > > >
-> > > > **La segunda no se puede navegar**: en un sentido `CarnetEntity` no tiene el atributo `estudiante`, así que no existe `carnet.getEstudiante()`. Por eso se **le pregunta al repositorio**.
-> > >
-> > > El método se declara en la interfaz del repositorio y **Spring Data lo implementa solo**, leyendo el nombre:
-> > >
-> > > ```java
-> > > List<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
-> > > ```
-> > >
-> > > Se lee así: **find** (buscar) **By** (donde) **Carnet** (el carnet del estudiante) **Codigo** (tenga este código). O sea: «buscame los estudiantes cuyo carnet tenga este código».
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL de las consultas</summary>
-> > >
-> > > ```text
-> > > ana.getCarnet().getCodigo()
-> > >   select id, codigo from carnet where id = 1                  -- 1 = carnet_id de Ana
-> > >   fila: (1, 'C-001')
-> > >
-> > > estudiantes.findByCarnetCodigo("C-001")
-> > >   select e.id, e.carnet_id, e.nombre
-> > >   from estudiante e left join carnet c on c.id = e.carnet_id
-> > >   where c.codigo = 'C-001'
-> > >   fila: (1, 1, 'Ana')
-> > > ```
+> > > > > 💡 **La primera pregunta se resuelve navegando**: el estudiante tiene el atributo `carnet`.
+> > > > >
+> > > > > **La segunda no se puede navegar**: en un sentido `CarnetEntity` no tiene el atributo `estudiante`, así que no existe `carnet.getEstudiante()`. Por eso se **le pregunta al repositorio**.
+> > > >
+> > > > El método se declara en la interfaz del repositorio y **Spring Data lo implementa solo**, leyendo el nombre:
+> > > >
+> > > > ```java
+> > > > List<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
+> > > > ```
+> > > >
+> > > > Se lee así: **find** (buscar) **By** (donde) **Carnet** (el carnet del estudiante) **Codigo** (tenga este código). O sea: «buscame los estudiantes cuyo carnet tenga este código».
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL de las consultas</summary>
+> > > >
+> > > > ```text
+> > > > ana.getCarnet().getCodigo()
+> > > >   select id, codigo from carnet where id = 1                  -- 1 = carnet_id de Ana
+> > > >   fila: (1, 'C-001')
+> > > >
+> > > > estudiantes.findByCarnetCodigo("C-001")
+> > > >   select e.id, e.carnet_id, e.nombre
+> > > >   from estudiante e left join carnet c on c.id = e.carnet_id
+> > > >   where c.codigo = 'C-001'
+> > > >   fila: (1, 1, 'Ana')
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > >
@@ -274,55 +280,61 @@
 > > <details open>
 > > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Guardar datos**
+> > > <details open>
+> > > <summary><strong>1️⃣ Guardar datos</strong></summary>
 > > >
-> > > ```java
-> > > ana.setCarnet(new CarnetEntity("C-001"));   // se asigna en el dueño
-> > > estudiantes.save(ana);                       // cascade guarda también el carnet
-> > > ```
-> > >
-> > > **Así queda en la base de datos:**
-> > >
-> > > ```text
-> > > carnet                     estudiante
-> > > +----+--------+            +-----------+----+--------+
-> > > | id | codigo |            | carnet_id | id | nombre |
-> > > +----+--------+            +-----------+----+--------+
-> > > |  1 | C-001  |  <───────  |         1 |  1 | Ana    |
-> > > +----+--------+            +-----------+----+--------+
-> > > ```
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL del guardado</summary>
-> > >
-> > > ```text
-> > > insert into carnet (codigo) values ('C-001');
-> > > insert into estudiante (carnet_id, nombre) values (1, 'Ana');   -- el carnet se guarda primero para tener su id
-> > > ```
+> > > > ```java
+> > > > ana.setCarnet(new CarnetEntity("C-001"));   // se asigna en el dueño
+> > > > estudiantes.save(ana);                       // cascade guarda también el carnet
+> > > > ```
+> > > >
+> > > > **Así queda en la base de datos:**
+> > > >
+> > > > ```text
+> > > > carnet                     estudiante
+> > > > +----+--------+            +-----------+----+--------+
+> > > > | id | codigo |            | carnet_id | id | nombre |
+> > > > +----+--------+            +-----------+----+--------+
+> > > > |  1 | C-001  |  <───────  |         1 |  1 | Ana    |
+> > > > +----+--------+            +-----------+----+--------+
+> > > > ```
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL del guardado</summary>
+> > > >
+> > > > ```text
+> > > > insert into carnet (codigo) values ('C-001');
+> > > > insert into estudiante (carnet_id, nombre) values (1, 'Ana');   -- el carnet se guarda primero para tener su id
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar datos** (en otra transacción)
+> > > <details open>
+> > > <summary><strong>2️⃣ Consultar datos (en otra transacción)</strong></summary>
 > > >
-> > > | Pregunta | Código | Resultado |
-> > > |---|---|---|
-> > > | ¿Cuál es el carnet de Ana? | `ana.getCarnet().getCodigo()` | **C-001** |
-> > > | ¿De quién es el carnet C-001? | `carnet.getEstudiante().getNombre()` | **Ana** |
-> > >
-> > > > 💡 **Las dos preguntas se resuelven navegando.** Como `CarnetEntity` ahora tiene el atributo `estudiante`, no hace falta escribir ningún método en el repositorio.
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL de las consultas</summary>
-> > >
-> > > ```text
-> > > ana.getCarnet().getCodigo()
-> > >   select id, codigo from carnet where id = 1
-> > >   fila: (1, 'C-001')
-> > >
-> > > carnet.getEstudiante().getNombre()
-> > >   select e.id, e.carnet_id, e.nombre from estudiante e where e.carnet_id = 1     -- 1 = id del carnet
-> > >   fila: (1, 1, 'Ana')
-> > > ```
+> > > > | Pregunta | Código | Resultado |
+> > > > |---|---|---|
+> > > > | ¿Cuál es el carnet de Ana? | `ana.getCarnet().getCodigo()` | **C-001** |
+> > > > | ¿De quién es el carnet C-001? | `carnet.getEstudiante().getNombre()` | **Ana** |
+> > > >
+> > > > > 💡 **Las dos preguntas se resuelven navegando.** Como `CarnetEntity` ahora tiene el atributo `estudiante`, no hace falta escribir ningún método en el repositorio.
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL de las consultas</summary>
+> > > >
+> > > > ```text
+> > > > ana.getCarnet().getCodigo()
+> > > >   select id, codigo from carnet where id = 1
+> > > >   fila: (1, 'C-001')
+> > > >
+> > > > carnet.getEstudiante().getNombre()
+> > > >   select e.id, e.carnet_id, e.nombre from estudiante e where e.carnet_id = 1     -- 1 = id del carnet
+> > > >   fila: (1, 1, 'Ana')
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > >
@@ -459,72 +471,78 @@
 > > <details open>
 > > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Guardar datos**
+> > > <details open>
+> > > <summary><strong>1️⃣ Guardar datos</strong></summary>
 > > >
-> > > ```java
-> > > marta.getCursos().add(java);
-> > > marta.getCursos().add(spring);
-> > > docentes.save(marta);      // guarda a Marta y, por cascade, sus cursos
-> > > ```
-> > >
-> > > **Así queda en la base de datos:**
-> > >
-> > > ```text
-> > > docente                 curso
-> > > +----+--------+         +------------+----+--------+
-> > > | id | nombre |         | docente_id | id | nombre |
-> > > +----+--------+         +------------+----+--------+
-> > > |  1 | Marta  |  <────  |          1 |  1 | Java   |
-> > > +----+--------+         |          1 |  2 | Spring |
-> > >                         +------------+----+--------+
-> > > ```
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL del guardado</summary>
-> > >
-> > > ```text
-> > > insert into docente (nombre) values ('Marta');
-> > > insert into curso (nombre) values ('Java');            -- el curso entra SIN docente_id
-> > > insert into curso (nombre) values ('Spring');
-> > > update curso set docente_id = 1 where id = 1;          -- Hibernate completa la clave después
-> > > update curso set docente_id = 1 where id = 2;
-> > > ```
+> > > > ```java
+> > > > marta.getCursos().add(java);
+> > > > marta.getCursos().add(spring);
+> > > > docentes.save(marta);      // guarda a Marta y, por cascade, sus cursos
+> > > > ```
+> > > >
+> > > > **Así queda en la base de datos:**
+> > > >
+> > > > ```text
+> > > > docente                 curso
+> > > > +----+--------+         +------------+----+--------+
+> > > > | id | nombre |         | docente_id | id | nombre |
+> > > > +----+--------+         +------------+----+--------+
+> > > > |  1 | Marta  |  <────  |          1 |  1 | Java   |
+> > > > +----+--------+         |          1 |  2 | Spring |
+> > > >                         +------------+----+--------+
+> > > > ```
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL del guardado</summary>
+> > > >
+> > > > ```text
+> > > > insert into docente (nombre) values ('Marta');
+> > > > insert into curso (nombre) values ('Java');            -- el curso entra SIN docente_id
+> > > > insert into curso (nombre) values ('Spring');
+> > > > update curso set docente_id = 1 where id = 1;          -- Hibernate completa la clave después
+> > > > update curso set docente_id = 1 where id = 2;
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar datos** (en otra transacción)
+> > > <details open>
+> > > <summary><strong>2️⃣ Consultar datos (en otra transacción)</strong></summary>
 > > >
-> > > | Pregunta | Código | Resultado |
-> > > |---|---|---|
-> > > | ¿Qué cursos dicta Marta? | `marta.getCursos()` | **[Java, Spring]** |
-> > > | ¿Quién dicta Java? | `docentes.findByCursosNombre("Java")` | **Marta** |
-> > >
-> > > > 💡 **La primera pregunta se resuelve navegando**: el docente tiene el atributo `cursos`.
+> > > > | Pregunta | Código | Resultado |
+> > > > |---|---|---|
+> > > > | ¿Qué cursos dicta Marta? | `marta.getCursos()` | **[Java, Spring]** |
+> > > > | ¿Quién dicta Java? | `docentes.findByCursosNombre("Java")` | **Marta** |
 > > > >
-> > > > **La segunda no se puede navegar**: en un sentido `CursoEntity` no tiene el atributo `docente`. Por eso se **le pregunta al repositorio**.
-> > >
-> > > El método se declara en la interfaz del repositorio y **Spring Data lo implementa solo**, leyendo el nombre:
-> > >
-> > > ```java
-> > > List<DocenteEntity> findByCursosNombre(String nombre);   // docente.cursos.nombre = ?
-> > > ```
-> > >
-> > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del docente) **Nombre** (tengan este nombre). O sea: «buscame los docentes que dicten un curso con este nombre».
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL de las consultas</summary>
-> > >
-> > > ```text
-> > > marta.getCursos()
-> > >   select docente_id, id, nombre from curso where docente_id = 1
-> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
-> > >
-> > > docentes.findByCursosNombre("Java")
-> > >   select d.id, d.nombre
-> > >   from docente d left join curso c on d.id = c.docente_id
-> > >   where c.nombre = 'Java'
-> > >   fila: (1, 'Marta')
-> > > ```
+> > > > > 💡 **La primera pregunta se resuelve navegando**: el docente tiene el atributo `cursos`.
+> > > > >
+> > > > > **La segunda no se puede navegar**: en un sentido `CursoEntity` no tiene el atributo `docente`. Por eso se **le pregunta al repositorio**.
+> > > >
+> > > > El método se declara en la interfaz del repositorio y **Spring Data lo implementa solo**, leyendo el nombre:
+> > > >
+> > > > ```java
+> > > > List<DocenteEntity> findByCursosNombre(String nombre);   // docente.cursos.nombre = ?
+> > > > ```
+> > > >
+> > > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del docente) **Nombre** (tengan este nombre). O sea: «buscame los docentes que dicten un curso con este nombre».
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL de las consultas</summary>
+> > > >
+> > > > ```text
+> > > > marta.getCursos()
+> > > >   select docente_id, id, nombre from curso where docente_id = 1
+> > > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > > >
+> > > > docentes.findByCursosNombre("Java")
+> > > >   select d.id, d.nombre
+> > > >   from docente d left join curso c on d.id = c.docente_id
+> > > >   where c.nombre = 'Java'
+> > > >   fila: (1, 'Marta')
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > >
@@ -614,61 +632,67 @@
 > > <details open>
 > > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Guardar datos**
+> > > <details open>
+> > > <summary><strong>1️⃣ Guardar datos</strong></summary>
 > > >
-> > > ```java
-> > > marta = docentes.save(new DocenteEntity("Marta"));
-> > > marta.agregarCurso(java);      // sincroniza los dos lados: curso.docente = marta
-> > > marta.agregarCurso(spring);
-> > > cursos.save(java);             // el dueño es el curso: se guarda cada curso
-> > > cursos.save(spring);
-> > > ```
-> > >
-> > > **Así queda en la base de datos:**
-> > >
-> > > ```text
-> > > docente                 curso
-> > > +----+--------+         +------------+----+--------+
-> > > | id | nombre |         | docente_id | id | nombre |
-> > > +----+--------+         +------------+----+--------+
-> > > |  1 | Marta  |  <────  |          1 |  1 | Java   |
-> > > +----+--------+         |          1 |  2 | Spring |
-> > >                         +------------+----+--------+
-> > > ```
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL del guardado</summary>
-> > >
-> > > ```text
-> > > insert into docente (nombre) values ('Marta');
-> > > insert into curso (docente_id, nombre) values (1, 'Java');     -- el curso entra CON docente_id
-> > > insert into curso (docente_id, nombre) values (1, 'Spring');   -- sin update extra
-> > > ```
+> > > > ```java
+> > > > marta = docentes.save(new DocenteEntity("Marta"));
+> > > > marta.agregarCurso(java);      // sincroniza los dos lados: curso.docente = marta
+> > > > marta.agregarCurso(spring);
+> > > > cursos.save(java);             // el dueño es el curso: se guarda cada curso
+> > > > cursos.save(spring);
+> > > > ```
+> > > >
+> > > > **Así queda en la base de datos:**
+> > > >
+> > > > ```text
+> > > > docente                 curso
+> > > > +----+--------+         +------------+----+--------+
+> > > > | id | nombre |         | docente_id | id | nombre |
+> > > > +----+--------+         +------------+----+--------+
+> > > > |  1 | Marta  |  <────  |          1 |  1 | Java   |
+> > > > +----+--------+         |          1 |  2 | Spring |
+> > > >                         +------------+----+--------+
+> > > > ```
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL del guardado</summary>
+> > > >
+> > > > ```text
+> > > > insert into docente (nombre) values ('Marta');
+> > > > insert into curso (docente_id, nombre) values (1, 'Java');     -- el curso entra CON docente_id
+> > > > insert into curso (docente_id, nombre) values (1, 'Spring');   -- sin update extra
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar datos** (en otra transacción)
+> > > <details open>
+> > > <summary><strong>2️⃣ Consultar datos (en otra transacción)</strong></summary>
 > > >
-> > > | Pregunta | Código | Resultado |
-> > > |---|---|---|
-> > > | ¿Qué cursos dicta Marta? | `marta.getCursos()` | **[Java, Spring]** |
-> > > | ¿Quién dicta Java? | `java.getDocente().getNombre()` | **Marta** |
-> > >
-> > > > 💡 **Las dos preguntas se resuelven navegando.** El docente tiene `cursos` y el curso tiene `docente`: no hace falta ningún método extra en el repositorio.
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL de las consultas</summary>
-> > >
-> > > ```text
-> > > marta.getCursos()
-> > >   select docente_id, id, nombre from curso where docente_id = 1
-> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
-> > >
-> > > java.getDocente().getNombre()
-> > >   select id, docente_id, nombre from curso                      -- el curso trae docente_id = 1
-> > >   select id, nombre from docente where id = 1                   -- si Marta aún no está cargada
-> > >   fila: (1, 'Marta')
-> > > ```
+> > > > | Pregunta | Código | Resultado |
+> > > > |---|---|---|
+> > > > | ¿Qué cursos dicta Marta? | `marta.getCursos()` | **[Java, Spring]** |
+> > > > | ¿Quién dicta Java? | `java.getDocente().getNombre()` | **Marta** |
+> > > >
+> > > > > 💡 **Las dos preguntas se resuelven navegando.** El docente tiene `cursos` y el curso tiene `docente`: no hace falta ningún método extra en el repositorio.
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL de las consultas</summary>
+> > > >
+> > > > ```text
+> > > > marta.getCursos()
+> > > >   select docente_id, id, nombre from curso where docente_id = 1
+> > > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > > >
+> > > > java.getDocente().getNombre()
+> > > >   select id, docente_id, nombre from curso                      -- el curso trae docente_id = 1
+> > > >   select id, nombre from docente where id = 1                   -- si Marta aún no está cargada
+> > > >   fila: (1, 'Marta')
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > >
@@ -805,78 +829,84 @@
 > > <details open>
 > > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Guardar datos**
+> > > <details open>
+> > > <summary><strong>1️⃣ Guardar datos</strong></summary>
 > > >
-> > > ```java
-> > > ana.getCursos().add(java);     // se agrega en el dueño
-> > > ana.getCursos().add(spring);
-> > > luis.getCursos().add(java);
-> > > estudiantes.save(ana);
-> > > estudiantes.save(luis);
-> > > ```
-> > >
-> > > **Así queda en la base de datos:**
-> > >
-> > > ```text
-> > > estudiante          estudiante_curso (tabla intermedia)        curso
-> > > +----+--------+     +---------------+----------+               +----+--------+
-> > > | id | nombre |     | estudiante_id | curso_id |               | id | nombre |
-> > > +----+--------+     +---------------+----------+               +----+--------+
-> > > |  1 | Ana    | <── |             1 |        1 | ──>           |  1 | Java   |
-> > > |  2 | Luis   | <── |             1 |        2 | ──>           |  2 | Spring |
-> > > +----+--------+     |             2 |        1 |               +----+--------+
-> > >                     +---------------+----------+
-> > > (solo se muestran las columnas de esta relación)
-> > > ```
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL del guardado</summary>
-> > >
-> > > ```text
-> > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
-> > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 2);
-> > > insert into estudiante_curso (estudiante_id, curso_id) values (2, 1);
-> > > ```
+> > > > ```java
+> > > > ana.getCursos().add(java);     // se agrega en el dueño
+> > > > ana.getCursos().add(spring);
+> > > > luis.getCursos().add(java);
+> > > > estudiantes.save(ana);
+> > > > estudiantes.save(luis);
+> > > > ```
+> > > >
+> > > > **Así queda en la base de datos:**
+> > > >
+> > > > ```text
+> > > > estudiante          estudiante_curso (tabla intermedia)        curso
+> > > > +----+--------+     +---------------+----------+               +----+--------+
+> > > > | id | nombre |     | estudiante_id | curso_id |               | id | nombre |
+> > > > +----+--------+     +---------------+----------+               +----+--------+
+> > > > |  1 | Ana    | <── |             1 |        1 | ──>           |  1 | Java   |
+> > > > |  2 | Luis   | <── |             1 |        2 | ──>           |  2 | Spring |
+> > > > +----+--------+     |             2 |        1 |               +----+--------+
+> > > >                     +---------------+----------+
+> > > > (solo se muestran las columnas de esta relación)
+> > > > ```
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL del guardado</summary>
+> > > >
+> > > > ```text
+> > > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
+> > > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 2);
+> > > > insert into estudiante_curso (estudiante_id, curso_id) values (2, 1);
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar datos** (en otra transacción)
+> > > <details open>
+> > > <summary><strong>2️⃣ Consultar datos (en otra transacción)</strong></summary>
 > > >
-> > > | Pregunta | Código | Resultado |
-> > > |---|---|---|
-> > > | ¿Qué cursos tiene Ana? | `ana.getCursos()` | **[Java, Spring]** |
-> > > | ¿Qué estudiantes tiene Java? | `estudiantes.findByCursosNombre("Java")` | **[Ana, Luis]** |
-> > >
-> > > > 💡 **La primera pregunta se resuelve navegando**: el estudiante tiene el atributo `cursos`.
+> > > > | Pregunta | Código | Resultado |
+> > > > |---|---|---|
+> > > > | ¿Qué cursos tiene Ana? | `ana.getCursos()` | **[Java, Spring]** |
+> > > > | ¿Qué estudiantes tiene Java? | `estudiantes.findByCursosNombre("Java")` | **[Ana, Luis]** |
 > > > >
-> > > > **La segunda no se puede navegar**: en un sentido `CursoEntity` no tiene el atributo `estudiantes`. Por eso se **le pregunta al repositorio**.
-> > >
-> > > El método se declara en la interfaz del repositorio y **Spring Data lo implementa solo**, leyendo el nombre:
-> > >
-> > > ```java
-> > > List<EstudianteEntity> findByCursosNombre(String nombre);   // estudiante.cursos.nombre = ?
-> > > ```
-> > >
-> > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del estudiante) **Nombre** (tengan este nombre). O sea: «buscame los estudiantes que cursen un curso con este nombre».
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL de las consultas</summary>
-> > >
-> > > ```text
-> > > ana.getCursos()
-> > >   select ec.estudiante_id, c.id, c.nombre
-> > >   from estudiante_curso ec join curso c on c.id = ec.curso_id
-> > >   where ec.estudiante_id = 1
-> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
-> > >
-> > > estudiantes.findByCursosNombre("Java")
-> > >   select e.id, e.carnet_id, e.nombre
-> > >   from estudiante e
-> > >   left join estudiante_curso ec on e.id = ec.estudiante_id
-> > >   left join curso c on c.id = ec.curso_id
-> > >   where c.nombre = 'Java'
-> > >   filas: (1, NULL, 'Ana'), (2, NULL, 'Luis')
-> > > ```
+> > > > > 💡 **La primera pregunta se resuelve navegando**: el estudiante tiene el atributo `cursos`.
+> > > > >
+> > > > > **La segunda no se puede navegar**: en un sentido `CursoEntity` no tiene el atributo `estudiantes`. Por eso se **le pregunta al repositorio**.
+> > > >
+> > > > El método se declara en la interfaz del repositorio y **Spring Data lo implementa solo**, leyendo el nombre:
+> > > >
+> > > > ```java
+> > > > List<EstudianteEntity> findByCursosNombre(String nombre);   // estudiante.cursos.nombre = ?
+> > > > ```
+> > > >
+> > > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del estudiante) **Nombre** (tengan este nombre). O sea: «buscame los estudiantes que cursen un curso con este nombre».
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL de las consultas</summary>
+> > > >
+> > > > ```text
+> > > > ana.getCursos()
+> > > >   select ec.estudiante_id, c.id, c.nombre
+> > > >   from estudiante_curso ec join curso c on c.id = ec.curso_id
+> > > >   where ec.estudiante_id = 1
+> > > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > > >
+> > > > estudiantes.findByCursosNombre("Java")
+> > > >   select e.id, e.carnet_id, e.nombre
+> > > >   from estudiante e
+> > > >   left join estudiante_curso ec on e.id = ec.estudiante_id
+> > > >   left join curso c on c.id = ec.curso_id
+> > > >   where c.nombre = 'Java'
+> > > >   filas: (1, NULL, 'Ana'), (2, NULL, 'Luis')
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > >
@@ -928,66 +958,72 @@
 > > <details open>
 > > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Guardar datos**
+> > > <details open>
+> > > <summary><strong>1️⃣ Guardar datos</strong></summary>
 > > >
-> > > ```java
-> > > ana.getCursos().add(java);     // se registra igual: en el dueño
-> > > ana.getCursos().add(spring);
-> > > luis.getCursos().add(java);
-> > > estudiantes.save(ana);
-> > > estudiantes.save(luis);
-> > > ```
-> > >
-> > > **Así queda en la base de datos:**
-> > >
-> > > ```text
-> > > estudiante          estudiante_curso (tabla intermedia)        curso
-> > > +----+--------+     +---------------+----------+               +----+--------+
-> > > | id | nombre |     | estudiante_id | curso_id |               | id | nombre |
-> > > +----+--------+     +---------------+----------+               +----+--------+
-> > > |  1 | Ana    | <── |             1 |        1 | ──>           |  1 | Java   |
-> > > |  2 | Luis   | <── |             1 |        2 | ──>           |  2 | Spring |
-> > > +----+--------+     |             2 |        1 |               +----+--------+
-> > >                     +---------------+----------+
-> > > (solo se muestran las columnas de esta relación)
-> > > ```
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL del guardado</summary>
-> > >
-> > > ```text
-> > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
-> > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 2);
-> > > insert into estudiante_curso (estudiante_id, curso_id) values (2, 1);
-> > > ```
+> > > > ```java
+> > > > ana.getCursos().add(java);     // se registra igual: en el dueño
+> > > > ana.getCursos().add(spring);
+> > > > luis.getCursos().add(java);
+> > > > estudiantes.save(ana);
+> > > > estudiantes.save(luis);
+> > > > ```
+> > > >
+> > > > **Así queda en la base de datos:**
+> > > >
+> > > > ```text
+> > > > estudiante          estudiante_curso (tabla intermedia)        curso
+> > > > +----+--------+     +---------------+----------+               +----+--------+
+> > > > | id | nombre |     | estudiante_id | curso_id |               | id | nombre |
+> > > > +----+--------+     +---------------+----------+               +----+--------+
+> > > > |  1 | Ana    | <── |             1 |        1 | ──>           |  1 | Java   |
+> > > > |  2 | Luis   | <── |             1 |        2 | ──>           |  2 | Spring |
+> > > > +----+--------+     |             2 |        1 |               +----+--------+
+> > > >                     +---------------+----------+
+> > > > (solo se muestran las columnas de esta relación)
+> > > > ```
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL del guardado</summary>
+> > > >
+> > > > ```text
+> > > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
+> > > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 2);
+> > > > insert into estudiante_curso (estudiante_id, curso_id) values (2, 1);
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar datos** (en otra transacción)
+> > > <details open>
+> > > <summary><strong>2️⃣ Consultar datos (en otra transacción)</strong></summary>
 > > >
-> > > | Pregunta | Código | Resultado |
-> > > |---|---|---|
-> > > | ¿Qué cursos tiene Ana? | `ana.getCursos()` | **[Java, Spring]** |
-> > > | ¿Qué estudiantes tiene Java? | `java.getEstudiantes()` | **[Ana, Luis]** |
-> > >
-> > > > 💡 **Las dos preguntas se resuelven navegando.** El estudiante tiene `cursos` y el curso tiene `estudiantes`: no hace falta ningún método extra en el repositorio.
-> > >
-> > > <details>
-> > > <summary>🔬 Ver el SQL de las consultas</summary>
-> > >
-> > > ```text
-> > > ana.getCursos()
-> > >   select ec.estudiante_id, c.id, c.nombre
-> > >   from estudiante_curso ec join curso c on c.id = ec.curso_id
-> > >   where ec.estudiante_id = 1
-> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
-> > >
-> > > java.getEstudiantes()
-> > >   select ec.curso_id, e.id, e.nombre
-> > >   from estudiante_curso ec join estudiante e on e.id = ec.estudiante_id
-> > >   where ec.curso_id = 1
-> > >   filas: (1, 1, 'Ana'), (1, 2, 'Luis')
-> > > ```
+> > > > | Pregunta | Código | Resultado |
+> > > > |---|---|---|
+> > > > | ¿Qué cursos tiene Ana? | `ana.getCursos()` | **[Java, Spring]** |
+> > > > | ¿Qué estudiantes tiene Java? | `java.getEstudiantes()` | **[Ana, Luis]** |
+> > > >
+> > > > > 💡 **Las dos preguntas se resuelven navegando.** El estudiante tiene `cursos` y el curso tiene `estudiantes`: no hace falta ningún método extra en el repositorio.
+> > > >
+> > > > <details>
+> > > > <summary>🔬 Ver el SQL de las consultas</summary>
+> > > >
+> > > > ```text
+> > > > ana.getCursos()
+> > > >   select ec.estudiante_id, c.id, c.nombre
+> > > >   from estudiante_curso ec join curso c on c.id = ec.curso_id
+> > > >   where ec.estudiante_id = 1
+> > > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > > >
+> > > > java.getEstudiantes()
+> > > >   select ec.curso_id, e.id, e.nombre
+> > > >   from estudiante_curso ec join estudiante e on e.id = ec.estudiante_id
+> > > >   where ec.curso_id = 1
+> > > >   filas: (1, 1, 'Ana'), (1, 2, 'Luis')
+> > > > ```
+> > > >
+> > > > </details>
 > > >
 > > > </details>
 > >
