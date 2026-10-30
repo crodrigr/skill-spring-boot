@@ -82,102 +82,112 @@
 >
 > > Las flechas del diagrama no llevan punta porque la relación puede recorrerse en los dos sentidos; el atributo `estudiante` de `CarnetEntity` existe **solo** en el doble sentido.
 >
-> **Un sentido** — solo el estudiante conoce su carnet. Es el **dueño**: la clave foránea vive en su tabla. Clases completas:
+> <details open>
+> <summary><strong>➡️ Un sentido</strong></summary>
 >
-> ```java
-> package com.academia.persistence.entity;
+> > **Un sentido** — solo el estudiante conoce su carnet. Es el **dueño**: la clave foránea vive en su tabla. Clases completas:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "estudiante")
+> > @Data
+> > @NoArgsConstructor
+> > public class EstudianteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
+> >     @OneToOne(cascade = CascadeType.ALL)
+> >     @JoinColumn(name = "carnet_id")
+> >     private CarnetEntity carnet;
+> >
+> >     public EstudianteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "carnet")
+> > @Data
+> > @NoArgsConstructor
+> > public class CarnetEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String codigo;
+> >
+> >     public CarnetEntity(String codigo) {
+> >         this.codigo = codigo;
+> >     }
+> > }
+> > ```
+> >
+> > - `@JoinColumn` crea `estudiante.carnet_id` y marca al **dueño**.
+> > - `cascade = ALL`: al guardar el estudiante se guarda **también** su carnet (sin el `cascade` habría que guardar el carnet primero).
 >
-> import jakarta.persistence.*;
-> import lombok.Data;
-> import lombok.NoArgsConstructor;
+> </details>
 >
-> @Entity
-> @Table(name = "estudiante")
-> @Data
-> @NoArgsConstructor
-> public class EstudianteEntity {
+> <details open>
+> <summary><strong>↔️ Doble sentido</strong></summary>
 >
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
+> > **Doble sentido** — `EstudianteEntity` **no cambia**; se agrega, **opcional**, el lado inverso en el carnet. Clase completa:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
+> > import lombok.NoArgsConstructor;
+> > import lombok.ToString;
+> >
+> > @Entity
+> > @Table(name = "carnet")
+> > @Data
+> > @NoArgsConstructor
+> > public class CarnetEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String codigo;
+> >
+> >     // Lado INVERSO (opcional): no crea columnas
+> >     @OneToOne(mappedBy = "carnet")
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
+> >     private EstudianteEntity estudiante;
+> >
+> >     public CarnetEntity(String codigo) {
+> >         this.codigo = codigo;
+> >     }
+> > }
+> > ```
+> >
+> > - `mappedBy = "carnet"` = «la clave la maneja el atributo `carnet` de `EstudianteEntity`». **No crea columnas.**
 >
->     private String nombre;
->
->     // Lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
->     @OneToOne(cascade = CascadeType.ALL)
->     @JoinColumn(name = "carnet_id")
->     private CarnetEntity carnet;
->
->     public EstudianteEntity(String nombre) {
->         this.nombre = nombre;
->     }
-> }
-> ```
->
-> ```java
-> package com.academia.persistence.entity;
->
-> import jakarta.persistence.*;
-> import lombok.Data;
-> import lombok.NoArgsConstructor;
->
-> @Entity
-> @Table(name = "carnet")
-> @Data
-> @NoArgsConstructor
-> public class CarnetEntity {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private String codigo;
->
->     public CarnetEntity(String codigo) {
->         this.codigo = codigo;
->     }
-> }
-> ```
->
-> - `@JoinColumn` crea `estudiante.carnet_id` y marca al **dueño**.
-> - `cascade = ALL`: al guardar el estudiante se guarda **también** su carnet (sin el `cascade` habría que guardar el carnet primero).
->
-> **Doble sentido** — `EstudianteEntity` **no cambia**; se agrega, **opcional**, el lado inverso en el carnet. Clase completa:
->
-> ```java
-> package com.academia.persistence.entity;
->
-> import jakarta.persistence.*;
-> import lombok.Data;
-> import lombok.EqualsAndHashCode;
-> import lombok.NoArgsConstructor;
-> import lombok.ToString;
->
-> @Entity
-> @Table(name = "carnet")
-> @Data
-> @NoArgsConstructor
-> public class CarnetEntity {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private String codigo;
->
->     // Lado INVERSO (opcional): no crea columnas
->     @OneToOne(mappedBy = "carnet")
->     @ToString.Exclude
->     @EqualsAndHashCode.Exclude
->     private EstudianteEntity estudiante;
->
->     public CarnetEntity(String codigo) {
->         this.codigo = codigo;
->     }
-> }
-> ```
->
-> - `mappedBy = "carnet"` = «la clave la maneja el atributo `carnet` de `EstudianteEntity`». **No crea columnas.**
+> </details>
 >
 > <details open>
 > <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
@@ -237,105 +247,115 @@
 >
 > Aquí el **dueño es el lado «muchos»**: la clave foránea (`docente_id`) va en la tabla `curso`.
 >
-> **Un sentido** — solo el curso conoce a su docente (`@ManyToOne`). Clases completas:
+> <details open>
+> <summary><strong>➡️ Un sentido</strong></summary>
 >
-> ```java
-> package com.academia.persistence.entity;
+> > **Un sentido** — solo el curso conoce a su docente (`@ManyToOne`). Clases completas:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "curso")
+> > @Data
+> > @NoArgsConstructor
+> > public class CursoEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado DUEÑO: la clave foránea docente_id vive en la tabla curso (el lado «muchos»)
+> >     @ManyToOne
+> >     @JoinColumn(name = "docente_id")
+> >     private DocenteEntity docente;
+> >
+> >     public CursoEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "docente")
+> > @Data
+> > @NoArgsConstructor
+> > public class DocenteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     public DocenteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
 >
-> import jakarta.persistence.*;
-> import lombok.Data;
-> import lombok.NoArgsConstructor;
+> </details>
 >
-> @Entity
-> @Table(name = "curso")
-> @Data
-> @NoArgsConstructor
-> public class CursoEntity {
+> <details open>
+> <summary><strong>↔️ Doble sentido</strong></summary>
 >
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
+> > **Doble sentido** — `CursoEntity` **no cambia**; el docente también ve su lista de cursos (`@OneToMany`, lado **inverso**). Clase completa:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import java.util.ArrayList;
+> > import java.util.List;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
+> > import lombok.NoArgsConstructor;
+> > import lombok.ToString;
+> >
+> > @Entity
+> > @Table(name = "docente")
+> > @Data
+> > @NoArgsConstructor
+> > public class DocenteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado INVERSO (opcional): no crea columnas
+> >     @OneToMany(mappedBy = "docente")
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
+> >     private List<CursoEntity> cursos = new ArrayList<>();
+> >
+> >     public DocenteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> >
+> >     // Mantiene sincronizados los dos lados
+> >     public void agregarCurso(CursoEntity curso) {
+> >         cursos.add(curso);
+> >         curso.setDocente(this);
+> >     }
+> > }
+> > ```
 >
->     private String nombre;
->
->     // Lado DUEÑO: la clave foránea docente_id vive en la tabla curso (el lado «muchos»)
->     @ManyToOne
->     @JoinColumn(name = "docente_id")
->     private DocenteEntity docente;
->
->     public CursoEntity(String nombre) {
->         this.nombre = nombre;
->     }
-> }
-> ```
->
-> ```java
-> package com.academia.persistence.entity;
->
-> import jakarta.persistence.*;
-> import lombok.Data;
-> import lombok.NoArgsConstructor;
->
-> @Entity
-> @Table(name = "docente")
-> @Data
-> @NoArgsConstructor
-> public class DocenteEntity {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private String nombre;
->
->     public DocenteEntity(String nombre) {
->         this.nombre = nombre;
->     }
-> }
-> ```
->
-> **Doble sentido** — `CursoEntity` **no cambia**; el docente también ve su lista de cursos (`@OneToMany`, lado **inverso**). Clase completa:
->
-> ```java
-> package com.academia.persistence.entity;
->
-> import jakarta.persistence.*;
-> import java.util.ArrayList;
-> import java.util.List;
-> import lombok.Data;
-> import lombok.EqualsAndHashCode;
-> import lombok.NoArgsConstructor;
-> import lombok.ToString;
->
-> @Entity
-> @Table(name = "docente")
-> @Data
-> @NoArgsConstructor
-> public class DocenteEntity {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private String nombre;
->
->     // Lado INVERSO (opcional): no crea columnas
->     @OneToMany(mappedBy = "docente")
->     @ToString.Exclude
->     @EqualsAndHashCode.Exclude
->     private List<CursoEntity> cursos = new ArrayList<>();
->
->     public DocenteEntity(String nombre) {
->         this.nombre = nombre;
->     }
->
->     // Mantiene sincronizados los dos lados
->     public void agregarCurso(CursoEntity curso) {
->         cursos.add(curso);
->         curso.setDocente(this);
->     }
-> }
-> ```
+> </details>
 >
 > <details open>
 > <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
@@ -395,106 +415,116 @@
 >
 > Ningún lado puede guardar la clave en su propia tabla: hace falta una **tabla intermedia** con las dos claves foráneas. JPA la crea por vos.
 >
-> **Un sentido** — solo el estudiante conoce sus cursos. Es el **dueño** (`@JoinTable`). Clases completas:
+> <details open>
+> <summary><strong>➡️ Un sentido</strong></summary>
 >
-> ```java
-> package com.academia.persistence.entity;
+> > **Un sentido** — solo el estudiante conoce sus cursos. Es el **dueño** (`@JoinTable`). Clases completas:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import java.util.HashSet;
+> > import java.util.Set;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "estudiante")
+> > @Data
+> > @NoArgsConstructor
+> > public class EstudianteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado DUEÑO: JPA crea la tabla intermedia estudiante_curso
+> >     @ManyToMany
+> >     @JoinTable(name = "estudiante_curso",
+> >             joinColumns = @JoinColumn(name = "estudiante_id"),
+> >             inverseJoinColumns = @JoinColumn(name = "curso_id"))
+> >     private Set<CursoEntity> cursos = new HashSet<>();
+> >
+> >     public EstudianteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "curso")
+> > @Data
+> > @NoArgsConstructor
+> > public class CursoEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     public CursoEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > - `name`: nombre de la tabla intermedia. `joinColumns`: la columna que apunta a **este** lado (`estudiante_id`). `inverseJoinColumns`: la que apunta al **otro** (`curso_id`).
+> > - Se usa un `Set`: un curso **no puede repetirse** para el mismo estudiante.
 >
-> import jakarta.persistence.*;
-> import java.util.HashSet;
-> import java.util.Set;
-> import lombok.Data;
-> import lombok.NoArgsConstructor;
+> </details>
 >
-> @Entity
-> @Table(name = "estudiante")
-> @Data
-> @NoArgsConstructor
-> public class EstudianteEntity {
+> <details open>
+> <summary><strong>↔️ Doble sentido</strong></summary>
 >
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
+> > **Doble sentido** — `EstudianteEntity` **no cambia**; el curso también ve a sus estudiantes (lado **inverso**, sin repetir la tabla). Clase completa:
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import java.util.HashSet;
+> > import java.util.Set;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
+> > import lombok.NoArgsConstructor;
+> > import lombok.ToString;
+> >
+> > @Entity
+> > @Table(name = "curso")
+> > @Data
+> > @NoArgsConstructor
+> > public class CursoEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado INVERSO (opcional): la tabla intermedia ya la define EstudianteEntity.cursos
+> >     @ManyToMany(mappedBy = "cursos")
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
+> >     private Set<EstudianteEntity> estudiantes = new HashSet<>();
+> >
+> >     public CursoEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
 >
->     private String nombre;
->
->     // Lado DUEÑO: JPA crea la tabla intermedia estudiante_curso
->     @ManyToMany
->     @JoinTable(name = "estudiante_curso",
->             joinColumns = @JoinColumn(name = "estudiante_id"),
->             inverseJoinColumns = @JoinColumn(name = "curso_id"))
->     private Set<CursoEntity> cursos = new HashSet<>();
->
->     public EstudianteEntity(String nombre) {
->         this.nombre = nombre;
->     }
-> }
-> ```
->
-> ```java
-> package com.academia.persistence.entity;
->
-> import jakarta.persistence.*;
-> import lombok.Data;
-> import lombok.NoArgsConstructor;
->
-> @Entity
-> @Table(name = "curso")
-> @Data
-> @NoArgsConstructor
-> public class CursoEntity {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private String nombre;
->
->     public CursoEntity(String nombre) {
->         this.nombre = nombre;
->     }
-> }
-> ```
->
-> - `name`: nombre de la tabla intermedia. `joinColumns`: la columna que apunta a **este** lado (`estudiante_id`). `inverseJoinColumns`: la que apunta al **otro** (`curso_id`).
-> - Se usa un `Set`: un curso **no puede repetirse** para el mismo estudiante.
->
-> **Doble sentido** — `EstudianteEntity` **no cambia**; el curso también ve a sus estudiantes (lado **inverso**, sin repetir la tabla). Clase completa:
->
-> ```java
-> package com.academia.persistence.entity;
->
-> import jakarta.persistence.*;
-> import java.util.HashSet;
-> import java.util.Set;
-> import lombok.Data;
-> import lombok.EqualsAndHashCode;
-> import lombok.NoArgsConstructor;
-> import lombok.ToString;
->
-> @Entity
-> @Table(name = "curso")
-> @Data
-> @NoArgsConstructor
-> public class CursoEntity {
->
->     @Id
->     @GeneratedValue(strategy = GenerationType.IDENTITY)
->     private Long id;
->
->     private String nombre;
->
->     // Lado INVERSO (opcional): la tabla intermedia ya la define EstudianteEntity.cursos
->     @ManyToMany(mappedBy = "cursos")
->     @ToString.Exclude
->     @EqualsAndHashCode.Exclude
->     private Set<EstudianteEntity> estudiantes = new HashSet<>();
->
->     public CursoEntity(String nombre) {
->         this.nombre = nombre;
->     }
-> }
-> ```
+> </details>
 >
 > <details open>
 > <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
