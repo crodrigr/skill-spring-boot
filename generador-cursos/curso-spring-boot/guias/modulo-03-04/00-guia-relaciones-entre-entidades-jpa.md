@@ -41,28 +41,7 @@
 <details open>
 <summary><strong>🗺️ El ejemplo: la academia</strong></summary>
 
-> Se usan cuatro entidades del mundo de la [guía del taller](01-guia-taller-gestion-de-cursos-con-bd.md), todas en `persistence.entity` (solo entidades: sin servicios ni API).
->
-> ```mermaid
-> classDiagram
->     direction TB
->     class EstudianteEntity {
->         <<Entity>>
->     }
->     class CarnetEntity {
->         <<Entity>>
->     }
->     class DocenteEntity {
->         <<Entity>>
->     }
->     class CursoEntity {
->         <<Entity>>
->     }
->
->     EstudianteEntity "1" -- "1" CarnetEntity : carnet
->     DocenteEntity "1" -- "*" CursoEntity : cursos / docente
->     EstudianteEntity "*" -- "*" CursoEntity : cursos / estudiantes
-> ```
+> Se usan cuatro entidades del mundo de la [guía del taller](01-guia-taller-gestion-de-cursos-con-bd.md), todas en `persistence.entity` (solo entidades: sin servicios ni API). Cada relación trae su **diagrama** y las **clases completas**.
 >
 > | Relación | Ejemplo | Lado **dueño** (tiene la clave) | Qué crea en MySQL |
 > |---|---|---|---|
@@ -77,24 +56,121 @@
 <details open>
 <summary><strong>1️⃣ Uno a uno — Estudiante y Carnet</strong></summary>
 
-> **Un sentido** — solo el estudiante conoce su carnet. Es el **dueño**: la clave foránea vive en su tabla.
+> ```mermaid
+> classDiagram
+>     direction LR
+>     class EstudianteEntity {
+>         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -CarnetEntity carnet
+>     }
+>     class CarnetEntity {
+>         <<Entity>>
+>         -Long id
+>         -String codigo
+>         -EstudianteEntity estudiante
+>     }
+>     EstudianteEntity "1" -- "1" CarnetEntity : carnet_id
+> ```
+>
+> > Las flechas del diagrama no llevan punta porque la relación puede recorrerse en los dos sentidos; el atributo `estudiante` de `CarnetEntity` existe **solo** en el doble sentido.
+>
+> **Un sentido** — solo el estudiante conoce su carnet. Es el **dueño**: la clave foránea vive en su tabla. Clases completas:
 >
 > ```java
-> // EstudianteEntity
-> @OneToOne(cascade = CascadeType.ALL)
-> @JoinColumn(name = "carnet_id")
-> private CarnetEntity carnet;
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "estudiante")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class EstudianteEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     // Lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
+>     @OneToOne(cascade = CascadeType.ALL)
+>     @JoinColumn(name = "carnet_id")
+>     private CarnetEntity carnet;
+>
+>     public EstudianteEntity(String nombre) {
+>         this.nombre = nombre;
+>     }
+> }
+> ```
+>
+> ```java
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "carnet")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class CarnetEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String codigo;
+>
+>     public CarnetEntity(String codigo) {
+>         this.codigo = codigo;
+>     }
+> }
 > ```
 >
 > - `@JoinColumn` crea `estudiante.carnet_id` y marca al **dueño**.
 > - `cascade = ALL`: al guardar el estudiante se guarda **también** su carnet (sin el `cascade` habría que guardar el carnet primero).
 >
-> **Doble sentido** — se agrega, **opcional**, el lado inverso en el carnet:
+> **Doble sentido** — `EstudianteEntity` **no cambia**; se agrega, **opcional**, el lado inverso en el carnet. Clase completa:
 >
 > ```java
-> // CarnetEntity
-> @OneToOne(mappedBy = "carnet")
-> private EstudianteEntity estudiante;
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "carnet")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class CarnetEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String codigo;
+>
+>     // Lado INVERSO (opcional): no crea columnas
+>     @OneToOne(mappedBy = "carnet")
+>     private EstudianteEntity estudiante;
+>
+>     public CarnetEntity(String codigo) {
+>         this.codigo = codigo;
+>     }
+> }
 > ```
 >
 > - `mappedBy = "carnet"` = «la clave la maneja el atributo `carnet` de `EstudianteEntity`». **No crea columnas.**
@@ -115,23 +191,128 @@
 <details open>
 <summary><strong>2️⃣ Uno a muchos — Docente y Curso</strong></summary>
 
-> Aquí el **dueño es el lado «muchos»**: la clave foránea (`docente_id`) va en la tabla `curso`.
->
-> **Un sentido** — solo el curso conoce a su docente (`@ManyToOne`):
->
-> ```java
-> // CursoEntity
-> @ManyToOne
-> @JoinColumn(name = "docente_id")
-> private DocenteEntity docente;
+> ```mermaid
+> classDiagram
+>     direction LR
+>     class DocenteEntity {
+>         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -List~CursoEntity~ cursos
+>     }
+>     class CursoEntity {
+>         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -DocenteEntity docente
+>     }
+>     DocenteEntity "1" -- "*" CursoEntity : docente_id
 > ```
 >
-> **Doble sentido** — el docente también ve su lista de cursos (`@OneToMany`, lado **inverso**):
+> > El atributo `cursos` de `DocenteEntity` existe **solo** en el doble sentido.
+>
+> Aquí el **dueño es el lado «muchos»**: la clave foránea (`docente_id`) va en la tabla `curso`.
+>
+> **Un sentido** — solo el curso conoce a su docente (`@ManyToOne`). Clases completas:
 >
 > ```java
-> // DocenteEntity
-> @OneToMany(mappedBy = "docente")
-> private List<CursoEntity> cursos = new ArrayList<>();
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "curso")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class CursoEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     // Lado DUEÑO: la clave foránea docente_id vive en la tabla curso (el lado «muchos»)
+>     @ManyToOne
+>     @JoinColumn(name = "docente_id")
+>     private DocenteEntity docente;
+>
+>     public CursoEntity(String nombre) {
+>         this.nombre = nombre;
+>     }
+> }
+> ```
+>
+> ```java
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "docente")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class DocenteEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     public DocenteEntity(String nombre) {
+>         this.nombre = nombre;
+>     }
+> }
+> ```
+>
+> **Doble sentido** — `CursoEntity` **no cambia**; el docente también ve su lista de cursos (`@OneToMany`, lado **inverso**). Clase completa:
+>
+> ```java
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import java.util.ArrayList;
+> import java.util.List;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "docente")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class DocenteEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     // Lado INVERSO (opcional): no crea columnas
+>     @OneToMany(mappedBy = "docente")
+>     private List<CursoEntity> cursos = new ArrayList<>();
+>
+>     public DocenteEntity(String nombre) {
+>         this.nombre = nombre;
+>     }
+>
+>     // Mantiene sincronizados los dos lados
+>     public void agregarCurso(CursoEntity curso) {
+>         cursos.add(curso);
+>         curso.setDocente(this);
+>     }
+> }
 > ```
 >
 > **Lo que genera MySQL:**
@@ -142,42 +323,136 @@
 > alter table curso add constraint FK… foreign key (docente_id) references docente (id)
 > ```
 >
-> > ⚠️ **Se asigna del lado dueño.** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, mantené **los dos lados sincronizados** con un método en el docente:
-> >
-> > ```java
-> > public void agregarCurso(CursoEntity curso) {
-> >     cursos.add(curso);
-> >     curso.setDocente(this);
-> > }
-> > ```
+> > ⚠️ **Se asigna del lado dueño.** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, mantené **los dos lados sincronizados** con el método `agregarCurso` de `DocenteEntity` (ya incluido arriba).
 
 </details>
 
 <details open>
 <summary><strong>3️⃣ Muchos a muchos — Estudiante y Curso</strong></summary>
 
+> ```mermaid
+> classDiagram
+>     direction LR
+>     class EstudianteEntity {
+>         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -Set~CursoEntity~ cursos
+>     }
+>     class CursoEntity {
+>         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -Set~EstudianteEntity~ estudiantes
+>     }
+>     EstudianteEntity "*" -- "*" CursoEntity : estudiante_curso
+> ```
+>
+> > El atributo `estudiantes` de `CursoEntity` existe **solo** en el doble sentido.
+>
 > Ningún lado puede guardar la clave en su propia tabla: hace falta una **tabla intermedia** con las dos claves foráneas. JPA la crea por vos.
 >
-> **Un sentido** — solo el estudiante conoce sus cursos. Es el **dueño** (`@JoinTable`):
+> **Un sentido** — solo el estudiante conoce sus cursos. Es el **dueño** (`@JoinTable`). Clases completas:
 >
 > ```java
-> // EstudianteEntity
-> @ManyToMany
-> @JoinTable(name = "estudiante_curso",
->         joinColumns = @JoinColumn(name = "estudiante_id"),
->         inverseJoinColumns = @JoinColumn(name = "curso_id"))
-> private Set<CursoEntity> cursos = new HashSet<>();
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import java.util.HashSet;
+> import java.util.Set;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "estudiante")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class EstudianteEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     // Lado DUEÑO: JPA crea la tabla intermedia estudiante_curso
+>     @ManyToMany
+>     @JoinTable(name = "estudiante_curso",
+>             joinColumns = @JoinColumn(name = "estudiante_id"),
+>             inverseJoinColumns = @JoinColumn(name = "curso_id"))
+>     private Set<CursoEntity> cursos = new HashSet<>();
+>
+>     public EstudianteEntity(String nombre) {
+>         this.nombre = nombre;
+>     }
+> }
+> ```
+>
+> ```java
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "curso")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class CursoEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     public CursoEntity(String nombre) {
+>         this.nombre = nombre;
+>     }
+> }
 > ```
 >
 > - `name`: nombre de la tabla intermedia. `joinColumns`: la columna que apunta a **este** lado (`estudiante_id`). `inverseJoinColumns`: la que apunta al **otro** (`curso_id`).
 > - Se usa un `Set`: un curso **no puede repetirse** para el mismo estudiante.
 >
-> **Doble sentido** — el curso también ve a sus estudiantes (lado **inverso**, sin repetir la tabla):
+> **Doble sentido** — `EstudianteEntity` **no cambia**; el curso también ve a sus estudiantes (lado **inverso**, sin repetir la tabla). Clase completa:
 >
 > ```java
-> // CursoEntity
-> @ManyToMany(mappedBy = "cursos")
-> private Set<EstudianteEntity> estudiantes = new HashSet<>();
+> package com.academia.persistence.entity;
+>
+> import jakarta.persistence.*;
+> import java.util.HashSet;
+> import java.util.Set;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
+> import lombok.Setter;
+>
+> @Entity
+> @Table(name = "curso")
+> @Getter
+> @Setter
+> @NoArgsConstructor
+> public class CursoEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String nombre;
+>
+>     // Lado INVERSO (opcional): la tabla intermedia ya la define EstudianteEntity.cursos
+>     @ManyToMany(mappedBy = "cursos")
+>     private Set<EstudianteEntity> estudiantes = new HashSet<>();
+>
+>     public CursoEntity(String nombre) {
+>         this.nombre = nombre;
+>     }
+> }
 > ```
 >
 > **Lo que genera MySQL:**
