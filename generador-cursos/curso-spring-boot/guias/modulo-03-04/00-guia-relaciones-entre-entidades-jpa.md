@@ -648,6 +648,104 @@
 </details>
 
 <details open>
+<summary><strong>🔍 Registrar y consultar: un sentido y doble sentido</strong></summary>
+
+> Mismos datos (Ana con el carnet C-001, Luis, la docente Marta, los cursos Java y Spring), registrados y consultados **en un sentido** y **en doble sentido**. Se ejecutó contra MySQL 8.
+>
+> <details open>
+> <summary><strong>📝 Registrar los datos</strong></summary>
+>
+> > | | **Un sentido** | **Doble sentido** |
+> > |---|---|---|
+> > | 1:1 | `ana.setCarnet(new CarnetEntity("C-001"))` | igual: se asigna en el **dueño** (el estudiante) |
+> > | 1:N | `marta.getCursos().add(java)` y `docentes.save(marta)` (el `cascade` guarda los cursos) | `marta.agregarCurso(java)` y `cursos.save(java)` (el dueño es el curso) |
+> > | N:M | `ana.getCursos().add(java)` | igual: se agrega en el **dueño** (el estudiante) |
+> >
+> > ```java
+> > // ➡️ UN SENTIDO
+> > ana.setCarnet(new CarnetEntity("C-001"));
+> > marta.getCursos().add(java);
+> > marta.getCursos().add(spring);
+> > docentes.save(marta);                    // guarda a Marta y, por cascade, sus cursos
+> > ana.getCursos().add(java);
+> > ana.getCursos().add(spring);
+> > luis.getCursos().add(java);
+> > estudiantes.save(ana);
+> > estudiantes.save(luis);
+> > ```
+> >
+> > ```java
+> > // ↔️ DOBLE SENTIDO
+> > ana.setCarnet(new CarnetEntity("C-001"));
+> > marta = docentes.save(new DocenteEntity("Marta"));
+> > marta.agregarCurso(java);                // sincroniza los dos lados: curso.docente = marta
+> > marta.agregarCurso(spring);
+> > cursos.save(java);
+> > cursos.save(spring);
+> > ana.getCursos().add(java);
+> > ana.getCursos().add(spring);
+> > luis.getCursos().add(java);
+> > estudiantes.save(ana);
+> > estudiantes.save(luis);
+> > ```
+> >
+> > > 🔎 En doble sentido se **escribe igual**: siempre en el dueño. El lado inverso no cambia lo que se guarda.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>🔍 Consultar en los dos sentidos</strong></summary>
+>
+> > **Sentido del dueño** (el que tiene la clave): funciona **igual** en un sentido y en doble sentido, navegando por los atributos.
+> >
+> > **Sentido contrario** (desde el lado inverso): en **doble sentido** se navega directo; en **un sentido** no existe el atributo, y se necesita una **consulta en el repositorio**.
+> >
+> > | Pregunta | Un sentido | Doble sentido |
+> > |---|---|---|
+> > | ¿Cuál es el carnet de Ana? | `ana.getCarnet().getCodigo()` | `ana.getCarnet().getCodigo()` |
+> > | ¿De quién es el carnet C-001? | `estudiantes.findByCarnetCodigo("C-001")` | `carnet.getEstudiante().getNombre()` |
+> > | ¿Qué cursos dicta Marta? | `marta.getCursos()` | `marta.getCursos()` |
+> > | ¿Quién dicta Java? | `docentes.findByCursosNombre("Java")` | `java.getDocente().getNombre()` |
+> > | ¿Qué cursos tiene Ana? | `ana.getCursos()` | `ana.getCursos()` |
+> > | ¿Qué estudiantes tiene Java? | `estudiantes.findByCursosNombre("Java")` | `java.getEstudiantes()` |
+> >
+> > En un sentido, esas consultas son métodos derivados que se declaran en la interfaz del repositorio. Spring Data los implementa solo, a partir del nombre:
+> >
+> > ```java
+> > public interface EstudianteJpaRepository extends JpaRepository<EstudianteEntity, Long> {
+> >     List<EstudianteEntity> findByCarnetCodigo(String codigo);    // estudiante.carnet.codigo = ?
+> >     List<EstudianteEntity> findByCursosNombre(String nombre);    // estudiante.cursos.nombre = ?
+> > }
+> >
+> > public interface DocenteJpaRepository extends JpaRepository<DocenteEntity, Long> {
+> >     List<DocenteEntity> findByCursosNombre(String nombre);       // docente.cursos.nombre = ?
+> > }
+> > ```
+>
+> </details>
+>
+> <details open>
+> <summary><strong>📋 Resultado de las consultas</strong></summary>
+>
+> > Cada consulta se ejecutó en una transacción distinta de la que guardó los datos. **Resultado real**, idéntico en los dos sentidos:
+> >
+> > ```text
+> >                            UN SENTIDO                     DOBLE SENTIDO
+> > carnet de Ana          :   C-001                          C-001
+> > dueño del carnet C-001 :   Ana  (repositorio)             Ana  (carnet.getEstudiante())
+> > cursos de Marta        :   [Java, Spring]                 [Java, Spring]
+> > docente de Java        :   Marta  (repositorio)           Marta  (java.getDocente())
+> > cursos de Ana          :   [Java, Spring]                 [Java, Spring]
+> > estudiantes de Java    :   [Ana, Luis]  (repositorio)     [Ana, Luis]  (java.getEstudiantes())
+> > ```
+> >
+> > > 💡 **Conclusión:** la **respuesta es la misma**. Lo que cambia es **cómo llegás** desde el lado inverso: con una consulta del repositorio (un sentido) o navegando por el atributo (doble sentido). Si esa consulta inversa es ocasional, el repositorio alcanza y no hace falta el doble sentido.
+>
+> </details>
+>
+</details>
+
+<details open>
 <summary><strong>🧪 Probalo</strong></summary>
 
 > El proyecto de prueba tiene **solo tres dependencias**: Spring Data JPA, MySQL Driver y Lombok (sin Web: aquí no hay API). Con MySQL en `localhost:3306` (ver «Preparar MySQL» en la [guía 1 de la tienda](02-guia-tienda-1-crud-productos.md)):
