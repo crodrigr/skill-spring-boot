@@ -146,6 +146,20 @@
 > > - `cascade = ALL`: al guardar el estudiante se guarda **también** su carnet (sin el `cascade` habría que guardar el carnet primero).
 > >
 > > <details open>
+> > <summary><strong>🛠️ Al iniciar el servidor: lo que genera MySQL</strong></summary>
+> >
+> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=update`). Este es el SQL que genera:
+> >
+> > ```text
+> > create table carnet (id bigint not null auto_increment, codigo varchar(255), primary key (id))
+> > create table estudiante (carnet_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
+> > alter table estudiante add constraint UK… unique (carnet_id)                       ← esto lo hace «uno a uno»
+> > alter table estudiante add constraint FK… foreign key (carnet_id) references carnet (id)
+> > ```
+> >
+> > </details>
+> >
+> > <details open>
 > > <summary><strong>▶️ Registrar y consultar</strong></summary>
 > >
 > > > **1️⃣ Registrar**
@@ -255,6 +269,8 @@
 > >
 > > - `mappedBy = "carnet"` = «la clave la maneja el atributo `carnet` de `EstudianteEntity`». **No crea columnas.**
 > >
+> > 🔎 Las tablas son **las mismas** que en un sentido: el lado inverso no crea columnas ni tablas.
+> >
 > > <details open>
 > > <summary><strong>▶️ Registrar y consultar</strong></summary>
 > >
@@ -311,18 +327,6 @@
 > > > </details>
 > >
 > > </details>
-> </details>
->
-> <details open>
-> <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
->
-> > ```text
-> > create table carnet (id bigint not null auto_increment, codigo varchar(255), primary key (id))
-> > create table estudiante (carnet_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
-> > alter table estudiante add constraint UK… unique (carnet_id)                       ← esto lo hace «uno a uno»
-> > alter table estudiante add constraint FK… foreign key (carnet_id) references carnet (id)
-> > ```
->
 > </details>
 >
 > <details open>
@@ -438,6 +442,19 @@
 > > - `@OneToMany` + `@JoinColumn(name = "docente_id")`: la clave `docente_id` se crea en la tabla `curso`, aunque `CursoEntity` no tenga ese atributo. Como `@JoinColumn` está aquí, **el dueño es `DocenteEntity`**.
 > > - `cascade = ALL`: al guardar el docente se guardan también sus cursos.
 > > - Se comprobó en MySQL: Hibernate hace primero un `insert into curso` por cada curso y después un `update curso set docente_id=?` por cada uno. Es normal en esta variante.
+> >
+> > <details open>
+> > <summary><strong>🛠️ Al iniciar el servidor: lo que genera MySQL</strong></summary>
+> >
+> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=update`). Este es el SQL que genera:
+> >
+> > ```text
+> > create table docente (id bigint not null auto_increment, nombre varchar(255), primary key (id))
+> > create table curso (docente_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
+> > alter table curso add constraint FK… foreign key (docente_id) references docente (id)
+> > ```
+> >
+> > </details>
 > >
 > > <details open>
 > > <summary><strong>▶️ Registrar y consultar</strong></summary>
@@ -592,6 +609,8 @@
 > >
 > > > ⚠️ Al pasar a doble sentido **cambia el dueño**: hay que quitar `@JoinColumn` y `cascade` del `@OneToMany` y poner `mappedBy = "docente"`. Si los dos lados llevaran `@JoinColumn`, los dos intentarían escribir `docente_id`. Una ventaja: sin el `UPDATE` extra, el curso se guarda ya con su `docente_id`.
 > >
+> > 🔎 Las tablas son **las mismas** que en un sentido: el lado inverso no crea columnas ni tablas.
+> >
 > > <details open>
 > > <summary><strong>▶️ Registrar y consultar</strong></summary>
 > >
@@ -654,17 +673,6 @@
 > > > </details>
 > >
 > > </details>
-> </details>
->
-> <details open>
-> <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
->
-> > ```text
-> > create table docente (id bigint not null auto_increment, nombre varchar(255), primary key (id))
-> > create table curso (docente_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
-> > alter table curso add constraint FK… foreign key (docente_id) references docente (id)
-> > ```
->
 > </details>
 >
 > <details open>
@@ -780,6 +788,19 @@
 > >
 > > - `name`: nombre de la tabla intermedia. `joinColumns`: la columna que apunta a **este** lado (`estudiante_id`). `inverseJoinColumns`: la que apunta al **otro** (`curso_id`).
 > > - Se usa un `Set`: un curso **no puede repetirse** para el mismo estudiante.
+> >
+> > <details open>
+> > <summary><strong>🛠️ Al iniciar el servidor: lo que genera MySQL</strong></summary>
+> >
+> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=update`). Este es el SQL que genera:
+> >
+> > ```text
+> > create table estudiante_curso (curso_id bigint not null, estudiante_id bigint not null, primary key (curso_id, estudiante_id))
+> > alter table estudiante_curso add constraint FK… foreign key (curso_id)      references curso (id)
+> > alter table estudiante_curso add constraint FK… foreign key (estudiante_id) references estudiante (id)
+> > ```
+> >
+> > </details>
 > >
 > > <details open>
 > > <summary><strong>▶️ Registrar y consultar</strong></summary>
@@ -902,6 +923,8 @@
 > > }
 > > ```
 > >
+> > 🔎 Las tablas son **las mismas** que en un sentido: el lado inverso no crea columnas ni tablas.
+> >
 > > <details open>
 > > <summary><strong>▶️ Registrar y consultar</strong></summary>
 > >
@@ -969,17 +992,6 @@
 > > > </details>
 > >
 > > </details>
-> </details>
->
-> <details open>
-> <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
->
-> > ```text
-> > create table estudiante_curso (curso_id bigint not null, estudiante_id bigint not null, primary key (curso_id, estudiante_id))
-> > alter table estudiante_curso add constraint FK… foreign key (curso_id)      references curso (id)
-> > alter table estudiante_curso add constraint FK… foreign key (estudiante_id) references estudiante (id)
-> > ```
->
 > </details>
 >
 > <details open>
