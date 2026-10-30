@@ -199,7 +199,7 @@
 > > > > | Pregunta | Código | Resultado |
 > > > > |---|---|---|
 > > > > | ¿Cuál es el carnet de Ana? | `ana.getCarnet().getCodigo()` | **C-001** |
-> > > > | ¿De quién es el carnet C-001? | `estudiantes.findByCarnetCodigo("C-001")` | **Ana** |
+> > > > | ¿De quién es el carnet C-001? | `estudiantes.findByCarnetCodigo("C-001").orElseThrow().getNombre()` | **Ana** |
 > > > >
 > > > > > 💡 **La primera pregunta se resuelve navegando**: el estudiante tiene el atributo `carnet`.
 > > > > >
@@ -208,10 +208,12 @@
 > > > > El método se declara en la interfaz del repositorio y **Spring Data lo implementa solo**, leyendo el nombre:
 > > > >
 > > > > ```java
-> > > > List<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
+> > > > Optional<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
 > > > > ```
 > > > >
-> > > > Se lee así: **find** (buscar) **By** (donde) **Carnet** (el carnet del estudiante) **Codigo** (tenga este código). O sea: «buscame los estudiantes cuyo carnet tenga este código».
+> > > > Se lee así: **find** (buscar) **By** (donde) **Carnet** (el carnet del estudiante) **Codigo** (tenga este código). O sea: «buscame el estudiante cuyo carnet tenga este código».
+> > > >
+> > > > Devuelve un `Optional` porque en uno a uno hay **como máximo un** estudiante por carnet (puede que no exista ninguno). `orElseThrow()` entrega el estudiante o lanza un error si no lo encuentra.
 > > > >
 > > > > <details>
 > > > > <summary>🔬 Ver el SQL de las consultas</summary>
@@ -513,7 +515,7 @@
 > > > > | Pregunta | Código | Resultado |
 > > > > |---|---|---|
 > > > > | ¿Qué cursos dicta Marta? | `marta.getCursos()` | **[Java, Spring]** |
-> > > > | ¿Quién dicta Java? | `docentes.findByCursosNombre("Java")` | **Marta** |
+> > > > | ¿Quién dicta Java? | `docentes.findByCursosNombre("Java")` | **[Marta]** (una lista) |
 > > > >
 > > > > > 💡 **La primera pregunta se resuelve navegando**: el docente tiene el atributo `cursos`.
 > > > > >
@@ -873,7 +875,7 @@
 > > > > | Pregunta | Código | Resultado |
 > > > > |---|---|---|
 > > > > | ¿Qué cursos tiene Ana? | `ana.getCursos()` | **[Java, Spring]** |
-> > > > | ¿Qué estudiantes tiene Java? | `estudiantes.findByCursosNombre("Java")` | **[Ana, Luis]** |
+> > > > | ¿Qué estudiantes tiene Java? | `estudiantes.findByCursosNombre("Java")` | **[Ana, Luis]** (una lista) |
 > > > >
 > > > > > 💡 **La primera pregunta se resuelve navegando**: el estudiante tiene el atributo `cursos`.
 > > > > >
