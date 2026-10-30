@@ -88,14 +88,12 @@
 > package com.academia.persistence.entity;
 >
 > import jakarta.persistence.*;
-> import lombok.Getter;
+> import lombok.Data;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
 >
 > @Entity
 > @Table(name = "estudiante")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class EstudianteEntity {
 >
@@ -120,14 +118,12 @@
 > package com.academia.persistence.entity;
 >
 > import jakarta.persistence.*;
-> import lombok.Getter;
+> import lombok.Data;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
 >
 > @Entity
 > @Table(name = "carnet")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class CarnetEntity {
 >
@@ -152,14 +148,14 @@
 > package com.academia.persistence.entity;
 >
 > import jakarta.persistence.*;
-> import lombok.Getter;
+> import lombok.Data;
+> import lombok.EqualsAndHashCode;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
+> import lombok.ToString;
 >
 > @Entity
 > @Table(name = "carnet")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class CarnetEntity {
 >
@@ -171,6 +167,8 @@
 >
 >     // Lado INVERSO (opcional): no crea columnas
 >     @OneToOne(mappedBy = "carnet")
+>     @ToString.Exclude
+>     @EqualsAndHashCode.Exclude
 >     private EstudianteEntity estudiante;
 >
 >     public CarnetEntity(String codigo) {
@@ -245,14 +243,12 @@
 > package com.academia.persistence.entity;
 >
 > import jakarta.persistence.*;
-> import lombok.Getter;
+> import lombok.Data;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
 >
 > @Entity
 > @Table(name = "curso")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class CursoEntity {
 >
@@ -277,14 +273,12 @@
 > package com.academia.persistence.entity;
 >
 > import jakarta.persistence.*;
-> import lombok.Getter;
+> import lombok.Data;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
 >
 > @Entity
 > @Table(name = "docente")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class DocenteEntity {
 >
@@ -308,14 +302,14 @@
 > import jakarta.persistence.*;
 > import java.util.ArrayList;
 > import java.util.List;
-> import lombok.Getter;
+> import lombok.Data;
+> import lombok.EqualsAndHashCode;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
+> import lombok.ToString;
 >
 > @Entity
 > @Table(name = "docente")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class DocenteEntity {
 >
@@ -327,6 +321,8 @@
 >
 >     // Lado INVERSO (opcional): no crea columnas
 >     @OneToMany(mappedBy = "docente")
+>     @ToString.Exclude
+>     @EqualsAndHashCode.Exclude
 >     private List<CursoEntity> cursos = new ArrayList<>();
 >
 >     public DocenteEntity(String nombre) {
@@ -407,14 +403,12 @@
 > import jakarta.persistence.*;
 > import java.util.HashSet;
 > import java.util.Set;
-> import lombok.Getter;
+> import lombok.Data;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
 >
 > @Entity
 > @Table(name = "estudiante")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class EstudianteEntity {
 >
@@ -441,14 +435,12 @@
 > package com.academia.persistence.entity;
 >
 > import jakarta.persistence.*;
-> import lombok.Getter;
+> import lombok.Data;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
 >
 > @Entity
 > @Table(name = "curso")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class CursoEntity {
 >
@@ -475,14 +467,14 @@
 > import jakarta.persistence.*;
 > import java.util.HashSet;
 > import java.util.Set;
-> import lombok.Getter;
+> import lombok.Data;
+> import lombok.EqualsAndHashCode;
 > import lombok.NoArgsConstructor;
-> import lombok.Setter;
+> import lombok.ToString;
 >
 > @Entity
 > @Table(name = "curso")
-> @Getter
-> @Setter
+> @Data
 > @NoArgsConstructor
 > public class CursoEntity {
 >
@@ -494,6 +486,8 @@
 >
 >     // Lado INVERSO (opcional): la tabla intermedia ya la define EstudianteEntity.cursos
 >     @ManyToMany(mappedBy = "cursos")
+>     @ToString.Exclude
+>     @EqualsAndHashCode.Exclude
 >     private Set<EstudianteEntity> estudiantes = new HashSet<>();
 >
 >     public CursoEntity(String nombre) {
@@ -553,7 +547,7 @@
 > 1. **Empezá en un sentido.** Agregá el inverso solo si lo vas a usar.
 > 2. **Siempre se escribe del lado dueño.** El inverso solo sirve para **leer**.
 > 3. **`mappedBy` lleva el nombre exacto** del atributo del dueño (`"docente"`, `"carnet"`, `"cursos"`).
-> 4. **Con doble sentido, no uses `@Data`** en las entidades: `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Usá `@Getter` y `@Setter`, como en este ejemplo.
+> 4. **Con `@Data` y doble sentido, excluí el lado inverso** con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`: si no, `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Así están las clases de esta guía.
 > 5. Al devolver entidades como **JSON**, el doble sentido genera un bucle infinito: por eso en la [guía 2 de la tienda](03-guia-tienda-2-uno-a-muchos.md) se usa `@JsonIgnore`, y en la [Fase II](05-guia-tienda-fase-2-buenas-practicas.md) se separan modelo y entidad.
 
 </details>
@@ -622,7 +616,7 @@
 > | `AnnotationException: Collection '…DocenteEntity.cursos' is 'mappedBy' a property named 'profesor' which does not exist in the target entity '…CursoEntity'` | El `mappedBy` no coincide con el atributo del dueño | Escribir el nombre **exacto**: `mappedBy = "docente"` |
 > | La relación «no se guarda» (la clave queda en `NULL`) | Se asignó solo en el lado **inverso** | Asignar en el **dueño** (`curso.setDocente(…)`) o usar un método que sincronice los dos lados |
 > | `LazyInitializationException: failed to lazily initialize a collection of role: …DocenteEntity.cursos … no Session` | Se leyó una colección `LAZY` **fuera** de una transacción | Leerla dentro de un método `@Transactional` |
-> | `StackOverflowError` al imprimir o comparar entidades | `@Data` (o `toString`/`equals`) recorre una relación en doble sentido | Usar `@Getter`/`@Setter`, o `@ToString.Exclude` y `@EqualsAndHashCode.Exclude` en el inverso |
+> | `StackOverflowError` al imprimir o comparar entidades | `@Data` (o `toString`/`equals`) recorre una relación en doble sentido | Poner `@ToString.Exclude` y `@EqualsAndHashCode.Exclude` en el atributo del lado inverso |
 > | `TransientObjectException` / «unsaved transient instance» | Se relacionó un objeto que **todavía no se guardó** | Guardarlo antes, o usar `cascade` |
 > | Una tabla intermedia sin columnas para datos propios | `@ManyToMany` no admite atributos de la relación | Pasar a una **entidad intermedia** con dos `@ManyToOne` |
 
