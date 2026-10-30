@@ -155,17 +155,40 @@
 > > > estudiantes.save(ana);                       // cascade guarda también el carnet
 > > > ```
 > > >
+> > > ```text
+> > > Así queda en la base de datos:
+> > >
+> > > carnet                     estudiante
+> > > +----+--------+            +-----------+----+--------+
+> > > | id | codigo |            | carnet_id | id | nombre |
+> > > +----+--------+            +-----------+----+--------+
+> > > |  1 | C-001  |  <───────  |         1 |  1 | Ana    |
+> > > +----+--------+            +-----------+----+--------+
+> > >
+> > > SQL: insert into carnet (codigo) values ('C-001');
+> > >      insert into estudiante (carnet_id, nombre) values (1, 'Ana');   ← el carnet se guarda primero para tener su id
+> > > ```
+> > >
 > > > Para la consulta inversa se declara un método derivado en el repositorio (Spring Data lo implementa por el nombre):
 > > >
 > > > ```java
 > > > List<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
 > > > ```
 > > >
-> > > **Consultar** (en otra transacción). Resultado **real**:
+> > > **Consultar** (en otra transacción). Para cada consulta: el SQL que ejecuta Hibernate (sin alias), las filas que lee y el resultado:
 > > >
 > > > ```text
-> > > ana.getCarnet().getCodigo()                          →  C-001
-> > > estudiantes.findByCarnetCodigo("C-001")  → Ana     ← el carnet no conoce a su estudiante: se usa el repositorio
+> > > ana.getCarnet().getCodigo()
+> > >   SQL : select id, codigo from carnet where id = 1          -- 1 = estudiante.carnet_id de Ana
+> > >   fila: (1, 'C-001')
+> > >   →  C-001
+> > >
+> > > estudiantes.findByCarnetCodigo("C-001")
+> > >   SQL : select e.id, e.carnet_id, e.nombre
+> > >         from estudiante e left join carnet c on c.id = e.carnet_id
+> > >         where c.codigo = 'C-001'
+> > >   fila: (1, 1, 'Ana')
+> > >   →  Ana          ← el carnet no conoce a su estudiante: se usa el repositorio
 > > > ```
 > >
 > > </details>
@@ -221,11 +244,32 @@
 > > > estudiantes.save(ana);
 > > > ```
 > > >
-> > > **Consultar** (en otra transacción). Resultado **real**:
+> > > ```text
+> > > Así queda en la base de datos:
+> > >
+> > > carnet                     estudiante
+> > > +----+--------+            +-----------+----+--------+
+> > > | id | codigo |            | carnet_id | id | nombre |
+> > > +----+--------+            +-----------+----+--------+
+> > > |  1 | C-001  |  <───────  |         1 |  1 | Ana    |
+> > > +----+--------+            +-----------+----+--------+
+> > >
+> > > SQL: insert into carnet (codigo) values ('C-001');
+> > >      insert into estudiante (carnet_id, nombre) values (1, 'Ana');   ← el carnet se guarda primero para tener su id
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Para cada consulta: el SQL que ejecuta Hibernate (sin alias), las filas que lee y el resultado:
 > > >
 > > > ```text
-> > > ana.getCarnet().getCodigo()          →  C-001
-> > > carnet.getEstudiante().getNombre()   →  Ana     ← se navega directo desde el carnet
+> > > ana.getCarnet().getCodigo()
+> > >   SQL : select id, codigo from carnet where id = 1
+> > >   fila: (1, 'C-001')
+> > >   →  C-001
+> > >
+> > > carnet.getEstudiante().getNombre()
+> > >   SQL : select e.id, e.carnet_id, e.nombre from estudiante e where e.carnet_id = 1     -- 1 = carnet.id
+> > >   fila: (1, 1, 'Ana')
+> > >   →  Ana          ← se navega directo desde el carnet
 > > > ```
 > >
 > > </details>
@@ -368,17 +412,44 @@
 > > > docentes.save(marta);      // guarda a Marta y, por cascade, sus cursos
 > > > ```
 > > >
-> > > Consulta inversa en el repositorio:
+> > > ```text
+> > > Así queda en la base de datos:
+> > >
+> > > docente                 curso
+> > > +----+--------+         +------------+----+--------+
+> > > | id | nombre |         | docente_id | id | nombre |
+> > > +----+--------+         +------------+----+--------+
+> > > |  1 | Marta  |  <────  |          1 |  1 | Java   |
+> > > +----+--------+         |          1 |  2 | Spring |
+> > >                         +------------+----+--------+
+> > >
+> > > SQL: insert into docente (nombre) values ('Marta');
+> > >      insert into curso (nombre) values ('Java');                  ← el curso entra SIN docente_id
+> > >      insert into curso (nombre) values ('Spring');
+> > >      update curso set docente_id = 1 where id = 1;                ← Hibernate completa la clave después
+> > >      update curso set docente_id = 1 where id = 2;
+> > > ```
+> > >
+> > > Para la consulta inversa se declara un método derivado en el repositorio:
 > > >
 > > > ```java
 > > > List<DocenteEntity> findByCursosNombre(String nombre);   // docente.cursos.nombre = ?
 > > > ```
 > > >
-> > > **Consultar** (en otra transacción). Resultado **real**:
+> > > **Consultar** (en otra transacción). Para cada consulta: el SQL que ejecuta Hibernate (sin alias), las filas que lee y el resultado:
 > > >
 > > > ```text
-> > > marta.getCursos()                       →  [Java, Spring]
-> > > docentes.findByCursosNombre("Java")     →  Marta     ← el curso no conoce a su docente: se usa el repositorio
+> > > marta.getCursos()
+> > >   SQL : select docente_id, id, nombre from curso where docente_id = 1
+> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > >   →  [Java, Spring]
+> > >
+> > > docentes.findByCursosNombre("Java")
+> > >   SQL : select d.id, d.nombre
+> > >         from docente d left join curso c on d.id = c.docente_id
+> > >         where c.nombre = 'Java'
+> > >   fila: (1, 'Marta')
+> > >   →  Marta        ← el curso no conoce a su docente: se usa el repositorio
 > > > ```
 > >
 > > </details>
@@ -475,11 +546,35 @@
 > > > cursos.save(spring);
 > > > ```
 > > >
-> > > **Consultar** (en otra transacción). Resultado **real**:
+> > > ```text
+> > > Así queda en la base de datos:
+> > >
+> > > docente                 curso
+> > > +----+--------+         +------------+----+--------+
+> > > | id | nombre |         | docente_id | id | nombre |
+> > > +----+--------+         +------------+----+--------+
+> > > |  1 | Marta  |  <────  |          1 |  1 | Java   |
+> > > +----+--------+         |          1 |  2 | Spring |
+> > >                         +------------+----+--------+
+> > >
+> > > SQL: insert into docente (nombre) values ('Marta');
+> > >      insert into curso (docente_id, nombre) values (1, 'Java');   ← el curso entra CON docente_id
+> > >      insert into curso (docente_id, nombre) values (1, 'Spring'); ← sin update extra
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Para cada consulta: el SQL que ejecuta Hibernate (sin alias), las filas que lee y el resultado:
 > > >
 > > > ```text
-> > > marta.getCursos()              →  [Java, Spring]
-> > > java.getDocente().getNombre()  →  Marta     ← se navega directo desde el curso
+> > > marta.getCursos()
+> > >   SQL : select docente_id, id, nombre from curso where docente_id = 1
+> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > >   →  [Java, Spring]
+> > >
+> > > java.getDocente().getNombre()
+> > >   SQL : select id, docente_id, nombre from curso                 -- trae el curso con su docente_id = 1
+> > >         select id, nombre from docente where id = 1              -- si Marta aún no está cargada
+> > >   fila: (1, 'Marta')
+> > >   →  Marta        ← se navega directo desde el curso
 > > > ```
 > >
 > > </details>
@@ -623,17 +718,47 @@
 > > > estudiantes.save(luis);
 > > > ```
 > > >
-> > > Consulta inversa en el repositorio:
+> > > ```text
+> > > Así queda en la base de datos (solo las columnas de esta relación):
+> > >
+> > > estudiante          estudiante_curso (tabla intermedia)        curso
+> > > +----+--------+     +---------------+----------+               +----+--------+
+> > > | id | nombre |     | estudiante_id | curso_id |               | id | nombre |
+> > > +----+--------+     +---------------+----------+               +----+--------+
+> > > |  1 | Ana    | <── |             1 |        1 | ──>           |  1 | Java   |
+> > > |  2 | Luis   | <── |             1 |        2 | ──>           |  2 | Spring |
+> > > +----+--------+     |             2 |        1 |               +----+--------+
+> > >                     +---------------+----------+
+> > >
+> > > SQL: insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
+> > >      insert into estudiante_curso (estudiante_id, curso_id) values (1, 2);
+> > >      insert into estudiante_curso (estudiante_id, curso_id) values (2, 1);
+> > > ```
+> > >
+> > > Para la consulta inversa se declara un método derivado en el repositorio:
 > > >
 > > > ```java
 > > > List<EstudianteEntity> findByCursosNombre(String nombre);   // estudiante.cursos.nombre = ?
 > > > ```
 > > >
-> > > **Consultar** (en otra transacción). Resultado **real**:
+> > > **Consultar** (en otra transacción). Para cada consulta: el SQL que ejecuta Hibernate (sin alias), las filas que lee y el resultado:
 > > >
 > > > ```text
-> > > ana.getCursos()                          →  [Java, Spring]
-> > > estudiantes.findByCursosNombre("Java")   →  [Ana, Luis]     ← el curso no conoce a sus estudiantes: se usa el repositorio
+> > > ana.getCursos()
+> > >   SQL : select ec.estudiante_id, c.id, c.nombre
+> > >         from estudiante_curso ec join curso c on c.id = ec.curso_id
+> > >         where ec.estudiante_id = 1
+> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > >   →  [Java, Spring]
+> > >
+> > > estudiantes.findByCursosNombre("Java")
+> > >   SQL : select e.id, e.carnet_id, e.nombre
+> > >         from estudiante e
+> > >         left join estudiante_curso ec on e.id = ec.estudiante_id
+> > >         left join curso c on c.id = ec.curso_id
+> > >         where c.nombre = 'Java'
+> > >   filas: (1, NULL, 'Ana'), (2, NULL, 'Luis')
+> > >   →  [Ana, Luis]  ← el curso no conoce a sus estudiantes: se usa el repositorio
 > > > ```
 > >
 > > </details>
@@ -692,11 +817,39 @@
 > > > estudiantes.save(luis);
 > > > ```
 > > >
-> > > **Consultar** (en otra transacción). Resultado **real**:
+> > > ```text
+> > > Así queda en la base de datos (solo las columnas de esta relación):
+> > >
+> > > estudiante          estudiante_curso (tabla intermedia)        curso
+> > > +----+--------+     +---------------+----------+               +----+--------+
+> > > | id | nombre |     | estudiante_id | curso_id |               | id | nombre |
+> > > +----+--------+     +---------------+----------+               +----+--------+
+> > > |  1 | Ana    | <── |             1 |        1 | ──>           |  1 | Java   |
+> > > |  2 | Luis   | <── |             1 |        2 | ──>           |  2 | Spring |
+> > > +----+--------+     |             2 |        1 |               +----+--------+
+> > >                     +---------------+----------+
+> > >
+> > > SQL: insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
+> > >      insert into estudiante_curso (estudiante_id, curso_id) values (1, 2);
+> > >      insert into estudiante_curso (estudiante_id, curso_id) values (2, 1);
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Para cada consulta: el SQL que ejecuta Hibernate (sin alias), las filas que lee y el resultado:
 > > >
 > > > ```text
-> > > ana.getCursos()                                    →  [Java, Spring]
-> > > java.getEstudiantes()  (nombres)                   →  [Ana, Luis]     ← se navega directo desde el curso
+> > > ana.getCursos()
+> > >   SQL : select ec.estudiante_id, c.id, c.nombre
+> > >         from estudiante_curso ec join curso c on c.id = ec.curso_id
+> > >         where ec.estudiante_id = 1
+> > >   filas: (1, 1, 'Java'), (1, 2, 'Spring')
+> > >   →  [Java, Spring]
+> > >
+> > > java.getEstudiantes()
+> > >   SQL : select ec.curso_id, e.id, e.nombre
+> > >         from estudiante_curso ec join estudiante e on e.id = ec.estudiante_id
+> > >         where ec.curso_id = 1
+> > >   filas: (1, 1, 'Ana'), (1, 2, 'Luis')
+> > >   →  [Ana, Luis]  ← se navega directo desde el curso
 > > > ```
 > >
 > > </details>
