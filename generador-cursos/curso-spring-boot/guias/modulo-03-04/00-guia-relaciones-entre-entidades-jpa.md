@@ -1,8 +1,14 @@
 # 🔗 Guía 00 — Relaciones entre entidades en JPA: uno a uno, uno a muchos y muchos a muchos
 
-> 🎯 **Qué vas a aprender:** a declarar las tres relaciones de JPA, **desde las entidades**, en **un sentido** y en **doble sentido**, y qué significa cada notación.
-> ⏱️ **Tiempo:** unos 20 minutos. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](03-guia-tienda-2-uno-a-muchos.md).
-> ✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que ves son reales.
+<div style="background-color:#fff3b0; color:#1f1f1f; border-left:6px solid #f2b705; padding:12px 16px; border-radius:6px;">
+
+🎯 **Qué vas a aprender:** a declarar las tres relaciones de JPA, **desde las entidades**, en **un sentido** y en **doble sentido**, y qué significa cada notación.
+
+⏱️ **Tiempo:** unos 20 minutos. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](03-guia-tienda-2-uno-a-muchos.md).
+
+✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que ves son reales.
+
+</div>
 
 <details open>
 <summary><strong>🧠 Tres ideas para entender todas las relaciones</strong></summary>
