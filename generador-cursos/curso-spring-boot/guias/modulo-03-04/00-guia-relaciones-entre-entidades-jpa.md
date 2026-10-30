@@ -160,9 +160,9 @@
 > > </details>
 > >
 > > <details open>
-> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Registrar**
+> > > **1️⃣ Guardar datos**
 > > >
 > > > ```java
 > > > ana.setCarnet(new CarnetEntity("C-001"));   // se asigna en el dueño
@@ -181,7 +181,7 @@
 > > > ```
 > > >
 > > > <details>
-> > > <summary>🔬 Ver el SQL del registro</summary>
+> > > <summary>🔬 Ver el SQL del guardado</summary>
 > > >
 > > > ```text
 > > > insert into carnet (codigo) values ('C-001');
@@ -190,7 +190,7 @@
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar** (en otra transacción)
+> > > **2️⃣ Consultar datos** (en otra transacción)
 > > >
 > > > | Pregunta | Código | Resultado |
 > > > |---|---|---|
@@ -272,9 +272,9 @@
 > > 🔎 Las tablas son **las mismas** que en un sentido: el lado inverso no crea columnas ni tablas.
 > >
 > > <details open>
-> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Registrar**
+> > > **1️⃣ Guardar datos**
 > > >
 > > > ```java
 > > > ana.setCarnet(new CarnetEntity("C-001"));   // se asigna en el dueño
@@ -293,7 +293,7 @@
 > > > ```
 > > >
 > > > <details>
-> > > <summary>🔬 Ver el SQL del registro</summary>
+> > > <summary>🔬 Ver el SQL del guardado</summary>
 > > >
 > > > ```text
 > > > insert into carnet (codigo) values ('C-001');
@@ -302,7 +302,7 @@
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar** (en otra transacción)
+> > > **2️⃣ Consultar datos** (en otra transacción)
 > > >
 > > > | Pregunta | Código | Resultado |
 > > > |---|---|---|
@@ -457,9 +457,9 @@
 > > </details>
 > >
 > > <details open>
-> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Registrar**
+> > > **1️⃣ Guardar datos**
 > > >
 > > > ```java
 > > > marta.getCursos().add(java);
@@ -480,7 +480,7 @@
 > > > ```
 > > >
 > > > <details>
-> > > <summary>🔬 Ver el SQL del registro</summary>
+> > > <summary>🔬 Ver el SQL del guardado</summary>
 > > >
 > > > ```text
 > > > insert into docente (nombre) values ('Marta');
@@ -492,7 +492,7 @@
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar** (en otra transacción)
+> > > **2️⃣ Consultar datos** (en otra transacción)
 > > >
 > > > | Pregunta | Código | Resultado |
 > > > |---|---|---|
@@ -612,9 +612,9 @@
 > > 🔎 Las tablas son **las mismas** que en un sentido: el lado inverso no crea columnas ni tablas.
 > >
 > > <details open>
-> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Registrar**
+> > > **1️⃣ Guardar datos**
 > > >
 > > > ```java
 > > > marta = docentes.save(new DocenteEntity("Marta"));
@@ -637,7 +637,7 @@
 > > > ```
 > > >
 > > > <details>
-> > > <summary>🔬 Ver el SQL del registro</summary>
+> > > <summary>🔬 Ver el SQL del guardado</summary>
 > > >
 > > > ```text
 > > > insert into docente (nombre) values ('Marta');
@@ -647,7 +647,7 @@
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar** (en otra transacción)
+> > > **2️⃣ Consultar datos** (en otra transacción)
 > > >
 > > > | Pregunta | Código | Resultado |
 > > > |---|---|---|
@@ -803,9 +803,9 @@
 > > </details>
 > >
 > > <details open>
-> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Registrar**
+> > > **1️⃣ Guardar datos**
 > > >
 > > > ```java
 > > > ana.getCursos().add(java);     // se agrega en el dueño
@@ -830,7 +830,7 @@
 > > > ```
 > > >
 > > > <details>
-> > > <summary>🔬 Ver el SQL del registro</summary>
+> > > <summary>🔬 Ver el SQL del guardado</summary>
 > > >
 > > > ```text
 > > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
@@ -840,7 +840,7 @@
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar** (en otra transacción)
+> > > **2️⃣ Consultar datos** (en otra transacción)
 > > >
 > > > | Pregunta | Código | Resultado |
 > > > |---|---|---|
@@ -926,9 +926,9 @@
 > > 🔎 Las tablas son **las mismas** que en un sentido: el lado inverso no crea columnas ni tablas.
 > >
 > > <details open>
-> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> > <summary><strong>▶️ Ejemplo: guardar y consultar datos</strong></summary>
 > >
-> > > **1️⃣ Registrar**
+> > > **1️⃣ Guardar datos**
 > > >
 > > > ```java
 > > > ana.getCursos().add(java);     // se registra igual: en el dueño
@@ -953,7 +953,7 @@
 > > > ```
 > > >
 > > > <details>
-> > > <summary>🔬 Ver el SQL del registro</summary>
+> > > <summary>🔬 Ver el SQL del guardado</summary>
 > > >
 > > > ```text
 > > > insert into estudiante_curso (estudiante_id, curso_id) values (1, 1);
@@ -963,7 +963,7 @@
 > > >
 > > > </details>
 > > >
-> > > **2️⃣ Consultar** (en otra transacción)
+> > > **2️⃣ Consultar datos** (en otra transacción)
 > > >
 > > > | Pregunta | Código | Resultado |
 > > > |---|---|---|
