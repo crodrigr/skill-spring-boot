@@ -144,7 +144,31 @@
 > >
 > > - `@JoinColumn` crea `estudiante.carnet_id` y marca al **dueño**.
 > > - `cascade = ALL`: al guardar el estudiante se guarda **también** su carnet (sin el `cascade` habría que guardar el carnet primero).
->
+> >
+> > <details open>
+> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> >
+> > > **Registrar:**
+> > >
+> > > ```java
+> > > ana.setCarnet(new CarnetEntity("C-001"));   // se asigna en el dueño
+> > > estudiantes.save(ana);                       // cascade guarda también el carnet
+> > > ```
+> > >
+> > > Para la consulta inversa se declara un método derivado en el repositorio (Spring Data lo implementa por el nombre):
+> > >
+> > > ```java
+> > > List<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Resultado **real**:
+> > >
+> > > ```text
+> > > ana.getCarnet().getCodigo()                          →  C-001
+> > > estudiantes.findByCarnetCodigo("C-001")  → Ana     ← el carnet no conoce a su estudiante: se usa el repositorio
+> > > ```
+> >
+> > </details>
 > </details>
 >
 > <details open>
@@ -186,7 +210,25 @@
 > > ```
 > >
 > > - `mappedBy = "carnet"` = «la clave la maneja el atributo `carnet` de `EstudianteEntity`». **No crea columnas.**
->
+> >
+> > <details open>
+> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> >
+> > > **Registrar:**
+> > >
+> > > ```java
+> > > ana.setCarnet(new CarnetEntity("C-001"));   // se registra igual: en el dueño
+> > > estudiantes.save(ana);
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Resultado **real**:
+> > >
+> > > ```text
+> > > ana.getCarnet().getCodigo()          →  C-001
+> > > carnet.getEstudiante().getNombre()   →  Ana     ← se navega directo desde el carnet
+> > > ```
+> >
+> > </details>
 > </details>
 >
 > <details open>
@@ -314,7 +356,32 @@
 > > - `@OneToMany` + `@JoinColumn(name = "docente_id")`: la clave `docente_id` se crea en la tabla `curso`, aunque `CursoEntity` no tenga ese atributo. Como `@JoinColumn` está aquí, **el dueño es `DocenteEntity`**.
 > > - `cascade = ALL`: al guardar el docente se guardan también sus cursos.
 > > - Se comprobó en MySQL: Hibernate hace primero un `insert into curso` por cada curso y después un `update curso set docente_id=?` por cada uno. Es normal en esta variante.
->
+> >
+> > <details open>
+> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> >
+> > > **Registrar:**
+> > >
+> > > ```java
+> > > marta.getCursos().add(java);
+> > > marta.getCursos().add(spring);
+> > > docentes.save(marta);      // guarda a Marta y, por cascade, sus cursos
+> > > ```
+> > >
+> > > Consulta inversa en el repositorio:
+> > >
+> > > ```java
+> > > List<DocenteEntity> findByCursosNombre(String nombre);   // docente.cursos.nombre = ?
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Resultado **real**:
+> > >
+> > > ```text
+> > > marta.getCursos()                       →  [Java, Spring]
+> > > docentes.findByCursosNombre("Java")     →  Marta     ← el curso no conoce a su docente: se usa el repositorio
+> > > ```
+> >
+> > </details>
 > </details>
 >
 > <details open>
@@ -394,7 +461,28 @@
 > > ```
 > >
 > > > ⚠️ Al pasar a doble sentido **cambia el dueño**: hay que quitar `@JoinColumn` y `cascade` del `@OneToMany` y poner `mappedBy = "docente"`. Si los dos lados llevaran `@JoinColumn`, los dos intentarían escribir `docente_id`. Una ventaja: sin el `UPDATE` extra, el curso se guarda ya con su `docente_id`.
->
+> >
+> > <details open>
+> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> >
+> > > **Registrar:**
+> > >
+> > > ```java
+> > > marta = docentes.save(new DocenteEntity("Marta"));
+> > > marta.agregarCurso(java);      // sincroniza los dos lados: curso.docente = marta
+> > > marta.agregarCurso(spring);
+> > > cursos.save(java);             // el dueño es el curso: se guarda cada curso
+> > > cursos.save(spring);
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Resultado **real**:
+> > >
+> > > ```text
+> > > marta.getCursos()              →  [Java, Spring]
+> > > java.getDocente().getNombre()  →  Marta     ← se navega directo desde el curso
+> > > ```
+> >
+> > </details>
 > </details>
 >
 > <details open>
@@ -521,7 +609,34 @@
 > >
 > > - `name`: nombre de la tabla intermedia. `joinColumns`: la columna que apunta a **este** lado (`estudiante_id`). `inverseJoinColumns`: la que apunta al **otro** (`curso_id`).
 > > - Se usa un `Set`: un curso **no puede repetirse** para el mismo estudiante.
->
+> >
+> > <details open>
+> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> >
+> > > **Registrar:**
+> > >
+> > > ```java
+> > > ana.getCursos().add(java);     // se agrega en el dueño
+> > > ana.getCursos().add(spring);
+> > > luis.getCursos().add(java);
+> > > estudiantes.save(ana);
+> > > estudiantes.save(luis);
+> > > ```
+> > >
+> > > Consulta inversa en el repositorio:
+> > >
+> > > ```java
+> > > List<EstudianteEntity> findByCursosNombre(String nombre);   // estudiante.cursos.nombre = ?
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Resultado **real**:
+> > >
+> > > ```text
+> > > ana.getCursos()                          →  [Java, Spring]
+> > > estudiantes.findByCursosNombre("Java")   →  [Ana, Luis]     ← el curso no conoce a sus estudiantes: se usa el repositorio
+> > > ```
+> >
+> > </details>
 > </details>
 >
 > <details open>
@@ -563,7 +678,28 @@
 > >     }
 > > }
 > > ```
->
+> >
+> > <details open>
+> > <summary><strong>▶️ Registrar y consultar</strong></summary>
+> >
+> > > **Registrar:**
+> > >
+> > > ```java
+> > > ana.getCursos().add(java);     // se registra igual: en el dueño
+> > > ana.getCursos().add(spring);
+> > > luis.getCursos().add(java);
+> > > estudiantes.save(ana);
+> > > estudiantes.save(luis);
+> > > ```
+> > >
+> > > **Consultar** (en otra transacción). Resultado **real**:
+> > >
+> > > ```text
+> > > ana.getCursos()                                    →  [Java, Spring]
+> > > java.getEstudiantes()  (nombres)                   →  [Ana, Luis]     ← se navega directo desde el curso
+> > > ```
+> >
+> > </details>
 > </details>
 >
 > <details open>
@@ -645,104 +781,6 @@
 > 4. **Con `@Data` y doble sentido, excluí el lado inverso** con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`: si no, `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Así están las clases de esta guía.
 > 5. Al devolver entidades como **JSON**, el doble sentido genera un bucle infinito: por eso en la [guía 2 de la tienda](03-guia-tienda-2-uno-a-muchos.md) se usa `@JsonIgnore`, y en la [Fase II](05-guia-tienda-fase-2-buenas-practicas.md) se separan modelo y entidad.
 
-</details>
-
-<details open>
-<summary><strong>🔍 Registrar y consultar: un sentido y doble sentido</strong></summary>
-
-> Mismos datos (Ana con el carnet C-001, Luis, la docente Marta, los cursos Java y Spring), registrados y consultados **en un sentido** y **en doble sentido**. Se ejecutó contra MySQL 8.
->
-> <details open>
-> <summary><strong>📝 Registrar los datos</strong></summary>
->
-> > | | **Un sentido** | **Doble sentido** |
-> > |---|---|---|
-> > | 1:1 | `ana.setCarnet(new CarnetEntity("C-001"))` | igual: se asigna en el **dueño** (el estudiante) |
-> > | 1:N | `marta.getCursos().add(java)` y `docentes.save(marta)` (el `cascade` guarda los cursos) | `marta.agregarCurso(java)` y `cursos.save(java)` (el dueño es el curso) |
-> > | N:M | `ana.getCursos().add(java)` | igual: se agrega en el **dueño** (el estudiante) |
-> >
-> > ```java
-> > // ➡️ UN SENTIDO
-> > ana.setCarnet(new CarnetEntity("C-001"));
-> > marta.getCursos().add(java);
-> > marta.getCursos().add(spring);
-> > docentes.save(marta);                    // guarda a Marta y, por cascade, sus cursos
-> > ana.getCursos().add(java);
-> > ana.getCursos().add(spring);
-> > luis.getCursos().add(java);
-> > estudiantes.save(ana);
-> > estudiantes.save(luis);
-> > ```
-> >
-> > ```java
-> > // ↔️ DOBLE SENTIDO
-> > ana.setCarnet(new CarnetEntity("C-001"));
-> > marta = docentes.save(new DocenteEntity("Marta"));
-> > marta.agregarCurso(java);                // sincroniza los dos lados: curso.docente = marta
-> > marta.agregarCurso(spring);
-> > cursos.save(java);
-> > cursos.save(spring);
-> > ana.getCursos().add(java);
-> > ana.getCursos().add(spring);
-> > luis.getCursos().add(java);
-> > estudiantes.save(ana);
-> > estudiantes.save(luis);
-> > ```
-> >
-> > > 🔎 En doble sentido se **escribe igual**: siempre en el dueño. El lado inverso no cambia lo que se guarda.
->
-> </details>
->
-> <details open>
-> <summary><strong>🔍 Consultar en los dos sentidos</strong></summary>
->
-> > **Sentido del dueño** (el que tiene la clave): funciona **igual** en un sentido y en doble sentido, navegando por los atributos.
-> >
-> > **Sentido contrario** (desde el lado inverso): en **doble sentido** se navega directo; en **un sentido** no existe el atributo, y se necesita una **consulta en el repositorio**.
-> >
-> > | Pregunta | Un sentido | Doble sentido |
-> > |---|---|---|
-> > | ¿Cuál es el carnet de Ana? | `ana.getCarnet().getCodigo()` | `ana.getCarnet().getCodigo()` |
-> > | ¿De quién es el carnet C-001? | `estudiantes.findByCarnetCodigo("C-001")` | `carnet.getEstudiante().getNombre()` |
-> > | ¿Qué cursos dicta Marta? | `marta.getCursos()` | `marta.getCursos()` |
-> > | ¿Quién dicta Java? | `docentes.findByCursosNombre("Java")` | `java.getDocente().getNombre()` |
-> > | ¿Qué cursos tiene Ana? | `ana.getCursos()` | `ana.getCursos()` |
-> > | ¿Qué estudiantes tiene Java? | `estudiantes.findByCursosNombre("Java")` | `java.getEstudiantes()` |
-> >
-> > En un sentido, esas consultas son métodos derivados que se declaran en la interfaz del repositorio. Spring Data los implementa solo, a partir del nombre:
-> >
-> > ```java
-> > public interface EstudianteJpaRepository extends JpaRepository<EstudianteEntity, Long> {
-> >     List<EstudianteEntity> findByCarnetCodigo(String codigo);    // estudiante.carnet.codigo = ?
-> >     List<EstudianteEntity> findByCursosNombre(String nombre);    // estudiante.cursos.nombre = ?
-> > }
-> >
-> > public interface DocenteJpaRepository extends JpaRepository<DocenteEntity, Long> {
-> >     List<DocenteEntity> findByCursosNombre(String nombre);       // docente.cursos.nombre = ?
-> > }
-> > ```
->
-> </details>
->
-> <details open>
-> <summary><strong>📋 Resultado de las consultas</strong></summary>
->
-> > Cada consulta se ejecutó en una transacción distinta de la que guardó los datos. **Resultado real**, idéntico en los dos sentidos:
-> >
-> > ```text
-> >                            UN SENTIDO                     DOBLE SENTIDO
-> > carnet de Ana          :   C-001                          C-001
-> > dueño del carnet C-001 :   Ana  (repositorio)             Ana  (carnet.getEstudiante())
-> > cursos de Marta        :   [Java, Spring]                 [Java, Spring]
-> > docente de Java        :   Marta  (repositorio)           Marta  (java.getDocente())
-> > cursos de Ana          :   [Java, Spring]                 [Java, Spring]
-> > estudiantes de Java    :   [Ana, Luis]  (repositorio)     [Ana, Luis]  (java.getEstudiantes())
-> > ```
-> >
-> > > 💡 **Conclusión:** la **respuesta es la misma**. Lo que cambia es **cómo llegás** desde el lado inverso: con una consulta del repositorio (un sentido) o navegando por el atributo (doble sentido). Si esa consulta inversa es ocasional, el repositorio alcanza y no hace falta el doble sentido.
->
-> </details>
->
 </details>
 
 <details open>
