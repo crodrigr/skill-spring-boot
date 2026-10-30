@@ -175,28 +175,34 @@
 >
 > - `mappedBy = "carnet"` = «la clave la maneja el atributo `carnet` de `EstudianteEntity`». **No crea columnas.**
 >
-> **Lo que genera MySQL:**
+> <details open>
+> <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
 >
-> ```text
-> create table carnet (id bigint not null auto_increment, codigo varchar(255), primary key (id))
-> create table estudiante (carnet_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
-> alter table estudiante add constraint UK… unique (carnet_id)                       ← esto lo hace «uno a uno»
-> alter table estudiante add constraint FK… foreign key (carnet_id) references carnet (id)
-> ```
+> > ```text
+> > create table carnet (id bigint not null auto_increment, codigo varchar(255), primary key (id))
+> > create table estudiante (carnet_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
+> > alter table estudiante add constraint UK… unique (carnet_id)                       ← esto lo hace «uno a uno»
+> > alter table estudiante add constraint FK… foreign key (carnet_id) references carnet (id)
+> > ```
 >
-> **Así queda en las tablas** (datos del escenario «Probalo»):
+> </details>
 >
-> ```text
-> carnet                      estudiante
-> +----+--------+             +----------+----+--------+
-> | id | codigo |             | carnet_id| id | nombre |
-> +----+--------+             +----------+----+--------+
-> |  1 | C-001  |  <────────  |        1 |  1 | Ana    |
-> +----+--------+             |     NULL |  2 | Luis   |   ← Luis no tiene carnet
->                             +----------+----+--------+
-> ```
+> <details open>
+> <summary><strong>🗄️ Así queda en las tablas (datos del escenario «Probalo»)</strong></summary>
 >
-> La clave `carnet_id` está en `estudiante`; `UNIQUE` impide que otro estudiante use el carnet 1.
+> > ```text
+> > carnet                      estudiante
+> > +----+--------+             +----------+----+--------+
+> > | id | codigo |             | carnet_id| id | nombre |
+> > +----+--------+             +----------+----+--------+
+> > |  1 | C-001  |  <────────  |        1 |  1 | Ana    |
+> > +----+--------+             |     NULL |  2 | Luis   |   ← Luis no tiene carnet
+> >                             +----------+----+--------+
+> > ```
+> >
+> > La clave `carnet_id` está en `estudiante`; `UNIQUE` impide que otro estudiante use el carnet 1.
+>
+> </details>
 >
 > > 🔎 La restricción **`UNIQUE`** sobre `carnet_id` es lo que impide que dos estudiantes compartan el mismo carnet: eso **es** el «uno a uno».
 
@@ -329,28 +335,34 @@
 > }
 > ```
 >
-> **Lo que genera MySQL:**
+> <details open>
+> <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
 >
-> ```text
-> create table docente (id bigint not null auto_increment, nombre varchar(255), primary key (id))
-> create table curso (docente_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
-> alter table curso add constraint FK… foreign key (docente_id) references docente (id)
-> ```
+> > ```text
+> > create table docente (id bigint not null auto_increment, nombre varchar(255), primary key (id))
+> > create table curso (docente_id bigint, id bigint not null auto_increment, nombre varchar(255), primary key (id))
+> > alter table curso add constraint FK… foreign key (docente_id) references docente (id)
+> > ```
 >
-> **Así queda en las tablas:**
+> </details>
 >
-> ```text
-> docente                     curso
-> +----+--------+             +-----------+----+--------+
-> | id | nombre |             | docente_id| id | nombre |
-> +----+--------+             +-----------+----+--------+
-> |  1 | Marta  |  <────────  |         1 |  1 | Java   |
-> +----+--------+             |         1 |  2 | Spring |
->                             |      NULL |  3 | HTML   |   ← se agregó solo a docente.getCursos()
->                             +-----------+----+--------+
-> ```
+> <details open>
+> <summary><strong>🗄️ Así queda en las tablas</strong></summary>
 >
-> La clave `docente_id` está en `curso` (lado «muchos»); `docente` **no** tiene ninguna columna de cursos.
+> > ```text
+> > docente                     curso
+> > +----+--------+             +-----------+----+--------+
+> > | id | nombre |             | docente_id| id | nombre |
+> > +----+--------+             +-----------+----+--------+
+> > |  1 | Marta  |  <────────  |         1 |  1 | Java   |
+> > +----+--------+             |         1 |  2 | Spring |
+> >                             |      NULL |  3 | HTML   |   ← se agregó solo a docente.getCursos()
+> >                             +-----------+----+--------+
+> > ```
+> >
+> > La clave `docente_id` está en `curso` (lado «muchos»); `docente` **no** tiene ninguna columna de cursos.
+>
+> </details>
 >
 > > ⚠️ **Se asigna del lado dueño.** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, mantené **los dos lados sincronizados** con el método `agregarCurso` de `DocenteEntity` (ya incluido arriba).
 
@@ -484,28 +496,34 @@
 > }
 > ```
 >
-> **Lo que genera MySQL:**
+> <details open>
+> <summary><strong>🛠️ Lo que genera MySQL</strong></summary>
 >
-> ```text
-> create table estudiante_curso (curso_id bigint not null, estudiante_id bigint not null, primary key (curso_id, estudiante_id))
-> alter table estudiante_curso add constraint FK… foreign key (curso_id)      references curso (id)
-> alter table estudiante_curso add constraint FK… foreign key (estudiante_id) references estudiante (id)
-> ```
+> > ```text
+> > create table estudiante_curso (curso_id bigint not null, estudiante_id bigint not null, primary key (curso_id, estudiante_id))
+> > alter table estudiante_curso add constraint FK… foreign key (curso_id)      references curso (id)
+> > alter table estudiante_curso add constraint FK… foreign key (estudiante_id) references estudiante (id)
+> > ```
 >
-> **Así queda en las tablas:**
+> </details>
 >
-> ```text
-> estudiante            estudiante_curso (tabla intermedia)      curso
-> +----+--------+       +---------------+----------+             +----+--------+
-> | id | nombre |       | estudiante_id | curso_id |             | id | nombre |
-> +----+--------+       +---------------+----------+             +----+--------+
-> |  1 | Ana    | <──── |             1 |        1 | ────>       |  1 | Java   |
-> |  2 | Luis   | <──── |             1 |        2 | ────>       |  2 | Spring |
-> +----+--------+       |             2 |        1 |             +----+--------+
->                       +---------------+----------+
-> ```
+> <details open>
+> <summary><strong>🗄️ Así queda en las tablas</strong></summary>
 >
-> Ana cursa Java y Spring; Luis, solo Java. Ninguna de las dos tablas principales guarda la relación: solo la tabla intermedia.
+> > ```text
+> > estudiante            estudiante_curso (tabla intermedia)      curso
+> > +----+--------+       +---------------+----------+             +----+--------+
+> > | id | nombre |       | estudiante_id | curso_id |             | id | nombre |
+> > +----+--------+       +---------------+----------+             +----+--------+
+> > |  1 | Ana    | <──── |             1 |        1 | ────>       |  1 | Java   |
+> > |  2 | Luis   | <──── |             1 |        2 | ────>       |  2 | Spring |
+> > +----+--------+       |             2 |        1 |             +----+--------+
+> >                       +---------------+----------+
+> > ```
+> >
+> > Ana cursa Java y Spring; Luis, solo Java. Ninguna de las dos tablas principales guarda la relación: solo la tabla intermedia.
+>
+> </details>
 >
 > > 🔎 La **clave primaria compuesta** `(curso_id, estudiante_id)` impide repetir un par a nivel de base.
 > >
