@@ -1228,191 +1228,206 @@
 > <details open>
 > <summary><strong>4️⃣ Paso 4 — Crear las entidades</strong></summary>
 >
-> > Cuatro clases en el paquete `com.academia.persistence.entity`, creadas **relación por relación**. Son las mismas de las secciones de **un sentido** de arriba. Copialas en este orden:
+> > Cuatro clases en el paquete `com.academia.persistence.entity`, creadas **relación por relación** y en el **mismo orden que los diagramas de clases**: primero el lado dueño y después el otro. Son las mismas de las secciones de **un sentido** de arriba.
 > >
-> > **🔹 4.1 Uno a uno — Estudiante y Carnet**
+> > <details open>
+> > <summary><strong>🔹 4.1 Uno a uno — Estudiante y Carnet</strong></summary>
 > >
-> > 📄 **CarnetEntity.java  (no conoce a su estudiante)**
+> > > Primero el **dueño** (`EstudianteEntity`, tiene la clave `carnet_id`) y después `CarnetEntity`, como en el diagrama de clases. Por ahora `EstudianteEntity` solo lleva el carnet.
+> > >
+> > > 📄 **EstudianteEntity.java  (lado dueño: tiene @JoinColumn)**
+> > >
+> > > ```java
+> > > package com.academia.persistence.entity;
+> > >
+> > > import jakarta.persistence.*;
+> > > import lombok.Data;
+> > > import lombok.NoArgsConstructor;
+> > >
+> > > @Entity
+> > > @Table(name = "estudiante")
+> > > @Data
+> > > @NoArgsConstructor
+> > > public class EstudianteEntity {
+> > >
+> > >     @Id
+> > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> > >     private Long id;
+> > >
+> > >     private String nombre;
+> > >
+> > >     // 1:1 — lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
+> > >     @OneToOne(cascade = CascadeType.ALL)
+> > >     @JoinColumn(name = "carnet_id")
+> > >     private CarnetEntity carnet;
+> > >
+> > >     public EstudianteEntity(String nombre) {
+> > >         this.nombre = nombre;
+> > >     }
+> > > }
+> > > ```
+> > >
+> > > 📄 **CarnetEntity.java  (no conoce a su estudiante)**
+> > >
+> > > ```java
+> > > package com.academia.persistence.entity;
+> > >
+> > > import jakarta.persistence.*;
+> > > import lombok.Data;
+> > > import lombok.NoArgsConstructor;
+> > >
+> > > @Entity
+> > > @Table(name = "carnet")
+> > > @Data
+> > > @NoArgsConstructor
+> > > public class CarnetEntity {
+> > >
+> > >     @Id
+> > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> > >     private Long id;
+> > >
+> > >     private String codigo;
+> > >
+> > >     public CarnetEntity(String codigo) {
+> > >         this.codigo = codigo;
+> > >     }
+> > > }
+> > > ```
 > >
-> > ```java
-> > package com.academia.persistence.entity;
+> > </details>
 > >
-> > import jakarta.persistence.*;
-> > import lombok.Data;
-> > import lombok.NoArgsConstructor;
+> > <details open>
+> > <summary><strong>🔹 4.2 Uno a muchos — Docente y Curso</strong></summary>
 > >
-> > @Entity
-> > @Table(name = "carnet")
-> > @Data
-> > @NoArgsConstructor
-> > public class CarnetEntity {
+> > > Primero el **dueño** (`DocenteEntity`, tiene la clave `docente_id` en la tabla `curso`) y después `CursoEntity`.
+> > >
+> > > 📄 **DocenteEntity.java  (lado dueño: tiene @JoinColumn)**
+> > >
+> > > ```java
+> > > package com.academia.persistence.entity;
+> > >
+> > > import jakarta.persistence.*;
+> > > import lombok.Data;
+> > > import lombok.NoArgsConstructor;
+> > >
+> > > import java.util.ArrayList;
+> > > import java.util.List;
+> > >
+> > > @Entity
+> > > @Table(name = "docente")
+> > > @Data
+> > > @NoArgsConstructor
+> > > public class DocenteEntity {
+> > >
+> > >     @Id
+> > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> > >     private Long id;
+> > >
+> > >     private String nombre;
+> > >
+> > >     // 1:N — lado DUEÑO (un sentido): tiene @JoinColumn. La columna docente_id se crea en la tabla curso
+> > >     @OneToMany(cascade = CascadeType.ALL)
+> > >     @JoinColumn(name = "docente_id")
+> > >     private List<CursoEntity> cursos = new ArrayList<>();
+> > >
+> > >     public DocenteEntity(String nombre) {
+> > >         this.nombre = nombre;
+> > >     }
+> > > }
+> > > ```
+> > >
+> > > 📄 **CursoEntity.java  (no conoce a su docente)**
+> > >
+> > > ```java
+> > > package com.academia.persistence.entity;
+> > >
+> > > import jakarta.persistence.*;
+> > > import lombok.Data;
+> > > import lombok.NoArgsConstructor;
+> > >
+> > > @Entity
+> > > @Table(name = "curso")
+> > > @Data
+> > > @NoArgsConstructor
+> > > public class CursoEntity {
+> > >
+> > >     @Id
+> > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> > >     private Long id;
+> > >
+> > >     private String nombre;
+> > >
+> > >     public CursoEntity(String nombre) {
+> > >         this.nombre = nombre;
+> > >     }
+> > > }
+> > > ```
 > >
-> >     @Id
-> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
-> >     private Long id;
+> > </details>
 > >
-> >     private String codigo;
+> > <details open>
+> > <summary><strong>🔹 4.3 Muchos a muchos — Estudiante y Curso</strong></summary>
 > >
-> >     public CarnetEntity(String codigo) {
-> >         this.codigo = codigo;
-> >     }
-> > }
-> > ```
+> > > Primero el **dueño** (`EstudianteEntity`, tiene la tabla intermedia `estudiante_curso`). Se amplía con el atributo `cursos`. Agregá estos imports y este atributo:
+> > >
+> > > ```java
+> > > // imports nuevos
+> > > import java.util.HashSet;
+> > > import java.util.Set;
+> > >
+> > > // atributo nuevo, después de "carnet"
+> > > @ManyToMany
+> > > @JoinTable(name = "estudiante_curso",
+> > >         joinColumns = @JoinColumn(name = "estudiante_id"),
+> > >         inverseJoinColumns = @JoinColumn(name = "curso_id"))
+> > > private Set<CursoEntity> cursos = new HashSet<>();
+> > > ```
+> > >
+> > > 📄 **EstudianteEntity.java  (versión final, completa)**
+> > >
+> > > ```java
+> > > package com.academia.persistence.entity;
+> > >
+> > > import jakarta.persistence.*;
+> > > import lombok.Data;
+> > > import lombok.NoArgsConstructor;
+> > >
+> > > import java.util.HashSet;
+> > > import java.util.Set;
+> > >
+> > > @Entity
+> > > @Table(name = "estudiante")
+> > > @Data
+> > > @NoArgsConstructor
+> > > public class EstudianteEntity {
+> > >
+> > >     @Id
+> > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> > >     private Long id;
+> > >
+> > >     private String nombre;
+> > >
+> > >     // 1:1 — lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
+> > >     @OneToOne(cascade = CascadeType.ALL)
+> > >     @JoinColumn(name = "carnet_id")
+> > >     private CarnetEntity carnet;
+> > >
+> > >     // N:M — lado DUEÑO: JPA crea la tabla intermedia estudiante_curso
+> > >     @ManyToMany
+> > >     @JoinTable(name = "estudiante_curso",
+> > >             joinColumns = @JoinColumn(name = "estudiante_id"),
+> > >             inverseJoinColumns = @JoinColumn(name = "curso_id"))
+> > >     private Set<CursoEntity> cursos = new HashSet<>();
+> > >
+> > >     public EstudianteEntity(String nombre) {
+> > >         this.nombre = nombre;
+> > >     }
+> > > }
+> > > ```
+> > >
+> > > `CursoEntity` **no cambia**: sigue sin conocer a sus estudiantes.
 > >
-> > 📄 **EstudianteEntity.java  (lado dueño: tiene @JoinColumn)  — por ahora solo con el carnet**
-> >
-> > ```java
-> > package com.academia.persistence.entity;
-> >
-> > import jakarta.persistence.*;
-> > import lombok.Data;
-> > import lombok.NoArgsConstructor;
-> >
-> > @Entity
-> > @Table(name = "estudiante")
-> > @Data
-> > @NoArgsConstructor
-> > public class EstudianteEntity {
-> >
-> >     @Id
-> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
-> >     private Long id;
-> >
-> >     private String nombre;
-> >
-> >     // 1:1 — lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
-> >     @OneToOne(cascade = CascadeType.ALL)
-> >     @JoinColumn(name = "carnet_id")
-> >     private CarnetEntity carnet;
-> >
-> >     public EstudianteEntity(String nombre) {
-> >         this.nombre = nombre;
-> >     }
-> > }
-> > ```
-> >
-> > **🔹 4.2 Uno a muchos — Docente y Curso**
-> >
-> > 📄 **CursoEntity.java  (no conoce a su docente)**
-> >
-> > ```java
-> > package com.academia.persistence.entity;
-> >
-> > import jakarta.persistence.*;
-> > import lombok.Data;
-> > import lombok.NoArgsConstructor;
-> >
-> > @Entity
-> > @Table(name = "curso")
-> > @Data
-> > @NoArgsConstructor
-> > public class CursoEntity {
-> >
-> >     @Id
-> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
-> >     private Long id;
-> >
-> >     private String nombre;
-> >
-> >     public CursoEntity(String nombre) {
-> >         this.nombre = nombre;
-> >     }
-> > }
-> > ```
-> >
-> > 📄 **DocenteEntity.java  (lado dueño: tiene @JoinColumn)**
-> >
-> > ```java
-> > package com.academia.persistence.entity;
-> >
-> > import jakarta.persistence.*;
-> > import lombok.Data;
-> > import lombok.NoArgsConstructor;
-> >
-> > import java.util.ArrayList;
-> > import java.util.List;
-> >
-> > @Entity
-> > @Table(name = "docente")
-> > @Data
-> > @NoArgsConstructor
-> > public class DocenteEntity {
-> >
-> >     @Id
-> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
-> >     private Long id;
-> >
-> >     private String nombre;
-> >
-> >     // 1:N — lado DUEÑO (un sentido): tiene @JoinColumn. La columna docente_id se crea en la tabla curso
-> >     @OneToMany(cascade = CascadeType.ALL)
-> >     @JoinColumn(name = "docente_id")
-> >     private List<CursoEntity> cursos = new ArrayList<>();
-> >
-> >     public DocenteEntity(String nombre) {
-> >         this.nombre = nombre;
-> >     }
-> > }
-> > ```
-> >
-> > **🔹 4.3 Muchos a muchos — Estudiante y Curso**
-> >
-> > `CursoEntity` **no cambia**. Solo se amplía `EstudianteEntity` con el atributo `cursos` y la tabla intermedia (`@JoinTable`). Agregá estos imports y este atributo:
-> >
-> > ```java
-> > // imports nuevos
-> > import java.util.HashSet;
-> > import java.util.Set;
-> >
-> > // atributo nuevo, después de "carnet"
-> > @ManyToMany
-> > @JoinTable(name = "estudiante_curso",
-> >         joinColumns = @JoinColumn(name = "estudiante_id"),
-> >         inverseJoinColumns = @JoinColumn(name = "curso_id"))
-> > private Set<CursoEntity> cursos = new HashSet<>();
-> > ```
-> >
-> > Así queda `EstudianteEntity` **completa**:
-> >
-> > ```java
-> > package com.academia.persistence.entity;
-> >
-> > import jakarta.persistence.*;
-> > import lombok.Data;
-> > import lombok.NoArgsConstructor;
-> >
-> > import java.util.HashSet;
-> > import java.util.Set;
-> >
-> > @Entity
-> > @Table(name = "estudiante")
-> > @Data
-> > @NoArgsConstructor
-> > public class EstudianteEntity {
-> >
-> >     @Id
-> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
-> >     private Long id;
-> >
-> >     private String nombre;
-> >
-> >     // 1:1 — lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
-> >     @OneToOne(cascade = CascadeType.ALL)
-> >     @JoinColumn(name = "carnet_id")
-> >     private CarnetEntity carnet;
-> >
-> >     // N:M — lado DUEÑO: JPA crea la tabla intermedia estudiante_curso
-> >     @ManyToMany
-> >     @JoinTable(name = "estudiante_curso",
-> >             joinColumns = @JoinColumn(name = "estudiante_id"),
-> >             inverseJoinColumns = @JoinColumn(name = "curso_id"))
-> >     private Set<CursoEntity> cursos = new HashSet<>();
-> >
-> >     public EstudianteEntity(String nombre) {
-> >         this.nombre = nombre;
-> >     }
-> > }
-> > ```
+> > </details>
 > >
 > > > 🔎 **¿Quién es el dueño?** Quien tiene `@JoinColumn` o `@JoinTable`: `EstudianteEntity` (`carnet` y `cursos`) y `DocenteEntity` (`cursos`). `CarnetEntity` y `CursoEntity` **no conocen** a quien los referencia: eso es **un sentido**. Por eso aquí no hace falta `@ToString.Exclude`.
 >
