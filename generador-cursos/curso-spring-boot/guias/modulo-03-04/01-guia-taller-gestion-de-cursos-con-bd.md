@@ -267,70 +267,39 @@
 > >
 > > 🗣️ **Pregunta:** si se cambiara JPA por JDBC puro, ¿qué clases del diagrama se reemplazan? *(Todas las de abajo del contrato; el contrato y el modelo se quedan.)*
 >
-> ### 2️⃣ Las relaciones de «Matrícula»: el modelo y la entidad tienen la misma forma
+> ### 2️⃣ Las relaciones de «Matrícula»: solo las entidades
 >
 > ```mermaid
 > classDiagram
->     direction TB
+>     direction LR
 >
->     namespace negocio_model {
->         class Matricula {
->             -Long id
->             -Estudiante estudiante
->             -Curso curso
->         }
->         class Estudiante {
->             -Long id
->             -String nombre
->             -int edad
->             -String correo
->         }
->         class Curso {
->             -Long id
->             -String nombre
->             -double precio
->             -int cupoMaximo
->         }
+>     class MatriculaEntity {
+>         <<Entity>>
+>         -Long id
+>         -EstudianteEntity estudiante
+>         -CursoEntity curso
+>     }
+>     class EstudianteEntity {
+>         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -int edad
+>         -String correo
+>     }
+>     class CursoEntity {
+>         <<Entity>>
+>         -Long id
+>         -String nombre
+>         -double precio
+>         -int cupoMaximo
 >     }
 >
->     namespace persistence_entity {
->         class MatriculaEntity {
->             <<Entity>>
->             -Long id
->             -EstudianteEntity estudiante
->             -CursoEntity curso
->         }
->         class EstudianteEntity {
->             <<Entity>>
->             -Long id
->             -String nombre
->             -int edad
->             -String correo
->         }
->         class CursoEntity {
->             <<Entity>>
->             -Long id
->             -String nombre
->             -double precio
->             -int cupoMaximo
->         }
->     }
->
->     Matricula --> "1" Estudiante
->     Matricula --> "1" Curso
 >     MatriculaEntity "*" --> "1" EstudianteEntity : @ManyToOne estudiante_id
 >     MatriculaEntity "*" --> "1" CursoEntity : @ManyToOne curso_id
->
->     Matricula ..> MatriculaEntity : MatriculaMapper
->     Estudiante ..> EstudianteEntity : EstudianteMapper
->     Curso ..> CursoEntity : CursoMapper
 > ```
 >
-> - Arriba, el **modelo**: objetos que se referencian entre sí, sin anotaciones. Abajo, las **entidades**: la misma forma, pero cada flecha es una **clave foránea** (`@ManyToOne` + `@JoinColumn`).
-> - Las líneas punteadas son los **mapeadores**: la única pieza que conoce ambos lados.
+> - Cada flecha es una **clave foránea** (`@ManyToOne` + `@JoinColumn`).
 > - `MatriculaEntity` es el **lado dueño**: la tabla `matricula` guarda `estudiante_id` y `curso_id`; `EstudianteEntity` y `CursoEntity` **no** conocen sus matrículas (relación unidireccional).
->
-> > 💡 **Para dibujar en la pizarra:** dos columnas. A la izquierda, el modelo (lo que entiende el negocio); a la derecha, las entidades (lo que entiende la base); en el centro, los mapeadores como «traductores».
 
 </details>
 
