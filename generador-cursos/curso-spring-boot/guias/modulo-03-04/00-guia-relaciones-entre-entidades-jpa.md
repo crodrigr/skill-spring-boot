@@ -56,6 +56,41 @@
 > | **Muchos a muchos** | Estudiantes y cursos | `EstudianteEntity.cursos` | tabla intermedia `estudiante_curso` |
 >
 > > 🔎 En el taller, el muchos a muchos entre estudiantes y cursos se resuelve con una **entidad intermedia** (`MatriculaEntity`), porque la matrícula necesita sus propios datos. Aquí se muestra la forma **directa**, sin datos propios.
+>
+> <details open>
+> <summary><strong>🧰 De dónde salen <code>docentes</code>, <code>cursos</code>, <code>estudiantes</code> y <code>carnets</code></strong></summary>
+>
+> > En los ejemplos aparecen líneas como `docentes.save(...)` o `cursos.save(...)`. Esas variables son los **repositorios**: un repositorio por entidad, que Spring Data crea solo a partir de una interfaz vacía.
+> >
+> > ```java
+> > public interface DocenteJpaRepository extends JpaRepository<DocenteEntity, Long> {}
+> > public interface CursoJpaRepository extends JpaRepository<CursoEntity, Long> {}
+> > public interface EstudianteJpaRepository extends JpaRepository<EstudianteEntity, Long> {}
+> > public interface CarnetJpaRepository extends JpaRepository<CarnetEntity, Long> {}
+> > ```
+> >
+> > Y se reciben en el constructor de una clase de Spring (un servicio, o un `CommandLineRunner` como en «Probalo»). El nombre del campo es el que se usa en los ejemplos:
+> >
+> > ```java
+> > @Component
+> > @RequiredArgsConstructor
+> > public class Demo implements CommandLineRunner {
+> >     private final DocenteJpaRepository docentes;       // docentes.save(...)
+> >     private final CursoJpaRepository cursos;           // cursos.save(...)
+> >     private final EstudianteJpaRepository estudiantes; // estudiantes.save(...)
+> >     private final CarnetJpaRepository carnets;         // carnets.findAll()
+> >
+> >     @Override
+> >     @Transactional
+> >     public void run(String... args) {
+> >         // aquí van los ejemplos de «guardar y consultar datos»
+> >     }
+> > }
+> > ```
+> >
+> > `save` guarda, `findAll` trae todo, y los métodos como `findByCarnetCodigo` se agregan dentro de la interfaz del repositorio que corresponda.
+>
+> </details>
 
 </details>
 
