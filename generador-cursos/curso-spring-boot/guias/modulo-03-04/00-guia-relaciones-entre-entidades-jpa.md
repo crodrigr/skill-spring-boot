@@ -64,29 +64,29 @@
 <details open>
 <summary><strong>1️⃣ Uno a uno — Estudiante y Carnet</strong></summary>
 
-> ```mermaid
-> classDiagram
->     direction LR
->     class EstudianteEntity {
->         <<Entity>>
->         -Long id
->         -String nombre
->         -CarnetEntity carnet
->     }
->     class CarnetEntity {
->         <<Entity>>
->         -Long id
->         -String codigo
->         -EstudianteEntity estudiante
->     }
->     EstudianteEntity "1" -- "1" CarnetEntity : carnet_id
-> ```
->
-> > Las flechas del diagrama no llevan punta porque la relación puede recorrerse en los dos sentidos; el atributo `estudiante` de `CarnetEntity` existe **solo** en el doble sentido.
 >
 > <details open>
 > <summary><strong>➡️ Un sentido</strong></summary>
 >
+> > ```mermaid
+> > classDiagram
+> >     direction LR
+> >     class EstudianteEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -CarnetEntity carnet
+> >     }
+> >     class CarnetEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String codigo
+> >     }
+> >     EstudianteEntity "1" --> "1" CarnetEntity : carnet_id
+> > ```
+> >
+> > La **flecha** indica quién conoce a quién: solo `EstudianteEntity` conoce a `CarnetEntity`. El carnet **no tiene** atributo `estudiante`.
+> >
 > > **Un sentido** — solo el estudiante conoce su carnet. Es el **dueño**: la clave foránea vive en su tabla. Clases completas:
 > >
 > > ```java
@@ -242,6 +242,26 @@
 > <details open>
 > <summary><strong>↔️ Doble sentido</strong></summary>
 >
+> > ```mermaid
+> > classDiagram
+> >     direction LR
+> >     class EstudianteEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -CarnetEntity carnet
+> >     }
+> >     class CarnetEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String codigo
+> >         -EstudianteEntity estudiante
+> >     }
+> >     EstudianteEntity "1" -- "1" CarnetEntity : carnet_id
+> > ```
+> >
+> > La línea **sin flecha** indica que se conocen los dos: el carnet **gana** el atributo `estudiante` (lado inverso).
+> >
 > > **Doble sentido** — `EstudianteEntity` **no cambia**; se agrega, **opcional**, el lado inverso en el carnet. Clase completa:
 > >
 > > ```java
@@ -369,31 +389,31 @@
 <details open>
 <summary><strong>2️⃣ Uno a muchos — Docente y Curso</strong></summary>
 
-> ```mermaid
-> classDiagram
->     direction LR
->     class DocenteEntity {
->         <<Entity>>
->         -Long id
->         -String nombre
->         -List~CursoEntity~ cursos
->     }
->     class CursoEntity {
->         <<Entity>>
->         -Long id
->         -String nombre
->         -DocenteEntity docente
->     }
->     DocenteEntity "1" -- "*" CursoEntity : docente_id
-> ```
->
-> > En un sentido solo existe `DocenteEntity.cursos`; en doble sentido se agrega también `CursoEntity.docente`.
 >
 > Un docente dicta **varios** cursos. Se muestra primero **desde el docente** (un sentido) y después se agrega el curso → docente (doble sentido). La clave foránea siempre queda en la tabla `curso` (el lado «muchos»), pero **quién la escribe** depende del sentido.
 >
 > <details open>
 > <summary><strong>➡️ Un sentido</strong></summary>
 >
+> > ```mermaid
+> > classDiagram
+> >     direction LR
+> >     class DocenteEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -List~CursoEntity~ cursos
+> >     }
+> >     class CursoEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >     }
+> >     DocenteEntity "1" --> "*" CursoEntity : docente_id
+> > ```
+> >
+> > La **flecha** va del docente a sus cursos: solo `DocenteEntity` conoce a `CursoEntity`. El curso **no tiene** atributo `docente`.
+> >
 > > **Un sentido** — **desde el docente**: un docente tiene **varios** cursos y el curso no sabe de quién es. Clases completas:
 > >
 > > ```java
@@ -556,6 +576,26 @@
 > <details open>
 > <summary><strong>↔️ Doble sentido</strong></summary>
 >
+> > ```mermaid
+> > classDiagram
+> >     direction LR
+> >     class DocenteEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -List~CursoEntity~ cursos
+> >     }
+> >     class CursoEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -DocenteEntity docente
+> >     }
+> >     DocenteEntity "1" -- "*" CursoEntity : docente_id
+> > ```
+> >
+> > La línea **sin flecha** indica que se conocen los dos: el curso **gana** el atributo `docente` y pasa a ser el dueño; el docente queda como lado inverso.
+> >
 > > **Doble sentido** — se agrega `@ManyToOne` en el curso y **el dueño pasa a ser `CursoEntity`**. El docente deja de tener `@JoinColumn` y queda como lado **inverso** (`mappedBy`). Clases completas:
 > >
 > > ```java
@@ -728,31 +768,31 @@
 <details open>
 <summary><strong>3️⃣ Muchos a muchos — Estudiante y Curso</strong></summary>
 
-> ```mermaid
-> classDiagram
->     direction LR
->     class EstudianteEntity {
->         <<Entity>>
->         -Long id
->         -String nombre
->         -Set~CursoEntity~ cursos
->     }
->     class CursoEntity {
->         <<Entity>>
->         -Long id
->         -String nombre
->         -Set~EstudianteEntity~ estudiantes
->     }
->     EstudianteEntity "*" -- "*" CursoEntity : estudiante_curso
-> ```
->
-> > El atributo `estudiantes` de `CursoEntity` existe **solo** en el doble sentido.
 >
 > Ningún lado puede guardar la clave en su propia tabla: hace falta una **tabla intermedia** con las dos claves foráneas. JPA la crea por vos.
 >
 > <details open>
 > <summary><strong>➡️ Un sentido</strong></summary>
 >
+> > ```mermaid
+> > classDiagram
+> >     direction LR
+> >     class EstudianteEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -Set~CursoEntity~ cursos
+> >     }
+> >     class CursoEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >     }
+> >     EstudianteEntity "*" --> "*" CursoEntity : estudiante_curso
+> > ```
+> >
+> > La **flecha** va del estudiante a sus cursos: solo `EstudianteEntity` conoce a `CursoEntity`. El curso **no tiene** atributo `estudiantes`.
+> >
 > > **Un sentido** — solo el estudiante conoce sus cursos. Es el **dueño** (`@JoinTable`). Clases completas:
 > >
 > > ```java
@@ -950,6 +990,26 @@
 > <details open>
 > <summary><strong>↔️ Doble sentido</strong></summary>
 >
+> > ```mermaid
+> > classDiagram
+> >     direction LR
+> >     class EstudianteEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -Set~CursoEntity~ cursos
+> >     }
+> >     class CursoEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -Set~EstudianteEntity~ estudiantes
+> >     }
+> >     EstudianteEntity "*" -- "*" CursoEntity : estudiante_curso
+> > ```
+> >
+> > La línea **sin flecha** indica que se conocen los dos: el curso **gana** el atributo `estudiantes` (lado inverso).
+> >
 > > **Doble sentido** — `EstudianteEntity` **no cambia**; el curso también ve a sus estudiantes (lado **inverso**, sin repetir la tabla). Clase completa:
 > >
 > > ```java
@@ -1294,55 +1354,61 @@
 >
 > </details>
 >
-> **⚠️ El problema típico de LAZY: `LazyInitializationException`**
+> <details open>
+> <summary><strong>⚠️ El problema típico de LAZY: LazyInitializationException</strong></summary>
 >
-> Se entiende en tres pasos:
+> > Se entiende en tres pasos:
+> >
+> > 1. Con **LAZY**, cuando JPA carga a Ana **no trae sus cursos**. En `ana.cursos` deja una *promesa*: «cuando alguien me los pida, voy a la base de datos y los traigo».
+> > 2. Para cumplir esa promesa, JPA necesita que **la conexión con la base (la transacción) siga abierta**.
+> > 3. Si la transacción **ya se cerró** cuando pedís los cursos, la promesa no se puede cumplir y salta el error.
+> >
+> > **❌ Lo que falla.** Cada método del repositorio (`findById`, `save`…) abre su transacción, hace su trabajo y **la cierra al terminar**:
+> >
+> > ```java
+> > EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();   // 1) abre transacción, lee a Ana y la CIERRA
+> > ana.getCursos().size();                                          // 2) pide los cursos con la transacción cerrada → 💥
+> > ```
+> >
+> > ```text
+> > LazyInitializationException: failed to lazily initialize a collection of role: ...EstudianteEntity.cursos
+> > ```
+> >
+> > Es como pedir algo a un teléfono que ya colgó: la información existe, pero ya no hay línea para pedirla.
+> >
+> > **✅ Dos formas de arreglarlo**
+> >
+> > | | Solución | Código | Qué hace |
+> > |---|---|---|---|
+> > | A | **Pedir los cursos mientras la transacción sigue abierta** (la recomendada) | `tx.executeWithoutResult(status -> { ... })` o `@Transactional` en un método | Leés a Ana **y** sus cursos dentro de la misma transacción |
+> > | B | Poner `EAGER` en `cursos` | `@ManyToMany(fetch = FetchType.EAGER)` | Los cursos ya vienen cargados con Ana; no hay nada que pedir después |
+> >
+> > ```java
+> > // A) Dentro de una transacción (así lo hace la práctica)
+> > tx.executeWithoutResult(status -> {
+> >     EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();
+> >     ana.getCursos().size();        // ✅ la transacción sigue abierta: la promesa se cumple
+> > });
+> > ```
+> >
+> > Con `cursos` en `EAGER`, el mismo código que fallaba **sí funciona** (devuelve 2), porque los cursos ya vinieron en el `SELECT` de Ana. Ejecutado en MySQL, comprobado.
 >
-> 1. Con **LAZY**, cuando JPA carga a Ana **no trae sus cursos**. En `ana.cursos` deja una *promesa*: «cuando alguien me los pida, voy a la base de datos y los traigo».
-> 2. Para cumplir esa promesa, JPA necesita que **la conexión con la base (la transacción) siga abierta**.
-> 3. Si la transacción **ya se cerró** cuando pedís los cursos, la promesa no se puede cumplir y salta el error.
+> </details>
 >
-> **❌ Lo que falla.** Cada método del repositorio (`findById`, `save`…) abre su transacción, hace su trabajo y **la cierra al terminar**:
+> <details open>
+> <summary><strong>🤔 ¿Cuándo cambiar los valores por defecto?</strong></summary>
 >
-> ```java
-> EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();   // 1) abre transacción, lee a Ana y la CIERRA
-> ana.getCursos().size();                                          // 2) pide los cursos con la transacción cerrada → 💥
-> ```
+> > Regla simple: **no los cambies hasta que tengas una razón.** Estas son las razones:
+> >
+> > | Si te pasa esto… | Hacé esto | Por qué |
+> > |---|---|---|
+> > | Todo funciona | **Nada** | Los valores por defecto son los adecuados casi siempre |
+> > | Te sale `LazyInitializationException` | **Leé la lista dentro de una transacción** (opción A) | Es lo correcto y no cuesta rendimiento |
+> > | *Siempre* que cargás la entidad también necesitás esa lista (y es corta) | `EAGER` en esa relación | Evita pedirla aparte cada vez |
+> > | La lista puede ser enorme (por ejemplo, un curso con miles de estudiantes) | Dejar `LAZY` | Si fuera EAGER, cada consulta del curso trae miles de filas aunque no las uses |
+> > | Una relación a un solo objeto que casi nunca se usa | `@OneToOne(fetch = FetchType.LAZY)` | No se trae si no se necesita |
 >
-> ```text
-> LazyInitializationException: failed to lazily initialize a collection of role: ...EstudianteEntity.cursos
-> ```
->
-> Es como pedir algo a un teléfono que ya colgó: la información existe, pero ya no hay línea para pedirla.
->
-> **✅ Dos formas de arreglarlo**
->
-> | | Solución | Código | Qué hace |
-> |---|---|---|---|
-> | A | **Pedir los cursos mientras la transacción sigue abierta** (la recomendada) | `tx.executeWithoutResult(status -> { ... })` o `@Transactional` en un método | Leés a Ana **y** sus cursos dentro de la misma transacción |
-> | B | Poner `EAGER` en `cursos` | `@ManyToMany(fetch = FetchType.EAGER)` | Los cursos ya vienen cargados con Ana; no hay nada que pedir después |
->
-> ```java
-> // A) Dentro de una transacción (así lo hace la práctica)
-> tx.executeWithoutResult(status -> {
->     EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();
->     ana.getCursos().size();        // ✅ la transacción sigue abierta: la promesa se cumple
-> });
-> ```
->
-> Con `cursos` en `EAGER`, el mismo código que fallaba **sí funciona** (devuelve 2), porque los cursos ya vinieron en el `SELECT` de Ana. Ejecutado en MySQL, comprobado.
->
-> **¿Cuándo cambiar los valores por defecto?**
->
-> Regla simple: **no los cambies hasta que tengas una razón.** Estas son las razones:
->
-> | Si te pasa esto… | Hacé esto | Por qué |
-> |---|---|---|
-> | Todo funciona | **Nada** | Los valores por defecto son los adecuados casi siempre |
-> | Te sale `LazyInitializationException` | **Leé la lista dentro de una transacción** (opción A) | Es lo correcto y no cuesta rendimiento |
-> | *Siempre* que cargás la entidad también necesitás esa lista (y es corta) | `EAGER` en esa relación | Evita pedirla aparte cada vez |
-> | La lista puede ser enorme (por ejemplo, un curso con miles de estudiantes) | Dejar `LAZY` | Si fuera EAGER, cada consulta del curso trae miles de filas aunque no las uses |
-> | Una relación a un solo objeto que casi nunca se usa | `@OneToOne(fetch = FetchType.LAZY)` | No se trae si no se necesita |
+> </details>
 >
 > > ⚠️ Poner `EAGER` en todo parece cómodo, pero con muchas relaciones cada consulta termina trayendo **media base de datos**. Empezá con los valores por defecto.
 > >
