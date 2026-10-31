@@ -1294,29 +1294,57 @@
 >
 > </details>
 >
-> **El problema típico de LAZY.** Lo perezoso solo se puede pedir **mientras la transacción está abierta**. Fuera de ella falla:
+> **⚠️ El problema típico de LAZY: `LazyInitializationException`**
+>
+> Se entiende en tres pasos:
+>
+> 1. Con **LAZY**, cuando JPA carga a Ana **no trae sus cursos**. En `ana.cursos` deja una *promesa*: «cuando alguien me los pida, voy a la base de datos y los traigo».
+> 2. Para cumplir esa promesa, JPA necesita que **la conexión con la base (la transacción) siga abierta**.
+> 3. Si la transacción **ya se cerró** cuando pedís los cursos, la promesa no se puede cumplir y salta el error.
+>
+> **❌ Lo que falla.** Cada método del repositorio (`findById`, `save`…) abre su transacción, hace su trabajo y **la cierra al terminar**:
 >
 > ```java
-> EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();   // la transacción ya terminó
-> ana.getCursos().size();                                          // 💥
+> EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();   // 1) abre transacción, lee a Ana y la CIERRA
+> ana.getCursos().size();                                          // 2) pide los cursos con la transacción cerrada → 💥
 > ```
 >
 > ```text
 > LazyInitializationException: failed to lazily initialize a collection of role: ...EstudianteEntity.cursos
 > ```
 >
-> Con `cursos` en EAGER, ese mismo código **sí funciona** (devuelve 2), porque ya vino cargado. Por eso la práctica ejecuta las consultas dentro de `TransactionTemplate`.
+> Es como pedir algo a un teléfono que ya colgó: la información existe, pero ya no hay línea para pedirla.
 >
-> **¿Cuándo cambiarlos?**
+> **✅ Dos formas de arreglarlo**
 >
-> | Situación | Qué hacer |
-> |---|---|
-> | Lo normal | **Dejar los valores por defecto** |
-> | `LazyInitializationException` y siempre necesitás esa lista | Leerla **dentro de una transacción** (o `EAGER` en esa relación) |
-> | Traer la lista completa cada vez es costoso | Dejar `LAZY` y pedirla solo cuando haga falta |
-> | Una relación a uno que casi nunca se usa | `@OneToOne(fetch = FetchType.LAZY)` |
+> | | Solución | Código | Qué hace |
+> |---|---|---|---|
+> | A | **Pedir los cursos mientras la transacción sigue abierta** (la recomendada) | `tx.executeWithoutResult(status -> { ... })` o `@Transactional` en un método | Leés a Ana **y** sus cursos dentro de la misma transacción |
+> | B | Poner `EAGER` en `cursos` | `@ManyToMany(fetch = FetchType.EAGER)` | Los cursos ya vienen cargados con Ana; no hay nada que pedir después |
 >
-> > ⚠️ Poner `EAGER` en todo parece cómodo, pero con muchas relaciones cada consulta termina trayendo media base de datos. Empezá con los valores por defecto.
+> ```java
+> // A) Dentro de una transacción (así lo hace la práctica)
+> tx.executeWithoutResult(status -> {
+>     EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();
+>     ana.getCursos().size();        // ✅ la transacción sigue abierta: la promesa se cumple
+> });
+> ```
+>
+> Con `cursos` en `EAGER`, el mismo código que fallaba **sí funciona** (devuelve 2), porque los cursos ya vinieron en el `SELECT` de Ana. Ejecutado en MySQL, comprobado.
+>
+> **¿Cuándo cambiar los valores por defecto?**
+>
+> Regla simple: **no los cambies hasta que tengas una razón.** Estas son las razones:
+>
+> | Si te pasa esto… | Hacé esto | Por qué |
+> |---|---|---|
+> | Todo funciona | **Nada** | Los valores por defecto son los adecuados casi siempre |
+> | Te sale `LazyInitializationException` | **Leé la lista dentro de una transacción** (opción A) | Es lo correcto y no cuesta rendimiento |
+> | *Siempre* que cargás la entidad también necesitás esa lista (y es corta) | `EAGER` en esa relación | Evita pedirla aparte cada vez |
+> | La lista puede ser enorme (por ejemplo, un curso con miles de estudiantes) | Dejar `LAZY` | Si fuera EAGER, cada consulta del curso trae miles de filas aunque no las uses |
+> | Una relación a un solo objeto que casi nunca se usa | `@OneToOne(fetch = FetchType.LAZY)` | No se trae si no se necesita |
+>
+> > ⚠️ Poner `EAGER` en todo parece cómodo, pero con muchas relaciones cada consulta termina trayendo **media base de datos**. Empezá con los valores por defecto.
 > >
 > > 🧑‍💻 Podés repetir estos casos en la **práctica**: cambiá el `fetch` en `EstudianteEntity` y mirá el SQL que Hibernate imprime en la consola.
 
