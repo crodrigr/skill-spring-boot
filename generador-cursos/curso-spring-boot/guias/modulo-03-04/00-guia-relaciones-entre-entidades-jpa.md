@@ -1190,6 +1190,25 @@
 >
 > Con el lado inverso (`@OneToOne(mappedBy = "carnet")` en `CarnetEntity`) las dos líneas funcionan.
 >
+> En el diagrama, las flechas continuas son lo que **puedes navegar en Java**; la flecha punteada es la **única que existe en la base de datos** (la columna `carnet_id`):
+>
+> ```mermaid
+> flowchart LR
+>     subgraph UN["➡️ Un sentido"]
+>         direction LR
+>         A1["Ana<br/>(EstudianteEntity)"] -->|"getCarnet()"| C1["C-001<br/>(CarnetEntity)"]
+>     end
+>     subgraph DOBLE["↔️ Doble sentido"]
+>         direction LR
+>         A2["Ana<br/>(EstudianteEntity)"] -->|"getCarnet()"| C2["C-001<br/>(CarnetEntity)"]
+>         C2 -->|"getEstudiante()"| A2
+>     end
+>     A1 -.->|"columna carnet_id"| C1
+>     A2 -.->|"columna carnet_id"| C2
+> ```
+>
+> Fíjate en que la columna `carnet_id` es la misma en los dos casos: el doble sentido **solo agrega la flecha de vuelta en Java**, no cambia las tablas.
+>
 > | | |
 > |---|---|
 > | **Qué hace** | Permite **navegar en sentido contrario**: al pedir `carnet.getEstudiante()`, JPA busca al estudiante cuyo `carnet_id` sea el de ese carnet. |
