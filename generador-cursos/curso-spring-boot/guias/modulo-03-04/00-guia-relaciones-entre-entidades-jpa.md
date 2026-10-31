@@ -231,7 +231,7 @@
 > | **Uno a muchos** | Un docente dicta **varios** cursos | un sentido: `DocenteEntity.cursos`; doble sentido: `CursoEntity.docente` | columna `curso.docente_id` |
 > | **Muchos a muchos** | Estudiantes y cursos | `EstudianteEntity.cursos` | tabla intermedia `estudiante_curso` |
 >
-> > 🔎 En el taller, el muchos a muchos entre estudiantes y cursos se resuelve con una **entidad intermedia** (`MatriculaEntity`), porque la matrícula necesita sus propios datos. Aquí se muestra la forma **directa**, sin datos propios.
+> > 🔎 En el taller, el muchos a muchos entre estudiantes y cursos se resuelve con una **entidad intermedia** (`EnrollmentEntity`), porque la matrícula necesita sus propios datos. Aquí se muestra la forma **directa**, sin datos propios.
 >
 > > 🧑‍💻 Los repositorios (`docentes`, `cursos`, `estudiantes`, `carnets`) y la clase `main` que los usa se arman **paso a paso** en la sección **«🧑‍💻 Práctica paso a paso»**, casi al final de esta guía.
 
@@ -1350,7 +1350,7 @@
 >
 > > 🔎 La **clave primaria compuesta** `(curso_id, estudiante_id)` impide repetir un par a nivel de base.
 > >
-> > 💡 **Cuándo pasar a una entidad intermedia:** si la relación necesita **sus propios datos** (la fecha de matrícula, una nota, un estado), un `@ManyToMany` simple no tiene dónde guardarlos. Se reemplaza por una entidad con **dos `@ManyToOne`**, como `MatriculaEntity` en el taller ([Ejemplo 04 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md)).
+> > 💡 **Cuándo pasar a una entidad intermedia:** si la relación necesita **sus propios datos** (la fecha de matrícula, una nota, un estado), un `@ManyToMany` simple no tiene dónde guardarlos. Se reemplaza por una entidad con **dos `@ManyToOne`**, como `EnrollmentEntity` en el taller ([Ejemplo 04 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md)).
 
 </details>
 
@@ -2262,7 +2262,7 @@
 
 > 1. **Cascade:** agregar `cascade = CascadeType.ALL` y `orphanRemoval = true` a `DocenteEntity.cursos` y comprobar qué pasa con los cursos al borrar un docente. ([Cascade y orphanRemoval](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/05-cascade-y-orphanRemoval.md).)
 > 2. **Un sentido:** quitar el lado inverso de `CarnetEntity` y comprobar que **las tablas no cambian**.
-> 3. **Dato propio:** agregar la **fecha de inscripción** a la relación estudiante–curso: ¿qué entidad nueva hace falta y qué relaciones declara? *(Pista: la `MatriculaEntity` del taller.)*
+> 3. **Dato propio:** agregar la **fecha de inscripción** a la relación estudiante–curso: ¿qué entidad nueva hace falta y qué relaciones declara? *(Pista: la `EnrollmentEntity` del taller.)*
 
 </details>
 
