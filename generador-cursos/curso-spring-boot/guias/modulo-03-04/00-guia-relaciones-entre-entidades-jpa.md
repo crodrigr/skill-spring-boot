@@ -1195,11 +1195,14 @@
 > > **En la entidad no escribís nada de `fetch`**: JPA aplica el valor por defecto. Así están los atributos en la práctica, con lo que JPA entiende en cada uno:
 > >
 > > ```java
-> > // EstudianteEntity (tal como está en la práctica)
+> > // ===== Clase EstudianteEntity (tal como está en la práctica) =====
+> >
+> > // Relación 1:1 con CarnetEntity
 > > @OneToOne(cascade = CascadeType.ALL)        // = fetch EAGER (por defecto en @OneToOne)
 > > @JoinColumn(name = "carnet_id")
 > > private CarnetEntity carnet;
 > >
+> > // Relación N:M con CursoEntity
 > > @ManyToMany                                  // = fetch LAZY (por defecto en @ManyToMany)
 > > @JoinTable(...)
 > > private Set<CursoEntity> cursos = new HashSet<>();
@@ -1230,10 +1233,14 @@
 > > **Qué se cambia en la entidad:** se agrega `fetch = FetchType.EAGER` a los cursos.
 > >
 > > ```java
+> > // ===== Clase EstudianteEntity =====
+> >
+> > // Relación 1:1 con CarnetEntity
 > > @OneToOne(cascade = CascadeType.ALL)                    // EAGER (por defecto)
 > > @JoinColumn(name = "carnet_id")
 > > private CarnetEntity carnet;
 > >
+> > // Relación N:M con CursoEntity
 > > @ManyToMany(fetch = FetchType.EAGER)                    // ← cambia: de LAZY a EAGER
 > > @JoinTable(...)
 > > private Set<CursoEntity> cursos = new HashSet<>();
@@ -1261,10 +1268,14 @@
 > > **Qué se cambia en la entidad:** se agrega `fetch = FetchType.LAZY` al carnet.
 > >
 > > ```java
+> > // ===== Clase EstudianteEntity =====
+> >
+> > // Relación 1:1 con CarnetEntity
 > > @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)   // ← cambia: de EAGER a LAZY
 > > @JoinColumn(name = "carnet_id")
 > > private CarnetEntity carnet;
 > >
+> > // Relación N:M con CursoEntity
 > > @ManyToMany                                                   // LAZY (por defecto)
 > > @JoinTable(...)
 > > private Set<CursoEntity> cursos = new HashSet<>();
