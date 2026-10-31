@@ -19,8 +19,8 @@
 > - Declara **entidades JPA** (`@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn`) en `persistence.entity` (M3 y M4).
 > - Configura la conexión a **MySQL** en `application.properties` y lee el SQL que genera Hibernate (M3 y M4).
 > - Crea interfaces `JpaRepository` con **métodos derivados** (`existsBy…`, `countBy…`) (M3).
-> - Escribe **servicios** (`@Service`) que aplican reglas del negocio y lanzan excepciones propias (M2).
-> - Expone una **API REST** con controladores (`@RestController`) y traduce las excepciones a códigos HTTP.
+> - Escribe **servicios** (`@Service`) que aplican reglas del negocio y devuelven un `Optional` cuando no se cumplen.
+> - Expone una **API REST** con controladores (`@RestController`) y elige el código HTTP (`201`, `404`, `409`) a partir de lo que devuelve el servicio.
 > - Comprueba que las **tablas y los datos persisten** en MySQL entre reinicios.
 > - Verifica que los datos **sobreviven al reinicio** en MySQL: la base vive en un servidor, no dentro de la aplicación.
 
@@ -117,8 +117,8 @@
 >
 > | Capa | Paquetes | Qué contiene | En esta guía |
 > |---|---|---|---|
-> | Presentación | `presentation.controller` | Controladores REST y manejo de errores HTTP. | **Paso 4** |
-> | Negocio | `business.service`, `business.exception` | Servicios con las reglas del negocio y sus excepciones. | **Paso 3** |
+> | Presentación | `presentation.controller` | Controladores REST: reciben HTTP y eligen el código de respuesta. | **Paso 4** |
+> | Negocio | `business.service` | Servicios con las reglas del negocio. | **Paso 3** |
 > | Persistencia | `persistence.repository`, `persistence.entity` | Repositorios de Spring Data y entidades JPA. | **Pasos 1 y 2** |
 >
 > ```text
@@ -279,9 +279,7 @@
 > > ```text
 > > com.academy
 > > ├── presentation.controller
-> > ├── business
-> > │   ├── service
-> > │   └── exception
+> > ├── business.service
 > > └── persistence
 > >     ├── repository
 > >     └── entity
@@ -724,64 +722,18 @@
 <summary><strong>⚙️ Paso 3 — Capa de negocio (<code>business.service</code>)</strong></summary>
 
 > El **servicio** aplica las **reglas del negocio** y decide cuándo se guarda algo. Usa los repositorios del Paso 2 y **no sabe nada de HTTP**: ni de rutas, ni de códigos de estado.
+> Cuando una regla no se cumple, devuelve un **`Optional` vacío**: «no hay resultado». Quien lo recibe decide qué responder.
 >
 > | Regla del taller | Dónde se aplica | Qué repositorio usa |
 > |---|---|---|
 > | El correo de un estudiante no puede repetirse (sin importar mayúsculas) | `StudentService.create` | `existsByEmailIgnoreCase` |
 > | Un curso necesita precio y cupo mayores que cero | `CourseService.create` | *(solo valida)* |
+> | El estudiante y el curso deben existir | `EnrollmentService.enroll` | `findById` |
 > | Un estudiante no se matricula dos veces en el mismo curso | `EnrollmentService.enroll` | `existsByStudentIdAndCourseId` |
 > | No se matricula si el curso ya llegó a su cupo | `EnrollmentService.enroll` | `countByCourseId` |
-> | El estudiante y el curso deben existir | `EnrollmentService.enroll` | `findById` |
 >
 > <details>
-> <summary><strong>Paso 3.1 · Las excepciones del negocio (<code>business.exception</code>)</strong></summary>
->
-> > Dos excepciones propias permiten al servicio **avisar qué falló** sin depender de la capa web. Se crea el paquete `business.exception`.
-> >
-> > <details>
-> > <summary><strong>📄 NotFoundException.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/business/exception/NotFoundException.java`
-> >
-> > ```java
-> > package com.academy.business.exception;
-> >
-> > public class NotFoundException extends RuntimeException {
-> >
-> >     public NotFoundException(String message) {
-> >         super(message);
-> >     }
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > <details>
-> > <summary><strong>📄 BusinessRuleException.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/business/exception/BusinessRuleException.java`
-> >
-> > ```java
-> > package com.academy.business.exception;
-> >
-> > public class BusinessRuleException extends RuntimeException {
-> >
-> >     public BusinessRuleException(String message) {
-> >         super(message);
-> >     }
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > - **`NotFoundException`**: algo que se buscó por `id` no existe.
-> > - **`BusinessRuleException`**: la operación rompe una regla del negocio.
->
-> </details>
->
->
-> <details>
-> <summary><strong>Paso 3.2 · <code>StudentService</code> y <code>CourseService</code></strong></summary>
+> <summary><strong>Paso 3.1 · <code>StudentService</code> y <code>CourseService</code></strong></summary>
 >
 > > Cada servicio recibe sus repositorios **por constructor** y lleva `@Service` para que Spring lo cree.
 > >
@@ -793,12 +745,12 @@
 > > ```java
 > > package com.academy.business.service;
 > >
-> > import com.academy.business.exception.BusinessRuleException;
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.repository.StudentJpaRepository;
 > > import org.springframework.stereotype.Service;
 > >
 > > import java.util.List;
+> > import java.util.Optional;
 > >
 > > @Service
 > > public class StudentService {
@@ -813,11 +765,11 @@
 > >         return students.findAll();
 > >     }
 > >
-> >     public StudentEntity create(StudentEntity student) {
+> >     public Optional<StudentEntity> create(StudentEntity student) {
 > >         if (students.existsByEmailIgnoreCase(student.getEmail())) {
-> >             throw new BusinessRuleException("Email already registered: " + student.getEmail());
+> >             return Optional.empty();
 > >         }
-> >         return students.save(student);
+> >         return Optional.of(students.save(student));
 > >     }
 > > }
 > > ```
@@ -832,14 +784,13 @@
 > > ```java
 > > package com.academy.business.service;
 > >
-> > import com.academy.business.exception.BusinessRuleException;
-> > import com.academy.business.exception.NotFoundException;
 > > import com.academy.persistence.entity.CourseEntity;
 > > import com.academy.persistence.repository.CourseJpaRepository;
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
 > > import org.springframework.stereotype.Service;
 > >
 > > import java.util.List;
+> > import java.util.Optional;
 > >
 > > @Service
 > > public class CourseService {
@@ -856,18 +807,18 @@
 > >         return courses.findAll();
 > >     }
 > >
-> >     public CourseEntity create(CourseEntity course) {
+> >     public Optional<CourseEntity> create(CourseEntity course) {
 > >         if (course.getPrice() <= 0 || course.getMaxCapacity() <= 0) {
-> >             throw new BusinessRuleException("Price and max capacity must be greater than zero");
+> >             return Optional.empty();
 > >         }
-> >         return courses.save(course);
+> >         return Optional.of(courses.save(course));
 > >     }
 > >
-> >     public long countEnrolled(Long courseId) {
+> >     public Optional<Long> countEnrolled(Long courseId) {
 > >         if (!courses.existsById(courseId)) {
-> >             throw new NotFoundException("Course not found: " + courseId);
+> >             return Optional.empty();
 > >         }
-> >         return enrollments.countByCourseId(courseId);
+> >         return Optional.of(enrollments.countByCourseId(courseId));
 > >     }
 > > }
 > > ```
@@ -875,16 +826,17 @@
 > > </details>
 > >
 > > - **`@Service`** registra la clase como *bean* de la capa de negocio (el mismo mecanismo de inyección del M2).
-> > - `create` **valida antes de guardar**: si la regla falla lanza `BusinessRuleException` y no se ejecuta ningún `insert`.
-> > - `save` devuelve la entidad con su `id` ya generado.
+> > - `create` **valida antes de guardar**: si la regla falla devuelve `Optional.empty()` y no se ejecuta ningún `insert`.
+> > - `save` devuelve la entidad con su `id` ya generado; se envuelve en `Optional.of(…)`.
+> > - `countEnrolled` devuelve vacío cuando el curso no existe, para no confundirlo con «cero inscritos».
 >
 > </details>
 >
 >
 > <details>
-> <summary><strong>Paso 3.3 · <code>EnrollmentService</code>: la regla más completa</strong></summary>
+> <summary><strong>Paso 3.2 · <code>EnrollmentService</code>: la regla más completa</strong></summary>
 >
-> > Matricular junta tres repositorios y **cuatro** comprobaciones, en este orden: existe el estudiante, existe el curso, no está ya matriculado y hay cupo.
+> > Matricular junta tres repositorios y **cuatro** comprobaciones, en este orden: existen el estudiante y el curso, no está ya matriculado y hay cupo.
 > >
 > > <details>
 > > <summary><strong>📄 EnrollmentService.java</strong></summary>
@@ -894,8 +846,6 @@
 > > ```java
 > > package com.academy.business.service;
 > >
-> > import com.academy.business.exception.BusinessRuleException;
-> > import com.academy.business.exception.NotFoundException;
 > > import com.academy.persistence.entity.CourseEntity;
 > > import com.academy.persistence.entity.EnrollmentEntity;
 > > import com.academy.persistence.entity.StudentEntity;
@@ -903,6 +853,8 @@
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
 > > import com.academy.persistence.repository.StudentJpaRepository;
 > > import org.springframework.stereotype.Service;
+> >
+> > import java.util.Optional;
 > >
 > > @Service
 > > public class EnrollmentService {
@@ -918,19 +870,20 @@
 > >         this.enrollments = enrollments;
 > >     }
 > >
-> >     public EnrollmentEntity enroll(Long studentId, Long courseId) {
-> >         StudentEntity student = students.findById(studentId)
-> >                 .orElseThrow(() -> new NotFoundException("Student not found: " + studentId));
-> >         CourseEntity course = courses.findById(courseId)
-> >                 .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
+> >     public Optional<EnrollmentEntity> enroll(Long studentId, Long courseId) {
+> >         Optional<StudentEntity> student = students.findById(studentId);
+> >         Optional<CourseEntity> course = courses.findById(courseId);
 > >
+> >         if (student.isEmpty() || course.isEmpty()) {
+> >             return Optional.empty();
+> >         }
 > >         if (enrollments.existsByStudentIdAndCourseId(studentId, courseId)) {
-> >             throw new BusinessRuleException("The student is already enrolled in this course");
+> >             return Optional.empty();
 > >         }
-> >         if (enrollments.countByCourseId(courseId) >= course.getMaxCapacity()) {
-> >             throw new BusinessRuleException("The course is full");
+> >         if (enrollments.countByCourseId(courseId) >= course.get().getMaxCapacity()) {
+> >             return Optional.empty();
 > >         }
-> >         return enrollments.save(new EnrollmentEntity(student, course));
+> >         return Optional.of(enrollments.save(new EnrollmentEntity(student.get(), course.get())));
 > >     }
 > > }
 > > ```
@@ -939,17 +892,19 @@
 > >
 > > | Línea | Qué hace |
 > > |---|---|
-> > | `students.findById(…).orElseThrow(…)` | Si no existe, `NotFoundException`. |
+> > | `students.findById(…)` y `courses.findById(…)` | Devuelven `Optional`: vacío si no existe la fila. |
 > > | `existsByStudentIdAndCourseId` | Evita la matrícula duplicada. |
-> > | `countByCourseId(courseId) >= course.getMaxCapacity()` | Compara los inscritos con el cupo del curso. |
-> > | `new EnrollmentEntity(student, course)` | Se construye con **objetos**; JPA guarda solo las claves foráneas. |
+> > | `countByCourseId(courseId) >= course.get().getMaxCapacity()` | Compara los inscritos con el cupo del curso. |
+> > | `new EnrollmentEntity(student.get(), course.get())` | Se construye con **objetos**; JPA guarda solo las claves foráneas. |
 > >
-> > > 🗣️ **Pregunta:** ¿por qué el servicio llama a `existsBy…` y no a `findAll` para ver si ya está matriculado? *(Porque deja a la base filtrar; traer todas las filas a memoria no escala.)*
+> > > 🗣️ **Preguntas:** ¿por qué el servicio llama a `existsBy…` y no a `findAll` para ver si ya está matriculado? *(Porque deja a la base filtrar; traer todas las filas a memoria no escala.)*
+> > > ¿Qué se pierde con un `Optional` vacío? *(No se sabe **por qué** falló: no existe, está repetido o el curso está lleno. Las excepciones propias resuelven eso en una guía posterior.)*
 > >
 > > ✅ **Punto de control 3:** el proyecto compila. Aún no se puede probar: falta quien reciba las peticiones (Paso 4).
 >
 > </details>
-
+>
+>
 </details>
 
 ---
@@ -958,6 +913,7 @@
 <summary><strong>🌐 Paso 4 — Capa de presentación (<code>presentation.controller</code>)</strong></summary>
 
 > El **controlador** recibe la petición HTTP, **delega** en el servicio y devuelve la respuesta. No contiene reglas del negocio ni habla con los repositorios.
+> Aquí se decide el **código HTTP** a partir del `Optional` que devuelve el servicio.
 >
 > | Método | Ruta | Qué hace | Respuesta |
 > |---|---|---|---|
@@ -965,8 +921,8 @@
 > | `POST` | `/api/students` | Crea un estudiante (JSON) | `201` · `409` si el correo existe |
 > | `GET` | `/api/courses` | Lista los cursos | `200` |
 > | `POST` | `/api/courses` | Crea un curso (JSON) | `201` · `409` si precio o cupo no son válidos |
-> | `GET` | `/api/courses/{id}/enrolled` | Cuántos inscritos tiene el curso | `200` · `404` |
-> | `POST` | `/api/enrollments?studentId=…&courseId=…` | Matricula a un estudiante | `201` · `404` · `409` |
+> | `GET` | `/api/courses/{id}/enrolled` | Cuántos inscritos tiene el curso | `200` · `404` si el curso no existe |
+> | `POST` | `/api/enrollments?studentId=…&courseId=…` | Matricula a un estudiante | `201` · `409` si no se puede matricular |
 >
 > <details>
 > <summary><strong>Paso 4.1 · Los controladores</strong></summary>
@@ -984,11 +940,11 @@
 > > import com.academy.business.service.StudentService;
 > > import com.academy.persistence.entity.StudentEntity;
 > > import org.springframework.http.HttpStatus;
+> > import org.springframework.http.ResponseEntity;
 > > import org.springframework.web.bind.annotation.GetMapping;
 > > import org.springframework.web.bind.annotation.PostMapping;
 > > import org.springframework.web.bind.annotation.RequestBody;
 > > import org.springframework.web.bind.annotation.RequestMapping;
-> > import org.springframework.web.bind.annotation.ResponseStatus;
 > > import org.springframework.web.bind.annotation.RestController;
 > >
 > > import java.util.List;
@@ -1009,9 +965,10 @@
 > >     }
 > >
 > >     @PostMapping
-> >     @ResponseStatus(HttpStatus.CREATED)
-> >     public StudentEntity create(@RequestBody StudentEntity student) {
-> >         return service.create(student);
+> >     public ResponseEntity<StudentEntity> create(@RequestBody StudentEntity student) {
+> >         return service.create(student)
+> >                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
+> >                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
 > >     }
 > > }
 > > ```
@@ -1029,12 +986,12 @@
 > > import com.academy.business.service.CourseService;
 > > import com.academy.persistence.entity.CourseEntity;
 > > import org.springframework.http.HttpStatus;
+> > import org.springframework.http.ResponseEntity;
 > > import org.springframework.web.bind.annotation.GetMapping;
 > > import org.springframework.web.bind.annotation.PathVariable;
 > > import org.springframework.web.bind.annotation.PostMapping;
 > > import org.springframework.web.bind.annotation.RequestBody;
 > > import org.springframework.web.bind.annotation.RequestMapping;
-> > import org.springframework.web.bind.annotation.ResponseStatus;
 > > import org.springframework.web.bind.annotation.RestController;
 > >
 > > import java.util.List;
@@ -1055,14 +1012,17 @@
 > >     }
 > >
 > >     @PostMapping
-> >     @ResponseStatus(HttpStatus.CREATED)
-> >     public CourseEntity create(@RequestBody CourseEntity course) {
-> >         return service.create(course);
+> >     public ResponseEntity<CourseEntity> create(@RequestBody CourseEntity course) {
+> >         return service.create(course)
+> >                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
+> >                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
 > >     }
 > >
 > >     @GetMapping("/{id}/enrolled")
-> >     public long countEnrolled(@PathVariable Long id) {
-> >         return service.countEnrolled(id);
+> >     public ResponseEntity<Long> countEnrolled(@PathVariable Long id) {
+> >         return service.countEnrolled(id)
+> >                 .map(ResponseEntity::ok)
+> >                 .orElse(ResponseEntity.notFound().build());
 > >     }
 > > }
 > > ```
@@ -1080,10 +1040,10 @@
 > > import com.academy.business.service.EnrollmentService;
 > > import com.academy.persistence.entity.EnrollmentEntity;
 > > import org.springframework.http.HttpStatus;
+> > import org.springframework.http.ResponseEntity;
 > > import org.springframework.web.bind.annotation.PostMapping;
 > > import org.springframework.web.bind.annotation.RequestMapping;
 > > import org.springframework.web.bind.annotation.RequestParam;
-> > import org.springframework.web.bind.annotation.ResponseStatus;
 > > import org.springframework.web.bind.annotation.RestController;
 > >
 > > @RestController
@@ -1097,23 +1057,25 @@
 > >     }
 > >
 > >     @PostMapping
-> >     @ResponseStatus(HttpStatus.CREATED)
-> >     public EnrollmentEntity enroll(@RequestParam Long studentId, @RequestParam Long courseId) {
-> >         return service.enroll(studentId, courseId);
+> >     public ResponseEntity<EnrollmentEntity> enroll(@RequestParam Long studentId, @RequestParam Long courseId) {
+> >         return service.enroll(studentId, courseId)
+> >                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
+> >                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
 > >     }
 > > }
 > > ```
 > >
 > > </details>
 > >
-> > | Anotación | Para qué sirve |
+> > | Anotación / clase | Para qué sirve |
 > > |---|---|
 > > | `@RestController` | La clase atiende HTTP y devuelve **JSON** (los objetos se convierten solos). |
 > > | `@RequestMapping("/api/students")` | Ruta base de todos los métodos de la clase. |
 > > | `@GetMapping` / `@PostMapping` | Método HTTP que atiende cada método Java. |
 > > | `@RequestBody` | Convierte el JSON de la petición en un objeto. |
 > > | `@PathVariable` / `@RequestParam` | Toma un dato de la ruta (`/{id}`) o de la consulta (`?studentId=1`). |
-> > | `@ResponseStatus(CREATED)` | Responde `201` en lugar de `200` al crear. |
+> > | `ResponseEntity` | Permite elegir el **código HTTP** y el cuerpo de la respuesta. |
+> > | `.map(…).orElse(…)` | Si el `Optional` trae valor responde `201`/`200`; si está vacío, responde `409` o `404`. |
 > >
 > > > ⚠️ **Simplificación del taller.** Los controladores reciben y devuelven las **entidades** directamente. En un proyecto real se usan objetos de transferencia (DTO) y mapeadores para no exponer la tabla: eso se resuelve en otra guía.
 >
@@ -1121,56 +1083,7 @@
 >
 >
 > <details>
-> <summary><strong>Paso 4.2 · <code>ApiExceptionHandler</code>: de excepción a código HTTP</strong></summary>
->
-> > Los servicios lanzan excepciones del negocio; **este es el único lugar** que las traduce a HTTP.
-> >
-> > <details>
-> > <summary><strong>📄 ApiExceptionHandler.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/presentation/controller/ApiExceptionHandler.java`
-> >
-> > ```java
-> > package com.academy.presentation.controller;
-> >
-> > import com.academy.business.exception.BusinessRuleException;
-> > import com.academy.business.exception.NotFoundException;
-> > import org.springframework.http.HttpStatus;
-> > import org.springframework.http.ResponseEntity;
-> > import org.springframework.web.bind.annotation.ExceptionHandler;
-> > import org.springframework.web.bind.annotation.RestControllerAdvice;
-> >
-> > import java.util.Map;
-> >
-> > @RestControllerAdvice
-> > public class ApiExceptionHandler {
-> >
-> >     @ExceptionHandler(NotFoundException.class)
-> >     public ResponseEntity<Map<String, String>> notFound(NotFoundException e) {
-> >         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-> >     }
-> >
-> >     @ExceptionHandler(BusinessRuleException.class)
-> >     public ResponseEntity<Map<String, String>> businessRule(BusinessRuleException e) {
-> >         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
-> >     }
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > | Excepción del negocio | Código HTTP |
-> > |---|---|
-> > | `NotFoundException` | `404 Not Found` |
-> > | `BusinessRuleException` | `409 Conflict` |
-> >
-> > `@RestControllerAdvice` hace que el método se aplique a **todos** los controladores. Así el servicio sigue sin conocer HTTP.
->
-> </details>
->
->
-> <details>
-> <summary><strong>Paso 4.3 · Arrancar y probar con <code>curl</code></strong></summary>
+> <summary><strong>Paso 4.2 · Arrancar y probar con <code>curl</code></strong></summary>
 >
 > > Se arranca la aplicación (`./mvnw spring-boot:run`) y, desde otra terminal, se prueba cada regla. **Resultados reales** (MySQL 8):
 > >
@@ -1192,16 +1105,17 @@
 > > | Petición | Respuesta real | Regla que se comprueba |
 > > |---|---|---|
 > > | `POST /api/students` (Ana) | `201` · `{"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com"}` | Crear |
-> > | `POST /api/students` con `ANA@mail.com` | `409` · `{"error":"Email already registered: ANA@mail.com"}` | Correo único, sin importar mayúsculas |
-> > | `POST /api/courses` con precio `0` | `409` · `{"error":"Price and max capacity must be greater than zero"}` | Precio y cupo válidos |
+> > | `POST /api/students` con `ANA@mail.com` | `409` · sin cuerpo | Correo único, sin importar mayúsculas |
+> > | `POST /api/courses` con precio `0` | `409` · sin cuerpo | Precio y cupo válidos |
 > > | `POST /api/enrollments?studentId=1&courseId=1` | `201` · `{"id":1,"student":{…},"course":{…}}` | Matricular |
-> > | La misma matrícula otra vez | `409` · `{"error":"The student is already enrolled in this course"}` | Sin duplicados |
-> > | `studentId=2&courseId=1` (cupo de 1) | `409` · `{"error":"The course is full"}` | Cupo |
-> > | `studentId=9&courseId=1` | `404` · `{"error":"Student not found: 9"}` | Estudiante inexistente |
+> > | La misma matrícula otra vez | `409` · sin cuerpo | Sin duplicados |
+> > | `studentId=2&courseId=1` (cupo de 1) | `409` · sin cuerpo | Cupo |
+> > | `studentId=9&courseId=1` | `409` · sin cuerpo | Estudiante inexistente |
 > > | `GET /api/courses/1/enrolled` | `200` · `1` | Conteo (`countByCourseId`) |
-> > | `GET /api/courses/9/enrolled` | `404` · `{"error":"Course not found: 9"}` | Curso inexistente |
+> > | `GET /api/courses/9/enrolled` | `404` · sin cuerpo | Curso inexistente |
 > >
-> > > 🗣️ **Preguntas:** ¿qué capa decidió que el segundo correo era un `409`? *(El servicio detectó la regla; el `ApiExceptionHandler` la tradujo a `409`.)*
+> > > 🗣️ **Preguntas:** ¿qué capa decidió que el segundo correo era un `409`? *(El servicio detectó la regla con un `Optional` vacío; el controlador la tradujo a `409`.)*
+> > > ¿Por qué tres casos distintos devuelven el mismo `409`? *(El `Optional` vacío no dice el motivo; las excepciones propias permitirán distinguirlos.)*
 > > > ¿Dónde se ve el SQL de cada petición? *(En la consola, por `show-sql=true`: aparece el `select … where upper(email)=upper(?) limit ?` del Paso 2.)*
 > >
 > > ✅ **Punto de control 4:** las nueve peticiones responden lo de la tabla.
@@ -1217,7 +1131,7 @@
 
 > La aplicación **no necesita cambiar nada** para que los datos persistan: la base vive en el **servidor**, fuera de la JVM, y conserva lo guardado aunque la aplicación se detenga.
 >
-> **1. Guardar un estudiante por la API** (si ya se hizo en el Paso 4.3, se omite):
+> **1. Guardar un estudiante por la API** (si ya se hizo en el Paso 4.2, se omite):
 >
 > ```bash
 > curl -X POST localhost:8080/api/students -H "Content-Type: application/json" \
@@ -1269,7 +1183,7 @@
 > 1. ¿Qué escribió el equipo y qué generó Hibernate? *(El equipo escribió entidades, repositorios, servicios y controladores; Hibernate generó las tablas y todo el SQL.)*
 > 2. ¿Quién escribe la implementación de `StudentJpaRepository`? *(Nadie: Spring Data la genera al arrancar.)*
 > 3. ¿Por qué `EnrollmentEntity` es el lado dueño? *(Tiene las dos `@JoinColumn`: las claves foráneas viven en la tabla `enrollment`.)*
-> 4. ¿Quién decide que un correo repetido es un error y quién lo convierte en `409`? *(El servicio detecta la regla y lanza `BusinessRuleException`; `ApiExceptionHandler` la traduce a HTTP.)*
+> 4. ¿Quién decide que un correo repetido es un error y quién lo convierte en `409`? *(El servicio detecta la regla y devuelve un `Optional` vacío; el controlador lo traduce a `409`.)*
 > 5. ¿Por qué el controlador no llama directamente al repositorio? *(Para que las reglas vivan en un solo lugar y se puedan reutilizar sin HTTP.)*
 > 6. ¿Quién crea la base `academy` y quién crea las tablas? *(La base se crea a mano en MySQL; las tablas las crea Hibernate al arrancar.)*
 
@@ -1310,8 +1224,9 @@
 > 2. **Filtro de punta a punta:** agregar `findByPriceLessThan(double price)` en `CourseJpaRepository`, un método en `CourseService` y `GET /api/courses?maxPrice=200000` en `CourseController`; probarlo con `curl`. Probarlo con datos queda para la capa de servicio.
 > 3. **Consulta con JPQL:** reescribir `countByCourseId` con `@Query("SELECT COUNT(e) FROM EnrollmentEntity e WHERE e.course.id = :courseId")`.
 > 4. **Otro motor:** reemplazar MySQL por **PostgreSQL** (dependencia del driver + `spring.datasource.*`) y comprobar que **ninguna** entidad ni repositorio cambia.
-> 5. **Desmatricular:** agregar `DELETE /api/enrollments/{id}` (`404` si no existe) pasando por el servicio.
-> 6. **Relación bidireccional:** agregar `List<EnrollmentEntity>` en `CourseEntity` con `@OneToMany(mappedBy = "course")` y explicar qué cambia en la tabla y en el código
+> 5. **Excepciones propias:** reemplazar los `Optional` vacíos por excepciones (`NotFoundException`, `BusinessRuleException`) con mensaje, y un `@RestControllerAdvice` que las traduzca a `404`/`409` con cuerpo JSON. ¿Qué información se gana?
+> 6. **Desmatricular:** agregar `DELETE /api/enrollments/{id}` (`404` si no existe) pasando por el servicio.
+> 7. **Relación bidireccional:** agregar `List<EnrollmentEntity>` en `CourseEntity` con `@OneToMany(mappedBy = "course")` y explicar qué cambia en la tabla y en el código
 >    ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md) y [Guía 00](00-guia-relaciones-entre-entidades-jpa.md)).
 
 </details>
@@ -1326,10 +1241,9 @@
 >     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
->     │   │   └── 📁 controller    StudentController · CourseController · EnrollmentController · ApiExceptionHandler
+>     │   │   └── 📁 controller    StudentController · CourseController · EnrollmentController
 >     │   ├── 📁 business
->     │   │   ├── 📁 service       StudentService · CourseService · EnrollmentService
->     │   │   └── 📁 exception     NotFoundException · BusinessRuleException
+>     │   │   └── 📁 service       StudentService · CourseService · EnrollmentService
 >     │   └── 📁 persistence
 >     │       ├── 📁 repository    StudentJpaRepository · CourseJpaRepository · EnrollmentJpaRepository
 >     │       └── 📁 entity        StudentEntity · CourseEntity · EnrollmentEntity
@@ -1355,15 +1269,14 @@
 > | `@RestController` | Los tres controladores | Atienden HTTP y devuelven JSON. | Combina `@Controller` y `@ResponseBody`. |
 > | `@RequestMapping` · `@GetMapping` · `@PostMapping` | Controladores | Cada método atiende una ruta y un verbo. | Enlaza la petición HTTP con el método Java. |
 > | `@RequestBody` · `@PathVariable` · `@RequestParam` | Parámetros de los controladores | Cada dato llega de un sitio distinto. | Cuerpo JSON, parte de la ruta y parámetro de consulta. |
-> | `@ResponseStatus` | `create` y `enroll` | Crear responde `201`. | Fija el código HTTP. |
-> | `@RestControllerAdvice` · `@ExceptionHandler` | `ApiExceptionHandler` | Un solo lugar traduce errores. | Convierte excepciones del negocio en `404` y `409`. |
+> | `ResponseEntity` *(clase, no anotación)* | Retorno de `create`, `enroll` y `countEnrolled` | La respuesta cambia según el caso. | Fija el código HTTP (`201`, `404`, `409`) y el cuerpo. |
 > | `@SpringBootApplication` | `AcademyApplication` | Es la clase que arranca Spring. | Activa el escaneo de entidades y repositorios. |
 >
 > ```text
 > persistence   ──▶  @Entity · @Table · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn     (en persistence.entity)
 >                    (las …JpaRepository no llevan anotaciones)
 business      ──▶  @Service                                                                       (en business.service)
-presentation  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping · @RestControllerAdvice
+presentation  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping
 > arranque      ──▶  @SpringBootApplication
 > ```
 >
