@@ -1,25 +1,27 @@
 # 🗄️ Guía paso a paso — Taller «Gestión de cursos» con base de datos (JPA): entidades y repositorios
 
-> 👩‍🏫 **Material docente.** Guía para resolver **junto con los estudiantes**, en vivo, la capa de persistencia del taller «Gestión de cursos» con base de datos.
+> 👩‍🏫 **Material docente.** Guía para resolver **junto con los estudiantes**, en vivo, las **tres capas** del taller «Gestión de cursos» con base de datos: persistencia, negocio y presentación.
 > Aplica lo visto en el [Módulo 03](../../03-introduccion-a-jpa/) y el [Módulo 04](../../04-gestion-de-bases-de-datos-mediante-jpa/).
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
-> ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8: las tablas, los resultados y el SQL que se muestran son salidas reales.
+> ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8: las tablas, las consultas derivadas y la persistencia entre reinicios que se muestran son salidas reales.
 >
-> 🧭 **Idea central.** Las clases que se guardan en la base (`…Entity`) viven en `persistence.entity`. Esta guía trabaja **solo** esa capa: las **entidades** y sus **repositorios de Spring Data**.
-> El modelo del negocio, los mapeadores, los servicios y los controladores **no se trabajan aquí**: se resuelven en otra guía.
+> 🧭 **Idea central.** Cada capa tiene una sola responsabilidad: `persistence` guarda (**entidades** y **repositorios de Spring Data**), `business` decide (**servicios** con las reglas) y `presentation` atiende HTTP (**controladores**).
+> El modelo del negocio (DTO) y los mapeadores **no se trabajan aquí**: se resuelven en otra guía.
 
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
 
-> Crear la **capa de persistencia** de **estudiantes, cursos y matrículas** con **Spring Data JPA** y una base de datos relacional (**MySQL**): declarar las entidades, guardarlas y consultarlas.
+> Construir las **tres capas** de **estudiantes, cursos y matrículas** con **Spring Boot**, **Spring Data JPA** y **MySQL**: entidades y repositorios, servicios con reglas de negocio y una API REST.
 >
 > Al terminar, el estudiante:
 >
 > - Declara **entidades JPA** (`@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn`) en `persistence.entity` (M3 y M4).
 > - Configura la conexión a **MySQL** en `application.properties` y lee el SQL que genera Hibernate (M3 y M4).
 > - Crea interfaces `JpaRepository` con **métodos derivados** (`existsBy…`, `countBy…`) (M3).
-> - **Guarda y consulta** datos desde la clase `main` (`CommandLineRunner`), la API (`presentation.controller`) queda para otra guía.
+> - Escribe **servicios** (`@Service`) que aplican reglas del negocio y lanzan excepciones propias (M2).
+> - Expone una **API REST** con controladores (`@RestController`) y traduce las excepciones a códigos HTTP.
+> - Comprueba que las **tablas y los datos persisten** en MySQL entre reinicios.
 > - Verifica que los datos **sobreviven al reinicio** en MySQL: la base vive en un servidor, no dentro de la aplicación.
 
 </details>
@@ -29,7 +31,7 @@
 
 > ### 🏫 El problema
 >
-> Una **academia de programación** (*academy*) necesita guardar **estudiantes**, **cursos** y **matrículas** en una base de datos. En esta guía se construye **solo la parte que habla con la base**; la lógica del negocio y la API REST quedan para otra guía.
+> Una **academia de programación** (*academy*) necesita guardar **estudiantes**, **cursos** y **matrículas** en una base de datos. En esta guía se construye el proyecto completo en tres capas; la lógica del negocio y la API REST quedan para otra guía.
 >
 > ### 🧩 Una entidad por concepto
 >
@@ -49,12 +51,12 @@
 > |---|---|
 > | **RNF-01** | Java 17 o superior, Spring Boot 3 y Maven. |
 > | **RNF-02** | Persistencia con **Spring Data JPA** y **MySQL 8** (en Docker o instalado). La base `academy` debe existir antes de arrancar. |
-> | **RNF-03** | Tres capas: `presentation` → `business` → `persistence`. Las anotaciones de JPA van **solo** en `persistence.entity`. |
+> | **RNF-03** | Tres capas: `presentation` → `business` → `persistence`. Las anotaciones de JPA van **solo** en `persistence.entity`; las de Spring Web, **solo** en `presentation.controller`. |
 > | **RNF-04** | Inyección por constructor. Todos los nombres del código (paquetes, clases, atributos, tablas) en **inglés**. |
-> | **RNF-05** | Las pruebas se hacen desde la clase `main` (`CommandLineRunner`) y con el SQL que imprime Hibernate. |
-> | **RNF-06** | Duración: 1 h 15 min. |
+> | **RNF-05** | La verificación se hace con `curl` contra la API, con el SQL que imprime Hibernate y con el cliente de MySQL. |
+> | **RNF-06** | Duración: 1 h 20 min. |
 >
-> > 💡 **Alcance.** Quedan fuera: el modelo del negocio, los mapeadores, los servicios y la API REST (otra guía), las relaciones bidireccionales, `cascade`,
+> > 💡 **Alcance.** Quedan fuera: el modelo del negocio (DTO), los mapeadores, las validaciones con Bean Validation, la seguridad, las relaciones bidireccionales, `cascade`,
 > > migraciones (Flyway) y otros motores (MySQL/PostgreSQL).
 
 </details>
@@ -67,11 +69,12 @@
 > | 0 | 0 – 10 | Preparación: proyecto, dependencias, `application.properties` y arranque | Docente |
 > | 1 | 10 – 30 | Entidades JPA en `persistence.entity` (`StudentEntity` en vivo) | Docente y estudiantes |
 > | 2 | 30 – 40 | Interfaces de Spring Data (`…JpaRepository`) | Estudiantes |
-> | 3 | 40 – 60 | Guardar y consultar desde `main` y leer el SQL | Todos |
-> | 4 | 60 – 75 | Persistencia real (reinicio contra MySQL) y cierre | Todos |
+> | 3 | 40 – 55 | Capa de negocio: servicios y reglas | Estudiantes |
+> | 4 | 55 – 70 | Capa de presentación: controladores y pruebas con `curl` | Todos |
+> | 5 | 70 – 80 | Persistencia real (reinicio contra MySQL) y cierre | Todos |
 >
 > > 💡 **Ritmo.** El Paso 1 con `StudentEntity` fija el patrón; con `CourseEntity` y `EnrollmentEntity` los estudiantes lo repiten. Si falta tiempo, el
-> > Paso 4 se hace como demostración del docente.
+> > Paso 5 se hace como demostración del docente.
 
 </details>
 
@@ -96,16 +99,16 @@
 <details>
 <summary><strong>🏗️ Arquitectura del taller: las capas y el árbol de archivos</strong></summary>
 
-> El proyecto tiene **tres capas**. En esta guía solo se **trabaja** la de persistencia; las otras dos se crean vacías y se resuelven en otra guía.
+> El proyecto tiene **tres capas**. Cada capa solo habla con la **siguiente hacia abajo**: el controlador usa servicios, el servicio usa repositorios.
 >
 > ```text
 > 📁 src/main/java/com/academy
-> ├── 📄 AcademyApplication.java                  (➕ la clase main; ejecuta los ejemplos)
-> ├── 📁 presentation                              ← 1 · otra guía
+> ├── 📄 AcademyApplication.java                  (la genera start.spring.io; no se modifica)
+> ├── 📁 presentation                              ← 1 · Paso 4
 > │   └── 📁 controller
-> ├── 📁 business                                  ← 2 · otra guía
+> ├── 📁 business                                  ← 2 · Paso 3
 > │   └── 📁 service
-> └── 📁 persistence                               ← 3 · lo único que se trabaja en esta guía
+> └── 📁 persistence                               ← 3 · Pasos 1 y 2
 >     ├── 📁 repository    StudentJpaRepository · CourseJpaRepository · EnrollmentJpaRepository   (➕ Spring Data)
 >     └── 📁 entity        StudentEntity · CourseEntity · EnrollmentEntity                         (➕ las @Entity)
 > 📁 src/main/resources
@@ -114,16 +117,16 @@
 >
 > | Capa | Paquetes | Qué contiene | En esta guía |
 > |---|---|---|---|
-> | Presentación | `presentation.controller` | Controladores REST. | Vacía |
-> | Negocio | `business.service` | Servicios con las reglas del negocio. | Vacía |
-> | Persistencia | `persistence.repository`, `persistence.entity` | Repositorios de Spring Data y entidades JPA. | **Se trabaja** |
+> | Presentación | `presentation.controller` | Controladores REST y manejo de errores HTTP. | **Paso 4** |
+> | Negocio | `business.service`, `business.exception` | Servicios con las reglas del negocio y sus excepciones. | **Paso 3** |
+> | Persistencia | `persistence.repository`, `persistence.entity` | Repositorios de Spring Data y entidades JPA. | **Pasos 1 y 2** |
 >
 > ```text
-> main (CommandLineRunner) ─▶ …JpaRepository ─▶ Hibernate ─▶ MySQL
->                             Spring Data lo genera   genera el SQL   la base
+> @RestController ─▶ @Service ─▶ …JpaRepository ─▶ Hibernate ─▶ MySQL
+>  HTTP / JSON       reglas      Spring Data lo genera   genera el SQL   la base
 > ```
 >
-> > 🔎 **Qué no está.** El modelo del negocio y los mapeadores no se crean aquí; pertenecen a otra guía. Todos los nombres del proyecto (paquetes, clases, atributos, tablas y columnas) están en **inglés** para mantener un solo idioma en el código.
+> > 🔎 **Qué no está.** El modelo del negocio (DTO) y los mapeadores no se crean aquí; pertenecen a otra guía. Todos los nombres del proyecto (paquetes, clases, atributos, tablas y columnas) están en **inglés** para mantener un solo idioma en el código.
 
 </details>
 
@@ -276,13 +279,15 @@
 > > ```text
 > > com.academy
 > > ├── presentation.controller
-> > ├── business.service
+> > ├── business
+> > │   ├── service
+> > │   └── exception
 > > └── persistence
 > >     ├── repository
 > >     └── entity
 > > ```
 > >
-> > `presentation.controller` y `business.service` quedan **vacíos**: se llenan en otra guía. Aquí solo se escriben `persistence.entity` y `persistence.repository`.
+> > Los paquetes se llenan en orden: primero `persistence.entity` y `persistence.repository` (Pasos 1 y 2), después `business` (Paso 3) y por último `presentation.controller` (Paso 4).
 > >
 > > > 💡 Los paquetes se crean desde el IDE (*New → Package*). Un paquete vacío no aparece en Git ni en el `.jar` hasta que tenga una clase.
 >
@@ -624,6 +629,91 @@
 >
 > </details>
 >
+> <details>
+> <summary><strong>📚 Todos los métodos derivados posibles: palabras clave y ejemplos</strong></summary>
+>
+> > Un método derivado se arma con **cuatro piezas**, siempre en este orden:
+> >
+> > ```text
+> > find  [Distinct] [First3 | Top3]  By  Atributo [Operador]  [And | Or  Atributo [Operador]]  [OrderBy Atributo Asc|Desc]
+> > └─1─┘ └───────────2───────────┘ └3┘ └──────────────────────4: criterios──────────────────────┘ └───────5: orden───────┘
+> > ```
+> >
+> > **1 · Qué hace el método (prefijo antes de `By`)**
+> >
+> > | Prefijo | Qué devuelve | Ejemplo | SQL equivalente |
+> > |---|---|---|---|
+> > | `find…By`, `read…By`, `get…By`, `query…By`, `search…By`, `stream…By` | Las filas (`List`, `Optional`, la entidad, `Stream`…) | `findByEmail(String email)` | `select … from student where email=?` |
+> > | `exists…By` | `boolean` | `existsByEmail(String email)` | `select id … where email=? limit 1` |
+> > | `count…By` | `long` | `countByAge(int age)` | `select count(id) … where age=?` |
+> > | `delete…By`, `remove…By` | Borra *(devuelve `void` o cuántas borró)* | `deleteByEmail(String email)` | `select …` y luego `delete … where id=?` por cada fila |
+> >
+> > **2 · Operadores de los criterios** (ejemplos con los atributos de `StudentEntity` y `CourseEntity`)
+> >
+> > | Palabra clave | Ejemplo | Condición generada |
+> > |---|---|---|
+> > | *(ninguna)*, `Is`, `Equals` | `findByName(String n)`, `findByNameIs(n)`, `findByNameEquals(n)` | `where name = ?` |
+> > | `Not`, `IsNot` | `findByNameNot(String n)` | `where name <> ?` |
+> > | `And` | `findByNameAndAge(String n, int a)` | `where name = ? and age = ?` |
+> > | `Or` | `findByNameOrEmail(String n, String e)` | `where name = ? or email = ?` |
+> > | `LessThan` | `findByPriceLessThan(double p)` | `where price < ?` |
+> > | `LessThanEqual` | `findByPriceLessThanEqual(double p)` | `where price <= ?` |
+> > | `GreaterThan` | `findByAgeGreaterThan(int a)` | `where age > ?` |
+> > | `GreaterThanEqual` | `findByAgeGreaterThanEqual(int a)` | `where age >= ?` |
+> > | `Between` | `findByAgeBetween(int min, int max)` | `where age between ? and ?` |
+> > | `After`, `Before` | `findByStartDateAfter(LocalDate d)` *(atributos de fecha)* | `where start_date > ?` / `< ?` |
+> > | `IsNull`, `Null` | `findByEmailIsNull()` | `where email is null` |
+> > | `IsNotNull`, `NotNull` | `findByEmailIsNotNull()` | `where email is not null` |
+> > | `Like` | `findByNameLike(String patron)` | `where name like ?` *(el `%` lo escribe quien llama: `"Ana%"`)* |
+> > | `NotLike` | `findByNameNotLike(String patron)` | `where name not like ?` |
+> > | `StartingWith` | `findByNameStartingWith("An")` | `where name like 'An%'` |
+> > | `EndingWith` | `findByNameEndingWith("es")` | `where name like '%es'` |
+> > | `Containing` | `findByNameContaining("or")` | `where name like '%or%'` |
+> > | `In` | `findByAgeIn(List<Integer> edades)` | `where age in (?, ?, …)` |
+> > | `NotIn` | `findByAgeNotIn(List<Integer> edades)` | `where age not in (?, ?, …)` |
+> > | `True`, `False` | `findByActiveTrue()` *(atributo `boolean`)* | `where active = true` / `false` |
+> > | `IgnoreCase` | `findByEmailIgnoreCase(String e)` | `where upper(email) = upper(?)` |
+> > | `AllIgnoreCase` | `findByNameAndEmailAllIgnoreCase(n, e)` | `upper(name)=upper(?) and upper(email)=upper(?)` |
+> >
+> > **3 · Orden, límite y duplicados**
+> >
+> > | Palabra clave | Ejemplo | Qué hace |
+> > |---|---|---|
+> > | `OrderBy…Asc` / `Desc` | `findByAgeGreaterThanOrderByNameAsc(int a)` | `… order by name asc` *(se pueden encadenar: `OrderByAgeDescNameAsc`)* |
+> > | `First` / `Top` | `findFirstByOrderByAgeDesc()` | Solo la **primera** fila (`limit 1`) |
+> > | `FirstN` / `TopN` | `findTop3ByOrderByPriceDesc()` | Las **N** primeras filas (`limit 3`): los 3 cursos más caros |
+> > | `Distinct` | `findDistinctByAge(int a)` | `select distinct …` |
+> >
+> > **4 · Recorrer relaciones**
+> >
+> > | Forma | Ejemplo | Qué hace |
+> > |---|---|---|
+> > | Atributo de la relación + atributo | `countByCourseId(Long id)` | `enrollment.course.id`; usa la clave foránea, sin `join` |
+> > | Atributo de la relación + otro atributo | `findByCourseName(String n)` | `join course … where course.name = ?` |
+> > | Guion bajo para separar | `findByCourse_Name(String n)` | Igual que el anterior; el `_` evita ambigüedad si hay un atributo `courseName` |
+> >
+> > **5 · Tipos de retorno que se pueden usar con `find…By`**
+> >
+> > | Tipo | Cuándo |
+> > |---|---|
+> > | `List<StudentEntity>` | Pueden ser varias filas (si no hay, lista vacía). |
+> > | `Optional<StudentEntity>` | Se espera **una** fila o ninguna (si hay más de una, error). |
+> > | `StudentEntity` | Se espera una fila; si no hay devuelve `null`. |
+> > | `Stream<StudentEntity>` | Recorrido perezoso de muchas filas (debe cerrarse). |
+> > | `Page<…>` / `Slice<…>` | Con un parámetro `Pageable` para paginar. |
+> >
+> > > 💡 **Reglas para no equivocarse.**
+> > >
+> > > - Los nombres de atributo van en **PascalCase** y deben existir **tal cual** en la entidad (`maxCapacity` → `MaxCapacity`).
+> > > - El **orden de los parámetros** del método es el orden en que aparecen los criterios en el nombre.
+> > > - `Between` recibe **dos** parámetros; `In` recibe una **colección**; `IsNull`, `True` y `False` no reciben ninguno.
+> > > - Un nombre muy largo (`findByNameAndAgeAndEmailOrderByName…`) es señal de que conviene una consulta con `@Query`.
+> >
+> > > ⚠️ **Estado de la tabla.** Es la referencia de Spring Data JPA; el SQL se muestra de forma simplificada. Los tres métodos del taller (`existsByEmailIgnoreCase`,
+> > > `existsByStudentIdAndCourseId`, `countByCourseId`) sí se ejecutaron y su SQL real está arriba. Para ver el de cualquier otro basta agregarlo a la interfaz y mirar la consola.
+>
+> </details>
+>
 > ✅ **Punto de control 2:** el proyecto compila y arranca; `CourseJpaRepository` queda vacía de métodos propios y está bien: solo necesita lo heredado.
 
 </details>
@@ -631,144 +721,491 @@
 ---
 
 <details>
-<summary><strong>▶️ Paso 3 — Guardar y consultar desde <code>main</code></strong></summary>
+<summary><strong>⚙️ Paso 3 — Capa de negocio (<code>business.service</code>)</strong></summary>
 
-> <details>
-> <summary><strong>Paso 3.1 · Escribir los ejemplos en <code>AcademyApplication</code></strong></summary>
+> El **servicio** aplica las **reglas del negocio** y decide cuándo se guarda algo. Usa los repositorios del Paso 2 y **no sabe nada de HTTP**: ni de rutas, ni de códigos de estado.
 >
-> > Se reemplaza el contenido de `AcademyApplication.java`. Es la clase del `main`: recibe los repositorios por constructor y ejecuta los ejemplos al arrancar.
+> | Regla del taller | Dónde se aplica | Qué repositorio usa |
+> |---|---|---|
+> | El correo de un estudiante no puede repetirse (sin importar mayúsculas) | `StudentService.create` | `existsByEmailIgnoreCase` |
+> | Un curso necesita precio y cupo mayores que cero | `CourseService.create` | *(solo valida)* |
+> | Un estudiante no se matricula dos veces en el mismo curso | `EnrollmentService.enroll` | `existsByStudentIdAndCourseId` |
+> | No se matricula si el curso ya llegó a su cupo | `EnrollmentService.enroll` | `countByCourseId` |
+> | El estudiante y el curso deben existir | `EnrollmentService.enroll` | `findById` |
+>
+> <details>
+> <summary><strong>Paso 3.1 · Las excepciones del negocio (<code>business.exception</code>)</strong></summary>
+>
+> > Dos excepciones propias permiten al servicio **avisar qué falló** sin depender de la capa web. Se crea el paquete `business.exception`.
 > >
 > > <details>
-> > <summary><strong>📄 AcademyApplication.java</strong></summary>
+> > <summary><strong>📄 NotFoundException.java</strong></summary>
 > >
-> > **Ruta:** `src/main/java/com/academy/AcademyApplication.java`
+> > **Ruta:** `src/main/java/com/academy/business/exception/NotFoundException.java`
 > >
 > > ```java
-> > package com.academy;
+> > package com.academy.business.exception;
 > >
-> > import com.academy.persistence.entity.CourseEntity;
-> > import com.academy.persistence.entity.EnrollmentEntity;
-> > import com.academy.persistence.entity.StudentEntity;
-> > import com.academy.persistence.repository.CourseJpaRepository;
-> > import com.academy.persistence.repository.EnrollmentJpaRepository;
-> > import com.academy.persistence.repository.StudentJpaRepository;
-> > import org.springframework.boot.CommandLineRunner;
-> > import org.springframework.boot.SpringApplication;
-> > import org.springframework.boot.autoconfigure.SpringBootApplication;
+> > public class NotFoundException extends RuntimeException {
 > >
-> > @SpringBootApplication
-> > public class AcademyApplication implements CommandLineRunner {
-> >
-> >     private final StudentJpaRepository students;
-> >     private final CourseJpaRepository courses;
-> >     private final EnrollmentJpaRepository enrollments;
-> >
-> >     public AcademyApplication(StudentJpaRepository students, CourseJpaRepository courses,
-> >                               EnrollmentJpaRepository enrollments) {
-> >         this.students = students;
-> >         this.courses = courses;
-> >         this.enrollments = enrollments;
-> >     }
-> >
-> >     public static void main(String[] args) {
-> >         SpringApplication.run(AcademyApplication.class, args);
-> >     }
-> >
-> >     @Override
-> >     public void run(String... args) {
-> >         if (students.count() == 0) {
-> >             saveData();
-> >         }
-> >         queryData();
-> >     }
-> >
-> >     private void saveData() {
-> >         StudentEntity ana = students.save(new StudentEntity("Ana Torres", 22, "ana@mail.com"));
-> >         StudentEntity luis = students.save(new StudentEntity("Luis Pérez", 25, "luis@mail.com"));
-> >         CourseEntity java = courses.save(new CourseEntity("Java from scratch", 150000, 3));
-> >         courses.save(new CourseEntity("Spring Boot", 450000, 10));
-> >
-> >         enrollments.save(new EnrollmentEntity(ana, java));
-> >         enrollments.save(new EnrollmentEntity(luis, java));
-> >     }
-> >
-> >     private void queryData() {
-> >         System.out.println("=== RESULTS ===");
-> >         students.findAll().forEach(s -> System.out.println("Student " + s.getId() + ": " + s.getName()));
-> >         courses.findAll().forEach(c -> System.out.println("Course " + c.getId() + ": " + c.getName()));
-> >         System.out.println("Does ANA@mail.com exist? " + students.existsByEmailIgnoreCase("ANA@mail.com"));
-> >         System.out.println("Is Ana (1) in Java (1)? " + enrollments.existsByStudentIdAndCourseId(1L, 1L));
-> >         System.out.println("Enrolled in Java (1): " + enrollments.countByCourseId(1L));
-> >         System.out.println("Enrolled in Spring Boot (2): " + enrollments.countByCourseId(2L));
+> >     public NotFoundException(String message) {
+> >         super(message);
 > >     }
 > > }
 > > ```
 > >
 > > </details>
 > >
-> > | Parte | Qué hace |
+> > <details>
+> > <summary><strong>📄 BusinessRuleException.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/exception/BusinessRuleException.java`
+> >
+> > ```java
+> > package com.academy.business.exception;
+> >
+> > public class BusinessRuleException extends RuntimeException {
+> >
+> >     public BusinessRuleException(String message) {
+> >         super(message);
+> >     }
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > - **`NotFoundException`**: algo que se buscó por `id` no existe.
+> > - **`BusinessRuleException`**: la operación rompe una regla del negocio.
+>
+> </details>
+>
+>
+> <details>
+> <summary><strong>Paso 3.2 · <code>StudentService</code> y <code>CourseService</code></strong></summary>
+>
+> > Cada servicio recibe sus repositorios **por constructor** y lleva `@Service` para que Spring lo cree.
+> >
+> > <details>
+> > <summary><strong>📄 StudentService.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
+> >
+> > ```java
+> > package com.academy.business.service;
+> >
+> > import com.academy.business.exception.BusinessRuleException;
+> > import com.academy.persistence.entity.StudentEntity;
+> > import com.academy.persistence.repository.StudentJpaRepository;
+> > import org.springframework.stereotype.Service;
+> >
+> > import java.util.List;
+> >
+> > @Service
+> > public class StudentService {
+> >
+> >     private final StudentJpaRepository students;
+> >
+> >     public StudentService(StudentJpaRepository students) {
+> >         this.students = students;
+> >     }
+> >
+> >     public List<StudentEntity> findAll() {
+> >         return students.findAll();
+> >     }
+> >
+> >     public StudentEntity create(StudentEntity student) {
+> >         if (students.existsByEmailIgnoreCase(student.getEmail())) {
+> >             throw new BusinessRuleException("Email already registered: " + student.getEmail());
+> >         }
+> >         return students.save(student);
+> >     }
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 CourseService.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/service/CourseService.java`
+> >
+> > ```java
+> > package com.academy.business.service;
+> >
+> > import com.academy.business.exception.BusinessRuleException;
+> > import com.academy.business.exception.NotFoundException;
+> > import com.academy.persistence.entity.CourseEntity;
+> > import com.academy.persistence.repository.CourseJpaRepository;
+> > import com.academy.persistence.repository.EnrollmentJpaRepository;
+> > import org.springframework.stereotype.Service;
+> >
+> > import java.util.List;
+> >
+> > @Service
+> > public class CourseService {
+> >
+> >     private final CourseJpaRepository courses;
+> >     private final EnrollmentJpaRepository enrollments;
+> >
+> >     public CourseService(CourseJpaRepository courses, EnrollmentJpaRepository enrollments) {
+> >         this.courses = courses;
+> >         this.enrollments = enrollments;
+> >     }
+> >
+> >     public List<CourseEntity> findAll() {
+> >         return courses.findAll();
+> >     }
+> >
+> >     public CourseEntity create(CourseEntity course) {
+> >         if (course.getPrice() <= 0 || course.getMaxCapacity() <= 0) {
+> >             throw new BusinessRuleException("Price and max capacity must be greater than zero");
+> >         }
+> >         return courses.save(course);
+> >     }
+> >
+> >     public long countEnrolled(Long courseId) {
+> >         if (!courses.existsById(courseId)) {
+> >             throw new NotFoundException("Course not found: " + courseId);
+> >         }
+> >         return enrollments.countByCourseId(courseId);
+> >     }
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > - **`@Service`** registra la clase como *bean* de la capa de negocio (el mismo mecanismo de inyección del M2).
+> > - `create` **valida antes de guardar**: si la regla falla lanza `BusinessRuleException` y no se ejecuta ningún `insert`.
+> > - `save` devuelve la entidad con su `id` ya generado.
+>
+> </details>
+>
+>
+> <details>
+> <summary><strong>Paso 3.3 · <code>EnrollmentService</code>: la regla más completa</strong></summary>
+>
+> > Matricular junta tres repositorios y **cuatro** comprobaciones, en este orden: existe el estudiante, existe el curso, no está ya matriculado y hay cupo.
+> >
+> > <details>
+> > <summary><strong>📄 EnrollmentService.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/service/EnrollmentService.java`
+> >
+> > ```java
+> > package com.academy.business.service;
+> >
+> > import com.academy.business.exception.BusinessRuleException;
+> > import com.academy.business.exception.NotFoundException;
+> > import com.academy.persistence.entity.CourseEntity;
+> > import com.academy.persistence.entity.EnrollmentEntity;
+> > import com.academy.persistence.entity.StudentEntity;
+> > import com.academy.persistence.repository.CourseJpaRepository;
+> > import com.academy.persistence.repository.EnrollmentJpaRepository;
+> > import com.academy.persistence.repository.StudentJpaRepository;
+> > import org.springframework.stereotype.Service;
+> >
+> > @Service
+> > public class EnrollmentService {
+> >
+> >     private final StudentJpaRepository students;
+> >     private final CourseJpaRepository courses;
+> >     private final EnrollmentJpaRepository enrollments;
+> >
+> >     public EnrollmentService(StudentJpaRepository students, CourseJpaRepository courses,
+> >                              EnrollmentJpaRepository enrollments) {
+> >         this.students = students;
+> >         this.courses = courses;
+> >         this.enrollments = enrollments;
+> >     }
+> >
+> >     public EnrollmentEntity enroll(Long studentId, Long courseId) {
+> >         StudentEntity student = students.findById(studentId)
+> >                 .orElseThrow(() -> new NotFoundException("Student not found: " + studentId));
+> >         CourseEntity course = courses.findById(courseId)
+> >                 .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
+> >
+> >         if (enrollments.existsByStudentIdAndCourseId(studentId, courseId)) {
+> >             throw new BusinessRuleException("The student is already enrolled in this course");
+> >         }
+> >         if (enrollments.countByCourseId(courseId) >= course.getMaxCapacity()) {
+> >             throw new BusinessRuleException("The course is full");
+> >         }
+> >         return enrollments.save(new EnrollmentEntity(student, course));
+> >     }
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > | Línea | Qué hace |
 > > |---|---|
-> > | `implements CommandLineRunner` + `run` | Spring llama a `run` **justo después de arrancar**: es el punto de entrada de los ejemplos. |
-> > | Constructor con los tres repositorios (`students`, `courses`, `enrollments`) | Spring los **inyecta** (inyección por constructor, M2). |
-> > | `students.count() == 0` | Guarda los datos **solo si la base está vacía**. Con la base recién creada está vacía; en la segunda ejecución (Paso 4) evita repetir los datos, porque MySQL **conserva** lo guardado. |
-> > | `save(...)` | Inserta la fila y **devuelve la entidad con su `id`** ya generado. Por eso `ana` y `java` sirven después para crear las inscripciones. |
-> > | `new EnrollmentEntity(ana, java)` | La inscripción (*enrollment*) se crea con **objetos** `StudentEntity` y `CourseEntity`; JPA guarda de ellos solo la clave foránea. |
-> > | `queryData()` | Lee con `findAll` y con los **métodos derivados** del Paso 2. |
+> > | `students.findById(…).orElseThrow(…)` | Si no existe, `NotFoundException`. |
+> > | `existsByStudentIdAndCourseId` | Evita la matrícula duplicada. |
+> > | `countByCourseId(courseId) >= course.getMaxCapacity()` | Compara los inscritos con el cupo del curso. |
+> > | `new EnrollmentEntity(student, course)` | Se construye con **objetos**; JPA guarda solo las claves foráneas. |
+
+> > > 🗣️ **Pregunta:** ¿por qué el servicio llama a `existsBy…` y no a `findAll` para ver si ya está matriculado? *(Porque deja a la base filtrar; traer todas las filas a memoria no escala.)*
 >
 > </details>
 >
-> <details>
-> <summary><strong>Paso 3.2 · Ejecutar y ver el resultado</strong></summary>
 >
-> > Se ejecuta la aplicación. Primero aparece el SQL de Hibernate y, al final, lo que imprimen los ejemplos. **Resultado real:**
+> ✅ **Punto de control 3:** el proyecto compila. Aún no se puede probar: falta quien reciba las peticiones (Paso 4).
+
+</details>
+
+---
+
+<details>
+<summary><strong>🌐 Paso 4 — Capa de presentación (<code>presentation.controller</code>)</strong></summary>
+
+> El **controlador** recibe la petición HTTP, **delega** en el servicio y devuelve la respuesta. No contiene reglas del negocio ni habla con los repositorios.
+>
+> | Método | Ruta | Qué hace | Respuesta |
+> |---|---|---|---|
+> | `GET` | `/api/students` | Lista los estudiantes | `200` |
+> | `POST` | `/api/students` | Crea un estudiante (JSON) | `201` · `409` si el correo existe |
+> | `GET` | `/api/courses` | Lista los cursos | `200` |
+> | `POST` | `/api/courses` | Crea un curso (JSON) | `201` · `409` si precio o cupo no son válidos |
+> | `GET` | `/api/courses/{id}/enrolled` | Cuántos inscritos tiene el curso | `200` · `404` |
+> | `POST` | `/api/enrollments?studentId=…&courseId=…` | Matricula a un estudiante | `201` · `404` · `409` |
+>
+> <details>
+> <summary><strong>Paso 4.1 · Los controladores</strong></summary>
+>
+> > Cada controlador lleva `@RestController` y `@RequestMapping` con su ruta base, y recibe el servicio **por constructor**.
 > >
-> > ```text
-> > === RESULTS ===
-> > Student 1: Ana Torres
-> > Student 2: Luis Pérez
-> > Course 1: Java from scratch
-> > Course 2: Spring Boot
-> > Does ANA@mail.com exist? true
-> > Is Ana (1) in Java (1)? true
-> > Enrolled in Java (1): 2
-> > Enrolled in Spring Boot (2): 0
+> > <details>
+> > <summary><strong>📄 StudentController.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/presentation/controller/StudentController.java`
+> >
+> > ```java
+> > package com.academy.presentation.controller;
+> >
+> > import com.academy.business.service.StudentService;
+> > import com.academy.persistence.entity.StudentEntity;
+> > import org.springframework.http.HttpStatus;
+> > import org.springframework.web.bind.annotation.GetMapping;
+> > import org.springframework.web.bind.annotation.PostMapping;
+> > import org.springframework.web.bind.annotation.RequestBody;
+> > import org.springframework.web.bind.annotation.RequestMapping;
+> > import org.springframework.web.bind.annotation.ResponseStatus;
+> > import org.springframework.web.bind.annotation.RestController;
+> >
+> > import java.util.List;
+> >
+> > @RestController
+> > @RequestMapping("/api/students")
+> > public class StudentController {
+> >
+> >     private final StudentService service;
+> >
+> >     public StudentController(StudentService service) {
+> >         this.service = service;
+> >     }
+> >
+> >     @GetMapping
+> >     public List<StudentEntity> findAll() {
+> >         return service.findAll();
+> >     }
+> >
+> >     @PostMapping
+> >     @ResponseStatus(HttpStatus.CREATED)
+> >     public StudentEntity create(@RequestBody StudentEntity student) {
+> >         return service.create(student);
+> >     }
+> > }
 > > ```
 > >
-> > Así quedaron los datos:
+> > </details>
 > >
-> > ```text
-> > student                                       course                                         enrollment
-> > +----+------------+-----+--------------+     +----+-------------------+--------+--------------+   +----+-----------+------------+
-> > | id | name       | age | email        |     | id | name              | price  | max_capacity |   | id | course_id | student_id |
-> > +----+------------+-----+--------------+     +----+-------------------+--------+--------------+   +----+-----------+------------+
-> > |  1 | Ana Torres |  22 | ana@mail.com |     |  1 | Java from scratch | 150000 |            3 |   |  1 |         1 |          1 |
-> > |  2 | Luis Pérez |  25 | luis@mail.com|     |  2 | Spring Boot       | 450000 |           10 |   |  2 |         1 |          2 |
-> > +----+------------+-----+--------------+     +----+-------------------+--------+--------------+   +----+-----------+------------+
+> > <details>
+> > <summary><strong>📄 CourseController.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/presentation/controller/CourseController.java`
+> >
+> > ```java
+> > package com.academy.presentation.controller;
+> >
+> > import com.academy.business.service.CourseService;
+> > import com.academy.persistence.entity.CourseEntity;
+> > import org.springframework.http.HttpStatus;
+> > import org.springframework.web.bind.annotation.GetMapping;
+> > import org.springframework.web.bind.annotation.PathVariable;
+> > import org.springframework.web.bind.annotation.PostMapping;
+> > import org.springframework.web.bind.annotation.RequestBody;
+> > import org.springframework.web.bind.annotation.RequestMapping;
+> > import org.springframework.web.bind.annotation.ResponseStatus;
+> > import org.springframework.web.bind.annotation.RestController;
+> >
+> > import java.util.List;
+> >
+> > @RestController
+> > @RequestMapping("/api/courses")
+> > public class CourseController {
+> >
+> >     private final CourseService service;
+> >
+> >     public CourseController(CourseService service) {
+> >         this.service = service;
+> >     }
+> >
+> >     @GetMapping
+> >     public List<CourseEntity> findAll() {
+> >         return service.findAll();
+> >     }
+> >
+> >     @PostMapping
+> >     @ResponseStatus(HttpStatus.CREATED)
+> >     public CourseEntity create(@RequestBody CourseEntity course) {
+> >         return service.create(course);
+> >     }
+> >
+> >     @GetMapping("/{id}/enrolled")
+> >     public long countEnrolled(@PathVariable Long id) {
+> >         return service.countEnrolled(id);
+> >     }
+> > }
 > > ```
 > >
-> > ✅ **Punto de control 3:** los ocho resultados coinciden y aparecen **seis** `insert` (2 estudiantes, 2 cursos, 2 matrículas).
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 EnrollmentController.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/presentation/controller/EnrollmentController.java`
+> >
+> > ```java
+> > package com.academy.presentation.controller;
+> >
+> > import com.academy.business.service.EnrollmentService;
+> > import com.academy.persistence.entity.EnrollmentEntity;
+> > import org.springframework.http.HttpStatus;
+> > import org.springframework.web.bind.annotation.PostMapping;
+> > import org.springframework.web.bind.annotation.RequestMapping;
+> > import org.springframework.web.bind.annotation.RequestParam;
+> > import org.springframework.web.bind.annotation.ResponseStatus;
+> > import org.springframework.web.bind.annotation.RestController;
+> >
+> > @RestController
+> > @RequestMapping("/api/enrollments")
+> > public class EnrollmentController {
+> >
+> >     private final EnrollmentService service;
+> >
+> >     public EnrollmentController(EnrollmentService service) {
+> >         this.service = service;
+> >     }
+> >
+> >     @PostMapping
+> >     @ResponseStatus(HttpStatus.CREATED)
+> >     public EnrollmentEntity enroll(@RequestParam Long studentId, @RequestParam Long courseId) {
+> >         return service.enroll(studentId, courseId);
+> >     }
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > | Anotación | Para qué sirve |
+> > |---|---|
+> > | `@RestController` | La clase atiende HTTP y devuelve **JSON** (los objetos se convierten solos). |
+> > | `@RequestMapping("/api/students")` | Ruta base de todos los métodos de la clase. |
+> > | `@GetMapping` / `@PostMapping` | Método HTTP que atiende cada método Java. |
+> > | `@RequestBody` | Convierte el JSON de la petición en un objeto. |
+> > | `@PathVariable` / `@RequestParam` | Toma un dato de la ruta (`/{id}`) o de la consulta (`?studentId=1`). |
+> > | `@ResponseStatus(CREATED)` | Responde `201` en lugar de `200` al crear. |
+
+> > > ⚠️ **Simplificación del taller.** Los controladores reciben y devuelven las **entidades** directamente. En un proyecto real se usan objetos de transferencia (DTO) y mapeadores para no exponer la tabla: eso se resuelve en otra guía.
 >
 > </details>
 >
-> <details>
-> <summary><strong>Paso 3.3 · Leer el SQL que genera cada llamada</strong></summary>
 >
-> > Con `show-sql=true`, cada llamada al repositorio produce su SQL (real, abreviado):
+> <details>
+> <summary><strong>Paso 4.2 · <code>ApiExceptionHandler</code>: de excepción a código HTTP</strong></summary>
+>
+> > Los servicios lanzan excepciones del negocio; **este es el único lugar** que las traduce a HTTP.
 > >
-> > ```text
-> > students.count()                        Hibernate: select count(*) from student
-> > students.save(...)                       Hibernate: insert into student (age,email,name) values (?,?,?)
-> > enrollments.save(new EnrollmentEntity)   Hibernate: insert into enrollment (course_id,student_id) values (?,?)
-> > students.findAll()                       Hibernate: select … from student
-> > existsByEmailIgnoreCase("ANA@…")         Hibernate: select … from student where upper(email)=upper(?) limit ?
-> > existsByStudentIdAndCourseId(1, 1)       Hibernate: select … from enrollment where student_id=? and course_id=? limit ?
-> > countByCourseId(1)                       Hibernate: select count(id) from enrollment where course_id=?
+> > <details>
+> > <summary><strong>📄 ApiExceptionHandler.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/presentation/controller/ApiExceptionHandler.java`
+> >
+> > ```java
+> > package com.academy.presentation.controller;
+> >
+> > import com.academy.business.exception.BusinessRuleException;
+> > import com.academy.business.exception.NotFoundException;
+> > import org.springframework.http.HttpStatus;
+> > import org.springframework.http.ResponseEntity;
+> > import org.springframework.web.bind.annotation.ExceptionHandler;
+> > import org.springframework.web.bind.annotation.RestControllerAdvice;
+> >
+> > import java.util.Map;
+> >
+> > @RestControllerAdvice
+> > public class ApiExceptionHandler {
+> >
+> >     @ExceptionHandler(NotFoundException.class)
+> >     public ResponseEntity<Map<String, String>> notFound(NotFoundException e) {
+> >         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+> >     }
+> >
+> >     @ExceptionHandler(BusinessRuleException.class)
+> >     public ResponseEntity<Map<String, String>> businessRule(BusinessRuleException e) {
+> >         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+> >     }
+> > }
 > > ```
 > >
-> > > 🗣️ **Preguntas:** ¿quién escribió el SQL de `existsByEmailIgnoreCase`? *(Nadie: Spring Data lo deduce del nombre del método.)* ¿Por qué el `insert` de `enrollment` lleva `course_id` y `student_id` y no los datos del curso?
-> > > *(Porque `@ManyToOne` guarda solo la clave foránea.)*
-> > >
-> > > 🔎 **Concepto (M3):** esto es el **ORM**: el código solo habla de objetos y Hibernate lo traduce a SQL ([Ejemplo 04 del M3](../../03-introduccion-a-jpa/material/ejemplos/04-que-es-orm.md)).
+> > </details>
+> >
+> > | Excepción del negocio | Código HTTP |
+> > |---|---|
+> > | `NotFoundException` | `404 Not Found` |
+> > | `BusinessRuleException` | `409 Conflict` |
+> >
+> > `@RestControllerAdvice` hace que el método se aplique a **todos** los controladores. Así el servicio sigue sin conocer HTTP.
+>
+> </details>
+>
+>
+> <details>
+> <summary><strong>Paso 4.3 · Arrancar y probar con <code>curl</code></strong></summary>
+>
+> > Se arranca la aplicación (`./mvnw spring-boot:run`) y, desde otra terminal, se prueba cada regla. **Resultados reales** (MySQL 8):
+> >
+> > ```bash
+> > # 1. Crear estudiantes
+> > curl -i -X POST localhost:8080/api/students -H "Content-Type: application/json" \
+> >      -d '{"name":"Ana Torres","age":22,"email":"ana@mail.com"}'
+> > curl -i -X POST localhost:8080/api/students -H "Content-Type: application/json" \
+> >      -d '{"name":"Luis Pérez","age":25,"email":"luis@mail.com"}'
+> >
+> > # 2. Crear un curso con cupo de 1
+> > curl -i -X POST localhost:8080/api/courses -H "Content-Type: application/json" \
+> >      -d '{"name":"Java from scratch","price":150000,"maxCapacity":1}'
+> >
+> > # 3. Matricular
+> > curl -i -X POST "localhost:8080/api/enrollments?studentId=1&courseId=1"
+> > ```
+> >
+> > | Petición | Respuesta real | Regla que se comprueba |
+> > |---|---|---|
+> > | `POST /api/students` (Ana) | `201` · `{"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com"}` | Crear |
+> > | `POST /api/students` con `ANA@mail.com` | `409` · `{"error":"Email already registered: ANA@mail.com"}` | Correo único, sin importar mayúsculas |
+> > | `POST /api/courses` con precio `0` | `409` · `{"error":"Price and max capacity must be greater than zero"}` | Precio y cupo válidos |
+> > | `POST /api/enrollments?studentId=1&courseId=1` | `201` · `{"id":1,"student":{…},"course":{…}}` | Matricular |
+> > | La misma matrícula otra vez | `409` · `{"error":"The student is already enrolled in this course"}` | Sin duplicados |
+> > | `studentId=2&courseId=1` (cupo de 1) | `409` · `{"error":"The course is full"}` | Cupo |
+> > | `studentId=9&courseId=1` | `404` · `{"error":"Student not found: 9"}` | Estudiante inexistente |
+> > | `GET /api/courses/1/enrolled` | `200` · `1` | Conteo (`countByCourseId`) |
+> > | `GET /api/courses/9/enrolled` | `404` · `{"error":"Course not found: 9"}` | Curso inexistente |
+> >
+> > > 🗣️ **Preguntas:** ¿qué capa decidió que el segundo correo era un `409`? *(El servicio detectó la regla; el `ApiExceptionHandler` la tradujo a `409`.)*
+> > > ¿Dónde se ve el SQL de cada petición? *(En la consola, por `show-sql=true`: aparece el `select … where upper(email)=upper(?) limit ?` del Paso 2.)*
+> >
+> > ✅ **Punto de control 4:** las nueve peticiones responden lo de la tabla.
 >
 > </details>
 
@@ -777,40 +1214,45 @@
 ---
 
 <details>
-<summary><strong>💾 Paso 4 — Los datos sobreviven al reinicio (MySQL)</strong></summary>
+<summary><strong>💾 Paso 5 — Los datos sobreviven al reinicio (MySQL)</strong></summary>
 
-> Con MySQL **no hay que cambiar nada** para que los datos persistan: la base vive en el **servidor**, fuera de la JVM, y conserva lo guardado aunque la aplicación termine.
-> Basta con ejecutar la misma aplicación dos veces.
+> La aplicación **no necesita cambiar nada** para que los datos persistan: la base vive en el **servidor**, fuera de la JVM, y conserva lo guardado aunque la aplicación se detenga.
 >
-> **1. Probar la persistencia:**
->
-> ```text
-> a) Primera ejecución   → aparecen los create table y los 6 insert; el resultado muestra 2 estudiantes y 2 inscritos en Java
-> b) Se detiene la aplicación (Ctrl+C)                  → las tablas y las filas siguen en MySQL
-> c) Segunda ejecución   → solo aparece  select count(*) from student  (no hay insert ni create table)
-> d) El resultado es el mismo: Student 1: Ana Torres · Student 2: Luis Pérez · Enrolled in Java (1): 2     ✅ siguen ahí
-> ```
->
-> **2. Ver los datos directamente en MySQL**, sin pasar por la aplicación:
+> **1. Guardar un estudiante por la API** (si ya se hizo en el Paso 4.3, se omite):
 >
 > ```bash
-> docker exec academy-mysql mysql -uroot -proot academy -e "select * from student; select * from enrollment"
+> curl -X POST localhost:8080/api/students -H "Content-Type: application/json" \
+>      -d '{"name":"Ana Torres","age":22,"email":"ana@mail.com"}'
+> ```
+>
+> **2. Reiniciar la aplicación** (`Ctrl+C` y volver a ejecutar) y comprobar:
+>
+> ```text
+> a) Primer arranque     → aparecen los create table y las restricciones (alter table …)
+> b) Se detiene la aplicación (Ctrl+C)                  → las tablas siguen en MySQL
+> c) Segundo arranque    → NO aparece ningún  create table  ni  alter table   (solo  Started AcademyApplication)
+> d) curl localhost:8080/api/students                   → el estudiante sigue ahí
+> ```
+>
+> **3. Ver que la fila sigue ahí:**
+>
+> ```bash
+> docker exec academy-mysql mysql -uroot -proot academy -e "show tables; select * from student"
 > ```
 >
 > ```text
+> Tables_in_academy
+> course
+> enrollment
+> student
+>
 > id  age  email          name
 > 1   22   ana@mail.com   Ana Torres
-> 2   25   luis@mail.com  Luis Pérez
->
-> id  course_id  student_id
-> 1   1          1
-> 2   1          2
 > ```
 >
 > | Pregunta | Respuesta |
 > |---|---|
 > | ¿Por qué no se crean de nuevo las tablas al reiniciar? | Ya existen en MySQL; `ddl-auto=update` solo agrega lo que falte y **no borra datos**. |
-> | ¿Por qué no se insertan de nuevo los datos? | Porque `students.count() == 0` es falso: la base ya tiene estudiantes. |
 > | ¿Qué pasaría con `ddl-auto=create`? | Borraría y recrearía las tablas en **cada arranque**: se perdería todo ([tabla de valores en el Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
 > | ¿Cómo se empieza de cero? | `docker exec academy-mysql mysql -uroot -proot -e "drop database academy; create database academy"`. |
 > | ¿Y si se borra el contenedor? | Se pierden los datos, porque viven dentro de él. Para conservarlos se monta un volumen (`-v academy-data:/var/lib/mysql`). |
@@ -825,11 +1267,12 @@
 <details>
 <summary><strong>🏁 Cierre — preguntas de síntesis</strong></summary>
 
-> 1. ¿Qué escribió el equipo y qué generó Hibernate? *(El equipo escribió las entidades, las interfaces de Spring Data y `main`; Hibernate generó las tablas y todo el SQL.)*
+> 1. ¿Qué escribió el equipo y qué generó Hibernate? *(El equipo escribió entidades, repositorios, servicios y controladores; Hibernate generó las tablas y todo el SQL.)*
 > 2. ¿Quién escribe la implementación de `StudentJpaRepository`? *(Nadie: Spring Data la genera al arrancar.)*
 > 3. ¿Por qué `EnrollmentEntity` es el lado dueño? *(Tiene las dos `@JoinColumn`: las claves foráneas viven en la tabla `enrollment`.)*
-> 4. ¿Qué devuelve `save` y por qué importa? *(La entidad con el `id` generado; se usa para relacionarla con otras, como `ana` y `java` en la matrícula.)*
-> 5. ¿Quién crea la base `academy` y quién crea las tablas? *(La base se crea a mano en MySQL; las tablas las crea Hibernate al arrancar.)*
+> 4. ¿Quién decide que un correo repetido es un error y quién lo convierte en `409`? *(El servicio detecta la regla y lanza `BusinessRuleException`; `ApiExceptionHandler` la traduce a HTTP.)*
+> 5. ¿Por qué el controlador no llama directamente al repositorio? *(Para que las reglas vivan en un solo lugar y se puedan reutilizar sin HTTP.)*
+> 6. ¿Quién crea la base `academy` y quién crea las tablas? *(La base se crea a mano en MySQL; las tablas las crea Hibernate al arrancar.)*
 
 </details>
 
@@ -848,8 +1291,13 @@
 > | `No default constructor for entity` | La entidad no tiene constructor **sin argumentos** | Agregar `protected StudentEntity() {}` |
 > | `PropertyReferenceException: No property 'x' found for type 'StudentEntity'` | El nombre del método derivado no coincide con un atributo de la **entidad** | Usar el nombre exacto: `existsByEmailIgnoreCase`, `countByCourseId` |
 > | `Table 'academy.student' doesn't exist` | `ddl-auto=none`, o la URL apunta a otra base | Usar `update` y revisar el nombre de la base en la URL |
-> | `DataIntegrityViolationException` al guardar un estudiante | El `email` ya existe (restricción `unique`), por ejemplo al reiniciar sin la comprobación `count() == 0` | Guardar los datos solo si la base está vacía, o usar otro correo |
+> | `DataIntegrityViolationException` al guardar un estudiante | El `email` ya existe y la comprobación del servicio no se ejecutó (se usó el repositorio directo) | Guardar siempre a través de `StudentService`, o usar otro correo |
 > | Los datos desaparecen al reiniciar | `ddl-auto=create` o `create-drop` | Usar `update` |
+> | `Parameter 0 of constructor in …Service required a bean of type …Repository` | El repositorio no está bajo `com.academy`, o no es una interfaz que extienda `JpaRepository` | Revisar el paquete y la herencia |
+> | `No qualifying bean` para un servicio | Falta `@Service` en la clase | Agregar `@Service` |
+> | `404` en una ruta que sí existe | El controlador no tiene `@RestController`, o la ruta de `@RequestMapping` no coincide | Revisar anotaciones y la ruta |
+> | `415 Unsupported Media Type` al hacer `POST` | Falta el encabezado `Content-Type: application/json` | Agregar `-H "Content-Type: application/json"` |
+> | `400 Bad Request` con un JSON válido | Un nombre del JSON no coincide con un atributo de la entidad (`maxCapacity`, no `max_capacity`) | Usar los nombres de los atributos |
 > | `Public Key Retrieval is not allowed` | MySQL 8 con un usuario que no es `root` y conexión sin SSL | Agregar `?allowPublicKeyRetrieval=true&useSSL=false` a la URL (solo en desarrollo) |
 
 </details>
@@ -860,10 +1308,11 @@
 > 1. **Restricción en la base:** en `EnrollmentEntity`, agregar `@Table(name = "enrollment", uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "course_id"}))`
 >    y comprobar que guardar dos veces la misma matrícula lanza `DataIntegrityViolationException`. ¿Para qué sirve si el código ya puede preguntar con `existsByStudentIdAndCourseId`?
 >    *(Dos peticiones simultáneas podrían pasar ambas la pregunta; la restricción es la última defensa.)*
-> 2. **Filtro en la base:** agregar `List<CourseEntity> findByPriceLessThan(double price)` a `CourseJpaRepository` y mostrar en `main` los cursos con precio menor a 200000.
+> 2. **Filtro de punta a punta:** agregar `findByPriceLessThan(double price)` en `CourseJpaRepository`, un método en `CourseService` y `GET /api/courses?maxPrice=200000` en `CourseController`; probarlo con `curl`. Probarlo con datos queda para la capa de servicio.
 > 3. **Consulta con JPQL:** reescribir `countByCourseId` con `@Query("SELECT COUNT(e) FROM EnrollmentEntity e WHERE e.course.id = :courseId")`.
 > 4. **Otro motor:** reemplazar MySQL por **PostgreSQL** (dependencia del driver + `spring.datasource.*`) y comprobar que **ninguna** entidad ni repositorio cambia.
-> 5. **Relación bidireccional:** agregar `List<EnrollmentEntity>` en `CourseEntity` con `@OneToMany(mappedBy = "course")` y explicar qué cambia en la tabla y en el código
+> 5. **Desmatricular:** agregar `DELETE /api/enrollments/{id}` (`404` si no existe) pasando por el servicio.
+> 6. **Relación bidireccional:** agregar `List<EnrollmentEntity>` en `CourseEntity` con `@OneToMany(mappedBy = "course")` y explicar qué cambia en la tabla y en el código
 >    ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md) y [Guía 00](00-guia-relaciones-entre-entidades-jpa.md)).
 
 </details>
@@ -878,9 +1327,10 @@
 >     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
->     │   │   └── 📁 controller    (vacío: otra guía)
+>     │   │   └── 📁 controller    StudentController · CourseController · EnrollmentController · ApiExceptionHandler
 >     │   ├── 📁 business
->     │   │   └── 📁 service       (vacío: otra guía)
+>     │   │   ├── 📁 service       StudentService · CourseService · EnrollmentService
+>     │   │   └── 📁 exception     NotFoundException · BusinessRuleException
 >     │   └── 📁 persistence
 >     │       ├── 📁 repository    StudentJpaRepository · CourseJpaRepository · EnrollmentJpaRepository
 >     │       └── 📁 entity        StudentEntity · CourseEntity · EnrollmentEntity
@@ -902,14 +1352,22 @@
 > | `@Column(unique = true)` | `StudentEntity.email` | Un correo no puede repetirse. | Crea una restricción `UNIQUE` en la columna. |
 > | `@ManyToOne` | `EnrollmentEntity.student`, `.course` | Muchas matrículas apuntan a **un** estudiante o curso. | Declara la relación de muchos a uno. |
 > | `@JoinColumn(name = "…")` | Esos mismos dos atributos | Hay que nombrar la **clave foránea**. | Define `student_id` / `course_id`; `EnrollmentEntity` es el **lado dueño**. |
+> | `@Service` | `StudentService`, `CourseService`, `EnrollmentService` | Son la capa de negocio. | Registra la clase como *bean* para inyectarla. |
+> | `@RestController` | Los tres controladores | Atienden HTTP y devuelven JSON. | Combina `@Controller` y `@ResponseBody`. |
+> | `@RequestMapping` · `@GetMapping` · `@PostMapping` | Controladores | Cada método atiende una ruta y un verbo. | Enlaza la petición HTTP con el método Java. |
+> | `@RequestBody` · `@PathVariable` · `@RequestParam` | Parámetros de los controladores | Cada dato llega de un sitio distinto. | Cuerpo JSON, parte de la ruta y parámetro de consulta. |
+> | `@ResponseStatus` | `create` y `enroll` | Crear responde `201`. | Fija el código HTTP. |
+> | `@RestControllerAdvice` · `@ExceptionHandler` | `ApiExceptionHandler` | Un solo lugar traduce errores. | Convierte excepciones del negocio en `404` y `409`. |
 > | `@SpringBootApplication` | `AcademyApplication` | Es la clase que arranca Spring. | Activa el escaneo de entidades y repositorios. |
 >
 > ```text
 > persistence   ──▶  @Entity · @Table · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn     (en persistence.entity)
 >                    (las …JpaRepository no llevan anotaciones)
+business      ──▶  @Service                                                                       (en business.service)
+presentation  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping · @RestControllerAdvice
 > arranque      ──▶  @SpringBootApplication
 > ```
 >
-> > 🔎 **Lectura clave.** Las anotaciones de JPA viven **solo** en `persistence.entity`. Más ejemplos de cada una: [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md).
+> > 🔎 **Lectura clave.** Las anotaciones de JPA viven **solo** en `persistence.entity`; las de Spring Web, **solo** en `presentation.controller`. Más ejemplos de cada una: [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md).
 
 </details>
