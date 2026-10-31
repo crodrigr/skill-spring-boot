@@ -748,6 +748,7 @@
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.repository.StudentJpaRepository;
 > > import org.springframework.stereotype.Service;
+> > import org.springframework.transaction.annotation.Transactional;
 > >
 > > import java.util.List;
 > > import java.util.Optional;
@@ -761,10 +762,12 @@
 > >         this.students = students;
 > >     }
 > >
+> >     @Transactional(readOnly = true)
 > >     public List<StudentEntity> findAll() {
 > >         return students.findAll();
 > >     }
 > >
+> >     @Transactional
 > >     public Optional<StudentEntity> create(StudentEntity student) {
 > >         if (students.existsByEmailIgnoreCase(student.getEmail())) {
 > >             return Optional.empty();
@@ -788,6 +791,7 @@
 > > import com.academy.persistence.repository.CourseJpaRepository;
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
 > > import org.springframework.stereotype.Service;
+> > import org.springframework.transaction.annotation.Transactional;
 > >
 > > import java.util.List;
 > > import java.util.Optional;
@@ -803,10 +807,12 @@
 > >         this.enrollments = enrollments;
 > >     }
 > >
+> >     @Transactional(readOnly = true)
 > >     public List<CourseEntity> findAll() {
 > >         return courses.findAll();
 > >     }
 > >
+> >     @Transactional
 > >     public Optional<CourseEntity> create(CourseEntity course) {
 > >         if (course.getPrice() <= 0 || course.getMaxCapacity() <= 0) {
 > >             return Optional.empty();
@@ -814,6 +820,7 @@
 > >         return Optional.of(courses.save(course));
 > >     }
 > >
+> >     @Transactional(readOnly = true)
 > >     public Optional<Long> countEnrolled(Long courseId) {
 > >         if (!courses.existsById(courseId)) {
 > >             return Optional.empty();
@@ -827,6 +834,8 @@
 > >
 > > - **`@Service`** registra la clase como *bean* de la capa de negocio (el mismo mecanismo de inyección del M2).
 > > - `create` **valida antes de guardar**: si la regla falla devuelve `Optional.empty()` y no se ejecuta ningún `insert`.
+> > - **`@Transactional`** (de `org.springframework.transaction.annotation`) abre una transacción al entrar al método y la cierra al salir: si algo falla, se deshace todo (*rollback*). Va en los **servicios**, nunca en el controlador.
+> > - **`@Transactional(readOnly = true)`** en las consultas (`findAll`, `countEnrolled`): indica que no se escribe, y Hibernate evita trabajo innecesario.
 > > - `save` devuelve la entidad con su `id` ya generado; se envuelve en `Optional.of(…)`.
 > > - `countEnrolled` devuelve vacío cuando el curso no existe, para no confundirlo con «cero inscritos».
 >
@@ -853,6 +862,7 @@
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
 > > import com.academy.persistence.repository.StudentJpaRepository;
 > > import org.springframework.stereotype.Service;
+> > import org.springframework.transaction.annotation.Transactional;
 > >
 > > import java.util.Optional;
 > >
@@ -870,6 +880,7 @@
 > >         this.enrollments = enrollments;
 > >     }
 > >
+> >     @Transactional
 > >     public Optional<EnrollmentEntity> enroll(Long studentId, Long courseId) {
 > >         Optional<StudentEntity> student = students.findById(studentId);
 > >         Optional<CourseEntity> course = courses.findById(courseId);
@@ -892,6 +903,7 @@
 > >
 > > | Línea | Qué hace |
 > > |---|---|
+> > | `@Transactional` | Todo `enroll` ocurre en **una sola transacción**: lecturas y `insert` van juntos o no va ninguno. |
 > > | `students.findById(…)` y `courses.findById(…)` | Devuelven `Optional`: vacío si no existe la fila. |
 > > | `existsByStudentIdAndCourseId` | Evita la matrícula duplicada. |
 > > | `countByCourseId(courseId) >= course.get().getMaxCapacity()` | Compara los inscritos con el cupo del curso. |
@@ -1266,6 +1278,7 @@
 > | `@ManyToOne` | `EnrollmentEntity.student`, `.course` | Muchas matrículas apuntan a **un** estudiante o curso. | Declara la relación de muchos a uno. |
 > | `@JoinColumn(name = "…")` | Esos mismos dos atributos | Hay que nombrar la **clave foránea**. | Define `student_id` / `course_id`; `EnrollmentEntity` es el **lado dueño**. |
 > | `@Service` | `StudentService`, `CourseService`, `EnrollmentService` | Son la capa de negocio. | Registra la clase como *bean* para inyectarla. |
+> | `@Transactional` · `@Transactional(readOnly = true)` | Métodos de los servicios (`create`, `enroll` · `findAll`, `countEnrolled`) | Una operación del negocio debe cumplirse completa o no cumplirse. | Abre y cierra la transacción; `readOnly` marca las consultas. |
 > | `@RestController` | Los tres controladores | Atienden HTTP y devuelven JSON. | Combina `@Controller` y `@ResponseBody`. |
 > | `@RequestMapping` · `@GetMapping` · `@PostMapping` | Controladores | Cada método atiende una ruta y un verbo. | Enlaza la petición HTTP con el método Java. |
 > | `@RequestBody` · `@PathVariable` · `@RequestParam` | Parámetros de los controladores | Cada dato llega de un sitio distinto. | Cuerpo JSON, parte de la ruta y parámetro de consulta. |
@@ -1275,7 +1288,7 @@
 > ```text
 > persistence   ──▶  @Entity · @Table · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn     (en persistence.entity)
 >                    (las …JpaRepository no llevan anotaciones)
-business      ──▶  @Service                                                                       (en business.service)
+business      ──▶  @Service · @Transactional                                                                   (en business.service)
 presentation  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping
 > arranque      ──▶  @SpringBootApplication
 > ```
