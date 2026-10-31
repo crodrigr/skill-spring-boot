@@ -1192,7 +1192,20 @@
 > <details open>
 > <summary><strong>1️⃣ Caso 1 — Por defecto: carnet EAGER, cursos LAZY</strong></summary>
 >
-> > Al hacer `findById`, el carnet **ya viene** en el mismo `SELECT` (con un `join`). Los cursos **no**: se piden recién en el paso 3.
+> > **En la entidad no escribís nada de `fetch`**: JPA aplica el valor por defecto. Así están los atributos en la práctica, con lo que JPA entiende en cada uno:
+> >
+> > ```java
+> > // EstudianteEntity (tal como está en la práctica)
+> > @OneToOne(cascade = CascadeType.ALL)        // = fetch EAGER (por defecto en @OneToOne)
+> > @JoinColumn(name = "carnet_id")
+> > private CarnetEntity carnet;
+> >
+> > @ManyToMany                                  // = fetch LAZY (por defecto en @ManyToMany)
+> > @JoinTable(...)
+> > private Set<CursoEntity> cursos = new HashSet<>();
+> > ```
+> >
+> > Por eso, al hacer `findById`, el carnet **ya viene** en el mismo `SELECT` (con un `join`) y los cursos **no**: se piden recién en el paso 3.
 > >
 > > ```text
 > > paso 1: findById(1)
@@ -1214,7 +1227,19 @@
 > <details open>
 > <summary><strong>2️⃣ Caso 2 — Cursos EAGER: todo en un solo SELECT</strong></summary>
 >
-> > Se cambia el atributo a `@ManyToMany(fetch = FetchType.EAGER)`. Ahora los cursos llegan **junto con el estudiante**:
+> > **Qué se cambia en la entidad:** se agrega `fetch = FetchType.EAGER` a los cursos.
+> >
+> > ```java
+> > @OneToOne(cascade = CascadeType.ALL)                    // EAGER (por defecto)
+> > @JoinColumn(name = "carnet_id")
+> > private CarnetEntity carnet;
+> >
+> > @ManyToMany(fetch = FetchType.EAGER)                    // ← cambia: de LAZY a EAGER
+> > @JoinTable(...)
+> > private Set<CursoEntity> cursos = new HashSet<>();
+> > ```
+> >
+> > Ahora los cursos llegan **junto con el estudiante**:
 > >
 > > ```text
 > > paso 1: findById(1)
@@ -1233,7 +1258,19 @@
 > <details open>
 > <summary><strong>3️⃣ Caso 3 — Carnet LAZY: se pide al usarlo</strong></summary>
 >
-> > Se cambia a `@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)`. Ahora `findById` trae **solo el estudiante** y el carnet se pide cuando se usa:
+> > **Qué se cambia en la entidad:** se agrega `fetch = FetchType.LAZY` al carnet.
+> >
+> > ```java
+> > @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)   // ← cambia: de EAGER a LAZY
+> > @JoinColumn(name = "carnet_id")
+> > private CarnetEntity carnet;
+> >
+> > @ManyToMany                                                   // LAZY (por defecto)
+> > @JoinTable(...)
+> > private Set<CursoEntity> cursos = new HashSet<>();
+> > ```
+> >
+> > Ahora `findById` trae **solo el estudiante** y el carnet se pide cuando se usa:
 > >
 > > ```text
 > > paso 1: findById(1)
