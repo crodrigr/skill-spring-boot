@@ -1228,9 +1228,11 @@
 > <details open>
 > <summary><strong>4️⃣ Paso 4 — Crear las entidades</strong></summary>
 >
-> > Cuatro clases en el paquete `com.academia.persistence.entity`. Son las mismas de las secciones de **un sentido** de arriba, completas. Copialas una por una:
+> > Cuatro clases en el paquete `com.academia.persistence.entity`, creadas **relación por relación**. Son las mismas de las secciones de **un sentido** de arriba. Copialas en este orden:
 > >
-> > 📄 **CarnetEntity.java  (1:1, el «otro» lado: no conoce a su estudiante)**
+> > **🔹 4.1 Uno a uno — Estudiante y Carnet**
+> >
+> > 📄 **CarnetEntity.java  (no conoce a su estudiante)**
 > >
 > > ```java
 > > package com.academia.persistence.entity;
@@ -1257,7 +1259,41 @@
 > > }
 > > ```
 > >
-> > 📄 **CursoEntity.java  (1:N y N:M, el «otro» lado: no conoce a su docente ni a sus estudiantes)**
+> > 📄 **EstudianteEntity.java  (lado dueño: tiene @JoinColumn)  — por ahora solo con el carnet**
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > @Entity
+> > @Table(name = "estudiante")
+> > @Data
+> > @NoArgsConstructor
+> > public class EstudianteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // 1:1 — lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
+> >     @OneToOne(cascade = CascadeType.ALL)
+> >     @JoinColumn(name = "carnet_id")
+> >     private CarnetEntity carnet;
+> >
+> >     public EstudianteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > **🔹 4.2 Uno a muchos — Docente y Curso**
+> >
+> > 📄 **CursoEntity.java  (no conoce a su docente)**
 > >
 > > ```java
 > > package com.academia.persistence.entity;
@@ -1284,7 +1320,7 @@
 > > }
 > > ```
 > >
-> > 📄 **DocenteEntity.java  (1:N, lado dueño)**
+> > 📄 **DocenteEntity.java  (lado dueño: tiene @JoinColumn)**
 > >
 > > ```java
 > > package com.academia.persistence.entity;
@@ -1319,7 +1355,24 @@
 > > }
 > > ```
 > >
-> > 📄 **EstudianteEntity.java  (1:1 y N:M, lado dueño)**
+> > **🔹 4.3 Muchos a muchos — Estudiante y Curso**
+> >
+> > `CursoEntity` **no cambia**. Solo se amplía `EstudianteEntity` con el atributo `cursos` y la tabla intermedia (`@JoinTable`). Agregá estos imports y este atributo:
+> >
+> > ```java
+> > // imports nuevos
+> > import java.util.HashSet;
+> > import java.util.Set;
+> >
+> > // atributo nuevo, después de "carnet"
+> > @ManyToMany
+> > @JoinTable(name = "estudiante_curso",
+> >         joinColumns = @JoinColumn(name = "estudiante_id"),
+> >         inverseJoinColumns = @JoinColumn(name = "curso_id"))
+> > private Set<CursoEntity> cursos = new HashSet<>();
+> > ```
+> >
+> > Así queda `EstudianteEntity` **completa**:
 > >
 > > ```java
 > > package com.academia.persistence.entity;
