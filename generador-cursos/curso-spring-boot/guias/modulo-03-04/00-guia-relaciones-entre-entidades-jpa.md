@@ -2,11 +2,11 @@
 
 <div style="background-color:#fff3b0; color:#1f1f1f; border-left:6px solid #f2b705; padding:12px 16px; border-radius:6px;">
 
-🎯 **Qué vas a aprender:** a declarar las tres relaciones de JPA, **desde las entidades**, en **un sentido** y en **doble sentido**, y qué significa cada notación.
+🎯 **Qué se aprende:** a declarar las tres relaciones de JPA, **desde las entidades**, en **un sentido** y en **doble sentido**, y qué significa cada notación.
 
 ⏱️ **Tiempo:** unos 20 minutos de lectura y 25 de práctica. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](03-guia-tienda-2-uno-a-muchos.md).
 
-✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que ves son reales.
+✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que se muestran son reales.
 
 </div>
 
@@ -213,7 +213,7 @@
 > > > > Optional<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
 > > > > ```
 > > > >
-> > > > Se lee así: **find** (buscar) **By** (donde) **Carnet** (el carnet del estudiante) **Codigo** (tenga este código). O sea: «buscame el estudiante cuyo carnet tenga este código».
+> > > > Se lee así: **find** (buscar) **By** (donde) **Carnet** (el carnet del estudiante) **Codigo** (tenga este código). O sea: «buscar el estudiante cuyo carnet tenga este código».
 > > > >
 > > > > Devuelve un `Optional` porque en uno a uno hay **como máximo un** estudiante por carnet (puede que no exista ninguno). `orElseThrow()` entrega el estudiante o lanza un error si no lo encuentra.
 > > > >
@@ -549,7 +549,7 @@
 > > > > List<DocenteEntity> findByCursosNombre(String nombre);   // docente.cursos.nombre = ?
 > > > > ```
 > > > >
-> > > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del docente) **Nombre** (tengan este nombre). O sea: «buscame los docentes que dicten un curso con este nombre».
+> > > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del docente) **Nombre** (tengan este nombre). O sea: «buscar los docentes que dicten un curso con este nombre».
 > > > >
 > > > > <details>
 > > > > <summary>🔬 Ver el SQL de las consultas</summary>
@@ -761,7 +761,7 @@
 >
 > </details>
 >
-> > ⚠️ **En doble sentido se asigna del lado dueño (el curso).** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, mantené **los dos lados sincronizados** con el método `agregarCurso` de `DocenteEntity` (ya incluido arriba).
+> > ⚠️ **En doble sentido se asigna del lado dueño (el curso).** `docente.getCursos().add(curso)` **no** escribe `docente_id`; hay que hacer `curso.setDocente(docente)`. Se comprobó: un curso agregado **solo** a la lista del docente quedó con `docente_id = NULL`. En doble sentido, se mantienen **los dos lados sincronizados** con el método `agregarCurso` de `DocenteEntity` (ya incluido arriba).
 
 </details>
 
@@ -769,7 +769,7 @@
 <summary><strong>3️⃣ Muchos a muchos — Estudiante y Curso</strong></summary>
 
 >
-> Ningún lado puede guardar la clave en su propia tabla: hace falta una **tabla intermedia** con las dos claves foráneas. JPA la crea por vos.
+> Ningún lado puede guardar la clave en su propia tabla: hace falta una **tabla intermedia** con las dos claves foráneas. JPA la crea automáticamente.
 >
 > <details open>
 > <summary><strong>➡️ Un sentido</strong></summary>
@@ -959,7 +959,7 @@
 > > > > List<EstudianteEntity> findByCursosNombre(String nombre);   // estudiante.cursos.nombre = ?
 > > > > ```
 > > > >
-> > > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del estudiante) **Nombre** (tengan este nombre). O sea: «buscame los estudiantes que cursen un curso con este nombre».
+> > > > Se lee así: **find** (buscar) **By** (donde) **Cursos** (los cursos del estudiante) **Nombre** (tengan este nombre). O sea: «buscar los estudiantes que cursen un curso con este nombre».
 > > > >
 > > > > <details>
 > > > > <summary>🔬 Ver el SQL de las consultas</summary>
@@ -1190,7 +1190,7 @@
 >
 > Con el lado inverso (`@OneToOne(mappedBy = "carnet")` en `CarnetEntity`) las dos líneas funcionan.
 >
-> En el diagrama, las flechas continuas son lo que **puedes navegar en Java**; la flecha punteada es la **única que existe en la base de datos** (la columna `carnet_id`):
+> En el diagrama, las flechas continuas son lo que **se puede navegar en Java**; la flecha punteada es la **única que existe en la base de datos** (la columna `carnet_id`):
 >
 > ```mermaid
 > flowchart LR
@@ -1207,7 +1207,7 @@
 >     A2 -.->|"columna carnet_id"| C2
 > ```
 >
-> Fíjate en que la columna `carnet_id` es la misma en los dos casos: el doble sentido **solo agrega la flecha de vuelta en Java**, no cambia las tablas.
+> Cabe notar que la columna `carnet_id` es la misma en los dos casos: el doble sentido **solo agrega la flecha de vuelta en Java**, no cambia las tablas.
 >
 > | | |
 > |---|---|
@@ -1219,26 +1219,26 @@
 >
 > | Situación | ¿Doble sentido? |
 > |---|---|
-> | Solo preguntás «¿cuál es el carnet de este estudiante?» | **No** |
-> | Preguntás «¿de quién es este carnet?» pocas veces | **No**: usá un método del repositorio, por ejemplo `findByCarnetCodigo("C-001")` en `EstudianteJpaRepository` |
-> | Recorrés **siempre en las dos direcciones** y querés `carnet.getEstudiante()` directo | **Sí** |
+> | Solo se pregunta «¿cuál es el carnet de este estudiante?» | **No** |
+> | Se pregunta «¿de quién es este carnet?» pocas veces | **No**: se usa un método del repositorio, por ejemplo `findByCarnetCodigo("C-001")` en `EstudianteJpaRepository` |
+> | Se recorre **siempre en las dos direcciones** y se quiere `carnet.getEstudiante()` directo | **Sí** |
 >
 > > ⚠️ **Costo:** hay que mantener los dos lados coherentes, excluir el inverso de `toString`/`equals` (con `@Data`) y evitar el bucle infinito en JSON.
 >
 > | | **Un sentido** (solo el dueño) | **Doble sentido** (dueño + inverso) |
 > |---|---|---|
-> | Qué agregás | Solo la notación del dueño | Además, la del inverso con `mappedBy` |
+> | Qué se agrega | Solo la notación del dueño | Además, la del inverso con `mappedBy` |
 > | Cambia la base de datos | — | **No**: el inverso no crea columnas ni tablas |
-> | Podés navegar | Solo desde el dueño | Desde los dos lados |
+> | Se puede navegar | Solo desde el dueño | Desde los dos lados |
 > | Costo | El más simple | Hay que **sincronizar** ambos lados y evitar ciclos en JSON y `toString` |
-> | Conviene cuando… | Solo necesitás consultar desde un lado | De verdad necesitás recorrer en las dos direcciones |
+> | Conviene cuando… | Solo se necesita consultar desde un lado | De verdad se necesita recorrer en las dos direcciones |
 >
-> **Reglas para no equivocarte:**
+> **Reglas para no equivocarse:**
 >
-> 1. **Empezá en un sentido.** Agregá el inverso solo si lo vas a usar.
+> 1. **Se empieza en un sentido.** El inverso se agrega solo si se va a usar.
 > 2. **Siempre se escribe del lado dueño.** El inverso solo sirve para **leer**.
 > 3. **`mappedBy` lleva el nombre exacto** del atributo del dueño (`"docente"`, `"carnet"`, `"cursos"`).
-> 4. **Con `@Data` y doble sentido, excluí el lado inverso** con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`: si no, `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Así están las clases de esta guía.
+> 4. **Con `@Data` y doble sentido, se excluye el lado inverso** con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`: si no, `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Así están las clases de esta guía.
 > 5. Al devolver entidades como **JSON**, el doble sentido genera un bucle infinito: por eso en la [guía 2 de la tienda](03-guia-tienda-2-uno-a-muchos.md) se usa `@JsonIgnore`, y en la [Fase II](05-guia-tienda-fase-2-buenas-practicas.md) se separan modelo y entidad.
 
 </details>
@@ -1250,8 +1250,8 @@
 >
 > | | Cuándo carga lo relacionado | Idea |
 > |---|---|---|
-> | **EAGER** («ansioso») | **Al mismo tiempo** que la entidad principal | Te trae todo de una vez |
-> | **LAZY** («perezoso») | **Solo cuando lo pedís** (`getXxx()`) | Te trae lo básico y espera a que lo uses |
+> | **EAGER** («ansioso») | **Al mismo tiempo** que la entidad principal | Trae todo de una vez |
+> | **LAZY** («perezoso») | **Solo cuando se pide** (`getXxx()`) | Trae lo básico y espera a que se use |
 >
 > **No hace falta escribirlos**: cada relación ya trae un valor por defecto.
 >
@@ -1271,7 +1271,7 @@
 > <details open>
 > <summary><strong>1️⃣ Caso 1 — Por defecto: carnet EAGER, cursos LAZY</strong></summary>
 >
-> > **En la entidad no escribís nada de `fetch`**: JPA aplica el valor por defecto. Así están los atributos en la práctica, con lo que JPA entiende en cada uno:
+> > **En la entidad no se escribe nada de `fetch`**: JPA aplica el valor por defecto. Así están los atributos en la práctica, con lo que JPA entiende en cada uno:
 > >
 > > ```java
 > > // ===== Clase EstudianteEntity (tal como está en la práctica) =====
@@ -1380,7 +1380,7 @@
 > >
 > > 1. Con **LAZY**, cuando JPA carga a Ana **no trae sus cursos**. En `ana.cursos` deja una *promesa*: «cuando alguien me los pida, voy a la base de datos y los traigo».
 > > 2. Para cumplir esa promesa, JPA necesita que **la conexión con la base (la transacción) siga abierta**.
-> > 3. Si la transacción **ya se cerró** cuando pedís los cursos, la promesa no se puede cumplir y salta el error.
+> > 3. Si la transacción **ya se cerró** cuando se piden los cursos, la promesa no se puede cumplir y salta el error.
 > >
 > > **❌ Lo que falla.** Cada método del repositorio (`findById`, `save`…) abre su transacción, hace su trabajo y **la cierra al terminar**:
 > >
@@ -1399,7 +1399,7 @@
 > >
 > > | | Solución | Código | Qué hace |
 > > |---|---|---|---|
-> > | A | **Pedir los cursos mientras la transacción sigue abierta** (la recomendada) | `tx.executeWithoutResult(status -> { ... })` o `@Transactional` en un método | Leés a Ana **y** sus cursos dentro de la misma transacción |
+> > | A | **Pedir los cursos mientras la transacción sigue abierta** (la recomendada) | `tx.executeWithoutResult(status -> { ... })` o `@Transactional` en un método | Se lee a Ana **y** sus cursos dentro de la misma transacción |
 > > | B | Poner `EAGER` en `cursos` | `@ManyToMany(fetch = FetchType.EAGER)` | Los cursos ya vienen cargados con Ana; no hay nada que pedir después |
 > >
 > > ```java
@@ -1417,35 +1417,35 @@
 > <details open>
 > <summary><strong>🤔 ¿Cuándo cambiar los valores por defecto?</strong></summary>
 >
-> > Regla simple: **no los cambies hasta que tengas una razón.** Estas son las razones:
+> > Regla simple: **no se cambian hasta que haya una razón.** Estas son las razones:
 > >
-> > | Si te pasa esto… | Hacé esto | Por qué |
+> > | Si ocurre esto… | Se hace esto | Por qué |
 > > |---|---|---|
 > > | Todo funciona | **Nada** | Los valores por defecto son los adecuados casi siempre |
-> > | Te sale `LazyInitializationException` | **Leé la lista dentro de una transacción** (opción A) | Es lo correcto y no cuesta rendimiento |
-> > | *Siempre* que cargás la entidad también necesitás esa lista (y es corta) | `EAGER` en esa relación | Evita pedirla aparte cada vez |
-> > | La lista puede ser enorme (por ejemplo, un curso con miles de estudiantes) | Dejar `LAZY` | Si fuera EAGER, cada consulta del curso trae miles de filas aunque no las uses |
+> > | Aparece `LazyInitializationException` | **Leer la lista dentro de una transacción** (opción A) | Es lo correcto y no cuesta rendimiento |
+> > | *Siempre* que se carga la entidad también se necesita esa lista (y es corta) | `EAGER` en esa relación | Evita pedirla aparte cada vez |
+> > | La lista puede ser enorme (por ejemplo, un curso con miles de estudiantes) | Dejar `LAZY` | Si fuera EAGER, cada consulta del curso trae miles de filas aunque no se usen |
 > > | Una relación a un solo objeto que casi nunca se usa | `@OneToOne(fetch = FetchType.LAZY)` | No se trae si no se necesita |
 >
 > </details>
 >
-> > ⚠️ Poner `EAGER` en todo parece cómodo, pero con muchas relaciones cada consulta termina trayendo **media base de datos**. Empezá con los valores por defecto.
+> > ⚠️ Poner `EAGER` en todo parece cómodo, pero con muchas relaciones cada consulta termina trayendo **media base de datos**. Conviene empezar con los valores por defecto.
 > >
-> > 🧑‍💻 Podés repetir estos casos en la **práctica**: cambiá el `fetch` en `EstudianteEntity` y mirá el SQL que Hibernate imprime en la consola.
+> > 🧑‍💻 Estos casos se pueden repetir en la **práctica**: se cambia el `fetch` en `EstudianteEntity` y se observa el SQL que Hibernate imprime en la consola.
 
 </details>
 
 <details open>
-<summary><strong>🧑‍💻 Práctica paso a paso: tu propio proyecto desde cero</strong></summary>
+<summary><strong>🧑‍💻 Práctica paso a paso: un proyecto propio desde cero</strong></summary>
 
-> Vas a construir **desde cero** un proyecto Spring Boot con las cuatro entidades de esta guía **en un solo sentido**, sus repositorios y una clase `main` que **guarda** datos y los **consulta** en MySQL, con las tres relaciones a la vez. Al final podés ver las tablas y comparar con lo que explican las secciones anteriores.
+> Se construye **desde cero** un proyecto Spring Boot con las cuatro entidades de esta guía **en un solo sentido**, sus repositorios y una clase `main` que **guarda** datos y los **consulta** en MySQL, con las tres relaciones a la vez. Al final se ven las tablas y se compara con lo que explican las secciones anteriores.
 >
-> **Necesitás:** JDK 17 o superior, Maven (o el `mvnw` que trae el proyecto), Docker (o un MySQL instalado) y un IDE. Tiempo: unos 25 minutos.
+> **Se necesita:** JDK 17 o superior, Maven (o el `mvnw` que trae el proyecto), Docker (o un MySQL instalado) y un IDE. Tiempo: unos 25 minutos.
 >
 > <details open>
 > <summary><strong>1️⃣ Paso 1 — Crear el proyecto</strong></summary>
 >
-> > Entrá a **[start.spring.io](https://start.spring.io)** y completá:
+> > Se entra a **[start.spring.io](https://start.spring.io)** y se completa:
 > >
 > > | Campo | Valor |
 > > |---|---|
@@ -1457,7 +1457,7 @@
 > > | Packaging | **Jar** |
 > > | Java | **17** (o superior) |
 > >
-> > **Dependencies** (botón *Add dependencies*): solo estas tres. **No** agregues Spring Web: aquí no hay API.
+> > **Dependencies** (botón *Add dependencies*): solo estas tres. **No** se agrega Spring Web: aquí no hay API.
 > >
 > > | Dependencia | Para qué sirve |
 > > |---|---|
@@ -1465,9 +1465,9 @@
 > > | **MySQL Driver** | el conector para hablar con MySQL |
 > > | **Lombok** | `@Data`, `@NoArgsConstructor`, `@RequiredArgsConstructor` |
 > >
-> > Pulsá **Generate**, descomprimí el `.zip` y abrí la carpeta `academia` en tu IDE.
+> > Se pulsa **Generate**, se descomprime el `.zip` y se abre la carpeta `academia` en el IDE.
 > >
-> > > ⚠️ **Si usás JDK 23 o superior**, Lombok necesita dos ajustes en el `pom.xml` (se probó con JDK 25): una versión reciente de Lombok y la opción `proc full` del compilador.
+> > > ⚠️ **Con JDK 23 o superior**, Lombok necesita dos ajustes en el `pom.xml` (se probó con JDK 25): una versión reciente de Lombok y la opción `proc full` del compilador.
 > > >
 > > > ```xml
 > > > <properties>
@@ -1499,7 +1499,7 @@
 > > docker run --name mysql-academia -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:8
 > > ```
 > >
-> > > Si ya tenés MySQL instalado, usalo: solo cambiá el usuario y la contraseña en el paso siguiente.
+> > > Si ya hay un MySQL instalado, se usa ese: solo se cambian el usuario y la contraseña en el paso siguiente.
 > >
 > > **b) Configurar la conexión** en `src/main/resources/application.properties`:
 > >
@@ -1520,7 +1520,7 @@
 > > |---|---|
 > > | `spring.datasource.url` | Dónde está MySQL (`localhost:3306`) y qué base usar (`academia`). `createDatabaseIfNotExist=true` **crea la base** si no existe. |
 > > | `spring.datasource.username` / `password` | Usuario y clave de MySQL (`root`/`root` es solo para desarrollo). |
-> > | `spring.jpa.hibernate.ddl-auto=create` | Al iniciar, Hibernate **borra y crea** las tablas a partir de las entidades. Así podés ejecutar la práctica las veces que quieras con datos limpios. *(En un proyecto real se usa `update` o `validate`.)* |
+> > | `spring.jpa.hibernate.ddl-auto=create` | Al iniciar, Hibernate **borra y crea** las tablas a partir de las entidades. Así se puede ejecutar la práctica las veces que quieras con datos limpios. *(En un proyecto real se usa `update` o `validate`.)* |
 > > | `spring.jpa.show-sql=true` | Muestra en la consola el SQL que ejecuta Hibernate. |
 >
 > </details>
@@ -1528,7 +1528,7 @@
 > <details open>
 > <summary><strong>3️⃣ Paso 3 — Crear el árbol de archivos</strong></summary>
 >
-> > Dentro de `src/main/java/com/academia/` crea los paquetes `persistence.entity` y `persistence.repository`, y los archivos vacíos que se ven abajo. La clase `AcademiaApplication` ya la generó Spring Initializr.
+> > Dentro de `src/main/java/com/academia/` se crean los paquetes `persistence.entity` y `persistence.repository`, y los archivos vacíos que se ven abajo. La clase `AcademiaApplication` ya la generó Spring Initializr.
 > >
 > > ```text
 > > academia/
@@ -1699,7 +1699,7 @@
 > > <details open>
 > > <summary><strong>🔹 4.3 Muchos a muchos — Estudiante y Curso</strong></summary>
 > >
-> > > Primero el **dueño** (`EstudianteEntity`, tiene la tabla intermedia `estudiante_curso`). Se amplía con el atributo `cursos`. Agregá estos imports y este atributo:
+> > > Primero el **dueño** (`EstudianteEntity`, tiene la tabla intermedia `estudiante_curso`). Se amplía con el atributo `cursos`. Se agregan estos imports y este atributo:
 > > >
 > > > ```java
 > > > // imports nuevos
@@ -1806,14 +1806,14 @@
 > >
 > > > 💡 **Solo dos repositorios.** `Carnet` y `Curso` no necesitan el suyo: se guardan por `cascade` desde su dueño (el estudiante guarda su carnet; el docente guarda sus cursos).
 > > >
-> > > 💡 Los métodos `findByCarnetCodigo` y `findByCursosNombre` son la **consulta del sentido contrario**: como `CarnetEntity` y `CursoEntity` no conocen a su dueño, se le **pregunta al repositorio del dueño**. Spring Data los implementa leyendo el nombre.
+> > > 💡 Los métodos `findByCarnetCodigo` y `findByCursosNombre` son la **consulta del sentido contrario**: como `CarnetEntity` y `CursoEntity` no conocen a su dueño, se **pregunta al repositorio del dueño**. Spring Data los implementa leyendo el nombre.
 >
 > </details>
 >
 > <details open>
 > <summary><strong>6️⃣ Paso 6 — Escribir los ejemplos en la clase principal</strong></summary>
 >
-> > Reemplazá el contenido de `AcademiaApplication.java`. Es la clase del `main`: recibe los repositorios por constructor y ejecuta los ejemplos al arrancar.
+> > Se reemplaza el contenido de `AcademiaApplication.java`. Es la clase del `main`: recibe los repositorios por constructor y ejecuta los ejemplos al arrancar.
 > >
 > > ```java
 > > package com.academia;
@@ -1898,7 +1898,7 @@
 > > |---|---|
 > > | `main` | Arranca Spring Boot. |
 > > | `@RequiredArgsConstructor` | Lombok genera el constructor que **recibe los repositorios** (así Spring los inyecta). |
-> > | `implements CommandLineRunner` + `run` | Spring llama a `run` **justo después de arrancar**: es nuestro punto de entrada para los ejemplos. |
+> > | `implements CommandLineRunner` + `run` | Spring llama a `run` **justo después de arrancar**: es el punto de entrada para los ejemplos. |
 > > | `TransactionTemplate` | Ejecuta cada bloque dentro de **una transacción**. Se usan **dos**: una para guardar y otra, distinta, para consultar. Así las consultas leen **de la base de datos** y no de la memoria. |
 > > | `guardarDatos()` | Registra todo asignando **siempre del lado dueño**; el carnet y los cursos se guardan por `cascade`. |
 > > | `consultarDatos()` | Responde **navegando desde el dueño** y **con el repositorio** (sentido contrario). |
@@ -1943,9 +1943,9 @@
 > > ./mvnw spring-boot:run
 > > ```
 > >
-> > *(En Windows: `mvnw.cmd spring-boot:run`. También podés pulsar **Run** sobre `AcademiaApplication` en tu IDE.)*
+> > *(En Windows: `mvnw.cmd spring-boot:run`. También se puede pulsar **Run** sobre `AcademiaApplication` en el IDE.)*
 > >
-> > Primero verás el SQL de Hibernate (`create table…`, `insert into…`) y, al final, lo que imprimen los ejemplos. **Resultado real:**
+> > Primero aparece el SQL de Hibernate (`create table…`, `insert into…`) y, al final, lo que imprimen los ejemplos. **Resultado real:**
 > >
 > > ```text
 > > ===== NAVEGANDO (desde el dueño) =====
@@ -1958,7 +1958,7 @@
 > > Estudiantes de Java    : [Ana, Luis]
 > > ```
 > >
-> > > 🔎 En el SQL de la consola vas a ver `insert into curso (nombre)` y **después** `update curso set docente_id=?`: es lo normal en un `@OneToMany` de un sentido (el curso entra primero sin docente y Hibernate completa la clave).
+> > > 🔎 En el SQL de la consola se ve `insert into curso (nombre)` y **después** `update curso set docente_id=?`: es lo normal en un `@OneToMany` de un sentido (el curso entra primero sin docente y Hibernate completa la clave).
 > > >
 > > > 🔎 La aplicación termina sola al acabar `run` (no hay servidor web).
 >
@@ -1967,7 +1967,7 @@
 > <details open>
 > <summary><strong>8️⃣ Paso 8 — Ver cómo quedaron las tablas</strong></summary>
 >
-> > Con la aplicación ya ejecutada, mirá las tablas en MySQL (con Docker; o usá MySQL Workbench / DBeaver con los mismos datos de conexión):
+> > Con la aplicación ya ejecutada, se miran las tablas en MySQL (con Docker; o con MySQL Workbench / DBeaver con los mismos datos de conexión):
 > >
 > > ```bash
 > > docker exec -it mysql-academia mysql -uroot -proot academia \
@@ -1995,14 +1995,14 @@
 > >                                    +----------+---------------+
 > > ```
 > >
-> > Compará con lo que esperabas: la clave `carnet_id` está en `estudiante`, `docente_id` en `curso`, y la relación muchos a muchos vive en la tabla `estudiante_curso`.
+> > Se compara con lo esperado: la clave `carnet_id` está en `estudiante`, `docente_id` en `curso`, y la relación muchos a muchos vive en la tabla `estudiante_curso`.
 >
 > </details>
 >
 > <details open>
 > <summary><strong>9️⃣ Paso 9 — Experimento: pasar a doble sentido</strong></summary>
 >
-> > Hasta ahora `CarnetEntity` no conoce a su estudiante. Agregale el **lado inverso** (opcional) en `CarnetEntity.java`:
+> > Hasta ahora `CarnetEntity` no conoce a su estudiante. Se agrega el **lado inverso** (opcional) en `CarnetEntity.java`:
 > >
 > > ```java
 > > // imports nuevos
@@ -2022,7 +2022,7 @@
 > > System.out.println("Dueño del carnet C-001 : " + ana.getCarnet().getEstudiante().getNombre());
 > > ```
 > >
-> > Ejecutá de nuevo. **Resultado real:**
+> > Se ejecuta de nuevo. **Resultado real:**
 > >
 > > ```text
 > > ===== NAVEGANDO (desde el dueño) =====
@@ -2030,7 +2030,7 @@
 > > Dueño del carnet C-001 : Ana          ← ahora se navega también desde el carnet
 > > ```
 > >
-> > Comprobá que **las tablas no cambiaron**:
+> > Se comprueba que **las tablas no cambiaron**:
 > >
 > > ```bash
 > > docker exec -it mysql-academia mysql -uroot -proot academia -e "describe carnet"
@@ -2045,7 +2045,7 @@
 > > +--------+--------------+------+-----+---------+----------------+
 > > ```
 > >
-> > > 🔎 `carnet` sigue sin columna del estudiante: el lado inverso (`mappedBy`) **no crea nada** y solo sirve para **navegar** en sentido contrario. Eso es el **doble sentido**. Ahora podés volver a quitarlo.
+> > > 🔎 `carnet` sigue sin columna del estudiante: el lado inverso (`mappedBy`) **no crea nada** y solo sirve para **navegar** en sentido contrario. Eso es el **doble sentido**. Ahora se puede volver a quitar.
 >
 > </details>
 
@@ -2084,9 +2084,9 @@
 <details open>
 <summary><strong>🚀 Retos</strong></summary>
 
-> 1. **Cascade:** agregá `cascade = CascadeType.ALL` y `orphanRemoval = true` a `DocenteEntity.cursos` y comprobá qué pasa con los cursos al borrar un docente. ([Cascade y orphanRemoval](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/05-cascade-y-orphanRemoval.md).)
-> 2. **Un sentido:** quitá el lado inverso de `CarnetEntity` y comprobá que **las tablas no cambian**.
-> 3. **Dato propio:** agregá la **fecha de inscripción** a la relación estudiante–curso: ¿qué entidad nueva necesitás y qué relaciones declara? *(Pista: la `MatriculaEntity` del taller.)*
+> 1. **Cascade:** agregar `cascade = CascadeType.ALL` y `orphanRemoval = true` a `DocenteEntity.cursos` y comprobar qué pasa con los cursos al borrar un docente. ([Cascade y orphanRemoval](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/05-cascade-y-orphanRemoval.md).)
+> 2. **Un sentido:** quitar el lado inverso de `CarnetEntity` y comprobar que **las tablas no cambian**.
+> 3. **Dato propio:** agregar la **fecha de inscripción** a la relación estudiante–curso: ¿qué entidad nueva hace falta y qué relaciones declara? *(Pista: la `MatriculaEntity` del taller.)*
 
 </details>
 
