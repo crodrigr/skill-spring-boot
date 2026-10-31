@@ -588,36 +588,41 @@
 >
 > </details>
 >
-> | Método | Para qué |
-> |---|---|
-> | `existsByEmailIgnoreCase(email)` | Saber si un correo ya está registrado (sin importar mayúsculas). |
-> | `existsByStudentIdAndCourseId(…)` | Saber si un estudiante ya está matriculado en un curso. |
-> | `countByCourseId(courseId)` | Contar las matrículas de un curso. |
-> | `save`, `findAll`, `count` *(heredados)* | Guardar, listar y contar. |
+> <details>
+> <summary><strong>🔍 Métodos derivados: la consulta que genera Spring</strong></summary>
 >
-> **La consulta que Spring genera a partir de cada nombre** (es lo que imprime `show-sql=true`; los `?` son los valores que se pasan al método):
->
-> | Método | Se lee así | SQL que se ejecuta en MySQL |
-> |---|---|---|
-> | `existsByEmailIgnoreCase` | `exists` + `By` + `Email` + `IgnoreCase` | `select se1_0.id from student se1_0 where upper(se1_0.email)=upper(?) limit ?` |
-> | `existsByStudentIdAndCourseId` | `exists` + `By` + `Student.Id` + `And` + `Course.Id` | `select ee1_0.id from enrollment ee1_0 where ee1_0.student_id=? and ee1_0.course_id=? limit ?` |
-> | `countByCourseId` | `count` + `By` + `Course.Id` | `select count(ee1_0.id) from enrollment ee1_0 where ee1_0.course_id=?` |
->
-> - **`exists…`** no trae la fila: pide solo el `id` y agrega `limit ?` (basta con encontrar **una**); si hay resultado devuelve `true`.
-> - **`IgnoreCase`** pasa a mayúsculas **los dos lados** (`upper(email)=upper(?)`), por eso `ANA@mail.com` encuentra `ana@mail.com`.
-> - **`StudentId` / `CourseId`** recorren la relación (`enrollment.student.id`), pero el SQL usa la **clave foránea** (`student_id`, `course_id`) y no necesita `join`.
-> - Los alias (`se1_0`, `ee1_0`) los inventa Hibernate: no hay que escribirlos.
->
-> > 🗣️ **Para el estudiante:** ejecutar la aplicación, buscar estas tres líneas en la consola y relacionar **cada palabra del nombre** con una parte del SQL.
->
-> > 🔎 **Concepto (M3):** el nombre del método **es** la consulta: `existsBy` + `Email` + `IgnoreCase`; `countBy` + `CourseId` recorre la relación
-> > (`course.id`); `And` une dos condiciones.
+> > | Método | Para qué |
+> > |---|---|
+> > | `existsByEmailIgnoreCase(email)` | Saber si un correo ya está registrado (sin importar mayúsculas). |
+> > | `existsByStudentIdAndCourseId(…)` | Saber si un estudiante ya está matriculado en un curso. |
+> > | `countByCourseId(courseId)` | Contar las matrículas de un curso. |
+> > | `save`, `findAll`, `count` *(heredados)* | Guardar, listar y contar. |
 > >
-> > 🔎 **Concepto (M2, repaso):** estas interfaces **no** llevan `@Repository` ni tienen clase: Spring Data crea la implementación al arrancar
-> > y la registra como **bean singleton**.
+> > **La consulta que Spring genera a partir de cada nombre** (es lo que imprime `show-sql=true`; los `?` son los valores que se pasan al método):
 > >
-> > ⚠️ **Trampa:** si el nombre no coincide con un atributo de la **entidad**, la aplicación **no arranca**:
-> > `PropertyReferenceException: No property 'emails' found for type 'StudentEntity'`.
+> > | Método | Se lee así | SQL que se ejecuta en MySQL |
+> > |---|---|---|
+> > | `existsByEmailIgnoreCase` | `exists` + `By` + `Email` + `IgnoreCase` | `select se1_0.id from student se1_0 where upper(se1_0.email)=upper(?) limit ?` |
+> > | `existsByStudentIdAndCourseId` | `exists` + `By` + `Student.Id` + `And` + `Course.Id` | `select ee1_0.id from enrollment ee1_0 where ee1_0.student_id=? and ee1_0.course_id=? limit ?` |
+> > | `countByCourseId` | `count` + `By` + `Course.Id` | `select count(ee1_0.id) from enrollment ee1_0 where ee1_0.course_id=?` |
+> >
+> > - **`exists…`** no trae la fila: pide solo el `id` y agrega `limit ?` (basta con encontrar **una**); si hay resultado devuelve `true`.
+> > - **`IgnoreCase`** pasa a mayúsculas **los dos lados** (`upper(email)=upper(?)`), por eso `ANA@mail.com` encuentra `ana@mail.com`.
+> > - **`StudentId` / `CourseId`** recorren la relación (`enrollment.student.id`), pero el SQL usa la **clave foránea** (`student_id`, `course_id`) y no necesita `join`.
+> > - Los alias (`se1_0`, `ee1_0`) los inventa Hibernate: no hay que escribirlos.
+> >
+> > > 🗣️ **Para el estudiante:** ejecutar la aplicación, buscar estas tres líneas en la consola y relacionar **cada palabra del nombre** con una parte del SQL.
+> >
+> > > 🔎 **Concepto (M3):** el nombre del método **es** la consulta: `existsBy` + `Email` + `IgnoreCase`; `countBy` + `CourseId` recorre la relación
+> > > (`course.id`); `And` une dos condiciones.
+> >
+> > > 🔎 **Concepto (M2, repaso):** estas interfaces **no** llevan `@Repository` ni tienen clase: Spring Data crea la implementación al arrancar
+> > > y la registra como **bean singleton**.
+> >
+> > > ⚠️ **Trampa:** si el nombre no coincide con un atributo de la **entidad**, la aplicación **no arranca**:
+> > > `PropertyReferenceException: No property 'emails' found for type 'StudentEntity'`.
+>
+> </details>
 >
 > ✅ **Punto de control 2:** el proyecto compila y arranca; `CourseJpaRepository` queda vacía de métodos propios y está bien: solo necesita lo heredado.
 
