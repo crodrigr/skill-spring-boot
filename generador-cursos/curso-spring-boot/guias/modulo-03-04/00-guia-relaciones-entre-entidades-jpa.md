@@ -1113,7 +1113,7 @@
 >
 > <details open>
 > <summary><strong>1️⃣ Paso 1 — Crear el proyecto</strong></summary>
-> >
+>
 > > Entrá a **[start.spring.io](https://start.spring.io)** y completá:
 > >
 > > | Campo | Valor |
@@ -1156,12 +1156,12 @@
 > > > ```
 > > >
 > > > (El plugin va dentro de `<build><plugins>`, junto al `spring-boot-maven-plugin`.) Con JDK 17 o 21 no hace falta.
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>2️⃣ Paso 2 — Levantar MySQL y configurar la conexión</strong></summary>
-> >
+>
 > > **a) Levantar MySQL.** Con Docker (un solo comando; ver también «Preparar MySQL» en la [guía 1 de la tienda](02-guia-tienda-1-crud-productos.md)):
 > >
 > > ```bash
@@ -1191,12 +1191,12 @@
 > > | `spring.datasource.username` / `password` | Usuario y clave de MySQL (`root`/`root` es solo para desarrollo). |
 > > | `spring.jpa.hibernate.ddl-auto=create` | Al iniciar, Hibernate **borra y crea** las tablas a partir de las entidades. Así podés ejecutar la práctica las veces que quieras con datos limpios. *(En un proyecto real se usa `update` o `validate`.)* |
 > > | `spring.jpa.show-sql=true` | Muestra en la consola el SQL que ejecuta Hibernate. |
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>3️⃣ Paso 3 — Crear el árbol de archivos</strong></summary>
-> >
+>
 > > Dentro de `src/main/java/com/academia/` crea los paquetes `persistence.entity` y `persistence.repository`, y los archivos vacíos que se ven abajo. La clase `AcademiaApplication` ya la generó Spring Initializr.
 > >
 > > ```text
@@ -1224,12 +1224,12 @@
 > > ```
 > >
 > > > Spring Initializr además genera `mvnw`, `.gitignore` y `src/test`. No hace falta tocarlos.
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>4️⃣ Paso 4 — Crear las entidades</strong></summary>
-> >
+>
 > > Cuatro clases en el paquete `com.academia.persistence.entity`. Son las mismas de las secciones de **doble sentido** de arriba, completas. Copialas una por una:
 > >
 > > 📄 **CarnetEntity.java  (1:1, lado inverso)**
@@ -1397,12 +1397,12 @@
 > > ```
 > >
 > > > 🔎 **¿Quién es el dueño?** `EstudianteEntity` (`carnet` y `cursos`) y `CursoEntity` (`docente`). Los atributos con `mappedBy` (`CarnetEntity.estudiante`, `DocenteEntity.cursos`, `CursoEntity.estudiantes`) son el lado inverso y llevan `@ToString.Exclude` y `@EqualsAndHashCode.Exclude` para evitar el bucle infinito con `@Data`.
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>5️⃣ Paso 5 — Crear los repositorios</strong></summary>
-> >
+>
 > > Cuatro interfaces en `com.academia.persistence.repository`. **No tienen implementación**: Spring Data la crea solo al arrancar. De ahí salen las variables `docentes`, `cursos`, `estudiantes` y `carnets` de los ejemplos.
 > >
 > > 📄 **CarnetJpaRepository.java**
@@ -1465,12 +1465,12 @@
 > > ```
 > >
 > > > 💡 `Carnet` y `Curso` quedan vacíos: `save`, `findById` y `findAll` ya vienen en `JpaRepository`. Los métodos `findByCarnetCodigo` y `findByCursosNombre` son las **consultas inversas** de la sección «Consultar datos»: Spring Data los implementa leyendo el nombre.
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>6️⃣ Paso 6 — Escribir los ejemplos en la clase principal</strong></summary>
-> >
+>
 > > Reemplazá el contenido de `AcademiaApplication.java`. Es la clase del `main`: recibe los cuatro repositorios por constructor y ejecuta los ejemplos al arrancar.
 > >
 > > ```java
@@ -1568,12 +1568,12 @@
 > > | `TransactionTemplate` | Ejecuta cada bloque dentro de **una transacción**. Se usan **dos**: una para guardar y otra, distinta, para consultar. Así las consultas leen **de la base de datos** y no de la memoria. |
 > > | `guardarDatos()` | Registra todo asignando **siempre del lado dueño**. |
 > > | `consultarDatos()` | Responde las preguntas **navegando** (doble sentido) y **con el repositorio**. |
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>7️⃣ Paso 7 — Ejecutar</strong></summary>
-> >
+>
 > > Desde la terminal, en la carpeta del proyecto:
 > >
 > > ```bash
@@ -1599,12 +1599,12 @@
 > > ```
 > >
 > > > 🔎 La aplicación termina sola al acabar `run` (no hay servidor web). Si no ves estas líneas, revisá la tabla de errores más abajo.
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>8️⃣ Paso 8 — Ver cómo quedaron las tablas</strong></summary>
-> >
+>
 > > Con la aplicación ya ejecutada, mirá las tablas en MySQL (con Docker; o usá MySQL Workbench / DBeaver con los mismos datos de conexión):
 > >
 > > ```bash
@@ -1634,12 +1634,12 @@
 > > ```
 > >
 > > Compará con lo que esperabas: la clave `carnet_id` está en `estudiante`, `docente_id` en `curso`, y la relación muchos a muchos vive en la tabla `estudiante_curso`.
-> >
+>
 > </details>
 >
 > <details open>
 > <summary><strong>9️⃣ Paso 9 — Experimento: el error típico</strong></summary>
-> >
+>
 > > Agregá estas líneas **al final de `guardarDatos()`**. El curso se relaciona **solo desde el lado inverso**:
 > >
 > > ```java
@@ -1670,7 +1670,7 @@
 > > ```
 > >
 > > > 🔎 El lado **inverso** (`mappedBy`) **solo lee**: lo que se agrega ahí no se guarda. Para que HTML quede con docente hay que usar el lado dueño: `marta.agregarCurso(html)` (que hace `curso.setDocente(marta)`) y guardar el curso. Probalo y comprobá que `docente_id` ahora vale 1.
-> >
+>
 > </details>
 
 </details>
