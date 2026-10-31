@@ -422,6 +422,48 @@
 <details>
 <summary><strong>🧱 Paso 1 — Entidades JPA (capa de persistencia)</strong></summary>
 
+> <details open>
+> <summary><strong>Diagrama de clases de las entidades</strong></summary>
+>
+> > ```mermaid
+> > classDiagram
+> >     direction LR
+> >
+> >     class EstudianteEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -int edad
+> >         -String correo
+> >     }
+> >     class CursoEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -String nombre
+> >         -double precio
+> >         -int cupoMaximo
+> >     }
+> >     class MatriculaEntity {
+> >         <<Entity>>
+> >         -Long id
+> >         -EstudianteEntity estudiante
+> >         -CursoEntity curso
+> >     }
+> >
+> >     MatriculaEntity "*" --> "1" EstudianteEntity : @ManyToOne estudiante_id
+> >     MatriculaEntity "*" --> "1" CursoEntity : @ManyToOne curso_id
+> > ```
+> >
+> > | Entidad | Tabla | Notas |
+> > |---|---|---|
+> > | `EstudianteEntity` | `estudiante` | `correo` es único (`@Column(unique = true)`). |
+> > | `CursoEntity` | `curso` | — |
+> > | `MatriculaEntity` | `matricula` | **Lado dueño**: guarda las claves foráneas `estudiante_id` y `curso_id`. |
+> >
+> > Cada flecha es una **clave foránea** y va en un solo sentido: `MatriculaEntity` conoce a `EstudianteEntity` y a `CursoEntity`, pero no al revés. Entre estudiante y curso la relación es de **muchos a muchos**, resuelta con la entidad intermedia `MatriculaEntity`.
+>
+> </details>
+
 > <details>
 > <summary><strong>Paso 1.1 · <code>EstudianteEntity</code> — capa de persistencia</strong></summary>
 >
