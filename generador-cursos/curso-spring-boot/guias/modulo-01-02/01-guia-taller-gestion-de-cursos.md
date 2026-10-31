@@ -187,12 +187,29 @@
 > 📁 src/main/java/com/academia
 > ├── 📄 AcademiaApplication.java
 > ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
-> │   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
+> │   └── 📁 controlador
+> │       ├── 📄 ControladorEstudiantes.java
+> │       ├── 📄 ControladorCursos.java
+> │       ├── 📄 ControladorMatriculas.java
+> │       └── 📄 SolicitudMatricula.java
 > ├── 📁 negocio                           ← 2 · las reglas
-> │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
-> │   └── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
+> │   ├── 📁 model
+> │   │   ├── 📄 Estudiante.java
+> │   │   ├── 📄 Curso.java
+> │   │   ├── 📄 Matricula.java
+> │   │   └── 📄 Ocupacion.java
+> │   └── 📁 service
+> │       ├── 📄 ServicioEstudiantes.java
+> │       ├── 📄 ServicioCursos.java
+> │       └── 📄 ServicioMatriculas.java
 > └── 📁 persistence                       ← 3 · dónde viven los datos (listas en memoria)
->     └── 📁 repository    Repositorio… (interfaces) · Repositorio…EnMemoria (@Repository)
+>     └── 📁 repository
+>         ├── 📄 RepositorioEstudiantes.java            (interfaz)
+>         ├── 📄 RepositorioEstudiantesEnMemoria.java   (@Repository)
+>         ├── 📄 RepositorioCursos.java                 (interfaz)
+>         ├── 📄 RepositorioCursosEnMemoria.java        (@Repository)
+>         ├── 📄 RepositorioMatriculas.java             (interfaz)
+>         └── 📄 RepositorioMatriculasEnMemoria.java    (@Repository)
 > ```
 >
 > Regla de dependencia: **presentación → negocio → persistencia**. El controlador nunca toca un
@@ -1652,13 +1669,30 @@
 > ├── 📄 pom.xml
 > └── 📁 src/main/java/com/academia
 >     ├── 📄 AcademiaApplication.java
->     ├── 📁 presentacion
->     │   └── 📁 controlador   ControladorEstudiantes · ControladorCursos · ControladorMatriculas · SolicitudMatricula
->     ├── 📁 negocio
->     │   ├── 📁 model         Estudiante · Curso · Matricula · Ocupacion
->     │   └── 📁 service       ServicioEstudiantes · ServicioCursos · ServicioMatriculas
->     └── 📁 persistence
->         └── 📁 repository    3 interfaces · 3 implementaciones «EnMemoria»
+>     ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
+>     │   └── 📁 controlador
+>     │       ├── 📄 ControladorEstudiantes.java
+>     │       ├── 📄 ControladorCursos.java
+>     │       ├── 📄 ControladorMatriculas.java
+>     │       └── 📄 SolicitudMatricula.java
+>     ├── 📁 negocio                           ← 2 · las reglas
+>     │   ├── 📁 model
+>     │   │   ├── 📄 Estudiante.java
+>     │   │   ├── 📄 Curso.java
+>     │   │   ├── 📄 Matricula.java
+>     │   │   └── 📄 Ocupacion.java
+>     │   └── 📁 service
+>     │       ├── 📄 ServicioEstudiantes.java
+>     │       ├── 📄 ServicioCursos.java
+>     │       └── 📄 ServicioMatriculas.java
+>     └── 📁 persistence                       ← 3 · dónde viven los datos (listas en memoria)
+>         └── 📁 repository
+>             ├── 📄 RepositorioEstudiantes.java            (interfaz)
+>             ├── 📄 RepositorioEstudiantesEnMemoria.java   (@Repository)
+>             ├── 📄 RepositorioCursos.java                 (interfaz)
+>             ├── 📄 RepositorioCursosEnMemoria.java        (@Repository)
+>             ├── 📄 RepositorioMatriculas.java             (interfaz)
+>             └── 📄 RepositorioMatriculasEnMemoria.java    (@Repository)
 > ```
 >
 </details>
