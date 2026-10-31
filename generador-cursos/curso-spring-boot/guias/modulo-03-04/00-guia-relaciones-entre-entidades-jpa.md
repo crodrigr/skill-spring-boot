@@ -67,6 +67,31 @@
 > > | `@UpdateTimestamp` | campo | Pone la fecha y hora **en cada actualización** (es de Hibernate). | — |
 > > | `@Version` | campo | Control de **concurrencia optimista**: el número sube en cada cambio y evita que dos usuarios se pisen. | — |
 > >
+> > <details open>
+> > <summary><strong>🔍 Entender <code>@Table</code>: nombre, restricción única e índice</strong></summary>
+> >
+> > > ```java
+> > > @Table(name = "curso",                                     // tabla «curso»
+> > >        uniqueConstraints = @UniqueConstraint(columnNames = "codigo"),
+> > >        indexes = @Index(name = "idx_curso_nombre", columnList = "nombre"))
+> > > ```
+> > >
+> > > `@Table` solo configura la **tabla**. Sus tres atributos, uno por línea:
+> > >
+> > > | Parte | Qué hace | SQL que genera |
+> > > |---|---|---|
+> > > | `name = "curso"` | Pone el **nombre de la tabla**. Sin él, la tabla se llamaría como la clase en `snake_case` (`curso_entity`). | `create table curso (…)` |
+> > > | `uniqueConstraints = @UniqueConstraint(columnNames = "codigo")` | Declara una **restricción de unicidad**: no pueden existir dos filas con el mismo `codigo`. Con varias columnas, la combinación es la que no se repite: `columnNames = {"codigo", "sede"}`. | `alter table curso add constraint UK… unique (codigo)` |
+> > > | `indexes = @Index(name = "idx_curso_nombre", columnList = "nombre")` | Crea un **índice** sobre `nombre`: las búsquedas `where nombre = …` son más rápidas. **No** impide repetidos. | `create index idx_curso_nombre on curso (nombre)` |
+> > >
+> > > **Diferencia clave:** la **restricción única** protege los **datos** (rechaza duplicados); el **índice** acelera las **consultas** (no rechaza nada).
+> > >
+> > > 💡 **`unique` en `@Column` o `@UniqueConstraint`:** en `codigo` aparecen las dos formas (`@Column(unique = true)` y `@UniqueConstraint`) solo para mostrarlas; **producen la misma restricción**, y en un proyecto real alcanza con una. `@UniqueConstraint` es la forma para unicidad de **varias columnas a la vez**; para una sola columna basta `@Column(unique = true)`.
+> > >
+> > > Para varios índices o restricciones se usan llaves: `indexes = { @Index(columnList = "nombre"), @Index(columnList = "fecha_inicio") }`. Dentro de `columnList` va el nombre de la **columna** (`fecha_inicio`), no el del campo Java (`fechaInicio`).
+> >
+> > </details>
+> >
 > > 🔎 **Lo que no necesita notación:** un campo sin notación se guarda igual, en una columna con su nombre en `snake_case` (`fechaInicio` → `fecha_inicio`). Los tipos `LocalDate` y `LocalDateTime` se guardan como `date` y `datetime` **sin** `@Temporal`; esa notación solo se usa con `java.util.Date`.
 >
 > </details>
