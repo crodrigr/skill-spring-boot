@@ -19,7 +19,7 @@
 > - Declara **entidades JPA** (`@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn`) en `persistence.entity` (M3 y M4).
 > - Configura la conexión a **MySQL** en `application.properties` y lee el SQL que genera Hibernate (M3 y M4).
 > - Crea interfaces `JpaRepository` con **métodos derivados** (`existsBy…`, `countBy…`) (M3).
-> - **Guarda y consulta** datos desde la clase `main` (`CommandLineRunner`), sin API.
+> - **Guarda y consulta** datos desde la clase `main` (`CommandLineRunner`), la API (`presentation.controller`) queda para otra guía.
 > - Verifica que los datos **sobreviven al reinicio** en MySQL: la base vive en un servidor, no dentro de la aplicación.
 
 </details>
@@ -173,11 +173,15 @@
 > <summary><strong>Paso 0.1 · Crear el proyecto con las dependencias</strong></summary>
 >
 > > Se crea un proyecto nuevo en [start.spring.io](https://start.spring.io): **Maven · Java 17 o superior · Group** `com.academy` · **Artifact** `academy` ·
-> > dependencias **Spring Data JPA** y **MySQL Driver**. **No** se agrega Spring Web: aquí no hay API.
+> > dependencias **Spring Web**, **Spring Data JPA**, **MySQL Driver** y **Spring Boot DevTools**.
 > >
-> > En el `pom.xml` quedan estas dos dependencias:
+> > En el `pom.xml` quedan estas cuatro dependencias:
 > >
 > > ```xml
+> > <dependency>
+> >     <groupId>org.springframework.boot</groupId>
+> >     <artifactId>spring-boot-starter-web</artifactId>
+> > </dependency>
 > > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
 > >     <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -187,10 +191,20 @@
 > >     <artifactId>mysql-connector-j</artifactId>
 > >     <scope>runtime</scope>
 > > </dependency>
+> > <dependency>
+> >     <groupId>org.springframework.boot</groupId>
+> >     <artifactId>spring-boot-devtools</artifactId>
+> >     <scope>runtime</scope>
+> >     <optional>true</optional>
+> > </dependency>
 > > ```
 > >
-> > > 🔎 **Concepto (M3 y M4):** `spring-boot-starter-data-jpa` trae JPA, **Hibernate** y Spring Data; `mysql-connector-j` es el **driver** de MySQL,
-> > > y `runtime` indica que solo hace falta al ejecutar.
+> > > 🔎 **Concepto (M3 y M4):**
+> > >
+> > > - `spring-boot-starter-web` trae Spring MVC y un **Tomcat embebido**: es la base para los controladores REST de `presentation.controller`. En esta guía todavía no hay ninguno.
+> > > - `spring-boot-starter-data-jpa` trae JPA, **Hibernate** y Spring Data.
+> > > - `mysql-connector-j` es el **driver** de MySQL; `runtime` indica que solo hace falta al ejecutar.
+> > > - `spring-boot-devtools` **reinicia la aplicación** al recompilar (en el IDE, *Build Project*). Solo se usa en desarrollo.
 >
 > </details>
 >
@@ -224,7 +238,8 @@
 > <details>
 > <summary><strong>Paso 0.3 · Configurar la conexión: <code>application.properties</code></strong></summary>
 >
-> > **Archivo:** `src/main/resources/application.properties`
+> > <details>
+> > <summary><strong>📄 <code>src/main/resources/application.properties</code></strong> · <em>mostrar / ocultar</em></summary>
 > >
 > > ```properties
 > > # MySQL connection
@@ -236,6 +251,8 @@
 > > spring.jpa.hibernate.ddl-auto=update
 > > spring.jpa.show-sql=true
 > > ```
+> >
+> > </details>
 > >
 > > | Propiedad | Para qué sirve |
 > > |---|---|
@@ -274,7 +291,9 @@
 >
 > > Se ejecuta la aplicación (`./mvnw spring-boot:run`; en Windows, `mvnw.cmd spring-boot:run`):
 > >
-> > - Aparece `Started AcademyApplication in … seconds` y la aplicación **termina sola** (no hay servidor web).
+> > - Aparece `Tomcat started on port 8080` y `Started AcademyApplication in … seconds`, y la aplicación **sigue en ejecución** (hay servidor web): se detiene con `Ctrl+C`.
+> > - Abrir `http://localhost:8080` responde **404**: es lo esperado, aún no hay controladores.
+> > - Aparece el aviso `spring.jpa.open-in-view is enabled by default`: es normal en este punto y se atiende al construir la capa web.
 > > - **No** se crea ninguna tabla (sin `@Entity`, Hibernate no tiene qué mapear).
 > >
 > > > ⚠️ **Trampas habituales.**
@@ -297,7 +316,8 @@
 > <details>
 > <summary><strong>Paso 1.1 · <code>StudentEntity</code> — capa de persistencia</strong></summary>
 >
-> > **Archivo:** `src/main/java/com/academy/persistence/entity/StudentEntity.java`
+> > <details>
+> > <summary><strong>📄 <code>src/main/java/com/academy/persistence/entity/StudentEntity.java</code></strong> · <em>mostrar / ocultar</em></summary>
 > >
 > > ```java
 > > package com.academy.persistence.entity;
@@ -340,6 +360,8 @@
 > > }
 > > ```
 > >
+> > </details>
+> >
 > > | Elemento | Por qué |
 > > |---|---|
 > > | `@Entity` | Le dice a JPA que la clase se guarda en una tabla. |
@@ -360,7 +382,8 @@
 > > Los estudiantes aplican el mismo patrón. La diferencia está en `EnrollmentEntity`: no guarda los datos del estudiante ni del curso, sino
 > > **claves foráneas** hacia sus tablas.
 > >
-> > **Archivo:** `src/main/java/com/academy/persistence/entity/CourseEntity.java`
+> > <details>
+> > <summary><strong>📄 <code>src/main/java/com/academy/persistence/entity/CourseEntity.java</code></strong> · <em>mostrar / ocultar</em></summary>
 > >
 > > ```java
 > > package com.academy.persistence.entity;
@@ -401,7 +424,10 @@
 > > }
 > > ```
 > >
-> > **Archivo:** `src/main/java/com/academy/persistence/entity/EnrollmentEntity.java`
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 <code>src/main/java/com/academy/persistence/entity/EnrollmentEntity.java</code></strong> · <em>mostrar / ocultar</em></summary>
 > >
 > > ```java
 > > package com.academy.persistence.entity;
@@ -443,6 +469,8 @@
 > >     public CourseEntity getCourse() { return course; }
 > > }
 > > ```
+> >
+> > </details>
 > >
 > > - **`@ManyToOne`**: *muchas matrículas* pertenecen a **un** estudiante y a **un** curso ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md)).
 > > - **`@JoinColumn(name = "student_id")`** nombra la **columna de clave foránea**. `EnrollmentEntity` es el **lado dueño**: guarda las dos claves
@@ -495,7 +523,8 @@
 > ([Ejemplo 06 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md)). Lo único que se escribe son las consultas propias, como **métodos derivados**: Spring Data lee el nombre y genera la
 > consulta ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)).
 >
-> **Archivo:** `src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`
+> <details>
+> <summary><strong>📄 <code>src/main/java/com/academy/persistence/repository/StudentJpaRepository.java</code></strong> · <em>mostrar / ocultar</em></summary>
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -509,7 +538,10 @@
 > }
 > ```
 >
-> **Archivo:** `src/main/java/com/academy/persistence/repository/CourseJpaRepository.java`
+> </details>
+>
+> <details>
+> <summary><strong>📄 <code>src/main/java/com/academy/persistence/repository/CourseJpaRepository.java</code></strong> · <em>mostrar / ocultar</em></summary>
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -521,7 +553,10 @@
 > }
 > ```
 >
-> **Archivo:** `src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java`
+> </details>
+>
+> <details>
+> <summary><strong>📄 <code>src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java</code></strong> · <em>mostrar / ocultar</em></summary>
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -536,6 +571,8 @@
 >     long countByCourseId(Long courseId);
 > }
 > ```
+>
+> </details>
 >
 > | Método | Consulta generada | Para qué |
 > |---|---|---|
@@ -566,6 +603,9 @@
 > <summary><strong>Paso 3.1 · Escribir los ejemplos en <code>AcademyApplication</code></strong></summary>
 >
 > > Se reemplaza el contenido de `AcademyApplication.java`. Es la clase del `main`: recibe los repositorios por constructor y ejecuta los ejemplos al arrancar.
+> >
+> > <details>
+> > <summary><strong>📄 <code>src/main/java/com/academy/AcademyApplication.java</code></strong> · <em>mostrar / ocultar</em></summary>
 > >
 > > ```java
 > > package com.academy;
@@ -627,6 +667,8 @@
 > >     }
 > > }
 > > ```
+> >
+> > </details>
 > >
 > > | Parte | Qué hace |
 > > |---|---|
@@ -708,7 +750,7 @@
 >
 > ```text
 > a) Primera ejecución   → aparecen los create table y los 6 insert; el resultado muestra 2 estudiantes y 2 inscritos en Java
-> b) La aplicación termina sola                        → las tablas y las filas siguen en MySQL
+> b) Se detiene la aplicación (Ctrl+C)                  → las tablas y las filas siguen en MySQL
 > c) Segunda ejecución   → solo aparece  select count(*) from student  (no hay insert ni create table)
 > d) El resultado es el mismo: Student 1: Ana Torres · Student 2: Luis Pérez · Enrolled in Java (1): 2     ✅ siguen ahí
 > ```
