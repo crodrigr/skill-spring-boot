@@ -1107,7 +1107,7 @@
 <details open>
 <summary><strong>🧑‍💻 Práctica paso a paso: tu propio proyecto desde cero</strong></summary>
 
-> Vas a construir **desde cero** un proyecto Spring Boot con las cuatro entidades de esta guía, sus repositorios y una clase `main` que **guarda** datos y los **consulta** en MySQL, con las tres relaciones a la vez. Al final podés ver las tablas y comparar con lo que explican las secciones anteriores.
+> Vas a construir **desde cero** un proyecto Spring Boot con las cuatro entidades de esta guía **en un solo sentido**, sus repositorios y una clase `main` que **guarda** datos y los **consulta** en MySQL, con las tres relaciones a la vez. Al final podés ver las tablas y comparar con lo que explican las secciones anteriores.
 >
 > **Necesitás:** JDK 17 o superior, Maven (o el `mvnw` que trae el proyecto), Docker (o un MySQL instalado) y un IDE. Tiempo: unos 25 minutos.
 >
@@ -1215,8 +1215,6 @@
 > >         │               │   ├── DocenteEntity.java
 > >         │               │   └── EstudianteEntity.java
 > >         │               └── repository/
-> >         │                   ├── CarnetJpaRepository.java
-> >         │                   ├── CursoJpaRepository.java
 > >         │                   ├── DocenteJpaRepository.java
 > >         │                   └── EstudianteJpaRepository.java
 > >         └── resources/
@@ -1230,18 +1228,16 @@
 > <details open>
 > <summary><strong>4️⃣ Paso 4 — Crear las entidades</strong></summary>
 >
-> > Cuatro clases en el paquete `com.academia.persistence.entity`. Son las mismas de las secciones de **doble sentido** de arriba, completas. Copialas una por una:
+> > Cuatro clases en el paquete `com.academia.persistence.entity`. Son las mismas de las secciones de **un sentido** de arriba, completas. Copialas una por una:
 > >
-> > 📄 **CarnetEntity.java  (1:1, lado inverso)**
+> > 📄 **CarnetEntity.java  (1:1, el «otro» lado: no conoce a su estudiante)**
 > >
 > > ```java
 > > package com.academia.persistence.entity;
 > >
 > > import jakarta.persistence.*;
 > > import lombok.Data;
-> > import lombok.EqualsAndHashCode;
 > > import lombok.NoArgsConstructor;
-> > import lombok.ToString;
 > >
 > > @Entity
 > > @Table(name = "carnet")
@@ -1255,28 +1251,47 @@
 > >
 > >     private String codigo;
 > >
-> >     // Lado INVERSO (opcional): no crea columnas
-> >     @OneToOne(mappedBy = "carnet")
-> >     @ToString.Exclude
-> >     @EqualsAndHashCode.Exclude
-> >     private EstudianteEntity estudiante;
-> >
 > >     public CarnetEntity(String codigo) {
 > >         this.codigo = codigo;
 > >     }
 > > }
 > > ```
 > >
-> > 📄 **DocenteEntity.java  (1:N, lado inverso)**
+> > 📄 **CursoEntity.java  (1:N y N:M, el «otro» lado: no conoce a su docente ni a sus estudiantes)**
 > >
 > > ```java
 > > package com.academia.persistence.entity;
 > >
 > > import jakarta.persistence.*;
 > > import lombok.Data;
-> > import lombok.EqualsAndHashCode;
 > > import lombok.NoArgsConstructor;
-> > import lombok.ToString;
+> >
+> > @Entity
+> > @Table(name = "curso")
+> > @Data
+> > @NoArgsConstructor
+> > public class CursoEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     public CursoEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > 📄 **DocenteEntity.java  (1:N, lado dueño)**
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
 > >
 > > import java.util.ArrayList;
 > > import java.util.List;
@@ -1293,68 +1308,18 @@
 > >
 > >     private String nombre;
 > >
-> >     // Lado INVERSO (opcional): ya no lleva @JoinColumn, solo mappedBy
-> >     @OneToMany(mappedBy = "docente")
-> >     @ToString.Exclude
-> >     @EqualsAndHashCode.Exclude
+> >     // 1:N — lado DUEÑO (un sentido): tiene @JoinColumn. La columna docente_id se crea en la tabla curso
+> >     @OneToMany(cascade = CascadeType.ALL)
+> >     @JoinColumn(name = "docente_id")
 > >     private List<CursoEntity> cursos = new ArrayList<>();
 > >
 > >     public DocenteEntity(String nombre) {
 > >         this.nombre = nombre;
 > >     }
-> >
-> >     // Mantiene sincronizados los dos lados
-> >     public void agregarCurso(CursoEntity curso) {
-> >         cursos.add(curso);
-> >         curso.setDocente(this);
-> >     }
 > > }
 > > ```
 > >
-> > 📄 **CursoEntity.java  (1:N lado dueño · N:M lado inverso)**
-> >
-> > ```java
-> > package com.academia.persistence.entity;
-> >
-> > import jakarta.persistence.*;
-> > import lombok.Data;
-> > import lombok.EqualsAndHashCode;
-> > import lombok.NoArgsConstructor;
-> > import lombok.ToString;
-> >
-> > import java.util.HashSet;
-> > import java.util.Set;
-> >
-> > @Entity
-> > @Table(name = "curso")
-> > @Data
-> > @NoArgsConstructor
-> > public class CursoEntity {
-> >
-> >     @Id
-> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
-> >     private Long id;
-> >
-> >     private String nombre;
-> >
-> >     // 1:N — lado DUEÑO: la clave foránea docente_id vive en la tabla curso
-> >     @ManyToOne
-> >     @JoinColumn(name = "docente_id")
-> >     private DocenteEntity docente;
-> >
-> >     // N:M — lado INVERSO (opcional): la tabla intermedia la define EstudianteEntity.cursos
-> >     @ManyToMany(mappedBy = "cursos")
-> >     @ToString.Exclude
-> >     @EqualsAndHashCode.Exclude
-> >     private Set<EstudianteEntity> estudiantes = new HashSet<>();
-> >
-> >     public CursoEntity(String nombre) {
-> >         this.nombre = nombre;
-> >     }
-> > }
-> > ```
-> >
-> > 📄 **EstudianteEntity.java  (1:1 lado dueño · N:M lado dueño)**
+> > 📄 **EstudianteEntity.java  (1:1 y N:M, lado dueño)**
 > >
 > > ```java
 > > package com.academia.persistence.entity;
@@ -1396,38 +1361,14 @@
 > > }
 > > ```
 > >
-> > > 🔎 **¿Quién es el dueño?** `EstudianteEntity` (`carnet` y `cursos`) y `CursoEntity` (`docente`). Los atributos con `mappedBy` (`CarnetEntity.estudiante`, `DocenteEntity.cursos`, `CursoEntity.estudiantes`) son el lado inverso y llevan `@ToString.Exclude` y `@EqualsAndHashCode.Exclude` para evitar el bucle infinito con `@Data`.
+> > > 🔎 **¿Quién es el dueño?** Quien tiene `@JoinColumn` o `@JoinTable`: `EstudianteEntity` (`carnet` y `cursos`) y `DocenteEntity` (`cursos`). `CarnetEntity` y `CursoEntity` **no conocen** a quien los referencia: eso es **un sentido**. Por eso aquí no hace falta `@ToString.Exclude`.
 >
 > </details>
 >
 > <details open>
 > <summary><strong>5️⃣ Paso 5 — Crear los repositorios</strong></summary>
 >
-> > Cuatro interfaces en `com.academia.persistence.repository`. **No tienen implementación**: Spring Data la crea solo al arrancar. De ahí salen las variables `docentes`, `cursos`, `estudiantes` y `carnets` de los ejemplos.
-> >
-> > 📄 **CarnetJpaRepository.java**
-> >
-> > ```java
-> > package com.academia.persistence.repository;
-> >
-> > import com.academia.persistence.entity.CarnetEntity;
-> > import org.springframework.data.jpa.repository.JpaRepository;
-> >
-> > public interface CarnetJpaRepository extends JpaRepository<CarnetEntity, Long> {
-> > }
-> > ```
-> >
-> > 📄 **CursoJpaRepository.java**
-> >
-> > ```java
-> > package com.academia.persistence.repository;
-> >
-> > import com.academia.persistence.entity.CursoEntity;
-> > import org.springframework.data.jpa.repository.JpaRepository;
-> >
-> > public interface CursoJpaRepository extends JpaRepository<CursoEntity, Long> {
-> > }
-> > ```
+> > Dos interfaces en `com.academia.persistence.repository`. **No tienen implementación**: Spring Data la crea solo al arrancar. De ahí salen las variables `docentes` y `estudiantes` de los ejemplos.
 > >
 > > 📄 **DocenteJpaRepository.java**
 > >
@@ -1464,14 +1405,16 @@
 > > }
 > > ```
 > >
-> > > 💡 `Carnet` y `Curso` quedan vacíos: `save`, `findById` y `findAll` ya vienen en `JpaRepository`. Los métodos `findByCarnetCodigo` y `findByCursosNombre` son las **consultas inversas** de la sección «Consultar datos»: Spring Data los implementa leyendo el nombre.
+> > > 💡 **Solo dos repositorios.** `Carnet` y `Curso` no necesitan el suyo: se guardan por `cascade` desde su dueño (el estudiante guarda su carnet; el docente guarda sus cursos).
+> > >
+> > > 💡 Los métodos `findByCarnetCodigo` y `findByCursosNombre` son la **consulta del sentido contrario**: como `CarnetEntity` y `CursoEntity` no conocen a su dueño, se le **pregunta al repositorio del dueño**. Spring Data los implementa leyendo el nombre.
 >
 > </details>
 >
 > <details open>
 > <summary><strong>6️⃣ Paso 6 — Escribir los ejemplos en la clase principal</strong></summary>
 >
-> > Reemplazá el contenido de `AcademiaApplication.java`. Es la clase del `main`: recibe los cuatro repositorios por constructor y ejecuta los ejemplos al arrancar.
+> > Reemplazá el contenido de `AcademiaApplication.java`. Es la clase del `main`: recibe los repositorios por constructor y ejecuta los ejemplos al arrancar.
 > >
 > > ```java
 > > package com.academia;
@@ -1492,9 +1435,7 @@
 > > public class AcademiaApplication implements CommandLineRunner {
 > >
 > >     private final DocenteJpaRepository docentes;
-> >     private final CursoJpaRepository cursos;
 > >     private final EstudianteJpaRepository estudiantes;
-> >     private final CarnetJpaRepository carnets;
 > >     private final TransactionTemplate tx;
 > >
 > >     public static void main(String[] args) {
@@ -1513,16 +1454,15 @@
 > >         ana.setCarnet(new CarnetEntity("C-001"));
 > >         EstudianteEntity luis = new EstudianteEntity("Luis");
 > >
-> >         // 1:N — el dueño es el curso; agregarCurso sincroniza los dos lados
-> >         DocenteEntity marta = docentes.save(new DocenteEntity("Marta"));
+> >         // 1:N — el dueño es el docente; cascade guarda sus cursos
+> >         DocenteEntity marta = new DocenteEntity("Marta");
 > >         CursoEntity java = new CursoEntity("Java");
 > >         CursoEntity spring = new CursoEntity("Spring");
-> >         marta.agregarCurso(java);
-> >         marta.agregarCurso(spring);
-> >         cursos.save(java);
-> >         cursos.save(spring);
+> >         marta.getCursos().add(java);
+> >         marta.getCursos().add(spring);
+> >         docentes.save(marta);
 > >
-> >         // N:M — se agrega en el dueño (el estudiante)
+> >         // N:M — se agrega en el dueño (el estudiante); los cursos ya están guardados
 > >         ana.getCursos().add(java);
 > >         ana.getCursos().add(spring);
 > >         luis.getCursos().add(java);
@@ -1532,19 +1472,14 @@
 > >
 > >     private void consultarDatos() {
 > >         EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();
-> >         CarnetEntity carnet = carnets.findById(1L).orElseThrow();
 > >         DocenteEntity marta = docentes.findById(1L).orElseThrow();
-> >         CursoEntity java = cursos.findById(1L).orElseThrow();
 > >
-> >         System.out.println("===== NAVEGANDO (doble sentido) =====");
+> >         System.out.println("===== NAVEGANDO (desde el dueño) =====");
 > >         System.out.println("Carnet de Ana          : " + ana.getCarnet().getCodigo());
-> >         System.out.println("Dueño del carnet C-001 : " + carnet.getEstudiante().getNombre());
 > >         System.out.println("Cursos de Marta        : " + nombresCursos(marta.getCursos()));
-> >         System.out.println("Docente de Java        : " + java.getDocente().getNombre());
 > >         System.out.println("Cursos de Ana          : " + nombresCursos(ana.getCursos()));
-> >         System.out.println("Estudiantes de Java    : " + nombresEstudiantes(java.getEstudiantes()));
 > >
-> >         System.out.println("===== CON EL REPOSITORIO =====");
+> >         System.out.println("===== CON EL REPOSITORIO (sentido contrario) =====");
 > >         System.out.println("Dueño del carnet C-001 : " + estudiantes.findByCarnetCodigo("C-001").orElseThrow().getNombre());
 > >         System.out.println("Docentes de Java       : " + docentes.findByCursosNombre("Java").stream().map(DocenteEntity::getNombre).toList());
 > >         System.out.println("Estudiantes de Java    : " + nombresEstudiantes(estudiantes.findByCursosNombre("Java")));
@@ -1566,8 +1501,8 @@
 > > | `@RequiredArgsConstructor` | Lombok genera el constructor que **recibe los repositorios** (así Spring los inyecta). |
 > > | `implements CommandLineRunner` + `run` | Spring llama a `run` **justo después de arrancar**: es nuestro punto de entrada para los ejemplos. |
 > > | `TransactionTemplate` | Ejecuta cada bloque dentro de **una transacción**. Se usan **dos**: una para guardar y otra, distinta, para consultar. Así las consultas leen **de la base de datos** y no de la memoria. |
-> > | `guardarDatos()` | Registra todo asignando **siempre del lado dueño**. |
-> > | `consultarDatos()` | Responde las preguntas **navegando** (doble sentido) y **con el repositorio**. |
+> > | `guardarDatos()` | Registra todo asignando **siempre del lado dueño**; el carnet y los cursos se guardan por `cascade`. |
+> > | `consultarDatos()` | Responde **navegando desde el dueño** y **con el repositorio** (sentido contrario). |
 >
 > </details>
 >
@@ -1585,20 +1520,19 @@
 > > Primero verás el SQL de Hibernate (`create table…`, `insert into…`) y, al final, lo que imprimen los ejemplos. **Resultado real:**
 > >
 > > ```text
-> > ===== NAVEGANDO (doble sentido) =====
+> > ===== NAVEGANDO (desde el dueño) =====
 > > Carnet de Ana          : C-001
-> > Dueño del carnet C-001 : Ana
 > > Cursos de Marta        : [Java, Spring]
-> > Docente de Java        : Marta
 > > Cursos de Ana          : [Java, Spring]
-> > Estudiantes de Java    : [Ana, Luis]
-> > ===== CON EL REPOSITORIO =====
+> > ===== CON EL REPOSITORIO (sentido contrario) =====
 > > Dueño del carnet C-001 : Ana
 > > Docentes de Java       : [Marta]
 > > Estudiantes de Java    : [Ana, Luis]
 > > ```
 > >
-> > > 🔎 La aplicación termina sola al acabar `run` (no hay servidor web). Si no ves estas líneas, revisá la tabla de errores más abajo.
+> > > 🔎 En el SQL de la consola vas a ver `insert into curso (nombre)` y **después** `update curso set docente_id=?`: es lo normal en un `@OneToMany` de un sentido (el curso entra primero sin docente y Hibernate completa la clave).
+> > >
+> > > 🔎 La aplicación termina sola al acabar `run` (no hay servidor web).
 >
 > </details>
 >
@@ -1638,38 +1572,52 @@
 > </details>
 >
 > <details open>
-> <summary><strong>9️⃣ Paso 9 — Experimento: el error típico</strong></summary>
+> <summary><strong>9️⃣ Paso 9 — Experimento: pasar a doble sentido</strong></summary>
 >
-> > Agregá estas líneas **al final de `guardarDatos()`**. El curso se relaciona **solo desde el lado inverso**:
+> > Hasta ahora `CarnetEntity` no conoce a su estudiante. Agregale el **lado inverso** (opcional) en `CarnetEntity.java`:
 > >
 > > ```java
-> > // ⚠️ Error típico: el curso se relaciona SOLO desde el lado inverso
-> > CursoEntity html = cursos.save(new CursoEntity("HTML"));
-> > marta.getCursos().add(html);          // NO escribe docente_id
+> > // imports nuevos
+> > import lombok.EqualsAndHashCode;
+> > import lombok.ToString;
+> >
+> > // dentro de la clase, después de "private String codigo;"
+> > @OneToOne(mappedBy = "carnet")
+> > @ToString.Exclude
+> > @EqualsAndHashCode.Exclude
+> > private EstudianteEntity estudiante;
 > > ```
 > >
-> > Y esta línea **dentro de `consultarDatos()`**, después de las otras `println` de «NAVEGANDO»:
+> > Y en `consultarDatos()`, justo después de la línea «Carnet de Ana», esta línea:
 > >
 > > ```java
-> > System.out.println("Docente de HTML        : " + cursos.findById(3L).orElseThrow().getDocente());
+> > System.out.println("Dueño del carnet C-001 : " + ana.getCarnet().getEstudiante().getNombre());
 > > ```
 > >
 > > Ejecutá de nuevo. **Resultado real:**
 > >
 > > ```text
-> > Cursos de Marta        : [Java, Spring]
-> > Docente de HTML        : null          ← la relación NO se guardó
-> >
-> > +------------+----+--------+
-> > | docente_id | id | nombre |
-> > +------------+----+--------+
-> > |          1 |  1 | Java   |
-> > |          1 |  2 | Spring |
-> > |       NULL |  3 | HTML   |           ← docente_id quedó en NULL
-> > +------------+----+--------+
+> > ===== NAVEGANDO (desde el dueño) =====
+> > Carnet de Ana          : C-001
+> > Dueño del carnet C-001 : Ana          ← ahora se navega también desde el carnet
 > > ```
 > >
-> > > 🔎 El lado **inverso** (`mappedBy`) **solo lee**: lo que se agrega ahí no se guarda. Para que HTML quede con docente hay que usar el lado dueño: `marta.agregarCurso(html)` (que hace `curso.setDocente(marta)`) y guardar el curso. Probalo y comprobá que `docente_id` ahora vale 1.
+> > Comprobá que **las tablas no cambiaron**:
+> >
+> > ```bash
+> > docker exec -it mysql-academia mysql -uroot -proot academia -e "describe carnet"
+> > ```
+> >
+> > ```text
+> > +--------+--------------+------+-----+---------+----------------+
+> > | Field  | Type         | Null | Key | Default | Extra          |
+> > +--------+--------------+------+-----+---------+----------------+
+> > | id     | bigint       | NO   | PRI | NULL    | auto_increment |
+> > | codigo | varchar(255) | YES  |     | NULL    |                |
+> > +--------+--------------+------+-----+---------+----------------+
+> > ```
+> >
+> > > 🔎 `carnet` sigue sin columna del estudiante: el lado inverso (`mappedBy`) **no crea nada** y solo sirve para **navegar** en sentido contrario. Eso es el **doble sentido**. Ahora podés volver a quitarlo.
 >
 > </details>
 
