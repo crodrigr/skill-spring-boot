@@ -45,6 +45,157 @@
 </details>
 
 <details open>
+<summary><strong>🧱 Las notaciones de los campos de una entidad</strong></summary>
+
+>
+> Antes de relacionar entidades conviene conocer las notaciones de **una sola** entidad: las que dicen qué tabla es, cuál es la clave y cómo se guarda cada campo. Las relaciones (`@OneToMany`…) se agregan después sobre esta base.
+>
+> <details open>
+> <summary><strong>📋 Las notaciones</strong></summary>
+>
+> > | Notación | Dónde va | Qué hace | Atributos que importan |
+> > |---|---|---|---|
+> > | `@Entity` | clase | Marca la clase como **entidad**: JPA la mapea a una tabla. | `name` |
+> > | `@Table` | clase | **Nombra la tabla** y puede declarar restricciones e índices. | `name`, `uniqueConstraints`, `indexes` |
+> > | `@Id` | campo | Marca la **clave primaria**. Toda entidad necesita una. | — |
+> > | `@GeneratedValue` | campo | La clave **se genera sola**. `IDENTITY` usa el `AUTO_INCREMENT` de MySQL. | `strategy` |
+> > | `@Column` | campo | **Configura la columna** del campo. Es opcional: sin ella se usa el nombre del campo. | `name`, `nullable`, `unique`, `length`, `precision`, `scale`, `updatable`, `insertable` |
+> > | `@Enumerated` | campo | Cómo se guarda un `enum`: `STRING` (el nombre) u `ORDINAL` (la posición). | `value` |
+> > | `@Lob` | campo | Texto o archivo **grande**: en MySQL, `longtext` o `longblob`. | — |
+> > | `@Transient` | campo | El campo **no se guarda**: no tiene columna. | — |
+> > | `@CreationTimestamp` | campo | Pone la fecha y hora **al insertar** (es de Hibernate). | — |
+> > | `@UpdateTimestamp` | campo | Pone la fecha y hora **en cada actualización** (es de Hibernate). | — |
+> > | `@Version` | campo | Control de **concurrencia optimista**: el número sube en cada cambio y evita que dos usuarios se pisen. | — |
+> >
+> > 🔎 **Lo que no necesita notación:** un campo sin notación se guarda igual, en una columna con su nombre en `snake_case` (`fechaInicio` → `fecha_inicio`). Los tipos `LocalDate` y `LocalDateTime` se guardan como `date` y `datetime` **sin** `@Temporal`; esa notación solo se usa con `java.util.Date`.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>💻 Ejemplo: CursoEntity con todos sus campos</strong></summary>
+>
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> > import org.hibernate.annotations.CreationTimestamp;
+> > import org.hibernate.annotations.UpdateTimestamp;
+> >
+> > import java.math.BigDecimal;
+> > import java.time.LocalDate;
+> > import java.time.LocalDateTime;
+> >
+> > @Entity                                                    // es una entidad
+> > @Table(name = "curso",                                     // tabla «curso»
+> >        uniqueConstraints = @UniqueConstraint(columnNames = "codigo"),
+> >        indexes = @Index(name = "idx_curso_nombre", columnList = "nombre"))
+> > @Data
+> > @NoArgsConstructor
+> > public class CursoEntity {
+> >
+> >     @Id                                                    // clave primaria
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)    // AUTO_INCREMENT
+> >     private Long id;
+> >
+> >     @Column(name = "codigo", nullable = false, unique = true, length = 10)
+> >     private String codigo;                                 // varchar(10) not null, único
+> >
+> >     @Column(nullable = false, length = 100)
+> >     private String nombre;                                 // varchar(100) not null
+> >
+> >     @Lob
+> >     private String descripcion;                            // longtext
+> >
+> >     @Column(precision = 8, scale = 2)
+> >     private BigDecimal precio;                             // decimal(8,2)
+> >
+> >     private LocalDate fechaInicio;                         // sin notación: date
+> >
+> >     private boolean activo;                                // sin notación: bit not null
+> >
+> >     @Enumerated(EnumType.STRING)
+> >     @Column(nullable = false, length = 15)
+> >     private NivelCurso nivel;                              // enum guardado por su nombre
+> >
+> >     @Column(updatable = false)
+> >     @CreationTimestamp
+> >     private LocalDateTime creadoEn;                        // se llena al insertar y no cambia
+> >
+> >     @UpdateTimestamp
+> >     private LocalDateTime actualizadoEn;                   // se llena en cada actualización
+> >
+> >     @Version
+> >     private Long version;                                  // control de concurrencia
+> >
+> >     @Transient
+> >     private String precioFormateado;                       // NO se guarda: no tiene columna
+> > }
+> > ```
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > public enum NivelCurso { BASICO, INTERMEDIO, AVANZADO }
+> > ```
+>
+> </details>
+>
+> <details open>
+> <summary><strong>🗄️ Así queda en la tabla</strong></summary>
+>
+> > Al iniciar la aplicación, Hibernate genera (ejecutado en MySQL 8):
+> >
+> > ```text
+> > create table curso (activo bit not null, fecha_inicio date, precio decimal(8,2),
+> >     actualizado_en datetime(6), creado_en datetime(6), id bigint not null auto_increment,
+> >     version bigint, codigo varchar(10) not null, nombre varchar(100) not null,
+> >     descripcion longtext, nivel enum ('AVANZADO','BASICO','INTERMEDIO') not null,
+> >     primary key (id))
+> > create index idx_curso_nombre on curso (nombre)
+> > alter table curso add constraint UK… unique (codigo)
+> > ```
+> >
+> > Cada campo y la columna que produce:
+> >
+> > | Campo Java | Notación | Columna en MySQL | Restricción |
+> > |---|---|---|---|
+> > | `id` | `@Id` + `@GeneratedValue` | `id bigint` | clave primaria, `AUTO_INCREMENT` |
+> > | `codigo` | `@Column(nullable=false, unique=true, length=10)` | `codigo varchar(10)` | `NOT NULL`, `UNIQUE` |
+> > | `nombre` | `@Column(nullable=false, length=100)` | `nombre varchar(100)` | `NOT NULL`, con índice `idx_curso_nombre` |
+> > | `descripcion` | `@Lob` | `descripcion longtext` | — |
+> > | `precio` | `@Column(precision=8, scale=2)` | `precio decimal(8,2)` | — |
+> > | `fechaInicio` | *(ninguna)* | `fecha_inicio date` | — |
+> > | `activo` | *(ninguna)* | `activo bit` | `NOT NULL` (un `boolean` primitivo nunca es nulo) |
+> > | `nivel` | `@Enumerated(STRING)` | `nivel enum('AVANZADO','BASICO','INTERMEDIO')` | `NOT NULL` |
+> > | `creadoEn` | `@CreationTimestamp` | `creado_en datetime(6)` | — |
+> > | `actualizadoEn` | `@UpdateTimestamp` | `actualizado_en datetime(6)` | — |
+> > | `version` | `@Version` | `version bigint` | — |
+> > | `precioFormateado` | `@Transient` | **no existe** | — |
+> >
+> > Al guardar un curso (`em.persist`) con los datos de Java, la fila queda así:
+> >
+> > ```text
+> > curso
+> > +----+---------+--------+---------------------------+--------+--------------+--------+--------+---------------------+---------------------+---------+
+> > | id | codigo  | nombre | descripcion               | precio | fecha_inicio | activo | nivel  | creado_en           | actualizado_en      | version |
+> > +----+---------+--------+---------------------------+--------+--------------+--------+--------+---------------------+---------------------+---------+
+> > |  1 | JAV-101 | Java   | Curso de Java desde cero  |  49.90 | 2026-03-02   |      1 | BASICO | 2026-10-31 11:45:45 | 2026-10-31 11:45:45 |       0 |
+> > +----+---------+--------+---------------------------+--------+--------------+--------+--------+---------------------+---------------------+---------+
+> > ```
+> >
+> > Las fechas las pone Hibernate, `version` empieza en `0` y `precioFormateado` no aparece porque es `@Transient`.
+> >
+> > ⚠️ **`@Enumerated`: usar siempre `STRING`.** Con `ORDINAL` (el valor por defecto) se guarda la posición (`0`, `1`, `2`) y, si luego se reordena o se inserta un valor en el `enum`, los datos existentes cambian de significado.
+> >
+> > 💡 Esta versión de `CursoEntity` es **solo para este apartado**. En el resto de la guía se usa la versión mínima (`id` y `nombre`), que basta para ver las relaciones.
+>
+> </details>
+
+</details>
+
+<details open>
 <summary><strong>🗺️ El ejemplo: la academia</strong></summary>
 
 > Se usan cuatro entidades del mundo de la [guía del taller](01-guia-taller-gestion-de-cursos-con-bd.md), todas en `persistence.entity` (solo entidades: sin servicios ni API). Cada relación trae su **diagrama** y las **clases completas**.
