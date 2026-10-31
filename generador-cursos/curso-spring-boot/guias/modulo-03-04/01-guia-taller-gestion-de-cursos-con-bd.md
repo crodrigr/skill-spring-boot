@@ -453,14 +453,6 @@
 > >     MatriculaEntity "*" --> "1" EstudianteEntity : @ManyToOne estudiante_id
 > >     MatriculaEntity "*" --> "1" CursoEntity : @ManyToOne curso_id
 > > ```
-> >
-> > | Entidad | Tabla | Notas |
-> > |---|---|---|
-> > | `EstudianteEntity` | `estudiante` | `correo` es único (`@Column(unique = true)`). |
-> > | `CursoEntity` | `curso` | — |
-> > | `MatriculaEntity` | `matricula` | **Lado dueño**: guarda las claves foráneas `estudiante_id` y `curso_id`. |
-> >
-> > Cada flecha es una **clave foránea** y va en un solo sentido: `MatriculaEntity` conoce a `EstudianteEntity` y a `CursoEntity`, pero no al revés. Entre estudiante y curso la relación es de **muchos a muchos**, resuelta con la entidad intermedia `MatriculaEntity`.
 >
 > </details>
 
