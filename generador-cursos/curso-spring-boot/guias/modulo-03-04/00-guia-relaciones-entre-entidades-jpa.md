@@ -4,7 +4,7 @@
 
 🎯 **Qué vas a aprender:** a declarar las tres relaciones de JPA, **desde las entidades**, en **un sentido** y en **doble sentido**, y qué significa cada notación.
 
-⏱️ **Tiempo:** unos 20 minutos. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](03-guia-tienda-2-uno-a-muchos.md).
+⏱️ **Tiempo:** unos 20 minutos de lectura y 25 de práctica. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](03-guia-tienda-2-uno-a-muchos.md).
 
 ✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que ves son reales.
 
@@ -57,40 +57,7 @@
 >
 > > 🔎 En el taller, el muchos a muchos entre estudiantes y cursos se resuelve con una **entidad intermedia** (`MatriculaEntity`), porque la matrícula necesita sus propios datos. Aquí se muestra la forma **directa**, sin datos propios.
 >
-> <details open>
-> <summary><strong>🧰 De dónde salen <code>docentes</code>, <code>cursos</code>, <code>estudiantes</code> y <code>carnets</code></strong></summary>
->
-> > En los ejemplos aparecen líneas como `docentes.save(...)` o `cursos.save(...)`. Esas variables son los **repositorios**: un repositorio por entidad, que Spring Data crea solo a partir de una interfaz vacía.
-> >
-> > ```java
-> > public interface DocenteJpaRepository extends JpaRepository<DocenteEntity, Long> {}
-> > public interface CursoJpaRepository extends JpaRepository<CursoEntity, Long> {}
-> > public interface EstudianteJpaRepository extends JpaRepository<EstudianteEntity, Long> {}
-> > public interface CarnetJpaRepository extends JpaRepository<CarnetEntity, Long> {}
-> > ```
-> >
-> > Y se reciben en el constructor de una clase de Spring (un servicio, o un `CommandLineRunner` como en «Probalo»). El nombre del campo es el que se usa en los ejemplos:
-> >
-> > ```java
-> > @Component
-> > @RequiredArgsConstructor
-> > public class Demo implements CommandLineRunner {
-> >     private final DocenteJpaRepository docentes;       // docentes.save(...)
-> >     private final CursoJpaRepository cursos;           // cursos.save(...)
-> >     private final EstudianteJpaRepository estudiantes; // estudiantes.save(...)
-> >     private final CarnetJpaRepository carnets;         // carnets.findAll()
-> >
-> >     @Override
-> >     @Transactional
-> >     public void run(String... args) {
-> >         // aquí van los ejemplos de «guardar y consultar datos»
-> >     }
-> > }
-> > ```
-> >
-> > `save` guarda, `findAll` trae todo, y los métodos como `findByCarnetCodigo` se agregan dentro de la interfaz del repositorio que corresponda.
->
-> </details>
+> > 🧑‍💻 Los repositorios (`docentes`, `cursos`, `estudiantes`, `carnets`) y la clase `main` que los usa se arman **paso a paso** en la sección **«🧑‍💻 Práctica paso a paso»**, casi al final de esta guía.
 
 </details>
 
@@ -379,7 +346,7 @@
 > </details>
 >
 > <details open>
-> <summary><strong>🗄️ Así queda en las tablas (datos del escenario «Probalo»)</strong></summary>
+> <summary><strong>🗄️ Así queda en las tablas (datos de la práctica)</strong></summary>
 >
 > > ```text
 > > carnet                      estudiante
@@ -1138,58 +1105,573 @@
 </details>
 
 <details open>
-<summary><strong>🧪 Probalo</strong></summary>
+<summary><strong>🧑‍💻 Práctica paso a paso: tu propio proyecto desde cero</strong></summary>
 
-> El proyecto de prueba tiene **solo tres dependencias**: Spring Data JPA, MySQL Driver y Lombok (sin Web: aquí no hay API). Con MySQL en `localhost:3306` (ver «Preparar MySQL» en la [guía 1 de la tienda](02-guia-tienda-1-crud-productos.md)):
+> Vas a construir **desde cero** un proyecto Spring Boot con las cuatro entidades de esta guía, sus repositorios y una clase `main` que **guarda** datos y los **consulta** en MySQL, con las tres relaciones a la vez. Al final podés ver las tablas y comparar con lo que explican las secciones anteriores.
 >
-> ```properties
-> spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
-> spring.datasource.username=root
-> spring.datasource.password=root
-> spring.jpa.hibernate.ddl-auto=update
-> spring.jpa.show-sql=true
-> ```
+> **Necesitás:** JDK 17 o superior, Maven (o el `mvnw` que trae el proyecto), Docker (o un MySQL instalado) y un IDE. Tiempo: unos 25 minutos.
 >
-> Se guardan datos asignando **siempre del lado dueño** (un `CommandLineRunner` con `@Transactional` y los repositorios `…JpaRepository` de cada entidad):
+> <details open>
+> <summary><strong>1️⃣ Paso 1 — Crear el proyecto</strong></summary>
+> >
+> > Entrá a **[start.spring.io](https://start.spring.io)** y completá:
+> >
+> > | Campo | Valor |
+> > |---|---|
+> > | Project | **Maven** |
+> > | Language | **Java** |
+> > | Spring Boot | **3.3.x** (la versión estable 3.3) |
+> > | Group | `com.academia` |
+> > | Artifact / Name | `academia` |
+> > | Packaging | **Jar** |
+> > | Java | **17** (o superior) |
+> >
+> > **Dependencies** (botón *Add dependencies*): solo estas tres. **No** agregues Spring Web: aquí no hay API.
+> >
+> > | Dependencia | Para qué sirve |
+> > |---|---|
+> > | **Spring Data JPA** | JPA, Hibernate y los repositorios `JpaRepository` |
+> > | **MySQL Driver** | el conector para hablar con MySQL |
+> > | **Lombok** | `@Data`, `@NoArgsConstructor`, `@RequiredArgsConstructor` |
+> >
+> > Pulsá **Generate**, descomprimí el `.zip` y abrí la carpeta `academia` en tu IDE.
+> >
+> > > ⚠️ **Si usás JDK 23 o superior**, Lombok necesita dos ajustes en el `pom.xml` (se probó con JDK 25): una versión reciente de Lombok y la opción `proc full` del compilador.
+> > >
+> > > ```xml
+> > > <properties>
+> > >     <java.version>17</java.version>
+> > >     <lombok.version>1.18.44</lombok.version>
+> > > </properties>
+> > > ```
+> > >
+> > > ```xml
+> > > <plugin>
+> > >     <groupId>org.apache.maven.plugins</groupId>
+> > >     <artifactId>maven-compiler-plugin</artifactId>
+> > >     <configuration>
+> > >         <proc>full</proc>
+> > >     </configuration>
+> > > </plugin>
+> > > ```
+> > >
+> > > (El plugin va dentro de `<build><plugins>`, junto al `spring-boot-maven-plugin`.) Con JDK 17 o 21 no hace falta.
+> >
+> </details>
 >
-> ```java
-> // 1:1 — se asigna el lado dueño; cascade guarda también el carnet
-> EstudianteEntity ana = new EstudianteEntity("Ana");
-> ana.setCarnet(new CarnetEntity("C-001"));
-> estudiantes.save(ana);
-> EstudianteEntity luis = estudiantes.save(new EstudianteEntity("Luis"));
+> <details open>
+> <summary><strong>2️⃣ Paso 2 — Levantar MySQL y configurar la conexión</strong></summary>
+> >
+> > **a) Levantar MySQL.** Con Docker (un solo comando; ver también «Preparar MySQL» en la [guía 1 de la tienda](02-guia-tienda-1-crud-productos.md)):
+> >
+> > ```bash
+> > docker run --name mysql-academia -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:8
+> > ```
+> >
+> > > Si ya tenés MySQL instalado, usalo: solo cambiá el usuario y la contraseña en el paso siguiente.
+> >
+> > **b) Configurar la conexión** en `src/main/resources/application.properties`:
+> >
+> > ```properties
+> > spring.application.name=academia
+> >
+> > # Conexión a MySQL (la base «academia» se crea sola si no existe)
+> > spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
+> > spring.datasource.username=root
+> > spring.datasource.password=root
+> >
+> > # JPA / Hibernate
+> > spring.jpa.hibernate.ddl-auto=create
+> > spring.jpa.show-sql=true
+> > ```
+> >
+> > | Propiedad | Qué hace |
+> > |---|---|
+> > | `spring.datasource.url` | Dónde está MySQL (`localhost:3306`) y qué base usar (`academia`). `createDatabaseIfNotExist=true` **crea la base** si no existe. |
+> > | `spring.datasource.username` / `password` | Usuario y clave de MySQL (`root`/`root` es solo para desarrollo). |
+> > | `spring.jpa.hibernate.ddl-auto=create` | Al iniciar, Hibernate **borra y crea** las tablas a partir de las entidades. Así podés ejecutar la práctica las veces que quieras con datos limpios. *(En un proyecto real se usa `update` o `validate`.)* |
+> > | `spring.jpa.show-sql=true` | Muestra en la consola el SQL que ejecuta Hibernate. |
+> >
+> </details>
 >
-> // 1:N (doble sentido) — el lado dueño es el curso
-> DocenteEntity marta = docentes.save(new DocenteEntity("Marta"));
-> CursoEntity java = new CursoEntity("Java");
-> java.setDocente(marta);
-> cursos.save(java);
-> CursoEntity spring = new CursoEntity("Spring");
-> spring.setDocente(marta);
-> cursos.save(spring);
+> <details open>
+> <summary><strong>3️⃣ Paso 3 — Crear el árbol de archivos</strong></summary>
+> >
+> > Dentro de `src/main/java/com/academia/` crea los paquetes `persistence.entity` y `persistence.repository`, y los archivos vacíos que se ven abajo. La clase `AcademiaApplication` ya la generó Spring Initializr.
+> >
+> > ```text
+> > academia/
+> > ├── pom.xml
+> > └── src/
+> >     └── main/
+> >         ├── java/
+> >         │   └── com/
+> >         │       └── academia/
+> >         │           ├── AcademiaApplication.java          ← main + los ejemplos
+> >         │           └── persistence/
+> >         │               ├── entity/
+> >         │               │   ├── CarnetEntity.java
+> >         │               │   ├── CursoEntity.java
+> >         │               │   ├── DocenteEntity.java
+> >         │               │   └── EstudianteEntity.java
+> >         │               └── repository/
+> >         │                   ├── CarnetJpaRepository.java
+> >         │                   ├── CursoJpaRepository.java
+> >         │                   ├── DocenteJpaRepository.java
+> >         │                   └── EstudianteJpaRepository.java
+> >         └── resources/
+> >             └── application.properties                    ← conexión a MySQL
+> > ```
+> >
+> > > Spring Initializr además genera `mvnw`, `.gitignore` y `src/test`. No hace falta tocarlos.
+> >
+> </details>
 >
-> // Error típico: solo del lado inverso. NO escribe docente_id
-> CursoEntity html = cursos.save(new CursoEntity("HTML"));
-> marta.getCursos().add(html);
+> <details open>
+> <summary><strong>4️⃣ Paso 4 — Crear las entidades</strong></summary>
+> >
+> > Cuatro clases en el paquete `com.academia.persistence.entity`. Son las mismas de las secciones de **doble sentido** de arriba, completas. Copialas una por una:
+> >
+> > 📄 **CarnetEntity.java  (1:1, lado inverso)**
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
+> > import lombok.NoArgsConstructor;
+> > import lombok.ToString;
+> >
+> > @Entity
+> > @Table(name = "carnet")
+> > @Data
+> > @NoArgsConstructor
+> > public class CarnetEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String codigo;
+> >
+> >     // Lado INVERSO (opcional): no crea columnas
+> >     @OneToOne(mappedBy = "carnet")
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
+> >     private EstudianteEntity estudiante;
+> >
+> >     public CarnetEntity(String codigo) {
+> >         this.codigo = codigo;
+> >     }
+> > }
+> > ```
+> >
+> > 📄 **DocenteEntity.java  (1:N, lado inverso)**
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
+> > import lombok.NoArgsConstructor;
+> > import lombok.ToString;
+> >
+> > import java.util.ArrayList;
+> > import java.util.List;
+> >
+> > @Entity
+> > @Table(name = "docente")
+> > @Data
+> > @NoArgsConstructor
+> > public class DocenteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // Lado INVERSO (opcional): ya no lleva @JoinColumn, solo mappedBy
+> >     @OneToMany(mappedBy = "docente")
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
+> >     private List<CursoEntity> cursos = new ArrayList<>();
+> >
+> >     public DocenteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> >
+> >     // Mantiene sincronizados los dos lados
+> >     public void agregarCurso(CursoEntity curso) {
+> >         cursos.add(curso);
+> >         curso.setDocente(this);
+> >     }
+> > }
+> > ```
+> >
+> > 📄 **CursoEntity.java  (1:N lado dueño · N:M lado inverso)**
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.EqualsAndHashCode;
+> > import lombok.NoArgsConstructor;
+> > import lombok.ToString;
+> >
+> > import java.util.HashSet;
+> > import java.util.Set;
+> >
+> > @Entity
+> > @Table(name = "curso")
+> > @Data
+> > @NoArgsConstructor
+> > public class CursoEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // 1:N — lado DUEÑO: la clave foránea docente_id vive en la tabla curso
+> >     @ManyToOne
+> >     @JoinColumn(name = "docente_id")
+> >     private DocenteEntity docente;
+> >
+> >     // N:M — lado INVERSO (opcional): la tabla intermedia la define EstudianteEntity.cursos
+> >     @ManyToMany(mappedBy = "cursos")
+> >     @ToString.Exclude
+> >     @EqualsAndHashCode.Exclude
+> >     private Set<EstudianteEntity> estudiantes = new HashSet<>();
+> >
+> >     public CursoEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > 📄 **EstudianteEntity.java  (1:1 lado dueño · N:M lado dueño)**
+> >
+> > ```java
+> > package com.academia.persistence.entity;
+> >
+> > import jakarta.persistence.*;
+> > import lombok.Data;
+> > import lombok.NoArgsConstructor;
+> >
+> > import java.util.HashSet;
+> > import java.util.Set;
+> >
+> > @Entity
+> > @Table(name = "estudiante")
+> > @Data
+> > @NoArgsConstructor
+> > public class EstudianteEntity {
+> >
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
+> >
+> >     private String nombre;
+> >
+> >     // 1:1 — lado DUEÑO: la clave foránea carnet_id vive en la tabla estudiante
+> >     @OneToOne(cascade = CascadeType.ALL)
+> >     @JoinColumn(name = "carnet_id")
+> >     private CarnetEntity carnet;
+> >
+> >     // N:M — lado DUEÑO: JPA crea la tabla intermedia estudiante_curso
+> >     @ManyToMany
+> >     @JoinTable(name = "estudiante_curso",
+> >             joinColumns = @JoinColumn(name = "estudiante_id"),
+> >             inverseJoinColumns = @JoinColumn(name = "curso_id"))
+> >     private Set<CursoEntity> cursos = new HashSet<>();
+> >
+> >     public EstudianteEntity(String nombre) {
+> >         this.nombre = nombre;
+> >     }
+> > }
+> > ```
+> >
+> > > 🔎 **¿Quién es el dueño?** `EstudianteEntity` (`carnet` y `cursos`) y `CursoEntity` (`docente`). Los atributos con `mappedBy` (`CarnetEntity.estudiante`, `DocenteEntity.cursos`, `CursoEntity.estudiantes`) son el lado inverso y llevan `@ToString.Exclude` y `@EqualsAndHashCode.Exclude` para evitar el bucle infinito con `@Data`.
+> >
+> </details>
 >
-> // N:M — se agrega en el lado dueño
-> ana.getCursos().add(java);
-> ana.getCursos().add(spring);
-> luis.getCursos().add(java);
-> ```
+> <details open>
+> <summary><strong>5️⃣ Paso 5 — Crear los repositorios</strong></summary>
+> >
+> > Cuatro interfaces en `com.academia.persistence.repository`. **No tienen implementación**: Spring Data la crea solo al arrancar. De ahí salen las variables `docentes`, `cursos`, `estudiantes` y `carnets` de los ejemplos.
+> >
+> > 📄 **CarnetJpaRepository.java**
+> >
+> > ```java
+> > package com.academia.persistence.repository;
+> >
+> > import com.academia.persistence.entity.CarnetEntity;
+> > import org.springframework.data.jpa.repository.JpaRepository;
+> >
+> > public interface CarnetJpaRepository extends JpaRepository<CarnetEntity, Long> {
+> > }
+> > ```
+> >
+> > 📄 **CursoJpaRepository.java**
+> >
+> > ```java
+> > package com.academia.persistence.repository;
+> >
+> > import com.academia.persistence.entity.CursoEntity;
+> > import org.springframework.data.jpa.repository.JpaRepository;
+> >
+> > public interface CursoJpaRepository extends JpaRepository<CursoEntity, Long> {
+> > }
+> > ```
+> >
+> > 📄 **DocenteJpaRepository.java**
+> >
+> > ```java
+> > package com.academia.persistence.repository;
+> >
+> > import com.academia.persistence.entity.DocenteEntity;
+> > import org.springframework.data.jpa.repository.JpaRepository;
+> >
+> > import java.util.List;
+> >
+> > public interface DocenteJpaRepository extends JpaRepository<DocenteEntity, Long> {
+> >
+> >     List<DocenteEntity> findByCursosNombre(String nombre);   // docente.cursos.nombre = ?
+> > }
+> > ```
+> >
+> > 📄 **EstudianteJpaRepository.java**
+> >
+> > ```java
+> > package com.academia.persistence.repository;
+> >
+> > import com.academia.persistence.entity.EstudianteEntity;
+> > import org.springframework.data.jpa.repository.JpaRepository;
+> >
+> > import java.util.List;
+> > import java.util.Optional;
+> >
+> > public interface EstudianteJpaRepository extends JpaRepository<EstudianteEntity, Long> {
+> >
+> >     Optional<EstudianteEntity> findByCarnetCodigo(String codigo);   // estudiante.carnet.codigo = ?
+> >
+> >     List<EstudianteEntity> findByCursosNombre(String nombre);       // estudiante.cursos.nombre = ?
+> > }
+> > ```
+> >
+> > > 💡 `Carnet` y `Curso` quedan vacíos: `save`, `findById` y `findAll` ya vienen en `JpaRepository`. Los métodos `findByCarnetCodigo` y `findByCursosNombre` son las **consultas inversas** de la sección «Consultar datos»: Spring Data los implementa leyendo el nombre.
+> >
+> </details>
 >
-> En otra transacción se leen las relaciones desde ambos lados. Resultado **real**:
+> <details open>
+> <summary><strong>6️⃣ Paso 6 — Escribir los ejemplos en la clase principal</strong></summary>
+> >
+> > Reemplazá el contenido de `AcademiaApplication.java`. Es la clase del `main`: recibe los cuatro repositorios por constructor y ejecuta los ejemplos al arrancar.
+> >
+> > ```java
+> > package com.academia;
+> >
+> > import com.academia.persistence.entity.*;
+> > import com.academia.persistence.repository.*;
+> > import lombok.RequiredArgsConstructor;
+> > import org.springframework.boot.CommandLineRunner;
+> > import org.springframework.boot.SpringApplication;
+> > import org.springframework.boot.autoconfigure.SpringBootApplication;
+> > import org.springframework.transaction.support.TransactionTemplate;
+> >
+> > import java.util.Collection;
+> > import java.util.List;
+> >
+> > @SpringBootApplication
+> > @RequiredArgsConstructor
+> > public class AcademiaApplication implements CommandLineRunner {
+> >
+> >     private final DocenteJpaRepository docentes;
+> >     private final CursoJpaRepository cursos;
+> >     private final EstudianteJpaRepository estudiantes;
+> >     private final CarnetJpaRepository carnets;
+> >     private final TransactionTemplate tx;
+> >
+> >     public static void main(String[] args) {
+> >         SpringApplication.run(AcademiaApplication.class, args);
+> >     }
+> >
+> >     @Override
+> >     public void run(String... args) {
+> >         tx.executeWithoutResult(status -> guardarDatos());       // transacción 1
+> >         tx.executeWithoutResult(status -> consultarDatos());     // transacción 2 (otra distinta)
+> >     }
+> >
+> >     private void guardarDatos() {
+> >         // 1:1 — se asigna el carnet en el dueño (el estudiante); cascade lo guarda
+> >         EstudianteEntity ana = new EstudianteEntity("Ana");
+> >         ana.setCarnet(new CarnetEntity("C-001"));
+> >         EstudianteEntity luis = new EstudianteEntity("Luis");
+> >
+> >         // 1:N — el dueño es el curso; agregarCurso sincroniza los dos lados
+> >         DocenteEntity marta = docentes.save(new DocenteEntity("Marta"));
+> >         CursoEntity java = new CursoEntity("Java");
+> >         CursoEntity spring = new CursoEntity("Spring");
+> >         marta.agregarCurso(java);
+> >         marta.agregarCurso(spring);
+> >         cursos.save(java);
+> >         cursos.save(spring);
+> >
+> >         // N:M — se agrega en el dueño (el estudiante)
+> >         ana.getCursos().add(java);
+> >         ana.getCursos().add(spring);
+> >         luis.getCursos().add(java);
+> >         estudiantes.save(ana);
+> >         estudiantes.save(luis);
+> >     }
+> >
+> >     private void consultarDatos() {
+> >         EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();
+> >         CarnetEntity carnet = carnets.findById(1L).orElseThrow();
+> >         DocenteEntity marta = docentes.findById(1L).orElseThrow();
+> >         CursoEntity java = cursos.findById(1L).orElseThrow();
+> >
+> >         System.out.println("===== NAVEGANDO (doble sentido) =====");
+> >         System.out.println("Carnet de Ana          : " + ana.getCarnet().getCodigo());
+> >         System.out.println("Dueño del carnet C-001 : " + carnet.getEstudiante().getNombre());
+> >         System.out.println("Cursos de Marta        : " + nombresCursos(marta.getCursos()));
+> >         System.out.println("Docente de Java        : " + java.getDocente().getNombre());
+> >         System.out.println("Cursos de Ana          : " + nombresCursos(ana.getCursos()));
+> >         System.out.println("Estudiantes de Java    : " + nombresEstudiantes(java.getEstudiantes()));
+> >
+> >         System.out.println("===== CON EL REPOSITORIO =====");
+> >         System.out.println("Dueño del carnet C-001 : " + estudiantes.findByCarnetCodigo("C-001").orElseThrow().getNombre());
+> >         System.out.println("Docentes de Java       : " + docentes.findByCursosNombre("Java").stream().map(DocenteEntity::getNombre).toList());
+> >         System.out.println("Estudiantes de Java    : " + nombresEstudiantes(estudiantes.findByCursosNombre("Java")));
+> >     }
+> >
+> >     private List<String> nombresCursos(Collection<CursoEntity> lista) {
+> >         return lista.stream().map(CursoEntity::getNombre).sorted().toList();
+> >     }
+> >
+> >     private List<String> nombresEstudiantes(Collection<EstudianteEntity> lista) {
+> >         return lista.stream().map(EstudianteEntity::getNombre).sorted().toList();
+> >     }
+> > }
+> > ```
+> >
+> > | Parte | Qué hace |
+> > |---|---|
+> > | `main` | Arranca Spring Boot. |
+> > | `@RequiredArgsConstructor` | Lombok genera el constructor que **recibe los repositorios** (así Spring los inyecta). |
+> > | `implements CommandLineRunner` + `run` | Spring llama a `run` **justo después de arrancar**: es nuestro punto de entrada para los ejemplos. |
+> > | `TransactionTemplate` | Ejecuta cada bloque dentro de **una transacción**. Se usan **dos**: una para guardar y otra, distinta, para consultar. Así las consultas leen **de la base de datos** y no de la memoria. |
+> > | `guardarDatos()` | Registra todo asignando **siempre del lado dueño**. |
+> > | `consultarDatos()` | Responde las preguntas **navegando** (doble sentido) y **con el repositorio**. |
+> >
+> </details>
 >
-> ```text
-> 1:1 desde el dueño   : carnet de Ana = C-001
-> 1:1 desde el inverso : dueño del carnet 1 = Ana
-> 1:N desde el inverso : cursos de Marta = 2       ← se guardaron 3, pero HTML solo se agregó del lado inverso
-> N:1 desde el dueño   : docente de HTML = null
-> N:M desde el dueño   : cursos de Ana = 2
-> N:M desde el inverso : estudiantes de Java = 2
-> ```
+> <details open>
+> <summary><strong>7️⃣ Paso 7 — Ejecutar</strong></summary>
+> >
+> > Desde la terminal, en la carpeta del proyecto:
+> >
+> > ```bash
+> > ./mvnw spring-boot:run
+> > ```
+> >
+> > *(En Windows: `mvnw.cmd spring-boot:run`. También podés pulsar **Run** sobre `AcademiaApplication` en tu IDE.)*
+> >
+> > Primero verás el SQL de Hibernate (`create table…`, `insert into…`) y, al final, lo que imprimen los ejemplos. **Resultado real:**
+> >
+> > ```text
+> > ===== NAVEGANDO (doble sentido) =====
+> > Carnet de Ana          : C-001
+> > Dueño del carnet C-001 : Ana
+> > Cursos de Marta        : [Java, Spring]
+> > Docente de Java        : Marta
+> > Cursos de Ana          : [Java, Spring]
+> > Estudiantes de Java    : [Ana, Luis]
+> > ===== CON EL REPOSITORIO =====
+> > Dueño del carnet C-001 : Ana
+> > Docentes de Java       : [Marta]
+> > Estudiantes de Java    : [Ana, Luis]
+> > ```
+> >
+> > > 🔎 La aplicación termina sola al acabar `run` (no hay servidor web). Si no ves estas líneas, revisá la tabla de errores más abajo.
+> >
+> </details>
 >
-> > 🔎 **Qué demuestra:** el lado **inverso** (`carnet.getEstudiante()`, `docente.getCursos()`, `curso.getEstudiantes()`) se **lee de la base** aunque nunca se asignó; en cambio, lo que se agrega **solo** en el inverso **no se guarda** (HTML sin docente).
+> <details open>
+> <summary><strong>8️⃣ Paso 8 — Ver cómo quedaron las tablas</strong></summary>
+> >
+> > Con la aplicación ya ejecutada, mirá las tablas en MySQL (con Docker; o usá MySQL Workbench / DBeaver con los mismos datos de conexión):
+> >
+> > ```bash
+> > docker exec -it mysql-academia mysql -uroot -proot academia \
+> >   -e "select * from carnet; select * from estudiante; select * from docente; select * from curso; select * from estudiante_curso"
+> > ```
+> >
+> > **Resultado real:**
+> >
+> > ```text
+> > carnet                 estudiante                        docente
+> > +----+--------+        +-----------+----+--------+      +----+--------+
+> > | id | codigo |        | carnet_id | id | nombre |      | id | nombre |
+> > +----+--------+        +-----------+----+--------+      +----+--------+
+> > |  1 | C-001  |        |         1 |  1 | Ana    |      |  1 | Marta  |
+> > +----+--------+        |      NULL |  2 | Luis   |      +----+--------+
+> >                        +-----------+----+--------+
+> >
+> > curso                              estudiante_curso
+> > +------------+----+--------+       +----------+---------------+
+> > | docente_id | id | nombre |       | curso_id | estudiante_id |
+> > +------------+----+--------+       +----------+---------------+
+> > |          1 |  1 | Java   |       |        1 |             1 |
+> > |          1 |  2 | Spring |       |        2 |             1 |
+> > +------------+----+--------+       |        1 |             2 |
+> >                                    +----------+---------------+
+> > ```
+> >
+> > Compará con lo que esperabas: la clave `carnet_id` está en `estudiante`, `docente_id` en `curso`, y la relación muchos a muchos vive en la tabla `estudiante_curso`.
+> >
+> </details>
+>
+> <details open>
+> <summary><strong>9️⃣ Paso 9 — Experimento: el error típico</strong></summary>
+> >
+> > Agregá estas líneas **al final de `guardarDatos()`**. El curso se relaciona **solo desde el lado inverso**:
+> >
+> > ```java
+> > // ⚠️ Error típico: el curso se relaciona SOLO desde el lado inverso
+> > CursoEntity html = cursos.save(new CursoEntity("HTML"));
+> > marta.getCursos().add(html);          // NO escribe docente_id
+> > ```
+> >
+> > Y esta línea **dentro de `consultarDatos()`**, después de las otras `println` de «NAVEGANDO»:
+> >
+> > ```java
+> > System.out.println("Docente de HTML        : " + cursos.findById(3L).orElseThrow().getDocente());
+> > ```
+> >
+> > Ejecutá de nuevo. **Resultado real:**
+> >
+> > ```text
+> > Cursos de Marta        : [Java, Spring]
+> > Docente de HTML        : null          ← la relación NO se guardó
+> >
+> > +------------+----+--------+
+> > | docente_id | id | nombre |
+> > +------------+----+--------+
+> > |          1 |  1 | Java   |
+> > |          1 |  2 | Spring |
+> > |       NULL |  3 | HTML   |           ← docente_id quedó en NULL
+> > +------------+----+--------+
+> > ```
+> >
+> > > 🔎 El lado **inverso** (`mappedBy`) **solo lee**: lo que se agrega ahí no se guarda. Para que HTML quede con docente hay que usar el lado dueño: `marta.agregarCurso(html)` (que hace `curso.setDocente(marta)`) y guardar el curso. Probalo y comprobá que `docente_id` ahora vale 1.
+> >
+> </details>
 
 </details>
 
