@@ -4,7 +4,7 @@
 > Aplica lo visto en el [Módulo 03](../../03-introduccion-a-jpa/) y el [Módulo 04](../../04-gestion-de-bases-de-datos-mediante-jpa/).
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
-> ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Spring Boot 3.3 y H2: las tablas, los resultados y el SQL que se muestran son salidas reales.
+> ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8: las tablas, los resultados y el SQL que se muestran son salidas reales.
 >
 > 🧭 **Idea central.** Las clases que se guardan en la base (`…Entity`) viven en `persistence.entity`. Esta guía trabaja **solo** esa capa: las **entidades** y sus **repositorios de Spring Data**.
 > El modelo del negocio, los mapeadores, los servicios y los controladores **no se trabajan aquí**: se resuelven en otra guía.
@@ -12,15 +12,15 @@
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
 
-> Crear la **capa de persistencia** de **estudiantes, cursos y matrículas** con **Spring Data JPA** y una base de datos relacional (**H2**): declarar las entidades, guardarlas y consultarlas.
+> Crear la **capa de persistencia** de **estudiantes, cursos y matrículas** con **Spring Data JPA** y una base de datos relacional (**MySQL**): declarar las entidades, guardarlas y consultarlas.
 >
 > Al terminar, el estudiante:
 >
 > - Declara **entidades JPA** (`@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn`) en `persistence.entity` (M3 y M4).
-> - Configura la conexión a **H2** en `application.properties` y lee el SQL que genera Hibernate (M3 y M4).
+> - Configura la conexión a **MySQL** en `application.properties` y lee el SQL que genera Hibernate (M3 y M4).
 > - Crea interfaces `JpaRepository` con **métodos derivados** (`existsBy…`, `countBy…`) (M3).
 > - **Guarda y consulta** datos desde la clase `main` (`CommandLineRunner`), sin API.
-> - Verifica que los datos **sobreviven al reinicio** usando H2 en archivo.
+> - Verifica que los datos **sobreviven al reinicio** en MySQL: la base vive en un servidor, no dentro de la aplicación.
 
 </details>
 
@@ -48,7 +48,7 @@
 > | Código | Requerimiento |
 > |---|---|
 > | **RNF-01** | Java 17 o superior, Spring Boot 3 y Maven. |
-> | **RNF-02** | Persistencia con **Spring Data JPA** y **H2**. Primero en memoria; al final, en **archivo**. |
+> | **RNF-02** | Persistencia con **Spring Data JPA** y **MySQL 8** (en Docker o instalado). La base `academy` debe existir antes de arrancar. |
 > | **RNF-03** | Tres capas: `presentation` → `business` → `persistence`. Las anotaciones de JPA van **solo** en `persistence.entity`. |
 > | **RNF-04** | Inyección por constructor. Todos los nombres del código (paquetes, clases, atributos, tablas) en **inglés**. |
 > | **RNF-05** | Las pruebas se hacen desde la clase `main` (`CommandLineRunner`) y con el SQL que imprime Hibernate. |
@@ -68,7 +68,7 @@
 > | 1 | 10 – 30 | Entidades JPA en `persistence.entity` (`StudentEntity` en vivo) | Docente y estudiantes |
 > | 2 | 30 – 40 | Interfaces de Spring Data (`…JpaRepository`) | Estudiantes |
 > | 3 | 40 – 60 | Guardar y consultar desde `main` y leer el SQL | Todos |
-> | 4 | 60 – 75 | Persistencia real (H2 en archivo) y cierre | Todos |
+> | 4 | 60 – 75 | Persistencia real (reinicio contra MySQL) y cierre | Todos |
 >
 > > 💡 **Ritmo.** El Paso 1 con `StudentEntity` fija el patrón; con `CourseEntity` y `EnrollmentEntity` los estudiantes lo repiten. Si falta tiempo, el
 > > Paso 4 se hace como demostración del docente.
@@ -85,7 +85,7 @@
 > | Relacionamiento entre clases | `EnrollmentEntity` apunta a `StudentEntity` y a `CourseEntity` | 03 | [Relacionamiento entre clases](../../03-introduccion-a-jpa/material/ejemplos/03-relacionamiento-entre-clases.md) |
 > | Spring Data JPA | `JpaRepository` y **métodos derivados** (`existsBy…`, `countBy…`) | 03 | [¿Qué es Spring Data JPA?](../../03-introduccion-a-jpa/material/ejemplos/06-que-es-spring-data-jpa.md) · [Uso básico](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md) |
 > | Anotaciones de JPA | `@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn` | 03 | [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md) |
-> | Proyecto y conexión a la base de datos | `pom.xml`, `application.properties`, H2 | 04 | [Creación de un proyecto](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/01-creacion-de-un-proyecto-spring-boot.md) |
+> | Proyecto y conexión a la base de datos | `pom.xml`, `application.properties`, MySQL | 04 | [Creación de un proyecto](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/01-creacion-de-un-proyecto-spring-boot.md) |
 > | Lado dueño de la relación y `fetch` | `EnrollmentEntity` es dueña de las dos claves foráneas | 04 | [OneToMany/ManyToOne y fetch](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md) |
 > | Entidad intermedia | `EnrollmentEntity` une `StudentEntity` y `CourseEntity` | 04 | [ManyToMany y entidad intermedia](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md) |
 > | CRUD | `save`, `findAll`, `count` | 04 | [CRUD completo](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md) |
@@ -109,7 +109,7 @@
 >     ├── 📁 repository    StudentJpaRepository · CourseJpaRepository · EnrollmentJpaRepository   (➕ Spring Data)
 >     └── 📁 entity        StudentEntity · CourseEntity · EnrollmentEntity                         (➕ las @Entity)
 > 📁 src/main/resources
-> └── 📄 application.properties                    (➕ conexión a H2 y JPA)
+> └── 📄 application.properties                    (➕ conexión a MySQL y JPA)
 > ```
 >
 > | Capa | Paquetes | Qué contiene | En esta guía |
@@ -119,7 +119,7 @@
 > | Persistencia | `persistence.repository`, `persistence.entity` | Repositorios de Spring Data y entidades JPA. | **Se trabaja** |
 >
 > ```text
-> main (CommandLineRunner) ─▶ …JpaRepository ─▶ Hibernate ─▶ H2
+> main (CommandLineRunner) ─▶ …JpaRepository ─▶ Hibernate ─▶ MySQL
 >                             Spring Data lo genera   genera el SQL   la base
 > ```
 >
@@ -173,7 +173,7 @@
 > <summary><strong>Paso 0.1 · Crear el proyecto con las dependencias</strong></summary>
 >
 > > Se crea un proyecto nuevo en [start.spring.io](https://start.spring.io): **Maven · Java 17 o superior · Group** `com.academy` · **Artifact** `academy` ·
-> > dependencias **Spring Data JPA** y **H2 Database**. **No** se agrega Spring Web: aquí no hay API.
+> > dependencias **Spring Data JPA** y **MySQL Driver**. **No** se agrega Spring Web: aquí no hay API.
 > >
 > > En el `pom.xml` quedan estas dos dependencias:
 > >
@@ -183,28 +183,54 @@
 > >     <artifactId>spring-boot-starter-data-jpa</artifactId>
 > > </dependency>
 > > <dependency>
-> >     <groupId>com.h2database</groupId>
-> >     <artifactId>h2</artifactId>
+> >     <groupId>com.mysql</groupId>
+> >     <artifactId>mysql-connector-j</artifactId>
 > >     <scope>runtime</scope>
 > > </dependency>
 > > ```
 > >
-> > > 🔎 **Concepto (M3 y M4):** `spring-boot-starter-data-jpa` trae JPA, **Hibernate** y Spring Data; `h2` es el **driver** de la base,
+> > > 🔎 **Concepto (M3 y M4):** `spring-boot-starter-data-jpa` trae JPA, **Hibernate** y Spring Data; `mysql-connector-j` es el **driver** de MySQL,
 > > > y `runtime` indica que solo hace falta al ejecutar.
 >
 > </details>
 >
 > <details>
-> <summary><strong>Paso 0.2 · Configurar la conexión: <code>application.properties</code></strong></summary>
+> <summary><strong>Paso 0.2 · Tener un MySQL con la base <code>academy</code></strong></summary>
+>
+> > Hibernate crea las **tablas**, pero **no la base de datos**: `academy` debe existir antes de arrancar. La forma más rápida es un contenedor de Docker:
+> >
+> > ```bash
+> > docker run -d --name academy-mysql \
+> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+> >   -p 3306:3306 mysql:8.0
+> > ```
+> >
+> > Con un MySQL ya instalado, se crea desde el cliente (`mysql -u root -p`):
+> >
+> > ```sql
+> > CREATE DATABASE academy CHARACTER SET utf8mb4;
+> > ```
+> >
+> > | Dato | Valor en esta guía |
+> > |---|---|
+> > | Servidor y puerto | `localhost:3306` *(si el 3306 está ocupado, usar `-p 3307:3306` y cambiar el puerto en la URL)* |
+> > | Base | `academy` |
+> > | Usuario y contraseña | `root` / `root` *(solo para el taller; en un proyecto real se crea un usuario propio)* |
+> >
+> > > 💡 Para comprobar que responde: `docker exec academy-mysql mysql -uroot -proot -e "select version()"`.
+>
+> </details>
+>
+> <details>
+> <summary><strong>Paso 0.3 · Configurar la conexión: <code>application.properties</code></strong></summary>
 >
 > > **Archivo:** `src/main/resources/application.properties`
 > >
 > > ```properties
-> > # H2 in-memory connection
-> > spring.datasource.url=jdbc:h2:mem:academy;DB_CLOSE_DELAY=-1
-> > spring.datasource.driver-class-name=org.h2.Driver
-> > spring.datasource.username=sa
-> > spring.datasource.password=
+> > # MySQL connection
+> > spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> > spring.datasource.username=root
+> > spring.datasource.password=root
 > >
 > > # JPA and Hibernate
 > > spring.jpa.hibernate.ddl-auto=update
@@ -213,18 +239,18 @@
 > >
 > > | Propiedad | Para qué sirve |
 > > |---|---|
-> > | `spring.datasource.url` | Dirección de la base. `jdbc:h2:mem:academy` crea una base H2 **en memoria** llamada `academy`; `DB_CLOSE_DELAY=-1` evita que se borre al cerrarse la primera conexión. |
-> > | `spring.datasource.driver-class-name`, `username`, `password` | Driver y credenciales por defecto de H2 (`sa` y sin contraseña). |
+> > | `spring.datasource.url` | Dirección de la base: `jdbc:mysql://` + servidor + puerto + nombre de la base (`academy`, creada en el Paso 0.2). |
+> > | `spring.datasource.username`, `password` | Credenciales del servidor MySQL. El driver se deduce de la URL: no hace falta `driver-class-name`. |
 > > | `spring.jpa.hibernate.ddl-auto=update` | Hibernate **crea o actualiza las tablas** al arrancar, sin borrar datos ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
 > > | `spring.jpa.show-sql=true` | Imprime en la consola **el SQL** que ejecuta Hibernate: sirve para ver el ORM trabajando. |
 > >
-> > > 💡 **Diferencia con el Módulo 3.** Allí se declaraba `spring.jpa.database-platform=…H2Dialect`. Con Hibernate 6 (Spring Boot 3)
-> > > el dialecto se **detecta solo**, así que aquí se omite; dejarlo no rompe nada, pero produce un aviso en el arranque.
+> > > 💡 **Diferencia con el Módulo 3.** Allí se declaraba `spring.jpa.database-platform=…` con el dialecto. Con Hibernate 6 (Spring Boot 3)
+> > > el dialecto se **detecta solo** a partir de la conexión (aquí, MySQL), así que se omite; dejarlo no rompe nada, pero produce un aviso en el arranque.
 >
 > </details>
 >
 > <details>
-> <summary><strong>Paso 0.3 · Crear las capas (paquetes)</strong></summary>
+> <summary><strong>Paso 0.4 · Crear las capas (paquetes)</strong></summary>
 >
 > > Dentro de `src/main/java/com/academy/` se crean los paquetes de las tres capas:
 > >
@@ -244,17 +270,20 @@
 > </details>
 >
 > <details>
-> <summary><strong>Paso 0.4 · Arrancar y comprobar</strong></summary>
+> <summary><strong>Paso 0.5 · Arrancar y comprobar</strong></summary>
 >
 > > Se ejecuta la aplicación (`./mvnw spring-boot:run`; en Windows, `mvnw.cmd spring-boot:run`):
 > >
 > > - Aparece `Started AcademyApplication in … seconds` y la aplicación **termina sola** (no hay servidor web).
 > > - **No** se crea ninguna tabla (sin `@Entity`, Hibernate no tiene qué mapear).
 > >
-> > > ⚠️ **Trampa habitual.** `Failed to configure a DataSource: 'url' attribute is not specified` indica que falta la dependencia `h2`
-> > > o que `application.properties` no está en `src/main/resources`.
+> > > ⚠️ **Trampas habituales.**
+> > >
+> > > - `Failed to configure a DataSource: 'url' attribute is not specified`: `application.properties` no está en `src/main/resources`.
+> > > - `Communications link failure` o `Connection refused`: MySQL no está arrancado, o el puerto de la URL no es el del servidor.
+> > > - `Unknown database 'academy'`: falta crear la base (Paso 0.2). `Access denied for user`: usuario o contraseña distintos de los del servidor.
 > >
-> > ✅ **Punto de control 0:** los paquetes existen, arranca sin errores y no se crea ninguna tabla.
+> > ✅ **Punto de control 0:** los paquetes existen, la aplicación se conecta a MySQL sin errores y no se crea ninguna tabla (`show tables;` en `academy` devuelve vacío).
 >
 > </details>
 
@@ -426,15 +455,15 @@
 > <details>
 > <summary><strong>Paso 1.3 · Ver las tablas que crea Hibernate</strong></summary>
 >
-> > Se ejecuta la aplicación. Con `show-sql=true` aparece en la consola (abreviado):
+> > Se ejecuta la aplicación. Con `show-sql=true` aparece en la consola (abreviado; `auto_increment` es la forma en que MySQL genera el `id`):
 > >
 > > ```text
-> > Hibernate: create table course (id bigint generated by default as identity, max_capacity integer not null, name varchar(255), price float(53) not null, primary key (id))
-> > Hibernate: create table enrollment (id bigint generated by default as identity, course_id bigint, student_id bigint, primary key (id))
-> > Hibernate: create table student (id bigint generated by default as identity, age integer not null, email varchar(255), name varchar(255), primary key (id))
-> > Hibernate: alter table if exists student add constraint UK… unique (email)
-> > Hibernate: alter table if exists enrollment add constraint FK… foreign key (course_id) references course
-> > Hibernate: alter table if exists enrollment add constraint FK… foreign key (student_id) references student
+> > Hibernate: create table course (id bigint not null auto_increment, max_capacity integer not null, name varchar(255), price float(53) not null, primary key (id)) engine=InnoDB
+> > Hibernate: create table enrollment (id bigint not null auto_increment, course_id bigint, student_id bigint, primary key (id)) engine=InnoDB
+> > Hibernate: create table student (id bigint not null auto_increment, age integer not null, email varchar(255), name varchar(255), primary key (id)) engine=InnoDB
+> > Hibernate: alter table student add constraint UK… unique (email)
+> > Hibernate: alter table enrollment add constraint FK… foreign key (course_id) references course (id)
+> > Hibernate: alter table enrollment add constraint FK… foreign key (student_id) references student (id)
 > > ```
 > >
 > > Así queda cada tabla:
@@ -446,6 +475,8 @@
 > > +----+------+-----+-------+           +----+------+-------+--------------+      +----+-----------+------------+
 > >  (email UNIQUE)                                                                       (FK a course) (FK a student)
 > > ```
+> >
+> > Para comprobarlo desde MySQL: `docker exec academy-mysql mysql -uroot -proot academy -e "show tables; show create table student\G"`.
 > >
 > > > 🗣️ **Preguntas:** ¿quién escribió ese `create table`? *(Hibernate, a partir de las anotaciones.)* ¿Qué tablas tienen una clave foránea? *(Solo `enrollment`: es el lado dueño.)*
 > >
@@ -601,7 +632,7 @@
 > > |---|---|
 > > | `implements CommandLineRunner` + `run` | Spring llama a `run` **justo después de arrancar**: es el punto de entrada de los ejemplos. |
 > > | Constructor con los tres repositorios (`students`, `courses`, `enrollments`) | Spring los **inyecta** (inyección por constructor, M2). |
-> > | `students.count() == 0` | Guarda los datos **solo si la base está vacía**. En memoria siempre lo está; en archivo (Paso 4) evita repetir los datos al reiniciar. |
+> > | `students.count() == 0` | Guarda los datos **solo si la base está vacía**. Con la base recién creada está vacía; en la segunda ejecución (Paso 4) evita repetir los datos, porque MySQL **conserva** lo guardado. |
 > > | `save(...)` | Inserta la fila y **devuelve la entidad con su `id`** ya generado. Por eso `ana` y `java` sirven después para crear las inscripciones. |
 > > | `new EnrollmentEntity(ana, java)` | La inscripción (*enrollment*) se crea con **objetos** `StudentEntity` y `CourseEntity`; JPA guarda de ellos solo la clave foránea. |
 > > | `queryData()` | Lee con `findAll` y con los **métodos derivados** del Paso 2. |
@@ -648,11 +679,11 @@
 > >
 > > ```text
 > > students.count()                        Hibernate: select count(*) from student
-> > students.save(...)                       Hibernate: insert into student (age,email,name,id) values (?,?,?,default)
-> > enrollments.save(new EnrollmentEntity)   Hibernate: insert into enrollment (course_id,student_id,id) values (?,?,default)
+> > students.save(...)                       Hibernate: insert into student (age,email,name) values (?,?,?)
+> > enrollments.save(new EnrollmentEntity)   Hibernate: insert into enrollment (course_id,student_id) values (?,?)
 > > students.findAll()                       Hibernate: select … from student
-> > existsByEmailIgnoreCase("ANA@…")         Hibernate: select … from student where upper(email)=upper(?) fetch first ? rows only
-> > existsByStudentIdAndCourseId(1, 1)       Hibernate: select … from enrollment where student_id=? and course_id=? fetch first ? rows only
+> > existsByEmailIgnoreCase("ANA@…")         Hibernate: select … from student where upper(email)=upper(?) limit ?
+> > existsByStudentIdAndCourseId(1, 1)       Hibernate: select … from enrollment where student_id=? and course_id=? limit ?
 > > countByCourseId(1)                       Hibernate: select count(id) from enrollment where course_id=?
 > > ```
 > >
@@ -668,37 +699,45 @@
 ---
 
 <details>
-<summary><strong>💾 Paso 4 — Que los datos sobrevivan al reinicio (H2 en archivo)</strong></summary>
+<summary><strong>💾 Paso 4 — Los datos sobreviven al reinicio (MySQL)</strong></summary>
 
-> Hasta aquí la base está **en memoria**: es una base de datos de verdad, pero vive dentro de la JVM y muere con ella. Cambiando **solo una línea** se guarda en un archivo del disco.
+> Con MySQL **no hay que cambiar nada** para que los datos persistan: la base vive en el **servidor**, fuera de la JVM, y conserva lo guardado aunque la aplicación termine.
+> Basta con ejecutar la misma aplicación dos veces.
 >
-> **1. Cambiar la URL en `application.properties`:**
->
-> ```properties
-> # Antes:  jdbc:h2:mem:academy;DB_CLOSE_DELAY=-1
-> spring.datasource.url=jdbc:h2:file:./data/academy
-> ```
->
-> **2. Probar la persistencia** (se ejecuta dos veces la misma aplicación):
+> **1. Probar la persistencia:**
 >
 > ```text
 > a) Primera ejecución   → aparecen los create table y los 6 insert; el resultado muestra 2 estudiantes y 2 inscritos en Java
-> b) Se detiene la aplicación (termina sola)           → queda el archivo  data/academy.mv.db
+> b) La aplicación termina sola                        → las tablas y las filas siguen en MySQL
 > c) Segunda ejecución   → solo aparece  select count(*) from student  (no hay insert ni create table)
 > d) El resultado es el mismo: Student 1: Ana Torres · Student 2: Luis Pérez · Enrolled in Java (1): 2     ✅ siguen ahí
 > ```
 >
-> **3. Agregar `data/` al `.gitignore`**: el archivo de la base **no** se sube al repositorio.
+> **2. Ver los datos directamente en MySQL**, sin pasar por la aplicación:
+>
+> ```bash
+> docker exec academy-mysql mysql -uroot -proot academy -e "select * from student; select * from enrollment"
+> ```
+>
+> ```text
+> id  age  email          name
+> 1   22   ana@mail.com   Ana Torres
+> 2   25   luis@mail.com  Luis Pérez
+>
+> id  course_id  student_id
+> 1   1          1
+> 2   1          2
+> ```
 >
 > | Pregunta | Respuesta |
 > |---|---|
-> | ¿Por qué no se crean de nuevo las tablas al reiniciar? | Existen en el archivo; `ddl-auto=update` solo agrega lo que falte y **no borra datos**. |
+> | ¿Por qué no se crean de nuevo las tablas al reiniciar? | Ya existen en MySQL; `ddl-auto=update` solo agrega lo que falte y **no borra datos**. |
 > | ¿Por qué no se insertan de nuevo los datos? | Porque `students.count() == 0` es falso: la base ya tiene estudiantes. |
 > | ¿Qué pasaría con `ddl-auto=create`? | Borraría y recrearía las tablas en **cada arranque**: se perdería todo ([tabla de valores en el Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
-> | ¿Cómo se empieza de cero? | Se borra la carpeta `data/`. |
-> | ¿Dónde se crea `data/`? | **Donde se ejecuta Java** (la carpeta del proyecto con `mvnw`). |
+> | ¿Cómo se empieza de cero? | `docker exec academy-mysql mysql -uroot -proot -e "drop database academy; create database academy"`. |
+> | ¿Y si se borra el contenedor? | Se pierden los datos, porque viven dentro de él. Para conservarlos se monta un volumen (`-v academy-data:/var/lib/mysql`). |
 >
-> > 💡 **Y en producción:** H2 en archivo es una comodidad de desarrollo. Contra MySQL o PostgreSQL cambian el **driver** (dependencia) y las propiedades `spring.datasource.*`; las entidades y los repositorios
+> > 💡 **Y con otro motor:** si se cambia a PostgreSQL u otro, cambian el **driver** (dependencia) y las propiedades `spring.datasource.*`; las entidades y los repositorios
 > > **no se tocan**. Es uno de los retos finales.
 
 </details>
@@ -712,7 +751,7 @@
 > 2. ¿Quién escribe la implementación de `StudentJpaRepository`? *(Nadie: Spring Data la genera al arrancar.)*
 > 3. ¿Por qué `EnrollmentEntity` es el lado dueño? *(Tiene las dos `@JoinColumn`: las claves foráneas viven en la tabla `enrollment`.)*
 > 4. ¿Qué devuelve `save` y por qué importa? *(La entidad con el `id` generado; se usa para relacionarla con otras, como `ana` y `java` en la matrícula.)*
-> 5. ¿Qué diferencia hay entre una base **en memoria** y una **en archivo**? *(Ambas son bases reales; solo la segunda sobrevive al reinicio.)*
+> 5. ¿Quién crea la base `academy` y quién crea las tablas? *(La base se crea a mano en MySQL; las tablas las crea Hibernate al arrancar.)*
 
 </details>
 
@@ -721,15 +760,19 @@
 
 > | Síntoma | Causa probable | Solución |
 > |---|---|---|
-> | `Failed to configure a DataSource: 'url' attribute is not specified` | Falta la dependencia `h2` o `application.properties` | Agregar el driver; revisar que esté en `src/main/resources` |
-> | La tabla se llama `estudiante_entity` | Falta `@Table(name = "student")` en la entidad | Agregar `@Table` |
+> | `Failed to configure a DataSource: 'url' attribute is not specified` | `application.properties` no se encuentra | Revisar que esté en `src/main/resources` |
+> | `Communications link failure` / `Connection refused` | MySQL no está arrancado o el puerto es otro | `docker ps`; arrancar el contenedor; revisar el puerto en la URL |
+> | `Unknown database 'academy'` | No se creó la base | `create database academy` (Paso 0.2) |
+> | `Access denied for user 'root'@…` | Usuario o contraseña distintos de los del servidor | Corregir `spring.datasource.username` / `password` |
+> | `No suitable driver found for jdbc:mysql…` | Falta la dependencia `mysql-connector-j` | Agregarla al `pom.xml` |
+> | La tabla se llama `student_entity` | Falta `@Table(name = "student")` en la entidad | Agregar `@Table` |
 > | `Not a managed type: class …StudentEntity` | Falta `@Entity`, o la clase quedó **fuera** de `com.academy` (el escaneo no la ve) | Anotar la clase y dejarla bajo el paquete de `AcademyApplication` |
 > | `No default constructor for entity` | La entidad no tiene constructor **sin argumentos** | Agregar `protected StudentEntity() {}` |
 > | `PropertyReferenceException: No property 'x' found for type 'StudentEntity'` | El nombre del método derivado no coincide con un atributo de la **entidad** | Usar el nombre exacto: `existsByEmailIgnoreCase`, `countByCourseId` |
-> | `Table "STUDENT" not found` | `ddl-auto=none`, o se apuntó a otra base (`mem` vs `file`) | Usar `update` y revisar la URL |
-> | `DataIntegrityViolationException` al guardar un estudiante | El `email` ya existe (restricción `unique`), por ejemplo al reiniciar con H2 en archivo sin la comprobación `count() == 0` | Guardar los datos solo si la base está vacía, o usar otro correo |
-> | Los datos desaparecen al reiniciar | La URL es `jdbc:h2:mem:…` | Cambiar a `jdbc:h2:file:./data/academy` |
-> | `Database may be already in use` | Dos procesos usan el mismo `data/academy.mv.db` | Cerrar la otra ejecución |
+> | `Table 'academy.student' doesn't exist` | `ddl-auto=none`, o la URL apunta a otra base | Usar `update` y revisar el nombre de la base en la URL |
+> | `DataIntegrityViolationException` al guardar un estudiante | El `email` ya existe (restricción `unique`), por ejemplo al reiniciar sin la comprobación `count() == 0` | Guardar los datos solo si la base está vacía, o usar otro correo |
+> | Los datos desaparecen al reiniciar | `ddl-auto=create` o `create-drop` | Usar `update` |
+> | `Public Key Retrieval is not allowed` | MySQL 8 con un usuario que no es `root` y conexión sin SSL | Agregar `?allowPublicKeyRetrieval=true&useSSL=false` a la URL (solo en desarrollo) |
 
 </details>
 
@@ -741,7 +784,7 @@
 >    *(Dos peticiones simultáneas podrían pasar ambas la pregunta; la restricción es la última defensa.)*
 > 2. **Filtro en la base:** agregar `List<CourseEntity> findByPriceLessThan(double price)` a `CourseJpaRepository` y mostrar en `main` los cursos con precio menor a 200000.
 > 3. **Consulta con JPQL:** reescribir `countByCourseId` con `@Query("SELECT COUNT(e) FROM EnrollmentEntity e WHERE e.course.id = :courseId")`.
-> 4. **Otro motor:** reemplazar H2 por **MySQL** o **PostgreSQL** (dependencia del driver + `spring.datasource.*`) y comprobar que **ninguna** entidad ni repositorio cambia.
+> 4. **Otro motor:** reemplazar MySQL por **PostgreSQL** (dependencia del driver + `spring.datasource.*`) y comprobar que **ninguna** entidad ni repositorio cambia.
 > 5. **Relación bidireccional:** agregar `List<EnrollmentEntity>` en `CourseEntity` con `@OneToMany(mappedBy = "course")` y explicar qué cambia en la tabla y en el código
 >    ([Ejemplo 03 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md) y [Guía 00](00-guia-relaciones-entre-entidades-jpa.md)).
 
@@ -753,9 +796,6 @@
 > ```text
 > 📁 academy
 > ├── 📄 pom.xml
-> ├── 📄 .gitignore                         ← incluye  data/
-> ├── 📁 data                               ← lo crea H2 en el Paso 4 (no se versiona)
-> │   └── 📄 academy.mv.db
 > └── 📁 src/main
 >     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
