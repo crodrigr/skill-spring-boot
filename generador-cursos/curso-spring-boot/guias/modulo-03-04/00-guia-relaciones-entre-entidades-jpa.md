@@ -1165,6 +1165,116 @@
 </details>
 
 <details open>
+<summary><strong>🐢⚡ LAZY y EAGER: cómo se cargan los datos</strong></summary>
+
+> Cuando JPA lee una entidad, hay que decidir **cuándo** trae lo que está relacionado con ella (el carnet de Ana, sus cursos…).
+>
+> | | Cuándo carga lo relacionado | Idea |
+> |---|---|---|
+> | **EAGER** («ansioso») | **Al mismo tiempo** que la entidad principal | Te trae todo de una vez |
+> | **LAZY** («perezoso») | **Solo cuando lo pedís** (`getXxx()`) | Te trae lo básico y espera a que lo uses |
+>
+> **No hace falta escribirlos**: cada relación ya trae un valor por defecto.
+>
+> | Relación | Por defecto |
+> |---|---|
+> | `@OneToOne`, `@ManyToOne` | **EAGER** (un solo objeto es barato de traer) |
+> | `@OneToMany`, `@ManyToMany` | **LAZY** (una lista puede ser enorme: se trae solo si hace falta) |
+>
+> **El ejemplo.** Siempre el mismo código, leyendo a Ana de la base (ejecutado en MySQL con la práctica; el SQL se muestra sin alias):
+>
+> ```java
+> EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();   // paso 1
+> ana.getCarnet().getCodigo();                                     // paso 2
+> ana.getCursos();                                                 // paso 3
+> ```
+>
+> <details open>
+> <summary><strong>1️⃣ Caso 1 — Por defecto: carnet EAGER, cursos LAZY</strong></summary>
+>
+> > Al hacer `findById`, el carnet **ya viene** en el mismo `SELECT` (con un `join`). Los cursos **no**: se piden recién en el paso 3.
+> >
+> > ```text
+> > paso 1: findById(1)
+> >   select e.id, c.id, c.codigo, e.nombre
+> >   from estudiante e left join carnet c on c.id = e.carnet_id      ← el carnet viene en el mismo SELECT
+> >   where e.id = 1
+> >
+> > paso 2: ana.getCarnet().getCodigo()   → C-001   (no ejecuta SQL: ya estaba cargado)
+> >
+> > paso 3: ana.getCursos()
+> >   select ec.estudiante_id, c.id, c.nombre                         ← recién ahora se piden los cursos
+> >   from estudiante_curso ec join curso c on c.id = ec.curso_id
+> >   where ec.estudiante_id = 1
+> >   → [Java, Spring]
+> > ```
+>
+> </details>
+>
+> <details open>
+> <summary><strong>2️⃣ Caso 2 — Cursos EAGER: todo en un solo SELECT</strong></summary>
+>
+> > Se cambia el atributo a `@ManyToMany(fetch = FetchType.EAGER)`. Ahora los cursos llegan **junto con el estudiante**:
+> >
+> > ```text
+> > paso 1: findById(1)
+> >   select e.id, c.id, c.codigo, ec.estudiante_id, cu.id, cu.nombre, e.nombre
+> >   from estudiante e
+> >   left join carnet c on c.id = e.carnet_id
+> >   left join estudiante_curso ec on e.id = ec.estudiante_id        ← los cursos también vienen aquí
+> >   left join curso cu on cu.id = ec.curso_id
+> >   where e.id = 1
+> >
+> > paso 3: ana.getCursos()   → [Java, Spring]   (no ejecuta SQL)
+> > ```
+>
+> </details>
+>
+> <details open>
+> <summary><strong>3️⃣ Caso 3 — Carnet LAZY: se pide al usarlo</strong></summary>
+>
+> > Se cambia a `@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)`. Ahora `findById` trae **solo el estudiante** y el carnet se pide cuando se usa:
+> >
+> > ```text
+> > paso 1: findById(1)
+> >   select e.id, e.carnet_id, e.nombre from estudiante e where e.id = 1      ← sin carnet
+> >
+> > paso 2: ana.getCarnet().getCodigo()
+> >   select id, codigo from carnet where id = 1                               ← se pide al usarlo
+> >   → C-001
+> > ```
+>
+> </details>
+>
+> **El problema típico de LAZY.** Lo perezoso solo se puede pedir **mientras la transacción está abierta**. Fuera de ella falla:
+>
+> ```java
+> EstudianteEntity ana = estudiantes.findById(1L).orElseThrow();   // la transacción ya terminó
+> ana.getCursos().size();                                          // 💥
+> ```
+>
+> ```text
+> LazyInitializationException: failed to lazily initialize a collection of role: ...EstudianteEntity.cursos
+> ```
+>
+> Con `cursos` en EAGER, ese mismo código **sí funciona** (devuelve 2), porque ya vino cargado. Por eso la práctica ejecuta las consultas dentro de `TransactionTemplate`.
+>
+> **¿Cuándo cambiarlos?**
+>
+> | Situación | Qué hacer |
+> |---|---|
+> | Lo normal | **Dejar los valores por defecto** |
+> | `LazyInitializationException` y siempre necesitás esa lista | Leerla **dentro de una transacción** (o `EAGER` en esa relación) |
+> | Traer la lista completa cada vez es costoso | Dejar `LAZY` y pedirla solo cuando haga falta |
+> | Una relación a uno que casi nunca se usa | `@OneToOne(fetch = FetchType.LAZY)` |
+>
+> > ⚠️ Poner `EAGER` en todo parece cómodo, pero con muchas relaciones cada consulta termina trayendo media base de datos. Empezá con los valores por defecto.
+> >
+> > 🧑‍💻 Podés repetir estos casos en la **práctica**: cambiá el `fetch` en `EstudianteEntity` y mirá el SQL que Hibernate imprime en la consola.
+
+</details>
+
+<details open>
 <summary><strong>🧑‍💻 Práctica paso a paso: tu propio proyecto desde cero</strong></summary>
 
 > Vas a construir **desde cero** un proyecto Spring Boot con las cuatro entidades de esta guía **en un solo sentido**, sus repositorios y una clase `main` que **guarda** datos y los **consulta** en MySQL, con las tres relaciones a la vez. Al final podés ver las tablas y comparar con lo que explican las secciones anteriores.
