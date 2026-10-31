@@ -869,6 +869,36 @@
 > > > >
 > > > > </details>
 > > >
+> > > >
+> > > > <details open>
+> > > > <summary><strong>🔍 Entender <code>ana.getCursos().add(java)</code></strong></summary>
+> > > >
+> > > > `ana.getCursos()` devuelve **la colección de cursos que está dentro de `ana`**: un `Set<CursoEntity>` que empieza **vacío**. `.add(java)` mete en esa colección el objeto `java`, el `CursoEntity` que se creó antes con `new CursoEntity("Java")`. (`java` es solo el nombre de una variable.)
+> > > >
+> > > > | Después de ejecutar… | `ana.getCursos()` | `luis.getCursos()` |
+> > > > |---|---|---|
+> > > > | `new EstudianteEntity("Ana")` y `("Luis")` | `[]` | `[]` |
+> > > > | `ana.getCursos().add(java)` | `[Java]` | `[]` |
+> > > > | `ana.getCursos().add(spring)` | `[Java, Spring]` | `[]` |
+> > > > | `luis.getCursos().add(java)` | `[Java, Spring]` | `[Java]` |
+> > > >
+> > > > Hasta aquí todo está **solo en memoria**. Al hacer `estudiantes.save(ana)` y `estudiantes.save(luis)`, JPA lee esas colecciones y escribe **una fila por curso** en la tabla intermedia:
+> > > >
+> > > > ```text
+> > > > ana.cursos   = [Java, Spring]            estudiante_curso
+> > > > luis.cursos  = [Java]                    +---------------+----------+
+> > > >                                          | estudiante_id | curso_id |
+> > > >                                          +---------------+----------+
+> > > >                                          |             1 |        1 |   ← Ana – Java
+> > > >                                          |             1 |        2 |   ← Ana – Spring
+> > > >                                          |             2 |        1 |   ← Luis – Java
+> > > >                                          +---------------+----------+
+> > > > ```
+> > > >
+> > > > > 🔎 Al **consultar**, `ana` se carga de la base (`findById`) y JPA llena su colección con esas filas: por eso allí `ana.getCursos()` ya devuelve `[Java, Spring]`.
+> > > >
+> > > > </details>
+> > > >
 > > > </details>
 > > >
 > > > <details open>
@@ -998,6 +1028,36 @@
 > > > >
 > > > > </details>
 > > >
+> > > >
+> > > > <details open>
+> > > > <summary><strong>🔍 Entender <code>ana.getCursos().add(java)</code></strong></summary>
+> > > >
+> > > > `ana.getCursos()` devuelve **la colección de cursos que está dentro de `ana`**: un `Set<CursoEntity>` que empieza **vacío**. `.add(java)` mete en esa colección el objeto `java`, el `CursoEntity` que se creó antes con `new CursoEntity("Java")`. (`java` es solo el nombre de una variable.)
+> > > >
+> > > > | Después de ejecutar… | `ana.getCursos()` | `luis.getCursos()` |
+> > > > |---|---|---|
+> > > > | `new EstudianteEntity("Ana")` y `("Luis")` | `[]` | `[]` |
+> > > > | `ana.getCursos().add(java)` | `[Java]` | `[]` |
+> > > > | `ana.getCursos().add(spring)` | `[Java, Spring]` | `[]` |
+> > > > | `luis.getCursos().add(java)` | `[Java, Spring]` | `[Java]` |
+> > > >
+> > > > Hasta aquí todo está **solo en memoria**. Al hacer `estudiantes.save(ana)` y `estudiantes.save(luis)`, JPA lee esas colecciones y escribe **una fila por curso** en la tabla intermedia:
+> > > >
+> > > > ```text
+> > > > ana.cursos   = [Java, Spring]            estudiante_curso
+> > > > luis.cursos  = [Java]                    +---------------+----------+
+> > > >                                          | estudiante_id | curso_id |
+> > > >                                          +---------------+----------+
+> > > >                                          |             1 |        1 |   ← Ana – Java
+> > > >                                          |             1 |        2 |   ← Ana – Spring
+> > > >                                          |             2 |        1 |   ← Luis – Java
+> > > >                                          +---------------+----------+
+> > > > ```
+> > > >
+> > > > > 🔎 Al **consultar**, `ana` se carga de la base (`findById`) y JPA llena su colección con esas filas: por eso allí `ana.getCursos()` ya devuelve `[Java, Spring]`.
+> > > >
+> > > > </details>
+> > > >
 > > > </details>
 > > >
 > > > <details open>
@@ -1571,6 +1631,35 @@
 > > | `TransactionTemplate` | Ejecuta cada bloque dentro de **una transacción**. Se usan **dos**: una para guardar y otra, distinta, para consultar. Así las consultas leen **de la base de datos** y no de la memoria. |
 > > | `guardarDatos()` | Registra todo asignando **siempre del lado dueño**; el carnet y los cursos se guardan por `cascade`. |
 > > | `consultarDatos()` | Responde **navegando desde el dueño** y **con el repositorio** (sentido contrario). |
+> >
+> > <details open>
+> > <summary><strong>🔍 Entender <code>ana.getCursos().add(java)</code></strong></summary>
+> >
+> > `ana.getCursos()` devuelve **la colección de cursos que está dentro de `ana`**: un `Set<CursoEntity>` que empieza **vacío**. `.add(java)` mete en esa colección el objeto `java`, el `CursoEntity` que se creó antes con `new CursoEntity("Java")`. (`java` es solo el nombre de una variable.)
+> >
+> > | Después de ejecutar… | `ana.getCursos()` | `luis.getCursos()` |
+> > |---|---|---|
+> > | `new EstudianteEntity("Ana")` y `("Luis")` | `[]` | `[]` |
+> > | `ana.getCursos().add(java)` | `[Java]` | `[]` |
+> > | `ana.getCursos().add(spring)` | `[Java, Spring]` | `[]` |
+> > | `luis.getCursos().add(java)` | `[Java, Spring]` | `[Java]` |
+> >
+> > Hasta aquí todo está **solo en memoria**. Al hacer `estudiantes.save(ana)` y `estudiantes.save(luis)`, JPA lee esas colecciones y escribe **una fila por curso** en la tabla intermedia:
+> >
+> > ```text
+> > ana.cursos   = [Java, Spring]            estudiante_curso
+> > luis.cursos  = [Java]                    +---------------+----------+
+> >                                          | estudiante_id | curso_id |
+> >                                          +---------------+----------+
+> >                                          |             1 |        1 |   ← Ana – Java
+> >                                          |             1 |        2 |   ← Ana – Spring
+> >                                          |             2 |        1 |   ← Luis – Java
+> >                                          +---------------+----------+
+> > ```
+> >
+> > > 🔎 Al **consultar**, `ana` se carga de la base (`findById`) y JPA llena su colección con esas filas: por eso allí `ana.getCursos()` ya devuelve `[Java, Spring]`.
+> >
+> > </details>
 >
 > </details>
 >
