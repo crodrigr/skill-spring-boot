@@ -239,7 +239,9 @@
 > <summary><strong>Paso 0.3 · Configurar la conexión: <code>application.properties</code></strong></summary>
 >
 > > <details>
-> > <summary><strong>📄 <code>src/main/resources/application.properties</code></strong> · <em>mostrar / ocultar</em></summary>
+> > <summary><strong>📄 application.properties</strong></summary>
+> >
+> > **Ruta:** `src/main/resources/application.properties`
 > >
 > > ```properties
 > > # MySQL connection
@@ -317,7 +319,9 @@
 > <summary><strong>Paso 1.1 · <code>StudentEntity</code> — capa de persistencia</strong></summary>
 >
 > > <details>
-> > <summary><strong>📄 <code>src/main/java/com/academy/persistence/entity/StudentEntity.java</code></strong> · <em>mostrar / ocultar</em></summary>
+> > <summary><strong>📄 StudentEntity.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/persistence/entity/StudentEntity.java`
 > >
 > > ```java
 > > package com.academy.persistence.entity;
@@ -383,7 +387,9 @@
 > > **claves foráneas** hacia sus tablas.
 > >
 > > <details>
-> > <summary><strong>📄 <code>src/main/java/com/academy/persistence/entity/CourseEntity.java</code></strong> · <em>mostrar / ocultar</em></summary>
+> > <summary><strong>📄 CourseEntity.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/persistence/entity/CourseEntity.java`
 > >
 > > ```java
 > > package com.academy.persistence.entity;
@@ -427,7 +433,9 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>📄 <code>src/main/java/com/academy/persistence/entity/EnrollmentEntity.java</code></strong> · <em>mostrar / ocultar</em></summary>
+> > <summary><strong>📄 EnrollmentEntity.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/persistence/entity/EnrollmentEntity.java`
 > >
 > > ```java
 > > package com.academy.persistence.entity;
@@ -524,7 +532,9 @@
 > consulta ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)).
 >
 > <details>
-> <summary><strong>📄 <code>src/main/java/com/academy/persistence/repository/StudentJpaRepository.java</code></strong> · <em>mostrar / ocultar</em></summary>
+> <summary><strong>📄 StudentJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -541,7 +551,9 @@
 > </details>
 >
 > <details>
-> <summary><strong>📄 <code>src/main/java/com/academy/persistence/repository/CourseJpaRepository.java</code></strong> · <em>mostrar / ocultar</em></summary>
+> <summary><strong>📄 CourseJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/CourseJpaRepository.java`
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -556,7 +568,9 @@
 > </details>
 >
 > <details>
-> <summary><strong>📄 <code>src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java</code></strong> · <em>mostrar / ocultar</em></summary>
+> <summary><strong>📄 EnrollmentJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java`
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -605,7 +619,9 @@
 > > Se reemplaza el contenido de `AcademyApplication.java`. Es la clase del `main`: recibe los repositorios por constructor y ejecuta los ejemplos al arrancar.
 > >
 > > <details>
-> > <summary><strong>📄 <code>src/main/java/com/academy/AcademyApplication.java</code></strong> · <em>mostrar / ocultar</em></summary>
+> > <summary><strong>📄 AcademyApplication.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/AcademyApplication.java`
 > >
 > > ```java
 > > package com.academy;
