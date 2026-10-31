@@ -943,13 +943,12 @@
 > > | `existsByStudentIdAndCourseId` | Evita la matrícula duplicada. |
 > > | `countByCourseId(courseId) >= course.getMaxCapacity()` | Compara los inscritos con el cupo del curso. |
 > > | `new EnrollmentEntity(student, course)` | Se construye con **objetos**; JPA guarda solo las claves foráneas. |
-
+> >
 > > > 🗣️ **Pregunta:** ¿por qué el servicio llama a `existsBy…` y no a `findAll` para ver si ya está matriculado? *(Porque deja a la base filtrar; traer todas las filas a memoria no escala.)*
+> >
+> > ✅ **Punto de control 3:** el proyecto compila. Aún no se puede probar: falta quien reciba las peticiones (Paso 4).
 >
 > </details>
->
->
-> ✅ **Punto de control 3:** el proyecto compila. Aún no se puede probar: falta quien reciba las peticiones (Paso 4).
 
 </details>
 
@@ -1115,7 +1114,7 @@
 > > | `@RequestBody` | Convierte el JSON de la petición en un objeto. |
 > > | `@PathVariable` / `@RequestParam` | Toma un dato de la ruta (`/{id}`) o de la consulta (`?studentId=1`). |
 > > | `@ResponseStatus(CREATED)` | Responde `201` en lugar de `200` al crear. |
-
+> >
 > > > ⚠️ **Simplificación del taller.** Los controladores reciben y devuelven las **entidades** directamente. En un proyecto real se usan objetos de transferencia (DTO) y mapeadores para no exponer la tabla: eso se resuelve en otra guía.
 >
 > </details>
