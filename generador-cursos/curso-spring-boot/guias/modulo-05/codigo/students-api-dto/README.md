@@ -3,6 +3,8 @@
 CRUD de estudiantes con Spring Boot 3.3, Spring Data JPA y MySQL 8, con **DTO** y controladores delgados.
 Código final de la guía [`01-guia-dto-y-estructura-de-controladores.md`](../../01-guia-dto-y-estructura-de-controladores.md).
 
+Colección de Postman: [`students-api-dto.postman_collection.json`](../postman/students-api-dto.postman_collection.json) (con su [entorno](../postman/academy-local.postman_environment.json) y [README](../postman/README.md)).
+
 ## Requisitos
 
 - Java 17 o superior · Maven 3.9+ (o el wrapper `./mvnw`)
