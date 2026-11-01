@@ -1662,19 +1662,912 @@
 >     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
->     │   │   ├── 📁 config        OpenApiConfig
->     │   │   ├── 📁 controller    StudentController · InternalController
->     │   │   ├── 📁 dto           StudentRequest · StudentStatusRequest · StudentResponse · PageResponse
->     │   │   └── 📁 mapper        StudentMapper
+>     │   │   ├── 📁 config
+>     │   │   │   └── 📄 OpenApiConfig.java
+>     │   │   ├── 📁 controller
+>     │   │   │   ├── 📄 StudentController.java
+>     │   │   │   └── 📄 InternalController.java
+>     │   │   ├── 📁 dto
+>     │   │   │   ├── 📄 StudentRequest.java
+>     │   │   │   ├── 📄 StudentStatusRequest.java
+>     │   │   │   ├── 📄 StudentResponse.java
+>     │   │   │   └── 📄 PageResponse.java
+>     │   │   └── 📁 mapper
+>     │   │       └── 📄 StudentMapper.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service       StudentService · ServiceResult · ServiceStatus
+>     │   │   └── 📁 service
+>     │   │       ├── 📄 StudentService.java
+>     │   │       ├── 📄 ServiceResult.java
+>     │   │       └── 📄 ServiceStatus.java
 >     │   └── 📁 persistence
->     │       ├── 📁 entity        StudentEntity · StudentStatus
->     │       └── 📁 repository    StudentJpaRepository
+>     │       ├── 📁 entity
+>     │       │   ├── 📄 StudentEntity.java
+>     │       │   └── 📄 StudentStatus.java
+>     │       └── 📁 repository
+>     │           └── 📄 StudentJpaRepository.java
 >     └── 📁 resources
 >         ├── 📄 application.properties
 >         └── 📄 application-prod.properties
 > ```
+>
+> **Código final, paso a paso**
+>
+> ### 📁 Configuración
+>
+> <details>
+> <summary><strong>📄 pom.xml</strong></summary>
+>
+> **Ruta:** `pom.xml`
+>
+> ```xml
+> <?xml version="1.0" encoding="UTF-8"?>
+> <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+>     <modelVersion>4.0.0</modelVersion>
+>     <parent>
+>         <groupId>org.springframework.boot</groupId>
+>         <artifactId>spring-boot-starter-parent</artifactId>
+>         <version>3.3.5</version>
+>         <relativePath/>
+>     </parent>
+>     <groupId>com.academy</groupId>
+>     <artifactId>students-api</artifactId>
+>     <version>0.0.1-SNAPSHOT</version>
+>
+>     <properties>
+>         <java.version>17</java.version>
+>     </properties>
+>
+>     <dependencies>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-web</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-data-jpa</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-validation</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>org.springdoc</groupId>
+>             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+>             <version>2.6.0</version>
+>         </dependency>
+>         <dependency>
+>             <groupId>com.mysql</groupId>
+>             <artifactId>mysql-connector-j</artifactId>
+>             <scope>runtime</scope>
+>         </dependency>
+>     </dependencies>
+>
+>     <build>
+>         <plugins>
+>             <plugin>
+>                 <groupId>org.springframework.boot</groupId>
+>                 <artifactId>spring-boot-maven-plugin</artifactId>
+>             </plugin>
+>         </plugins>
+>     </build>
+> </project>
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 application.properties</strong></summary>
+>
+> **Ruta:** `src/main/resources/application.properties`
+>
+> ```properties
+> # MySQL connection
+> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.username=root
+> spring.datasource.password=root
+>
+> # JPA and Hibernate
+> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.show-sql=true
+>
+> # Pagination limits (protect the API)
+> spring.data.web.pageable.default-page-size=10
+> spring.data.web.pageable.max-page-size=50
+>
+> # Swagger (springdoc)
+> springdoc.api-docs.path=/api-docs
+> springdoc.swagger-ui.path=/swagger-ui.html
+> springdoc.swagger-ui.urls-primary-name=Students
+> springdoc.swagger-ui.deep-linking=true
+> springdoc.swagger-ui.operations-sorter=method
+> springdoc.swagger-ui.tags-sorter=alpha
+> springdoc.swagger-ui.display-request-duration=true
+> springdoc.swagger-ui.doc-expansion=list
+> springdoc.swagger-ui.try-it-out-enabled=true
+> springdoc.default-produces-media-type=application/json
+> springdoc.default-consumes-media-type=application/json
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 application-prod.properties</strong></summary>
+>
+> **Ruta:** `src/main/resources/application-prod.properties`
+>
+> ```properties
+> springdoc.api-docs.enabled=false
+> springdoc.swagger-ui.enabled=false
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 AcademyApplication.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/AcademyApplication.java`
+>
+> ```java
+> package com.academy;
+>
+> import org.springframework.boot.SpringApplication;
+> import org.springframework.boot.autoconfigure.SpringBootApplication;
+>
+> @SpringBootApplication
+> public class AcademyApplication {
+>
+>     public static void main(String[] args) {
+>         SpringApplication.run(AcademyApplication.class, args);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 persistence
+>
+> #### 📁 entity
+>
+> <details>
+> <summary><strong>📄 StudentStatus.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentStatus.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> public enum StudentStatus {
+>     ACTIVE,
+>     INACTIVE
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 StudentEntity.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentEntity.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> import jakarta.persistence.Column;
+> import jakarta.persistence.Entity;
+> import jakarta.persistence.EnumType;
+> import jakarta.persistence.Enumerated;
+> import jakarta.persistence.GeneratedValue;
+> import jakarta.persistence.GenerationType;
+> import jakarta.persistence.Id;
+> import jakarta.persistence.Table;
+> import org.hibernate.annotations.CreationTimestamp;
+>
+> import java.time.LocalDateTime;
+>
+> @Entity
+> @Table(name = "student")
+> public class StudentEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     @Column(nullable = false)
+>     private String name;
+>
+>     private int age;
+>
+>     @Column(nullable = false, unique = true)
+>     private String email;
+>
+>     @Enumerated(EnumType.STRING)
+>     @Column(nullable = false)
+>     private StudentStatus status;
+>
+>     @CreationTimestamp
+>     @Column(name = "created_at", updatable = false)
+>     private LocalDateTime createdAt;
+>
+>     protected StudentEntity() {
+>     }
+>
+>     public StudentEntity(Long id, String name, int age, String email, StudentStatus status) {
+>         this.id = id;
+>         this.name = name;
+>         this.age = age;
+>         this.email = email;
+>         this.status = status;
+>     }
+>
+>     public Long getId() { return id; }
+>     public String getName() { return name; }
+>     public int getAge() { return age; }
+>     public String getEmail() { return email; }
+>     public StudentStatus getStatus() { return status; }
+>     public LocalDateTime getCreatedAt() { return createdAt; }
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 repository
+>
+> <details>
+> <summary><strong>📄 StudentJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`
+>
+> ```java
+> package com.academy.persistence.repository;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import org.springframework.data.domain.Page;
+> import org.springframework.data.domain.Pageable;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> import java.util.Optional;
+>
+> public interface StudentJpaRepository extends JpaRepository<StudentEntity, Long> {
+>
+>     Page<StudentEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
+>
+>     Optional<StudentEntity> findByEmailIgnoreCase(String email);
+>
+>     boolean existsByEmailIgnoreCase(String email);
+>
+>     boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 business
+>
+> #### 📁 service
+>
+> <details>
+> <summary><strong>📄 ServiceStatus.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/ServiceStatus.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> public enum ServiceStatus {
+>     OK,
+>     NOT_FOUND,
+>     CONFLICT
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 ServiceResult.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/ServiceResult.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> public record ServiceResult<T>(ServiceStatus status, T value) {
+>
+>     public static <T> ServiceResult<T> ok(T value) {
+>         return new ServiceResult<>(ServiceStatus.OK, value);
+>     }
+>
+>     public static <T> ServiceResult<T> notFound() {
+>         return new ServiceResult<>(ServiceStatus.NOT_FOUND, null);
+>     }
+>
+>     public static <T> ServiceResult<T> conflict() {
+>         return new ServiceResult<>(ServiceStatus.CONFLICT, null);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 StudentService.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.entity.StudentStatus;
+> import com.academy.persistence.repository.StudentJpaRepository;
+> import org.springframework.data.domain.Page;
+> import org.springframework.data.domain.Pageable;
+> import org.springframework.stereotype.Service;
+> import org.springframework.transaction.annotation.Transactional;
+>
+> import java.util.Optional;
+>
+> @Service
+> public class StudentService {
+>
+>     private final StudentJpaRepository students;
+>
+>     public StudentService(StudentJpaRepository students) {
+>         this.students = students;
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public Page<StudentEntity> search(String name, Pageable pageable) {
+>         if (name == null || name.isBlank()) {
+>             return students.findAll(pageable);
+>         }
+>         return students.findByNameContainingIgnoreCase(name, pageable);
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public Optional<StudentEntity> findById(Long id) {
+>         return students.findById(id);
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public Optional<StudentEntity> findByEmail(String email) {
+>         return students.findByEmailIgnoreCase(email);
+>     }
+>
+>     @Transactional
+>     public ServiceResult<StudentEntity> create(StudentEntity data) {
+>         if (students.existsByEmailIgnoreCase(data.getEmail())) {
+>             return ServiceResult.conflict();
+>         }
+>         StudentEntity toSave = new StudentEntity(
+>                 null, data.getName(), data.getAge(), data.getEmail(), data.getStatus());
+>         return ServiceResult.ok(students.save(toSave));
+>     }
+>
+>     @Transactional
+>     public ServiceResult<StudentEntity> update(Long id, StudentEntity data) {
+>         if (!students.existsById(id)) {
+>             return ServiceResult.notFound();
+>         }
+>         if (students.existsByEmailIgnoreCaseAndIdNot(data.getEmail(), id)) {
+>             return ServiceResult.conflict();
+>         }
+>         StudentEntity toSave = new StudentEntity(
+>                 id, data.getName(), data.getAge(), data.getEmail(), data.getStatus());
+>         return ServiceResult.ok(students.save(toSave));
+>     }
+>
+>     @Transactional
+>     public ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status) {
+>         Optional<StudentEntity> current = students.findById(id);
+>         if (current.isEmpty()) {
+>             return ServiceResult.notFound();
+>         }
+>         StudentEntity student = current.get();
+>         StudentEntity toSave = new StudentEntity(
+>                 id, student.getName(), student.getAge(), student.getEmail(), status);
+>         return ServiceResult.ok(students.save(toSave));
+>     }
+>
+>     @Transactional
+>     public boolean delete(Long id) {
+>         if (!students.existsById(id)) {
+>             return false;
+>         }
+>         students.deleteById(id);
+>         return true;
+>     }
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 presentation
+>
+> #### 📁 dto
+>
+> <details>
+> <summary><strong>📄 StudentRequest.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentRequest.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import com.academy.persistence.entity.StudentStatus;
+> import io.swagger.v3.oas.annotations.media.Schema;
+> import jakarta.validation.constraints.Email;
+> import jakarta.validation.constraints.Max;
+> import jakarta.validation.constraints.Min;
+> import jakarta.validation.constraints.NotBlank;
+> import jakarta.validation.constraints.NotNull;
+> import jakarta.validation.constraints.Size;
+>
+> @Schema(description = "Datos que el cliente envía para crear o reemplazar un estudiante")
+> public record StudentRequest(
+>
+>         @Schema(description = "Nombre completo", example = "Ana Torres")
+>         @NotBlank
+>         @Size(min = 2, max = 100)
+>         String name,
+>
+>         @Schema(description = "Edad en años", example = "22")
+>         @Min(16)
+>         @Max(99)
+>         int age,
+>
+>         @Schema(description = "Correo electrónico, único entre estudiantes", example = "ana@mail.com")
+>         @NotBlank
+>         @Email
+>         String email,
+>
+>         @Schema(description = "Estado académico", example = "ACTIVE")
+>         @NotNull
+>         StudentStatus status
+> ) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 StudentStatusRequest.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentStatusRequest.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import com.academy.persistence.entity.StudentStatus;
+> import io.swagger.v3.oas.annotations.media.Schema;
+> import jakarta.validation.constraints.NotNull;
+>
+> @Schema(description = "Nuevo estado del estudiante (es lo único que cambia)")
+> public record StudentStatusRequest(
+>
+>         @Schema(description = "Estado académico", example = "INACTIVE")
+>         @NotNull
+>         StudentStatus status
+> ) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 StudentResponse.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentResponse.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import com.academy.persistence.entity.StudentStatus;
+> import io.swagger.v3.oas.annotations.media.Schema;
+>
+> @Schema(description = "Estudiante tal como lo ve el cliente")
+> public record StudentResponse(
+>
+>         @Schema(description = "Identificador generado por la base", example = "1")
+>         Long id,
+>
+>         @Schema(description = "Nombre completo", example = "Ana Torres")
+>         String name,
+>
+>         @Schema(description = "Edad en años", example = "22")
+>         int age,
+>
+>         @Schema(description = "Correo electrónico", example = "ana@mail.com")
+>         String email,
+>
+>         @Schema(description = "Estado académico", example = "ACTIVE")
+>         StudentStatus status
+> ) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 PageResponse.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/PageResponse.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import io.swagger.v3.oas.annotations.media.Schema;
+>
+> import java.util.List;
+>
+> @Schema(description = "Una página de resultados")
+> public record PageResponse<T>(
+>
+>         @Schema(description = "Elementos de la página")
+>         List<T> content,
+>
+>         @Schema(description = "Número de página, desde 0", example = "0")
+>         int page,
+>
+>         @Schema(description = "Elementos por página (máximo 50)", example = "10")
+>         int size,
+>
+>         @Schema(description = "Total de elementos que cumplen el filtro", example = "3")
+>         long totalElements,
+>
+>         @Schema(description = "Total de páginas", example = "1")
+>         int totalPages
+> ) {
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 mapper
+>
+> <details>
+> <summary><strong>📄 StudentMapper.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/mapper/StudentMapper.java`
+>
+> ```java
+> package com.academy.presentation.mapper;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.presentation.dto.PageResponse;
+> import com.academy.presentation.dto.StudentRequest;
+> import com.academy.presentation.dto.StudentResponse;
+> import org.springframework.data.domain.Page;
+>
+> public final class StudentMapper {
+>
+>     private StudentMapper() {
+>     }
+>
+>     public static StudentEntity toEntity(StudentRequest request) {
+>         return new StudentEntity(null, request.name(), request.age(), request.email(), request.status());
+>     }
+>
+>     public static StudentResponse toResponse(StudentEntity entity) {
+>         return new StudentResponse(entity.getId(), entity.getName(), entity.getAge(),
+>                 entity.getEmail(), entity.getStatus());
+>     }
+>
+>     public static PageResponse<StudentResponse> toPageResponse(Page<StudentEntity> page) {
+>         return new PageResponse<>(
+>                 page.getContent().stream().map(StudentMapper::toResponse).toList(),
+>                 page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages());
+>     }
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 config
+>
+> <details>
+> <summary><strong>📄 OpenApiConfig.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/config/OpenApiConfig.java`
+>
+> ```java
+> package com.academy.presentation.config;
+>
+> import io.swagger.v3.oas.models.Components;
+> import io.swagger.v3.oas.models.OpenAPI;
+> import io.swagger.v3.oas.models.info.Contact;
+> import io.swagger.v3.oas.models.info.Info;
+> import io.swagger.v3.oas.models.info.License;
+> import io.swagger.v3.oas.models.security.SecurityScheme;
+> import io.swagger.v3.oas.models.servers.Server;
+> import org.springdoc.core.models.GroupedOpenApi;
+> import org.springframework.context.annotation.Bean;
+> import org.springframework.context.annotation.Configuration;
+>
+> import java.util.List;
+>
+> @Configuration
+> public class OpenApiConfig {
+>
+>     @Bean
+>     public OpenAPI academyOpenApi() {
+>         return new OpenAPI()
+>                 .info(new Info()
+>                         .title("Academy API")
+>                         .version("1.0.0")
+>                         .description("CRUD de estudiantes con DTO, Spring Boot, JPA y MySQL, documentado con OpenAPI.")
+>                         .contact(new Contact().name("Equipo Academy").email("academy@mail.com"))
+>                         .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")))
+>                 .servers(List.of(new Server().url("http://localhost:8080").description("Local")))
+>                 .components(new Components().addSecuritySchemes("bearerAuth",
+>                         new SecurityScheme()
+>                                 .type(SecurityScheme.Type.HTTP)
+>                                 .scheme("bearer")
+>                                 .bearerFormat("JWT")));
+>     }
+>
+>     @Bean
+>     public GroupedOpenApi studentsGroup() {
+>         return GroupedOpenApi.builder()
+>                 .group("students")
+>                 .displayName("Students")
+>                 .pathsToMatch("/api/v1/students/**")
+>                 .build();
+>     }
+>
+>     @Bean
+>     public GroupedOpenApi internalGroup() {
+>         return GroupedOpenApi.builder()
+>                 .group("internal")
+>                 .displayName("Internal")
+>                 .pathsToMatch("/internal/**")
+>                 .build();
+>     }
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 controller
+>
+> <details>
+> <summary><strong>📄 StudentController.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/controller/StudentController.java`
+>
+> ```java
+> package com.academy.presentation.controller;
+>
+> import com.academy.business.service.ServiceResult;
+> import com.academy.business.service.ServiceStatus;
+> import com.academy.business.service.StudentService;
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.presentation.dto.PageResponse;
+> import com.academy.presentation.dto.StudentRequest;
+> import com.academy.presentation.dto.StudentResponse;
+> import com.academy.presentation.dto.StudentStatusRequest;
+> import com.academy.presentation.mapper.StudentMapper;
+> import io.swagger.v3.oas.annotations.Hidden;
+> import io.swagger.v3.oas.annotations.Operation;
+> import io.swagger.v3.oas.annotations.Parameter;
+> import io.swagger.v3.oas.annotations.headers.Header;
+> import io.swagger.v3.oas.annotations.media.Content;
+> import io.swagger.v3.oas.annotations.media.ExampleObject;
+> import io.swagger.v3.oas.annotations.media.Schema;
+> import io.swagger.v3.oas.annotations.responses.ApiResponse;
+> import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+> import io.swagger.v3.oas.annotations.tags.Tag;
+> import jakarta.validation.Valid;
+> import org.springdoc.core.annotations.ParameterObject;
+> import org.springframework.data.domain.Pageable;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.http.ResponseEntity;
+> import org.springframework.web.bind.annotation.DeleteMapping;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PatchMapping;
+> import org.springframework.web.bind.annotation.PathVariable;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.PutMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.RequestParam;
+> import org.springframework.web.bind.annotation.RestController;
+> import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+>
+> import java.net.URI;
+>
+> @RestController
+> @RequestMapping("/api/v1/students")
+> @Tag(name = "Students", description = "Operaciones sobre estudiantes")
+> public class StudentController {
+>
+>     private final StudentService service;
+>
+>     public StudentController(StudentService service) {
+>         this.service = service;
+>     }
+>
+>     @Operation(summary = "Listar estudiantes",
+>             description = "Devuelve una página de estudiantes. Con `name` filtra por nombre (contiene, sin importar mayúsculas). El tamaño máximo de página es 50.")
+>     @ApiResponse(responseCode = "200", description = "Página de estudiantes")
+>     @GetMapping
+>     public PageResponse<StudentResponse> search(
+>             @Parameter(description = "Parte del nombre a buscar", example = "ana")
+>             @RequestParam(required = false) String name,
+>             @ParameterObject Pageable pageable) {
+>         return StudentMapper.toPageResponse(service.search(name, pageable));
+>     }
+>
+>     @Operation(summary = "Buscar un estudiante por id")
+>     @ApiResponse(responseCode = "200", description = "Estudiante encontrado")
+>     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
+>     @GetMapping("/{id}")
+>     public ResponseEntity<StudentResponse> findById(
+>             @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id) {
+>         return service.findById(id)
+>                 .map(StudentMapper::toResponse)
+>                 .map(ResponseEntity::ok)
+>                 .orElseGet(() -> ResponseEntity.notFound().build());
+>     }
+>
+>     @Operation(summary = "Buscar un estudiante por correo",
+>             description = "Obsoleto: usar `GET /api/v1/students?name=` o `GET /api/v1/students/{id}`.",
+>             deprecated = true)
+>     @ApiResponse(responseCode = "200", description = "Estudiante encontrado")
+>     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese correo", content = @Content)
+>     @GetMapping("/by-email")
+>     public ResponseEntity<StudentResponse> findByEmail(
+>             @Parameter(description = "Correo exacto", example = "ana@mail.com") @RequestParam String email) {
+>         return service.findByEmail(email)
+>                 .map(StudentMapper::toResponse)
+>                 .map(ResponseEntity::ok)
+>                 .orElseGet(() -> ResponseEntity.notFound().build());
+>     }
+>
+>     @Operation(summary = "Crear un estudiante",
+>             description = "El `id` lo genera la base y no se envía. Si el correo ya existe responde `409`.")
+>     @io.swagger.v3.oas.annotations.parameters.RequestBody(
+>             description = "Datos del estudiante",
+>             content = @Content(examples = {
+>                     @ExampleObject(name = "Estudiante activo", summary = "Un estudiante activo",
+>                             value = "{\"name\":\"Ana Torres\",\"age\":22,\"email\":\"ana@mail.com\",\"status\":\"ACTIVE\"}"),
+>                     @ExampleObject(name = "Estudiante inactivo", summary = "Un estudiante inactivo",
+>                             value = "{\"name\":\"Luis Pérez\",\"age\":25,\"email\":\"luis@mail.com\",\"status\":\"INACTIVE\"}")
+>             }))
+>     @ApiResponse(responseCode = "201", description = "Estudiante creado",
+>             headers = @Header(name = "Location", description = "URL del estudiante creado",
+>                     schema = @Schema(type = "string", example = "http://localhost:8080/api/v1/students/1")))
+>     @ApiResponse(responseCode = "400", description = "Datos inválidos (Bean Validation)", content = @Content)
+>     @ApiResponse(responseCode = "409", description = "El correo ya está registrado", content = @Content)
+>     @PostMapping
+>     public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
+>         ServiceResult<StudentEntity> result = service.create(StudentMapper.toEntity(request));
+>         if (result.status() == ServiceStatus.CONFLICT) {
+>             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+>         }
+>         StudentResponse body = StudentMapper.toResponse(result.value());
+>         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+>                 .path("/{id}").buildAndExpand(body.id()).toUri();
+>         return ResponseEntity.created(location).body(body);
+>     }
+>
+>     @Operation(summary = "Reemplazar un estudiante",
+>             description = "Reemplaza todos los datos del estudiante. Responde `404` si no existe y `409` si el correo es de otro estudiante.")
+>     @ApiResponse(responseCode = "200", description = "Estudiante actualizado")
+>     @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
+>     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
+>     @ApiResponse(responseCode = "409", description = "El correo pertenece a otro estudiante", content = @Content)
+>     @PutMapping("/{id}")
+>     public ResponseEntity<StudentResponse> update(
+>             @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id,
+>             @Valid @RequestBody StudentRequest request) {
+>         return respond(service.update(id, StudentMapper.toEntity(request)));
+>     }
+>
+>     @Operation(summary = "Cambiar el estado de un estudiante",
+>             description = "Cambia solo el estado; el resto de los datos no se toca.")
+>     @ApiResponse(responseCode = "200", description = "Estado actualizado")
+>     @ApiResponse(responseCode = "400", description = "El estado es obligatorio", content = @Content)
+>     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
+>     @PatchMapping("/{id}/status")
+>     public ResponseEntity<StudentResponse> changeStatus(
+>             @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id,
+>             @Valid @RequestBody StudentStatusRequest request) {
+>         return respond(service.changeStatus(id, request.status()));
+>     }
+>
+>     @Operation(summary = "Eliminar un estudiante", security = @SecurityRequirement(name = "bearerAuth"))
+>     @ApiResponse(responseCode = "204", description = "Estudiante eliminado")
+>     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
+>     @DeleteMapping("/{id}")
+>     public ResponseEntity<Void> delete(
+>             @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id) {
+>         return service.delete(id)
+>                 ? ResponseEntity.noContent().build()
+>                 : ResponseEntity.notFound().build();
+>     }
+>
+>     @Hidden
+>     @GetMapping("/ping")
+>     public String ping() {
+>         return "pong";
+>     }
+>
+>     private ResponseEntity<StudentResponse> respond(ServiceResult<StudentEntity> result) {
+>         return switch (result.status()) {
+>             case OK -> ResponseEntity.ok(StudentMapper.toResponse(result.value()));
+>             case NOT_FOUND -> ResponseEntity.notFound().build();
+>             case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+>         };
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 InternalController.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/controller/InternalController.java`
+>
+> ```java
+> package com.academy.presentation.controller;
+>
+> import com.academy.business.service.ServiceStatus;
+> import com.academy.business.service.StudentService;
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.entity.StudentStatus;
+> import io.swagger.v3.oas.annotations.Operation;
+> import io.swagger.v3.oas.annotations.tags.Tag;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> import java.util.Map;
+>
+> @RestController
+> @RequestMapping("/internal")
+> @Tag(name = "Internal", description = "Operaciones de apoyo para el equipo (no son parte de la API pública)")
+> public class InternalController {
+>
+>     private final StudentService service;
+>
+>     public InternalController(StudentService service) {
+>         this.service = service;
+>     }
+>
+>     @Operation(summary = "Estado del servicio")
+>     @GetMapping("/health")
+>     public Map<String, String> health() {
+>         return Map.of("status", "UP");
+>     }
+>
+>     @Operation(summary = "Cargar estudiantes de ejemplo", description = "Crea tres estudiantes si no existen.")
+>     @PostMapping("/seed")
+>     public Map<String, Integer> seed() {
+>         int created = 0;
+>         StudentEntity[] samples = {
+>                 new StudentEntity(null, "Ana Torres", 22, "ana@mail.com", StudentStatus.ACTIVE),
+>                 new StudentEntity(null, "Luis Pérez", 25, "luis@mail.com", StudentStatus.ACTIVE),
+>                 new StudentEntity(null, "María Gómez", 31, "maria@mail.com", StudentStatus.INACTIVE)
+>         };
+>         for (StudentEntity sample : samples) {
+>             if (service.create(sample).status() == ServiceStatus.OK) {
+>                 created++;
+>             }
+>         }
+>         return Map.of("created", created);
+>     }
+> }
+> ```
+>
+> </details>
 
 </details>
 
