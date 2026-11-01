@@ -77,9 +77,9 @@
 > | Código | Requerimiento |
 > |---|---|
 > | **RNF-01** | Java 21 (o superior), Maven y **una sola** dependencia funcional: *Spring Web*. Group `com.biblioteca`, Artifact `biblioteca`. |
-> | **RNF-02** | Tres capas, cada clase en su paquete y con **estos nombres** (ver «Estructura esperada»). |
+> | **RNF-02** | La aplicación se organiza en **tres capas** —presentación, negocio y persistencia—, cada una en su propio paquete. Los nombres de paquetes y clases los decide quien resuelve el examen, en español. |
 > | **RNF-03** | **Regla de dependencia:** presentación → negocio → persistencia. El controlador **no** conoce el repositorio, y el servicio **no** importa nada de presentación. |
-> | **RNF-04** | El servicio depende de la **interfaz** `RepositorioLibros`, no de la implementación. |
+> | **RNF-04** | El servicio depende de una **interfaz** del repositorio, no de su implementación. |
 > | **RNF-05** | **Inyección por constructor.** No se usa `@Autowired` ni `new` para crear servicios o repositorios. |
 > | **RNF-06** | Sin base de datos, sin JPA, sin Lombok. Los datos viven en una `List<Libro>` dentro del repositorio. |
 > | **RNF-07** | `listar()` del repositorio devuelve una **copia** de la lista, para que nadie de afuera la modifique. |
@@ -88,56 +88,21 @@
 </details>
 
 <details>
-<summary><strong>🏗️ Estructura esperada</strong></summary>
+<summary><strong>🏗️ Las tres capas</strong></summary>
 
-> ```text
-> 📁 biblioteca
-> ├── 📄 pom.xml
-> └── 📁 src/main/java/com/biblioteca
->     ├── 📄 BibliotecaApplication.java
->     ├── 📁 presentacion                      ← 1 · lo que ve el cliente HTTP
->     │   └── 📁 controlador
->     │       └── 📄 ControladorLibros.java
->     ├── 📁 negocio                           ← 2 · las reglas
->     │   ├── 📁 model
->     │   │   └── 📄 Libro.java
->     │   └── 📁 service
->     │       └── 📄 ServicioLibros.java
->     └── 📁 persistence                       ← 3 · dónde viven los datos (lista en memoria)
->         └── 📁 repository
->             ├── 📄 RepositorioLibros.java              (interfaz)
->             └── 📄 RepositorioLibrosEnMemoria.java     (@Repository)
-> ```
+> La aplicación se construye en **tres capas**, que son las del curso:
+>
+> | Capa | Qué hace |
+> |---|---|
+> | **Presentación** | Recibe las peticiones HTTP y devuelve las respuestas. |
+> | **Negocio** | Contiene las reglas y el modelo de datos. |
+> | **Persistencia** | Guarda y busca los datos (aquí, una lista en memoria). |
 >
 > ```text
-> HTTP ─▶ ControladorLibros ─▶ ServicioLibros ─▶ RepositorioLibros (interfaz)
->                                                        ▲
->                                          RepositorioLibrosEnMemoria (implementa)
+> HTTP ─▶ Presentación ─▶ Negocio ─▶ Persistencia
 > ```
 >
-> | Clase | Capa | Responsabilidad |
-> |---|---|---|
-> | `Libro` | Negocio (modelo) | Los datos de un libro. |
-> | `RepositorioLibros` | Persistencia | **Contrato**: `listar()` y `buscarPorId(Long)` (este devuelve `Optional<Libro>`). |
-> | `RepositorioLibrosEnMemoria` | Persistencia | Guarda los cinco libros en una lista. |
-> | `ServicioLibros` | Negocio | `listar()` y `obtener(Long)`; decide qué hacer si el libro no existe. |
-> | `ControladorLibros` | Presentación | Traduce las rutas HTTP a llamadas del servicio. |
-
-</details>
-
-<details>
-<summary><strong>🧭 Cómo avanzar (sin código)</strong></summary>
-
-> Se construye **de abajo hacia arriba**: primero el dato, luego quien lo guarda, luego la regla y al final la puerta HTTP.
->
-> 1. Crear el proyecto y comprobar que **arranca** (`Started BibliotecaApplication`).
-> 2. Crear los paquetes y la clase `Libro`.
-> 3. Escribir la interfaz del repositorio y su implementación con los cinco libros.
-> 4. Escribir el servicio con `listar()` y `obtener(id)`.
-> 5. Escribir el controlador con los dos `GET`.
-> 6. Probar con `curl` o Postman y guardar las capturas.
->
-> > 🔎 **Pista:** si `obtener` no encuentra el libro, ¿qué te devuelve el repositorio? ¿Y qué debería hacer el servicio con eso?
+> Cada capa solo conoce a la que tiene **a su derecha**, como indica RNF-03.
 
 </details>
 
@@ -169,21 +134,25 @@
 <details>
 <summary><strong>📦 Entrega</strong></summary>
 
-> - El **proyecto comprimido** (`.zip`), **sin** la carpeta `target`.
-> - Un documento con las **capturas** de los cuatro comandos de «Cómo se comprueba»: petición, código de estado y cuerpo.
-> - Una frase por capa explicando **qué hace** y **qué no debe hacer**.
+> La entrega es un **repositorio en GitHub**:
+>
+> 1. Crear un repositorio **público** en GitHub (por ejemplo, `examen-biblioteca`) con el proyecto completo.
+> 2. Subir el código **sin** la carpeta `target` (el archivo `.gitignore` que genera Initializr ya la excluye).
+> 3. Agregar un `README.md` con el nombre de quien entrega, cómo ejecutar el proyecto y las **capturas** de los cuatro comandos de «Cómo se comprueba»: petición, código de estado y cuerpo.
+> 4. Enviar al docente la **URL** del repositorio.
+>
+> > 💡 Conviene hacer **commits** a medida que se avanza: el historial muestra cómo se construyó el proyecto.
 
 </details>
 
 <details>
 <summary><strong>🏷️ Anotaciones que se esperan ver</strong></summary>
 
-> | Anotación | Dónde |
+> | Capa | Anotaciones |
 > |---|---|
-> | `@SpringBootApplication` | `BibliotecaApplication` (la genera Initializr) |
-> | `@RestController` · `@RequestMapping` | `ControladorLibros` |
-> | `@GetMapping` · `@PathVariable` | Métodos del controlador |
-> | `@Service` | `ServicioLibros` |
-> | `@Repository` | `RepositorioLibrosEnMemoria` (solo en la clase, no en la interfaz) |
+> | Clase principal | `@SpringBootApplication` (la genera Initializr) |
+> | Presentación | `@RestController` · `@RequestMapping` · `@GetMapping` · `@PathVariable` |
+> | Negocio | `@Service` |
+> | Persistencia | `@Repository` (solo en la clase, no en la interfaz) |
 
 </details>
