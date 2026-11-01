@@ -2082,6 +2082,10 @@
 >
 > **Código final, paso a paso**
 >
+> ---
+>
+> ### ⚙️ Configuración del proyecto
+>
 > <details>
 > <summary><strong>1 · 📄 pom.xml</strong></summary>
 >
@@ -2181,6 +2185,10 @@
 > ```
 >
 > </details>
+>
+> ---
+>
+> ### 🗄️ Capa de persistencia (`persistence`)
 >
 > <details>
 > <summary><strong>4 · 📄 StudentStatus.java</strong></summary>
@@ -2292,6 +2300,10 @@
 > ```
 >
 > </details>
+>
+> ---
+>
+> ### 💼 Capa de negocio (`business`)
 >
 > <details>
 > <summary><strong>7 · 📄 ServiceStatus.java</strong></summary>
@@ -2423,6 +2435,10 @@
 > ```
 >
 > </details>
+>
+> ---
+>
+> ### 🌐 Capa de presentación (`presentation`)
 >
 > <details>
 > <summary><strong>10 · 📄 StudentRequest.java</strong></summary>
