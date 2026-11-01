@@ -1,11 +1,11 @@
 # 📝 Examen — CRUD de libros en tres capas
 
 > 📌 **Examen práctico individual.** Este documento contiene **solo el enunciado**: qué construir, con qué
-> reglas y cómo se evalúa. No incluye código ni pasos de solución. Se aplica lo visto en el
+> reglas y cómo se comprueba. No incluye código ni pasos de solución. Se aplica lo visto en el
 > [Módulo 01](../../01-introduccion-a-spring-boot/) y el [Módulo 02](../../02-manejo-de-dependencias-y-java-beans/),
 > con el mismo patrón del taller «Gestión de cursos».
 >
-> ⏱️ **Duración:** 60 minutos · 🎯 **Puntaje:** 100 puntos · ✅ **Aprobado:** 60 puntos.
+> ⏱️ **Duración:** 60 minutos.
 > 📚 **Se permite** consultar los apuntes y las guías del módulo. **No se permite** copiar el trabajo de otra persona.
 
 <details>
@@ -176,25 +176,6 @@
 </details>
 
 <details>
-<summary><strong>📊 Rúbrica (100 puntos)</strong></summary>
-
-> | Criterio | Puntos |
-> |---|---:|
-> | El proyecto **compila y arranca** con `./mvnw` | 10 |
-> | **Tres capas:** cada clase está en su paquete y con el nombre pedido | 20 |
-> | **Persistencia:** interfaz + implementación con `@Repository`, cinco libros, `listar()` con copia y `buscarPorId` con `Optional` | 15 |
-> | **Negocio:** `@Service`, constructor con la **interfaz**, `listar()` y `obtener(id)` con `NoSuchElementException` y el mensaje pedido | 15 |
-> | **Presentación:** `@RestController`, `@RequestMapping("/libros")`, dos `@GetMapping`, `@PathVariable` | 15 |
-> | **Regla de dependencia:** el controlador no usa el repositorio; el servicio no importa presentación; no hay `@Autowired` | 10 |
-> | **Evidencia:** los cuatro comandos con petición, código y cuerpo | 10 |
-> | **Calidad:** nombres claros, sin código sobrante ni comentarios inútiles | 5 |
-> | **Total** | **100** |
->
-> > ⚠️ **Descuentos:** −10 si hay base de datos o JPA; −10 si el servicio depende de la **clase** `RepositorioLibrosEnMemoria` en vez de la interfaz; −5 por cada endpoint que devuelva datos distintos a los de la tabla.
-
-</details>
-
-<details>
 <summary><strong>🏷️ Anotaciones que se esperan ver</strong></summary>
 
 > | Anotación | Dónde |
@@ -206,5 +187,3 @@
 > | `@Repository` | `RepositorioLibrosEnMemoria` (solo en la clase, no en la interfaz) |
 
 </details>
-
-➡️ **Solución para docentes:** [05-examen-crud-libros-solucion.md](05-examen-crud-libros-solucion.md)
