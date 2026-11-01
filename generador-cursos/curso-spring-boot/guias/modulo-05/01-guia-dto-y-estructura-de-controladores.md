@@ -1381,7 +1381,8 @@
 > >
 > > > 💡 La API devuelve el JSON en una sola línea; aquí se muestra con sangría para leerlo mejor. Los `404` y `409` del controlador llegan **sin cuerpo**; los `400` de validación traen el cuerpo genérico de Spring Boot.
 > >
-> > **1. Crear un estudiante → `201` y la cabecera `Location`**
+> > <details>
+> > <summary><strong>1. Crear un estudiante → <code>201</code> y la cabecera <code>Location</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
@@ -1406,7 +1407,10 @@
 > > }
 > > ```
 > >
-> > **2. Crear enviando campos de más (`id` y `createdAt`) → `201`; ambos se ignoran**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>2. Crear enviando campos de más (<code>id</code> y <code>createdAt</code>) → <code>201</code>; ambos se ignoran</strong></summary>
 > >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
@@ -1431,7 +1435,10 @@
 > > }
 > > ```
 > >
-> > **3. Correo repetido, en mayúsculas → `409`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>3. Correo repetido, en mayúsculas → <code>409</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
@@ -1446,7 +1453,10 @@
 > > Content-Length: 0
 > > ```
 > >
-> > **4. Datos inválidos → `400`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>4. Datos inválidos → <code>400</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
@@ -1470,7 +1480,10 @@
 > > }
 > > ```
 > >
-> > **5. Listar con filtro, tamaño excesivo y orden → `200` con `"size":50`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>5. Listar con filtro, tamaño excesivo y orden → <code>200</code> con <code>"size":50</code></strong></summary>
 > >
 > > ```bash
 > > curl -i "http://localhost:8080/api/v1/students?name=a&size=1000&sort=name,asc"
@@ -1500,7 +1513,10 @@
 > > }
 > > ```
 > >
-> > **6. Buscar por id → `200`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>6. Buscar por id → <code>200</code></strong></summary>
 > >
 > > ```bash
 > > curl -i http://localhost:8080/api/v1/students/1
@@ -1522,7 +1538,10 @@
 > > }
 > > ```
 > >
-> > **7. Buscar un id que no existe → `404`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>7. Buscar un id que no existe → <code>404</code></strong></summary>
 > >
 > > ```bash
 > > curl -i http://localhost:8080/api/v1/students/99
@@ -1535,7 +1554,10 @@
 > > Content-Length: 0
 > > ```
 > >
-> > **8. Reemplazar (`PUT`) con datos válidos → `200`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>8. Reemplazar (<code>PUT</code>) con datos válidos → <code>200</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X PUT http://localhost:8080/api/v1/students/1 \
@@ -1559,7 +1581,10 @@
 > > }
 > > ```
 > >
-> > **9. Reemplazar con el correo de otro estudiante → `409`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>9. Reemplazar con el correo de otro estudiante → <code>409</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X PUT http://localhost:8080/api/v1/students/1 \
@@ -1574,7 +1599,10 @@
 > > Content-Length: 0
 > > ```
 > >
-> > **10. Reemplazar un id que no existe → `404`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>10. Reemplazar un id que no existe → <code>404</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X PUT http://localhost:8080/api/v1/students/99 \
@@ -1589,7 +1617,10 @@
 > > Content-Length: 0
 > > ```
 > >
-> > **11. Cambiar solo el estado (`PATCH`) → `200`; el nombre y la edad no cambian**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>11. Cambiar solo el estado (<code>PATCH</code>) → <code>200</code>; el nombre y la edad no cambian</strong></summary>
 > >
 > > ```bash
 > > curl -i -X PATCH http://localhost:8080/api/v1/students/1/status \
@@ -1613,7 +1644,10 @@
 > > }
 > > ```
 > >
-> > **12. `PATCH` con estado nulo → `400`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>12. <code>PATCH</code> con estado nulo → <code>400</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X PATCH http://localhost:8080/api/v1/students/1/status \
@@ -1637,7 +1671,10 @@
 > > }
 > > ```
 > >
-> > **13. `PATCH` de un id que no existe → `404`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>13. <code>PATCH</code> de un id que no existe → <code>404</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X PATCH http://localhost:8080/api/v1/students/99/status \
@@ -1652,7 +1689,10 @@
 > > Content-Length: 0
 > > ```
 > >
-> > **14. Eliminar → `204`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>14. Eliminar → <code>204</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X DELETE http://localhost:8080/api/v1/students/2
@@ -1664,7 +1704,10 @@
 > > HTTP/1.1 204
 > > ```
 > >
-> > **15. Eliminar otra vez → `404`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>15. Eliminar otra vez → <code>404</code></strong></summary>
 > >
 > > ```bash
 > > curl -i -X DELETE http://localhost:8080/api/v1/students/2
@@ -1677,7 +1720,10 @@
 > > Content-Length: 0
 > > ```
 > >
-> > **16. La ruta sin versión ya no existe → `404`**
+> > </details>
+> >
+> > <details>
+> > <summary><strong>16. La ruta sin versión ya no existe → <code>404</code></strong></summary>
 > >
 > > ```bash
 > > curl -i http://localhost:8080/api/students
@@ -1698,6 +1744,8 @@
 > > }
 > > ```
 > >
+> > </details>
+> >
 > > Y en MySQL, la columna interna sigue existiendo:
 > >
 > > ```text
@@ -1713,7 +1761,7 @@
 > > >
 > > > 🗣️ **Preguntas:** ¿qué pasó con el `"id":99` que mandó el cliente? *(Nunca llegó al servicio: el DTO no tiene `id`, y el servicio, además, inserta siempre con `id` en `null`.)* ¿Por qué `PATCH` no cambió el nombre? *(Su DTO solo tiene `status`: el contrato lo impide.)*
 > > >
-> > > ✅ **Punto de control 7:** las respuestas coinciden con la tabla.
+> > > ✅ **Punto de control 7:** las respuestas coinciden con las que se muestran bajo cada comando.
 >
 > </details>
 >
