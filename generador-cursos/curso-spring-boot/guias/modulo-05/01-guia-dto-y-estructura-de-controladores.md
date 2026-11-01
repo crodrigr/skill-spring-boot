@@ -2168,6 +2168,8 @@
 >
 > ### 🌐 Capa de presentación (`presentation`)
 >
+> #### 📁 `controller`
+>
 > <details>
 > <summary><strong>3 · 📄 StudentController.java</strong></summary>
 >
@@ -2268,6 +2270,8 @@
 >
 > </details>
 >
+> #### 📁 `dto`
+>
 > <details>
 > <summary><strong>4 · 📄 StudentRequest.java</strong></summary>
 >
@@ -2355,6 +2359,8 @@
 >
 > </details>
 >
+> #### 📁 `mapper`
+>
 > <details>
 > <summary><strong>8 · 📄 StudentMapper.java</strong></summary>
 >
@@ -2396,6 +2402,8 @@
 > ---
 >
 > ### 💼 Capa de negocio (`business`)
+>
+> #### 📁 `service`
 >
 > <details>
 > <summary><strong>9 · 📄 StudentService.java</strong></summary>
@@ -2532,6 +2540,8 @@
 >
 > ### 🗄️ Capa de persistencia (`persistence`)
 >
+> #### 📁 `entity`
+>
 > <details>
 > <summary><strong>12 · 📄 StudentEntity.java</strong></summary>
 >
@@ -2613,6 +2623,8 @@
 > ```
 >
 > </details>
+>
+> #### 📁 `repository`
 >
 > <details>
 > <summary><strong>14 · 📄 StudentJpaRepository.java</strong></summary>
