@@ -1695,6 +1695,740 @@
 >             └── 📄 RepositorioMatriculasEnMemoria.java    (@Repository)
 > ```
 >
+> **Código final, paso a paso**
+>
+> ### 📁 Configuración
+>
+> <details>
+> <summary><strong>📄 pom.xml</strong></summary>
+>
+> **Ruta:** `pom.xml`
+>
+> ```xml
+> <?xml version="1.0" encoding="UTF-8"?>
+> <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+>     <modelVersion>4.0.0</modelVersion>
+>     <parent>
+>         <groupId>org.springframework.boot</groupId>
+>         <artifactId>spring-boot-starter-parent</artifactId>
+>         <version>3.3.5</version>
+>         <relativePath/>
+>     </parent>
+>     <groupId>com.academia</groupId>
+>     <artifactId>academia</artifactId>
+>     <version>0.0.1-SNAPSHOT</version>
+>     <name>academia</name>
+>     <description>Taller de gestión de cursos (en memoria)</description>
+>     <properties>
+>         <java.version>21</java.version>
+>     </properties>
+>     <dependencies>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-web</artifactId>
+>         </dependency>
+>     </dependencies>
+>     <build>
+>         <plugins>
+>             <plugin>
+>                 <groupId>org.springframework.boot</groupId>
+>                 <artifactId>spring-boot-maven-plugin</artifactId>
+>             </plugin>
+>         </plugins>
+>     </build>
+> </project>
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 AcademiaApplication.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/AcademiaApplication.java`
+>
+> ```java
+> package com.academia;
+>
+> import org.springframework.boot.SpringApplication;
+> import org.springframework.boot.autoconfigure.SpringBootApplication;
+>
+> @SpringBootApplication
+> public class AcademiaApplication {
+>
+>     public static void main(String[] args) {
+>         SpringApplication.run(AcademiaApplication.class, args);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 negocio — model
+>
+> <details>
+> <summary><strong>📄 Estudiante.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/negocio/model/Estudiante.java`
+>
+> ```java
+> package com.academia.negocio.model;
+>
+> public class Estudiante {
+>
+>     private Long id;
+>     private String nombre;
+>     private int edad;
+>     private String correo;
+>
+>     public Estudiante(String nombre, int edad, String correo) {
+>         this.nombre = nombre;
+>         this.edad = edad;
+>         this.correo = correo;
+>     }
+>
+>     public Long getId() { return id; }
+>     public void setId(Long id) { this.id = id; }
+>     public String getNombre() { return nombre; }
+>     public int getEdad() { return edad; }
+>     public String getCorreo() { return correo; }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 Curso.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/negocio/model/Curso.java`
+>
+> ```java
+> package com.academia.negocio.model;
+>
+> public class Curso {
+>
+>     private Long id;
+>     private String nombre;
+>     private double precio;
+>     private int cupoMaximo;
+>
+>     public Curso(String nombre, double precio, int cupoMaximo) {
+>         this.nombre = nombre;
+>         this.precio = precio;
+>         this.cupoMaximo = cupoMaximo;
+>     }
+>
+>     public Long getId() { return id; }
+>     public void setId(Long id) { this.id = id; }
+>     public String getNombre() { return nombre; }
+>     public double getPrecio() { return precio; }
+>     public int getCupoMaximo() { return cupoMaximo; }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 Matricula.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/negocio/model/Matricula.java`
+>
+> ```java
+> package com.academia.negocio.model;
+>
+> public class Matricula {
+>
+>     private Long id;
+>     private Estudiante estudiante;
+>     private Curso curso;
+>
+>     public Matricula(Estudiante estudiante, Curso curso) {
+>         this.estudiante = estudiante;
+>         this.curso = curso;
+>     }
+>
+>     public Long getId() { return id; }
+>     public void setId(Long id) { this.id = id; }
+>     public Estudiante getEstudiante() { return estudiante; }
+>     public Curso getCurso() { return curso; }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 Ocupacion.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/negocio/model/Ocupacion.java`
+>
+> ```java
+> package com.academia.negocio.model;
+>
+> public record Ocupacion(String curso, int cupoMaximo, int matriculados,
+>                         int cuposDisponibles, double porcentajeOcupacion) {
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 persistence — repository
+>
+> <details>
+> <summary><strong>📄 RepositorioEstudiantes.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantes.java`
+>
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.negocio.model.Estudiante;
+> import java.util.List;
+> import java.util.Optional;
+>
+> public interface RepositorioEstudiantes {
+>
+>     Estudiante guardar(Estudiante estudiante);
+>
+>     List<Estudiante> listar();
+>
+>     Optional<Estudiante> buscarPorId(Long id);
+>
+>     boolean existePorCorreo(String correo);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 RepositorioEstudiantesEnMemoria.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/persistence/repository/RepositorioEstudiantesEnMemoria.java`
+>
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.negocio.model.Estudiante;
+> import java.util.ArrayList;
+> import java.util.List;
+> import java.util.Optional;
+> import org.springframework.stereotype.Repository;
+>
+> @Repository
+> public class RepositorioEstudiantesEnMemoria implements RepositorioEstudiantes {
+>
+>     private final List<Estudiante> estudiantes = new ArrayList<>();
+>     private long siguienteId = 1;
+>
+>     @Override
+>     public Estudiante guardar(Estudiante estudiante) {
+>         estudiante.setId(siguienteId++);
+>         estudiantes.add(estudiante);
+>         return estudiante;
+>     }
+>
+>     @Override
+>     public List<Estudiante> listar() {
+>         return new ArrayList<>(estudiantes);
+>     }
+>
+>     @Override
+>     public Optional<Estudiante> buscarPorId(Long id) {
+>         for (Estudiante estudiante : estudiantes) {
+>             if (estudiante.getId().equals(id)) {
+>                 return Optional.of(estudiante);
+>             }
+>         }
+>         return Optional.empty();
+>     }
+>
+>     @Override
+>     public boolean existePorCorreo(String correo) {
+>         for (Estudiante estudiante : estudiantes) {
+>             if (estudiante.getCorreo().equalsIgnoreCase(correo)) {
+>                 return true;
+>             }
+>         }
+>         return false;
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 RepositorioCursos.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/persistence/repository/RepositorioCursos.java`
+>
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.negocio.model.Curso;
+> import java.util.List;
+> import java.util.Optional;
+>
+> public interface RepositorioCursos {
+>
+>     Curso guardar(Curso curso);
+>
+>     List<Curso> listar();
+>
+>     Optional<Curso> buscarPorId(Long id);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 RepositorioCursosEnMemoria.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/persistence/repository/RepositorioCursosEnMemoria.java`
+>
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.negocio.model.Curso;
+> import java.util.ArrayList;
+> import java.util.List;
+> import java.util.Optional;
+> import org.springframework.stereotype.Repository;
+>
+> @Repository
+> public class RepositorioCursosEnMemoria implements RepositorioCursos {
+>
+>     private final List<Curso> cursos = new ArrayList<>();
+>     private long siguienteId = 1;
+>
+>     @Override
+>     public Curso guardar(Curso curso) {
+>         curso.setId(siguienteId++);
+>         cursos.add(curso);
+>         return curso;
+>     }
+>
+>     @Override
+>     public List<Curso> listar() {
+>         return new ArrayList<>(cursos);
+>     }
+>
+>     @Override
+>     public Optional<Curso> buscarPorId(Long id) {
+>         for (Curso curso : cursos) {
+>             if (curso.getId().equals(id)) {
+>                 return Optional.of(curso);
+>             }
+>         }
+>         return Optional.empty();
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 RepositorioMatriculas.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/persistence/repository/RepositorioMatriculas.java`
+>
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.negocio.model.Matricula;
+>
+> public interface RepositorioMatriculas {
+>
+>     Matricula guardar(Matricula matricula);
+>
+>     boolean existe(Long estudianteId, Long cursoId);
+>
+>     int contarPorCurso(Long cursoId);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 RepositorioMatriculasEnMemoria.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/persistence/repository/RepositorioMatriculasEnMemoria.java`
+>
+> ```java
+> package com.academia.persistence.repository;
+>
+> import com.academia.negocio.model.Matricula;
+> import java.util.ArrayList;
+> import java.util.List;
+> import org.springframework.stereotype.Repository;
+>
+> @Repository
+> public class RepositorioMatriculasEnMemoria implements RepositorioMatriculas {
+>
+>     private final List<Matricula> matriculas = new ArrayList<>();
+>     private long siguienteId = 1;
+>
+>     @Override
+>     public Matricula guardar(Matricula matricula) {
+>         matricula.setId(siguienteId++);
+>         matriculas.add(matricula);
+>         return matricula;
+>     }
+>
+>     @Override
+>     public boolean existe(Long estudianteId, Long cursoId) {
+>         for (Matricula matricula : matriculas) {
+>             if (matricula.getEstudiante().getId().equals(estudianteId)
+>                     && matricula.getCurso().getId().equals(cursoId)) {
+>                 return true;
+>             }
+>         }
+>         return false;
+>     }
+>
+>     @Override
+>     public int contarPorCurso(Long cursoId) {
+>         int contador = 0;
+>         for (Matricula matricula : matriculas) {
+>             if (matricula.getCurso().getId().equals(cursoId)) {
+>                 contador++;
+>             }
+>         }
+>         return contador;
+>     }
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 negocio — service
+>
+> <details>
+> <summary><strong>📄 ServicioEstudiantes.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/negocio/service/ServicioEstudiantes.java`
+>
+> ```java
+> package com.academia.negocio.service;
+>
+> import com.academia.negocio.model.Estudiante;
+> import com.academia.persistence.repository.RepositorioEstudiantes;
+> import java.util.List;
+> import java.util.NoSuchElementException;
+> import org.springframework.stereotype.Service;
+>
+> @Service
+> public class ServicioEstudiantes {
+>
+>     private final RepositorioEstudiantes repositorio;
+>
+>     public ServicioEstudiantes(RepositorioEstudiantes repositorio) {
+>         this.repositorio = repositorio;
+>     }
+>
+>     public Estudiante registrar(Estudiante estudiante) {
+>         if (repositorio.existePorCorreo(estudiante.getCorreo())) {
+>             throw new IllegalStateException("Ya existe un estudiante con el correo " + estudiante.getCorreo());
+>         }
+>         return repositorio.guardar(estudiante);
+>     }
+>
+>     public List<Estudiante> listar() {
+>         return repositorio.listar();
+>     }
+>
+>     public Estudiante obtener(Long id) {
+>         return repositorio.buscarPorId(id)
+>                 .orElseThrow(() -> new NoSuchElementException("No existe el estudiante " + id));
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 ServicioCursos.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/negocio/service/ServicioCursos.java`
+>
+> ```java
+> package com.academia.negocio.service;
+>
+> import com.academia.negocio.model.Curso;
+> import com.academia.negocio.model.Ocupacion;
+> import com.academia.persistence.repository.RepositorioCursos;
+> import com.academia.persistence.repository.RepositorioMatriculas;
+> import java.util.ArrayList;
+> import java.util.List;
+> import java.util.NoSuchElementException;
+> import org.springframework.stereotype.Service;
+>
+> @Service
+> public class ServicioCursos {
+>
+>     private static final double PRECIO_ECONOMICO = 200_000;
+>
+>     private final RepositorioCursos repositorio;
+>     private final RepositorioMatriculas repositorioMatriculas;
+>
+>     public ServicioCursos(RepositorioCursos repositorio, RepositorioMatriculas repositorioMatriculas) {
+>         this.repositorio = repositorio;
+>         this.repositorioMatriculas = repositorioMatriculas;
+>     }
+>
+>     public Curso registrar(Curso curso) {
+>         if (curso.getPrecio() <= 0) {
+>             throw new IllegalArgumentException("El precio debe ser mayor que cero");
+>         }
+>         if (curso.getCupoMaximo() <= 0) {
+>             throw new IllegalArgumentException("El cupo máximo debe ser mayor que cero");
+>         }
+>         return repositorio.guardar(curso);
+>     }
+>
+>     public List<Curso> listar() {
+>         return repositorio.listar();
+>     }
+>
+>     public List<Curso> listarEconomicos() {
+>         List<Curso> economicos = new ArrayList<>();
+>         for (Curso curso : repositorio.listar()) {
+>             if (curso.getPrecio() < PRECIO_ECONOMICO) {
+>                 economicos.add(curso);
+>             }
+>         }
+>         return economicos;
+>     }
+>
+>     public Curso obtener(Long id) {
+>         return repositorio.buscarPorId(id)
+>                 .orElseThrow(() -> new NoSuchElementException("No existe el curso " + id));
+>     }
+>
+>     public Ocupacion calcularOcupacion(Long id) {
+>         Curso curso = obtener(id);
+>         int matriculados = repositorioMatriculas.contarPorCurso(id);
+>         int disponibles = curso.getCupoMaximo() - matriculados;
+>         double porcentaje = (double) matriculados / curso.getCupoMaximo() * 100;
+>         porcentaje = Math.round(porcentaje * 100.0) / 100.0;
+>         return new Ocupacion(curso.getNombre(), curso.getCupoMaximo(), matriculados, disponibles, porcentaje);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 ServicioMatriculas.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/negocio/service/ServicioMatriculas.java`
+>
+> ```java
+> package com.academia.negocio.service;
+>
+> import com.academia.negocio.model.Curso;
+> import com.academia.negocio.model.Estudiante;
+> import com.academia.negocio.model.Matricula;
+> import com.academia.persistence.repository.RepositorioMatriculas;
+> import org.springframework.stereotype.Service;
+>
+> @Service
+> public class ServicioMatriculas {
+>
+>     private final RepositorioMatriculas repositorio;
+>     private final ServicioEstudiantes servicioEstudiantes;
+>     private final ServicioCursos servicioCursos;
+>
+>     public ServicioMatriculas(RepositorioMatriculas repositorio,
+>                               ServicioEstudiantes servicioEstudiantes,
+>                               ServicioCursos servicioCursos) {
+>         this.repositorio = repositorio;
+>         this.servicioEstudiantes = servicioEstudiantes;
+>         this.servicioCursos = servicioCursos;
+>     }
+>
+>     public Matricula matricular(Long estudianteId, Long cursoId) {
+>         Estudiante estudiante = servicioEstudiantes.obtener(estudianteId);
+>         Curso curso = servicioCursos.obtener(cursoId);
+>
+>         if (repositorio.existe(estudianteId, cursoId)) {
+>             throw new IllegalStateException(
+>                     "El estudiante " + estudianteId + " ya está matriculado en el curso " + cursoId);
+>         }
+>         if (repositorio.contarPorCurso(cursoId) >= curso.getCupoMaximo()) {
+>             throw new IllegalStateException("El curso " + cursoId + " no tiene cupos disponibles");
+>         }
+>         return repositorio.guardar(new Matricula(estudiante, curso));
+>     }
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 presentacion — controlador
+>
+> <details>
+> <summary><strong>📄 ControladorEstudiantes.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/presentacion/controlador/ControladorEstudiantes.java`
+>
+> ```java
+> package com.academia.presentacion.controlador;
+>
+> import com.academia.negocio.model.Estudiante;
+> import com.academia.negocio.service.ServicioEstudiantes;
+> import java.util.List;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PathVariable;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.ResponseStatus;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> @RestController
+> @RequestMapping("/estudiantes")
+> public class ControladorEstudiantes {
+>
+>     private final ServicioEstudiantes servicio;
+>
+>     public ControladorEstudiantes(ServicioEstudiantes servicio) {
+>         this.servicio = servicio;
+>     }
+>
+>     @PostMapping
+>     @ResponseStatus(HttpStatus.CREATED)
+>     public Estudiante registrar(@RequestBody Estudiante estudiante) {
+>         return servicio.registrar(estudiante);
+>     }
+>
+>     @GetMapping
+>     public List<Estudiante> listar() {
+>         return servicio.listar();
+>     }
+>
+>     @GetMapping("/{id}")
+>     public Estudiante obtener(@PathVariable Long id) {
+>         return servicio.obtener(id);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 ControladorCursos.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/presentacion/controlador/ControladorCursos.java`
+>
+> ```java
+> package com.academia.presentacion.controlador;
+>
+> import com.academia.negocio.model.Curso;
+> import com.academia.negocio.model.Ocupacion;
+> import com.academia.negocio.service.ServicioCursos;
+> import java.util.List;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PathVariable;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.ResponseStatus;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> @RestController
+> @RequestMapping("/cursos")
+> public class ControladorCursos {
+>
+>     private final ServicioCursos servicio;
+>
+>     public ControladorCursos(ServicioCursos servicio) {
+>         this.servicio = servicio;
+>     }
+>
+>     @PostMapping
+>     @ResponseStatus(HttpStatus.CREATED)
+>     public Curso registrar(@RequestBody Curso curso) {
+>         return servicio.registrar(curso);
+>     }
+>
+>     @GetMapping
+>     public List<Curso> listar() {
+>         return servicio.listar();
+>     }
+>
+>     @GetMapping("/economicos")
+>     public List<Curso> listarEconomicos() {
+>         return servicio.listarEconomicos();
+>     }
+>
+>     @GetMapping("/{id}/ocupacion")
+>     public Ocupacion ocupacion(@PathVariable Long id) {
+>         return servicio.calcularOcupacion(id);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 SolicitudMatricula.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/presentacion/controlador/SolicitudMatricula.java`
+>
+> ```java
+> package com.academia.presentacion.controlador;
+>
+> public record SolicitudMatricula(Long estudianteId, Long cursoId) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 ControladorMatriculas.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academia/presentacion/controlador/ControladorMatriculas.java`
+>
+> ```java
+> package com.academia.presentacion.controlador;
+>
+> import com.academia.negocio.model.Matricula;
+> import com.academia.negocio.service.ServicioMatriculas;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.ResponseStatus;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> @RestController
+> @RequestMapping("/matriculas")
+> public class ControladorMatriculas {
+>
+>     private final ServicioMatriculas servicio;
+>
+>     public ControladorMatriculas(ServicioMatriculas servicio) {
+>         this.servicio = servicio;
+>     }
+>
+>     @PostMapping
+>     @ResponseStatus(HttpStatus.CREATED)
+>     public Matricula matricular(@RequestBody SolicitudMatricula solicitud) {
+>         return servicio.matricular(solicitud.estudianteId(), solicitud.cursoId());
+>     }
+> }
+> ```
+>
+> </details>
+
 </details>
 
 <details>
