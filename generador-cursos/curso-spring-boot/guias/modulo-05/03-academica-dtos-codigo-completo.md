@@ -2,7 +2,7 @@
 
 > 🧾 **Solo el código.** Versión final de la [guía `02-academica-dtos`](02-academica-dtos.md), con el árbol (🆕 nuevo · ✏️ cambia) y el código completo sin explicaciones, seguido del **Paso 7 — Probar la API**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
-> 📦 **Código fuente:** [`academica-dtos/`](../codigo/academica-dtos/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado y ejecutado con Spring Boot 3.3 y MySQL 8.
+> 📦 **Código fuente:** [`academica-dtos/`](codigo/academica-dtos/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado y ejecutado con Spring Boot 3.3 y MySQL 8.
 
 <details>
 <summary><strong>📁 Estructura final esperada</strong></summary>
@@ -60,7 +60,7 @@
 > <details>
 > <summary><strong>📄 pom.xml</strong></summary>
 >
-> **Ruta:** [`pom.xml`](../codigo/academica-dtos/pom.xml)
+> **Ruta:** [`pom.xml`](codigo/academica-dtos/pom.xml)
 >
 > ```xml
 > <?xml version="1.0" encoding="UTF-8"?>
@@ -121,7 +121,7 @@
 > <details>
 > <summary><strong>📄 application.properties</strong></summary>
 >
-> **Ruta:** [`src/main/resources/application.properties`](../codigo/academica-dtos/src/main/resources/application.properties)
+> **Ruta:** [`src/main/resources/application.properties`](codigo/academica-dtos/src/main/resources/application.properties)
 >
 > ```properties
 > # MySQL connection
@@ -148,7 +148,7 @@
 > <details>
 > <summary><strong>📄 AcademyApplication.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/AcademyApplication.java`](../codigo/academica-dtos/src/main/java/com/academy/AcademyApplication.java)
+> **Ruta:** [`src/main/java/com/academy/AcademyApplication.java`](codigo/academica-dtos/src/main/java/com/academy/AcademyApplication.java)
 >
 > ```java
 > package com.academy;
@@ -176,7 +176,7 @@
 > <details>
 > <summary><strong>📄 StudentEntity.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/persistence/entity/StudentEntity.java`](../codigo/academica-dtos/src/main/java/com/academy/persistence/entity/StudentEntity.java)
+> **Ruta:** [`src/main/java/com/academy/persistence/entity/StudentEntity.java`](codigo/academica-dtos/src/main/java/com/academy/persistence/entity/StudentEntity.java)
 >
 > ```java
 > package com.academy.persistence.entity;
@@ -233,7 +233,7 @@
 > <details>
 > <summary><strong>📄 CourseEntity.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/persistence/entity/CourseEntity.java`](../codigo/academica-dtos/src/main/java/com/academy/persistence/entity/CourseEntity.java)
+> **Ruta:** [`src/main/java/com/academy/persistence/entity/CourseEntity.java`](codigo/academica-dtos/src/main/java/com/academy/persistence/entity/CourseEntity.java)
 >
 > ```java
 > package com.academy.persistence.entity;
@@ -279,7 +279,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentEntity.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/persistence/entity/EnrollmentEntity.java`](../codigo/academica-dtos/src/main/java/com/academy/persistence/entity/EnrollmentEntity.java)
+> **Ruta:** [`src/main/java/com/academy/persistence/entity/EnrollmentEntity.java`](codigo/academica-dtos/src/main/java/com/academy/persistence/entity/EnrollmentEntity.java)
 >
 > ```java
 > package com.academy.persistence.entity;
@@ -329,7 +329,7 @@
 > <details>
 > <summary><strong>📄 StudentJpaRepository.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`](../codigo/academica-dtos/src/main/java/com/academy/persistence/repository/StudentJpaRepository.java)
+> **Ruta:** [`src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`](codigo/academica-dtos/src/main/java/com/academy/persistence/repository/StudentJpaRepository.java)
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -348,7 +348,7 @@
 > <details>
 > <summary><strong>📄 CourseJpaRepository.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/persistence/repository/CourseJpaRepository.java`](../codigo/academica-dtos/src/main/java/com/academy/persistence/repository/CourseJpaRepository.java)
+> **Ruta:** [`src/main/java/com/academy/persistence/repository/CourseJpaRepository.java`](codigo/academica-dtos/src/main/java/com/academy/persistence/repository/CourseJpaRepository.java)
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -365,7 +365,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentJpaRepository.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java`](../codigo/academica-dtos/src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java)
+> **Ruta:** [`src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java`](codigo/academica-dtos/src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java)
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -392,7 +392,7 @@
 > <details>
 > <summary><strong>📄 ServiceStatus.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/business/service/ServiceStatus.java`](../codigo/academica-dtos/src/main/java/com/academy/business/service/ServiceStatus.java)
+> **Ruta:** [`src/main/java/com/academy/business/service/ServiceStatus.java`](codigo/academica-dtos/src/main/java/com/academy/business/service/ServiceStatus.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -409,7 +409,7 @@
 > <details>
 > <summary><strong>📄 ServiceResult.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/business/service/ServiceResult.java`](../codigo/academica-dtos/src/main/java/com/academy/business/service/ServiceResult.java)
+> **Ruta:** [`src/main/java/com/academy/business/service/ServiceResult.java`](codigo/academica-dtos/src/main/java/com/academy/business/service/ServiceResult.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -435,7 +435,7 @@
 > <details>
 > <summary><strong>📄 StudentService.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/business/service/StudentService.java`](../codigo/academica-dtos/src/main/java/com/academy/business/service/StudentService.java)
+> **Ruta:** [`src/main/java/com/academy/business/service/StudentService.java`](codigo/academica-dtos/src/main/java/com/academy/business/service/StudentService.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -483,7 +483,7 @@
 > <details>
 > <summary><strong>📄 CourseService.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/business/service/CourseService.java`](../codigo/academica-dtos/src/main/java/com/academy/business/service/CourseService.java)
+> **Ruta:** [`src/main/java/com/academy/business/service/CourseService.java`](codigo/academica-dtos/src/main/java/com/academy/business/service/CourseService.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -539,7 +539,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentService.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/business/service/EnrollmentService.java`](../codigo/academica-dtos/src/main/java/com/academy/business/service/EnrollmentService.java)
+> **Ruta:** [`src/main/java/com/academy/business/service/EnrollmentService.java`](codigo/academica-dtos/src/main/java/com/academy/business/service/EnrollmentService.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -603,7 +603,7 @@
 > <details>
 > <summary><strong>📄 StudentRequest.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/StudentRequest.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/StudentRequest.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/StudentRequest.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/StudentRequest.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -636,7 +636,7 @@
 > <details>
 > <summary><strong>📄 StudentResponse.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/StudentResponse.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/StudentResponse.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/StudentResponse.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/StudentResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -650,7 +650,7 @@
 > <details>
 > <summary><strong>📄 CourseRequest.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/CourseRequest.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/CourseRequest.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/CourseRequest.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/CourseRequest.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -680,7 +680,7 @@
 > <details>
 > <summary><strong>📄 CourseResponse.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/CourseResponse.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/CourseResponse.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/CourseResponse.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/CourseResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -694,7 +694,7 @@
 > <details>
 > <summary><strong>📄 EnrolledResponse.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrolledResponse.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/EnrolledResponse.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrolledResponse.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/EnrolledResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -708,7 +708,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentRequest.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrollmentRequest.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/EnrollmentRequest.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrollmentRequest.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/EnrollmentRequest.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -731,7 +731,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentResponse.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrollmentResponse.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/EnrollmentResponse.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrollmentResponse.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/EnrollmentResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -745,7 +745,7 @@
 > <details>
 > <summary><strong>📄 PageResponse.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/dto/PageResponse.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/dto/PageResponse.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/PageResponse.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/dto/PageResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -763,7 +763,7 @@
 > <details>
 > <summary><strong>📄 StudentMapper.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/mapper/StudentMapper.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/mapper/StudentMapper.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/mapper/StudentMapper.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/mapper/StudentMapper.java)
 >
 > ```java
 > package com.academy.presentation.mapper;
@@ -800,7 +800,7 @@
 > <details>
 > <summary><strong>📄 CourseMapper.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/mapper/CourseMapper.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/mapper/CourseMapper.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/mapper/CourseMapper.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/mapper/CourseMapper.java)
 >
 > ```java
 > package com.academy.presentation.mapper;
@@ -837,7 +837,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentMapper.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/mapper/EnrollmentMapper.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/mapper/EnrollmentMapper.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/mapper/EnrollmentMapper.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/mapper/EnrollmentMapper.java)
 >
 > ```java
 > package com.academy.presentation.mapper;
@@ -866,7 +866,7 @@
 > <details>
 > <summary><strong>📄 StudentController.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/controller/StudentController.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/controller/StudentController.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/controller/StudentController.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/controller/StudentController.java)
 >
 > ```java
 > package com.academy.presentation.controller;
@@ -935,7 +935,7 @@
 > <details>
 > <summary><strong>📄 CourseController.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/controller/CourseController.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/controller/CourseController.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/controller/CourseController.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/controller/CourseController.java)
 >
 > ```java
 > package com.academy.presentation.controller;
@@ -1009,7 +1009,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentController.java</strong></summary>
 >
-> **Ruta:** [`src/main/java/com/academy/presentation/controller/EnrollmentController.java`](../codigo/academica-dtos/src/main/java/com/academy/presentation/controller/EnrollmentController.java)
+> **Ruta:** [`src/main/java/com/academy/presentation/controller/EnrollmentController.java`](codigo/academica-dtos/src/main/java/com/academy/presentation/controller/EnrollmentController.java)
 >
 > ```java
 > package com.academy.presentation.controller;

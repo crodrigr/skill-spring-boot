@@ -1,8 +1,8 @@
 # academica-dtos
 
 Taller de gestión de cursos (estudiantes, cursos y matrículas) con **DTO**, mapeadores y controladores delgados.
-Es el proyecto de la [guía 01 del módulo 03-04](../../modulo-03-04/01-guia-taller-gestion-de-cursos-con-bd.md) con las mejoras del [Módulo 05](../../modulo-05/01-guia-dto-y-estructura-de-controladores.md).
-Guía: [`02-academica-dtos.md`](../../modulo-05/02-academica-dtos.md) · Código completo: [`03-academica-dtos-codigo-completo.md`](../../modulo-05/03-academica-dtos-codigo-completo.md).
+Es el proyecto de la [guía 01 del módulo 03-04](../../../modulo-03-04/01-guia-taller-gestion-de-cursos-con-bd.md) con las mejoras del [Módulo 05](../../01-guia-dto-y-estructura-de-controladores.md).
+Guía: [`02-academica-dtos.md`](../../02-academica-dtos.md) · Código completo: [`03-academica-dtos-codigo-completo.md`](../../03-academica-dtos-codigo-completo.md).
 
 ## Requisitos
 
