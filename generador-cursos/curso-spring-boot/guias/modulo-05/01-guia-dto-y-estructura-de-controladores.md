@@ -1384,6 +1384,10 @@
 > > <details>
 > > <summary><strong>1. Crear un estudiante → <code>201</code> y la cabecera <code>Location</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.create(...)` · `@PostMapping`
+> >
+> > Entra por `create`, que llama a `StudentService.create(...)`.
+> >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
 > >      -H "Content-Type: application/json" \
@@ -1411,6 +1415,10 @@
 > >
 > > <details>
 > > <summary><strong>2. Crear enviando campos de más (<code>id</code> y <code>createdAt</code>) → <code>201</code>; ambos se ignoran</strong></summary>
+> >
+> > **Método del controlador:** `StudentController.create(...)` · `@PostMapping`
+> >
+> > Entra por `create`. El `id` y el `createdAt` no existen en `StudentRequest`, así que nunca llegan al método.
 > >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
@@ -1440,6 +1448,10 @@
 > > <details>
 > > <summary><strong>3. Correo repetido, en mayúsculas → <code>409</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.create(...)` · `@PostMapping`
+> >
+> > Entra por `create`; `StudentService.create(...)` detecta el correo repetido y devuelve `CONFLICT`, que `create` traduce a `409`.
+> >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
 > >      -H "Content-Type: application/json" \
@@ -1457,6 +1469,10 @@
 > >
 > > <details>
 > > <summary><strong>4. Datos inválidos → <code>400</code></strong></summary>
+> >
+> > **Método del controlador:** `StudentController.create(...)` · `@PostMapping`
+> >
+> > `@Valid` falla **antes** de ejecutar el cuerpo de `create`: Spring responde `400` y el método no llega a correr.
 > >
 > > ```bash
 > > curl -i -X POST http://localhost:8080/api/v1/students \
@@ -1484,6 +1500,10 @@
 > >
 > > <details>
 > > <summary><strong>5. Listar con filtro, tamaño excesivo y orden → <code>200</code> con <code>"size":50</code></strong></summary>
+> >
+> > **Método del controlador:** `StudentController.search(...)` · `@GetMapping`
+> >
+> > Entra por `search`, que llama a `StudentService.search(...)`. El tope de 50 lo aplica Spring antes, con `spring.data.web.pageable.max-page-size`.
 > >
 > > ```bash
 > > curl -i "http://localhost:8080/api/v1/students?name=a&size=1000&sort=name,asc"
@@ -1518,6 +1538,10 @@
 > > <details>
 > > <summary><strong>6. Buscar por id → <code>200</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.findById(...)` · `@GetMapping("/{id}")`
+> >
+> > Entra por `findById`, que llama a `StudentService.findById(...)`.
+> >
 > > ```bash
 > > curl -i http://localhost:8080/api/v1/students/1
 > > ```
@@ -1543,6 +1567,10 @@
 > > <details>
 > > <summary><strong>7. Buscar un id que no existe → <code>404</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.findById(...)` · `@GetMapping("/{id}")`
+> >
+> > Entra por `findById`; el servicio no encuentra el estudiante y el método responde `404`.
+> >
 > > ```bash
 > > curl -i http://localhost:8080/api/v1/students/99
 > > ```
@@ -1558,6 +1586,10 @@
 > >
 > > <details>
 > > <summary><strong>8. Reemplazar (<code>PUT</code>) con datos válidos → <code>200</code></strong></summary>
+> >
+> > **Método del controlador:** `StudentController.update(...)` · `@PutMapping("/{id}")`
+> >
+> > Entra por `update`, que llama a `StudentService.update(...)` y traduce el resultado con `respond(...)`.
 > >
 > > ```bash
 > > curl -i -X PUT http://localhost:8080/api/v1/students/1 \
@@ -1586,6 +1618,10 @@
 > > <details>
 > > <summary><strong>9. Reemplazar con el correo de otro estudiante → <code>409</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.update(...)` · `@PutMapping("/{id}")`
+> >
+> > Entra por `update`; el servicio devuelve `CONFLICT` y `respond(...)` lo traduce a `409`.
+> >
 > > ```bash
 > > curl -i -X PUT http://localhost:8080/api/v1/students/1 \
 > >      -H "Content-Type: application/json" \
@@ -1604,6 +1640,10 @@
 > > <details>
 > > <summary><strong>10. Reemplazar un id que no existe → <code>404</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.update(...)` · `@PutMapping("/{id}")`
+> >
+> > Entra por `update`; el servicio devuelve `NOT_FOUND` y `respond(...)` lo traduce a `404`.
+> >
 > > ```bash
 > > curl -i -X PUT http://localhost:8080/api/v1/students/99 \
 > >      -H "Content-Type: application/json" \
@@ -1621,6 +1661,10 @@
 > >
 > > <details>
 > > <summary><strong>11. Cambiar solo el estado (<code>PATCH</code>) → <code>200</code>; el nombre y la edad no cambian</strong></summary>
+> >
+> > **Método del controlador:** `StudentController.changeStatus(...)` · `@PatchMapping("/{id}/status")`
+> >
+> > Entra por `changeStatus`, que recibe un `StudentStatusRequest` y llama a `StudentService.changeStatus(...)`.
 > >
 > > ```bash
 > > curl -i -X PATCH http://localhost:8080/api/v1/students/1/status \
@@ -1649,6 +1693,10 @@
 > > <details>
 > > <summary><strong>12. <code>PATCH</code> con estado nulo → <code>400</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.changeStatus(...)` · `@PatchMapping("/{id}/status")`
+> >
+> > `@Valid` falla **antes** de ejecutar `changeStatus`: `StudentStatusRequest.status` es `@NotNull`.
+> >
 > > ```bash
 > > curl -i -X PATCH http://localhost:8080/api/v1/students/1/status \
 > >      -H "Content-Type: application/json" \
@@ -1676,6 +1724,10 @@
 > > <details>
 > > <summary><strong>13. <code>PATCH</code> de un id que no existe → <code>404</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.changeStatus(...)` · `@PatchMapping("/{id}/status")`
+> >
+> > Entra por `changeStatus`; el servicio devuelve `NOT_FOUND` y `respond(...)` lo traduce a `404`.
+> >
 > > ```bash
 > > curl -i -X PATCH http://localhost:8080/api/v1/students/99/status \
 > >      -H "Content-Type: application/json" \
@@ -1694,6 +1746,10 @@
 > > <details>
 > > <summary><strong>14. Eliminar → <code>204</code></strong></summary>
 > >
+> > **Método del controlador:** `StudentController.delete(...)` · `@DeleteMapping("/{id}")`
+> >
+> > Entra por `delete`, que llama a `StudentService.delete(...)` y responde `204` sin cuerpo.
+> >
 > > ```bash
 > > curl -i -X DELETE http://localhost:8080/api/v1/students/2
 > > ```
@@ -1708,6 +1764,10 @@
 > >
 > > <details>
 > > <summary><strong>15. Eliminar otra vez → <code>404</code></strong></summary>
+> >
+> > **Método del controlador:** `StudentController.delete(...)` · `@DeleteMapping("/{id}")`
+> >
+> > Entra por `delete`; el estudiante ya no existe y responde `404`.
 > >
 > > ```bash
 > > curl -i -X DELETE http://localhost:8080/api/v1/students/2
@@ -1724,6 +1784,8 @@
 > >
 > > <details>
 > > <summary><strong>16. La ruta sin versión ya no existe → <code>404</code></strong></summary>
+> >
+> > **Método del controlador:** ninguno. La ruta no existe: el `404` lo genera Spring antes de llegar a `StudentController`.
 > >
 > > ```bash
 > > curl -i http://localhost:8080/api/students
