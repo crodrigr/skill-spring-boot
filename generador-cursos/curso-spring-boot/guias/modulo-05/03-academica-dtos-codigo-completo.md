@@ -1,46 +1,46 @@
 # 📘 Academia con DTO — Código completo
 
-> 🧾 **Solo el código.** Versión final de la [guía `02-academica-dtos`](02-academica-dtos.md), sin explicaciones. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
+> 🧾 **Solo el código.** Versión final de la [guía `02-academica-dtos`](02-academica-dtos.md), con el árbol (🆕 nuevo · ✏️ cambia) y el código completo sin explicaciones, seguido del **Paso 7 — Probar la API**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
-> 📦 **Proyecto terminado:** [`academica-dtos/`](academica-dtos/) · ✅ compilado y ejecutado con Spring Boot 3.3 y MySQL 8.
+> 📦 **Código fuente:** [`academica-dtos/`](academica-dtos/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado y ejecutado con Spring Boot 3.3 y MySQL 8.
 
 <details>
 <summary><strong>📁 Estructura final esperada</strong></summary>
 
 > ```text
 > 📁 academica-dtos
-> ├── 📄 pom.xml
+> ├── ✏️ pom.xml                                   + spring-boot-starter-validation
 > └── 📁 src/main
 >     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
 >     │   │   ├── 📁 controller
->     │   │   │   ├── 📄 StudentController.java
->     │   │   │   ├── 📄 CourseController.java
->     │   │   │   └── 📄 EnrollmentController.java
+>     │   │   │   ├── ✏️ StudentController.java
+>     │   │   │   ├── ✏️ CourseController.java
+>     │   │   │   └── ✏️ EnrollmentController.java
 >     │   │   ├── 📁 dto
->     │   │   │   ├── 📄 StudentRequest.java
->     │   │   │   ├── 📄 StudentResponse.java
->     │   │   │   ├── 📄 CourseRequest.java
->     │   │   │   ├── 📄 CourseResponse.java
->     │   │   │   ├── 📄 EnrolledResponse.java
->     │   │   │   ├── 📄 EnrollmentRequest.java
->     │   │   │   ├── 📄 EnrollmentResponse.java
->     │   │   │   └── 📄 PageResponse.java
+>     │   │   │   ├── 🆕 StudentRequest.java
+>     │   │   │   ├── 🆕 StudentResponse.java
+>     │   │   │   ├── 🆕 CourseRequest.java
+>     │   │   │   ├── 🆕 CourseResponse.java
+>     │   │   │   ├── 🆕 EnrolledResponse.java
+>     │   │   │   ├── 🆕 EnrollmentRequest.java
+>     │   │   │   ├── 🆕 EnrollmentResponse.java
+>     │   │   │   └── 🆕 PageResponse.java
 >     │   │   └── 📁 mapper
->     │   │       ├── 📄 StudentMapper.java
->     │   │       ├── 📄 CourseMapper.java
->     │   │       └── 📄 EnrollmentMapper.java
+>     │   │       ├── 🆕 StudentMapper.java
+>     │   │       ├── 🆕 CourseMapper.java
+>     │   │       └── 🆕 EnrollmentMapper.java
 >     │   ├── 📁 business
 >     │   │   └── 📁 service
->     │   │       ├── 📄 StudentService.java
->     │   │       ├── 📄 CourseService.java
->     │   │       ├── 📄 EnrollmentService.java
->     │   │       ├── 📄 ServiceResult.java
->     │   │       └── 📄 ServiceStatus.java
+>     │   │       ├── ✏️ StudentService.java
+>     │   │       ├── ✏️ CourseService.java
+>     │   │       ├── ✏️ EnrollmentService.java
+>     │   │       ├── 🆕 ServiceResult.java
+>     │   │       └── 🆕 ServiceStatus.java
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity
->     │       │   ├── 📄 StudentEntity.java
+>     │       │   ├── ✏️ StudentEntity.java          + campo interno createdAt
 >     │       │   ├── 📄 CourseEntity.java
 >     │       │   └── 📄 EnrollmentEntity.java
 >     │       └── 📁 repository
@@ -48,8 +48,10 @@
 >     │           ├── 📄 CourseJpaRepository.java
 >     │           └── 📄 EnrollmentJpaRepository.java
 >     └── 📁 resources
->         └── 📄 application.properties
+>         └── ✏️ application.properties             límites de paginación y errores
 > ```
+>
+> 🆕 archivo nuevo · ✏️ archivo del taller que cambia · 📄 sin cambios respecto al taller (guía 01 del módulo 03-04)
 >
 > **Código final, paso a paso**
 >
@@ -58,7 +60,7 @@
 > <details>
 > <summary><strong>📄 pom.xml</strong></summary>
 >
-> **Ruta:** `pom.xml`
+> **Ruta:** [`pom.xml`](academica-dtos/pom.xml)
 >
 > ```xml
 > <?xml version="1.0" encoding="UTF-8"?>
@@ -119,7 +121,7 @@
 > <details>
 > <summary><strong>📄 application.properties</strong></summary>
 >
-> **Ruta:** `src/main/resources/application.properties`
+> **Ruta:** [`src/main/resources/application.properties`](academica-dtos/src/main/resources/application.properties)
 >
 > ```properties
 > # MySQL connection
@@ -146,7 +148,7 @@
 > <details>
 > <summary><strong>📄 AcademyApplication.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/AcademyApplication.java`
+> **Ruta:** [`src/main/java/com/academy/AcademyApplication.java`](academica-dtos/src/main/java/com/academy/AcademyApplication.java)
 >
 > ```java
 > package com.academy;
@@ -174,7 +176,7 @@
 > <details>
 > <summary><strong>📄 StudentEntity.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentEntity.java`
+> **Ruta:** [`src/main/java/com/academy/persistence/entity/StudentEntity.java`](academica-dtos/src/main/java/com/academy/persistence/entity/StudentEntity.java)
 >
 > ```java
 > package com.academy.persistence.entity;
@@ -231,7 +233,7 @@
 > <details>
 > <summary><strong>📄 CourseEntity.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/persistence/entity/CourseEntity.java`
+> **Ruta:** [`src/main/java/com/academy/persistence/entity/CourseEntity.java`](academica-dtos/src/main/java/com/academy/persistence/entity/CourseEntity.java)
 >
 > ```java
 > package com.academy.persistence.entity;
@@ -277,7 +279,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentEntity.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/persistence/entity/EnrollmentEntity.java`
+> **Ruta:** [`src/main/java/com/academy/persistence/entity/EnrollmentEntity.java`](academica-dtos/src/main/java/com/academy/persistence/entity/EnrollmentEntity.java)
 >
 > ```java
 > package com.academy.persistence.entity;
@@ -327,7 +329,7 @@
 > <details>
 > <summary><strong>📄 StudentJpaRepository.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`
+> **Ruta:** [`src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`](academica-dtos/src/main/java/com/academy/persistence/repository/StudentJpaRepository.java)
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -346,7 +348,7 @@
 > <details>
 > <summary><strong>📄 CourseJpaRepository.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/persistence/repository/CourseJpaRepository.java`
+> **Ruta:** [`src/main/java/com/academy/persistence/repository/CourseJpaRepository.java`](academica-dtos/src/main/java/com/academy/persistence/repository/CourseJpaRepository.java)
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -363,7 +365,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentJpaRepository.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java`
+> **Ruta:** [`src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java`](academica-dtos/src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java)
 >
 > ```java
 > package com.academy.persistence.repository;
@@ -390,7 +392,7 @@
 > <details>
 > <summary><strong>📄 ServiceStatus.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/business/service/ServiceStatus.java`
+> **Ruta:** [`src/main/java/com/academy/business/service/ServiceStatus.java`](academica-dtos/src/main/java/com/academy/business/service/ServiceStatus.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -407,7 +409,7 @@
 > <details>
 > <summary><strong>📄 ServiceResult.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/business/service/ServiceResult.java`
+> **Ruta:** [`src/main/java/com/academy/business/service/ServiceResult.java`](academica-dtos/src/main/java/com/academy/business/service/ServiceResult.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -433,7 +435,7 @@
 > <details>
 > <summary><strong>📄 StudentService.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
+> **Ruta:** [`src/main/java/com/academy/business/service/StudentService.java`](academica-dtos/src/main/java/com/academy/business/service/StudentService.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -481,7 +483,7 @@
 > <details>
 > <summary><strong>📄 CourseService.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/business/service/CourseService.java`
+> **Ruta:** [`src/main/java/com/academy/business/service/CourseService.java`](academica-dtos/src/main/java/com/academy/business/service/CourseService.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -537,7 +539,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentService.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/business/service/EnrollmentService.java`
+> **Ruta:** [`src/main/java/com/academy/business/service/EnrollmentService.java`](academica-dtos/src/main/java/com/academy/business/service/EnrollmentService.java)
 >
 > ```java
 > package com.academy.business.service;
@@ -601,7 +603,7 @@
 > <details>
 > <summary><strong>📄 StudentRequest.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentRequest.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/StudentRequest.java`](academica-dtos/src/main/java/com/academy/presentation/dto/StudentRequest.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -634,7 +636,7 @@
 > <details>
 > <summary><strong>📄 StudentResponse.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentResponse.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/StudentResponse.java`](academica-dtos/src/main/java/com/academy/presentation/dto/StudentResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -648,7 +650,7 @@
 > <details>
 > <summary><strong>📄 CourseRequest.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/CourseRequest.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/CourseRequest.java`](academica-dtos/src/main/java/com/academy/presentation/dto/CourseRequest.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -678,7 +680,7 @@
 > <details>
 > <summary><strong>📄 CourseResponse.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/CourseResponse.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/CourseResponse.java`](academica-dtos/src/main/java/com/academy/presentation/dto/CourseResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -692,7 +694,7 @@
 > <details>
 > <summary><strong>📄 EnrolledResponse.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/EnrolledResponse.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrolledResponse.java`](academica-dtos/src/main/java/com/academy/presentation/dto/EnrolledResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -706,7 +708,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentRequest.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/EnrollmentRequest.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrollmentRequest.java`](academica-dtos/src/main/java/com/academy/presentation/dto/EnrollmentRequest.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -729,7 +731,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentResponse.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/EnrollmentResponse.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/EnrollmentResponse.java`](academica-dtos/src/main/java/com/academy/presentation/dto/EnrollmentResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -743,7 +745,7 @@
 > <details>
 > <summary><strong>📄 PageResponse.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/dto/PageResponse.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/dto/PageResponse.java`](academica-dtos/src/main/java/com/academy/presentation/dto/PageResponse.java)
 >
 > ```java
 > package com.academy.presentation.dto;
@@ -761,7 +763,7 @@
 > <details>
 > <summary><strong>📄 StudentMapper.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/mapper/StudentMapper.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/mapper/StudentMapper.java`](academica-dtos/src/main/java/com/academy/presentation/mapper/StudentMapper.java)
 >
 > ```java
 > package com.academy.presentation.mapper;
@@ -798,7 +800,7 @@
 > <details>
 > <summary><strong>📄 CourseMapper.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/mapper/CourseMapper.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/mapper/CourseMapper.java`](academica-dtos/src/main/java/com/academy/presentation/mapper/CourseMapper.java)
 >
 > ```java
 > package com.academy.presentation.mapper;
@@ -835,7 +837,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentMapper.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/mapper/EnrollmentMapper.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/mapper/EnrollmentMapper.java`](academica-dtos/src/main/java/com/academy/presentation/mapper/EnrollmentMapper.java)
 >
 > ```java
 > package com.academy.presentation.mapper;
@@ -864,7 +866,7 @@
 > <details>
 > <summary><strong>📄 StudentController.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/controller/StudentController.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/controller/StudentController.java`](academica-dtos/src/main/java/com/academy/presentation/controller/StudentController.java)
 >
 > ```java
 > package com.academy.presentation.controller;
@@ -933,7 +935,7 @@
 > <details>
 > <summary><strong>📄 CourseController.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/controller/CourseController.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/controller/CourseController.java`](academica-dtos/src/main/java/com/academy/presentation/controller/CourseController.java)
 >
 > ```java
 > package com.academy.presentation.controller;
@@ -1007,7 +1009,7 @@
 > <details>
 > <summary><strong>📄 EnrollmentController.java</strong></summary>
 >
-> **Ruta:** `src/main/java/com/academy/presentation/controller/EnrollmentController.java`
+> **Ruta:** [`src/main/java/com/academy/presentation/controller/EnrollmentController.java`](academica-dtos/src/main/java/com/academy/presentation/controller/EnrollmentController.java)
 >
 > ```java
 > package com.academy.presentation.controller;
@@ -1069,3 +1071,856 @@
 > </details>
 
 </details>
+
+---
+
+<details>
+<summary><strong>🧪 Paso 7 — Probar la API</strong></summary>
+
+> <details>
+> <summary><strong>Paso 7.1 · Las pruebas con <code>curl</code></strong></summary>
+>
+> > Se arranca la aplicación con MySQL en marcha (`./mvnw spring-boot:run`) y se ejecuta cada comando en otra terminal. Debajo de cada uno está la **respuesta real**.
+> >
+> > > 💡 La API devuelve el JSON en una sola línea; aquí se muestra con sangría para leerlo mejor. Los `404` y `409` del controlador llegan **sin cuerpo**; los `400` de validación traen el cuerpo genérico de Spring Boot.
+> >
+> > <details>
+> > <summary><strong>1. Estudiantes · crear → <code>201</code> y la cabecera <code>Location</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `StudentController.create(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
+> >     ServiceResult<StudentEntity> result = service.create(StudentMapper.toEntity(request));
+> >     if (result.status() == ServiceStatus.CONFLICT) {
+> >         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >     }
+> >     StudentResponse body = StudentMapper.toResponse(result.value());
+> >     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >             .path("/{id}").buildAndExpand(body.id()).toUri();
+> >     return ResponseEntity.created(location).body(body);
+> > }
+> > ```
+> >
+> > Entra por `create`: valida el cuerpo (`@Valid`), lo convierte a entidad con el mapeador y responde `201` con `Location`.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"Ana Torres","age":22,"email":"ana@mail.com"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 201
+> > Location: http://localhost:8080/api/v1/students/1
+> > Content-Type: application/json
+> >
+> > {
+> >   "id": 1,
+> >   "name": "Ana Torres",
+> >   "age": 22,
+> >   "email": "ana@mail.com"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>2. Estudiantes · crear enviando campos de más (<code>id</code> y <code>createdAt</code>) → <code>201</code>; ambos se ignoran</strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `StudentController.create(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
+> >     ServiceResult<StudentEntity> result = service.create(StudentMapper.toEntity(request));
+> >     if (result.status() == ServiceStatus.CONFLICT) {
+> >         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >     }
+> >     StudentResponse body = StudentMapper.toResponse(result.value());
+> >     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >             .path("/{id}").buildAndExpand(body.id()).toUri();
+> >     return ResponseEntity.created(location).body(body);
+> > }
+> > ```
+> >
+> > `StudentRequest` no tiene `id` ni `createdAt`: Jackson ignora lo que no existe en el `record`. Se contrasta con el Paso 1.2, donde el `id` forjado **pisaba** a Ana.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"id":99,"name":"Luis Pérez","age":25,"email":"luis@mail.com","createdAt":"2000-01-01T00:00:00"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 201
+> > Location: http://localhost:8080/api/v1/students/2
+> > Content-Type: application/json
+> >
+> > {
+> >   "id": 2,
+> >   "name": "Luis Pérez",
+> >   "age": 25,
+> >   "email": "luis@mail.com"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>3. Estudiantes · correo repetido, en mayúsculas → <code>409</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `StudentController.create(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
+> >     ServiceResult<StudentEntity> result = service.create(StudentMapper.toEntity(request));
+> >     if (result.status() == ServiceStatus.CONFLICT) {
+> >         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >     }
+> >     StudentResponse body = StudentMapper.toResponse(result.value());
+> >     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >             .path("/{id}").buildAndExpand(body.id()).toUri();
+> >     return ResponseEntity.created(location).body(body);
+> > }
+> > ```
+> >
+> > `StudentService.create` detecta el correo repetido y devuelve `CONFLICT`; `create` lo traduce a `409`.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"Otra","age":30,"email":"ANA@MAIL.COM"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 409
+> > Content-Length: 0
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>4. Estudiantes · datos inválidos → <code>400</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `StudentController.create(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
+> >     ServiceResult<StudentEntity> result = service.create(StudentMapper.toEntity(request));
+> >     if (result.status() == ServiceStatus.CONFLICT) {
+> >         return ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >     }
+> >     StudentResponse body = StudentMapper.toResponse(result.value());
+> >     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >             .path("/{id}").buildAndExpand(body.id()).toUri();
+> >     return ResponseEntity.created(location).body(body);
+> > }
+> > ```
+> >
+> > `@Valid` falla **antes** de ejecutar el cuerpo de `create`: Spring responde `400` y el método no llega a correr.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"","age":5,"email":"x"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 400
+> > Content-Type: application/json
+> >
+> > {
+> >   "timestamp": "2026-11-01T20:15:55.151+00:00",
+> >   "status": 400,
+> >   "error": "Bad Request",
+> >   "path": "/api/v1/students"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>5. Estudiantes · listar con tamaño excesivo y orden → <code>200</code> con <code>"size":50</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `StudentController.findAll(...)`
+> >
+> > ```java
+> > @GetMapping
+> > public PageResponse<StudentResponse> findAll(Pageable pageable) {
+> >     return StudentMapper.toPageResponse(service.findAll(pageable));
+> > }
+> > ```
+> >
+> > Entra por `findAll`, que arma una `PageResponse`. El tope de 50 lo aplica Spring antes, con `spring.data.web.pageable.max-page-size`.
+> >
+> > ```bash
+> > curl -i "http://localhost:8080/api/v1/students?size=1000&sort=name,asc"
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> >
+> > {
+> >   "content": [
+> >     {
+> >       "id": 1,
+> >       "name": "Ana Torres",
+> >       "age": 22,
+> >       "email": "ana@mail.com"
+> >     },
+> >     {
+> >       "id": 2,
+> >       "name": "Luis Pérez",
+> >       "age": 25,
+> >       "email": "luis@mail.com"
+> >     }
+> >   ],
+> >   "page": 0,
+> >   "size": 50,
+> >   "totalElements": 2,
+> >   "totalPages": 1
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>6. Estudiantes · buscar por id → <code>200</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `StudentController.findById(...)`
+> >
+> > ```java
+> > @GetMapping("/{id}")
+> > public ResponseEntity<StudentResponse> findById(@PathVariable Long id) {
+> >     return service.findById(id)
+> >             .map(StudentMapper::toResponse)
+> >             .map(ResponseEntity::ok)
+> >             .orElseGet(() -> ResponseEntity.notFound().build());
+> > }
+> > ```
+> >
+> > Entra por `findById`: el `Optional` con entidad pasa por el mapeador y se envuelve en `200`.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/students/1
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> >
+> > {
+> >   "id": 1,
+> >   "name": "Ana Torres",
+> >   "age": 22,
+> >   "email": "ana@mail.com"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>7. Estudiantes · buscar un id que no existe → <code>404</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `StudentController.findById(...)`
+> >
+> > ```java
+> > @GetMapping("/{id}")
+> > public ResponseEntity<StudentResponse> findById(@PathVariable Long id) {
+> >     return service.findById(id)
+> >             .map(StudentMapper::toResponse)
+> >             .map(ResponseEntity::ok)
+> >             .orElseGet(() -> ResponseEntity.notFound().build());
+> > }
+> > ```
+> >
+> > El `Optional` está vacío y `orElseGet` responde `404`.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/students/99
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>8. Cursos · crear → <code>201</code> y la cabecera <code>Location</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `CourseController.create(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<CourseResponse> create(@Valid @RequestBody CourseRequest request) {
+> >     CourseEntity created = service.create(CourseMapper.toEntity(request));
+> >     CourseResponse body = CourseMapper.toResponse(created);
+> >     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >             .path("/{id}").buildAndExpand(body.id()).toUri();
+> >     return ResponseEntity.created(location).body(body);
+> > }
+> > ```
+> >
+> > Entra por `create`. El precio y el cupo ya se validaron en `CourseRequest`; el servicio solo guarda.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/courses \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"Java from scratch","price":150000,"maxCapacity":1}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 201
+> > Location: http://localhost:8080/api/v1/courses/1
+> > Content-Type: application/json
+> >
+> > {
+> >   "id": 1,
+> >   "name": "Java from scratch",
+> >   "price": 150000.0,
+> >   "maxCapacity": 1
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>9. Cursos · precio <code>0</code> y cupo <code>0</code> → <code>400</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `CourseController.create(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<CourseResponse> create(@Valid @RequestBody CourseRequest request) {
+> >     CourseEntity created = service.create(CourseMapper.toEntity(request));
+> >     CourseResponse body = CourseMapper.toResponse(created);
+> >     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >             .path("/{id}").buildAndExpand(body.id()).toUri();
+> >     return ResponseEntity.created(location).body(body);
+> > }
+> > ```
+> >
+> > `@Positive` y `@Min(1)` fallan en `CourseRequest`. Antes esta regla vivía en el servicio y respondía `409`.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/courses \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"X","price":0,"maxCapacity":0}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 400
+> > Content-Type: application/json
+> >
+> > {
+> >   "timestamp": "2026-11-01T20:15:55.257+00:00",
+> >   "status": 400,
+> >   "error": "Bad Request",
+> >   "path": "/api/v1/courses"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>10. Cursos · listar → <code>200</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `CourseController.findAll(...)`
+> >
+> > ```java
+> > @GetMapping
+> > public PageResponse<CourseResponse> findAll(Pageable pageable) {
+> >     return CourseMapper.toPageResponse(service.findAll(pageable));
+> > }
+> > ```
+> >
+> > Entra por `findAll`: devuelve la misma `PageResponse` que los estudiantes, ahora con `CourseResponse`.
+> >
+> > ```bash
+> > curl -i "http://localhost:8080/api/v1/courses?page=0&size=5"
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> >
+> > {
+> >   "content": [
+> >     {
+> >       "id": 1,
+> >       "name": "Java from scratch",
+> >       "price": 150000.0,
+> >       "maxCapacity": 1
+> >     }
+> >   ],
+> >   "page": 0,
+> >   "size": 5,
+> >   "totalElements": 1,
+> >   "totalPages": 1
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>11. Cursos · cuántos matriculados → <code>200</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `CourseController.countEnrolled(...)`
+> >
+> > ```java
+> > @GetMapping("/{id}/enrolled")
+> > public ResponseEntity<EnrolledResponse> countEnrolled(@PathVariable Long id) {
+> >     ServiceResult<Long> result = service.countEnrolled(id);
+> >     return switch (result.status()) {
+> >         case OK -> ResponseEntity.ok(new EnrolledResponse(id, result.value()));
+> >         case NOT_FOUND, CONFLICT -> ResponseEntity.notFound().build();
+> >     };
+> > }
+> > ```
+> >
+> > Entra por `countEnrolled`: el servicio devuelve `ServiceResult<Long>` y el controlador lo envuelve en un objeto JSON (`EnrolledResponse`), no en un número suelto.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/courses/1/enrolled
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> >
+> > {
+> >   "courseId": 1,
+> >   "enrolled": 0
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>12. Cursos · conteo de un curso que no existe → <code>404</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `CourseController.countEnrolled(...)`
+> >
+> > ```java
+> > @GetMapping("/{id}/enrolled")
+> > public ResponseEntity<EnrolledResponse> countEnrolled(@PathVariable Long id) {
+> >     ServiceResult<Long> result = service.countEnrolled(id);
+> >     return switch (result.status()) {
+> >         case OK -> ResponseEntity.ok(new EnrolledResponse(id, result.value()));
+> >         case NOT_FOUND, CONFLICT -> ResponseEntity.notFound().build();
+> >     };
+> > }
+> > ```
+> >
+> > El servicio devuelve `NOT_FOUND` y el `switch` lo traduce a `404`.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/courses/9/enrolled
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>13. Matrículas · matricular → <code>201</code> y la cabecera <code>Location</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `EnrollmentController.enroll(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<EnrollmentResponse> enroll(@Valid @RequestBody EnrollmentRequest request) {
+> >     ServiceResult<EnrollmentEntity> result = service.enroll(request.studentId(), request.courseId());
+> >     return switch (result.status()) {
+> >         case NOT_FOUND -> ResponseEntity.notFound().build();
+> >         case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >         case OK -> {
+> >             EnrollmentResponse body = EnrollmentMapper.toResponse(result.value());
+> >             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >                     .path("/{id}").buildAndExpand(body.id()).toUri();
+> >             yield ResponseEntity.created(location).body(body);
+> >         }
+> >     };
+> > }
+> > ```
+> >
+> > Entra por `enroll`: los ids viajan en el **cuerpo** (`EnrollmentRequest`) y la respuesta es plana (`EnrollmentResponse`), no dos entidades anidadas.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/enrollments \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"studentId":1,"courseId":1}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 201
+> > Location: http://localhost:8080/api/v1/enrollments/1
+> > Content-Type: application/json
+> >
+> > {
+> >   "id": 1,
+> >   "studentId": 1,
+> >   "studentName": "Ana Torres",
+> >   "courseId": 1,
+> >   "courseName": "Java from scratch"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>14. Matrículas · la misma matrícula otra vez → <code>409</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `EnrollmentController.enroll(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<EnrollmentResponse> enroll(@Valid @RequestBody EnrollmentRequest request) {
+> >     ServiceResult<EnrollmentEntity> result = service.enroll(request.studentId(), request.courseId());
+> >     return switch (result.status()) {
+> >         case NOT_FOUND -> ResponseEntity.notFound().build();
+> >         case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >         case OK -> {
+> >             EnrollmentResponse body = EnrollmentMapper.toResponse(result.value());
+> >             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >                     .path("/{id}").buildAndExpand(body.id()).toUri();
+> >             yield ResponseEntity.created(location).body(body);
+> >         }
+> >     };
+> > }
+> > ```
+> >
+> > El servicio devuelve `CONFLICT` (ya existe) y el `switch` responde `409`.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/enrollments \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"studentId":1,"courseId":1}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 409
+> > Content-Length: 0
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>15. Matrículas · curso sin cupo → <code>409</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `EnrollmentController.enroll(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<EnrollmentResponse> enroll(@Valid @RequestBody EnrollmentRequest request) {
+> >     ServiceResult<EnrollmentEntity> result = service.enroll(request.studentId(), request.courseId());
+> >     return switch (result.status()) {
+> >         case NOT_FOUND -> ResponseEntity.notFound().build();
+> >         case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >         case OK -> {
+> >             EnrollmentResponse body = EnrollmentMapper.toResponse(result.value());
+> >             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >                     .path("/{id}").buildAndExpand(body.id()).toUri();
+> >             yield ResponseEntity.created(location).body(body);
+> >         }
+> >     };
+> > }
+> > ```
+> >
+> > El curso tiene cupo `1` y ya está ocupado: `CONFLICT` → `409`.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/enrollments \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"studentId":2,"courseId":1}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 409
+> > Content-Length: 0
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>16. Matrículas · estudiante inexistente → <code>404</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `EnrollmentController.enroll(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<EnrollmentResponse> enroll(@Valid @RequestBody EnrollmentRequest request) {
+> >     ServiceResult<EnrollmentEntity> result = service.enroll(request.studentId(), request.courseId());
+> >     return switch (result.status()) {
+> >         case NOT_FOUND -> ResponseEntity.notFound().build();
+> >         case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >         case OK -> {
+> >             EnrollmentResponse body = EnrollmentMapper.toResponse(result.value());
+> >             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >                     .path("/{id}").buildAndExpand(body.id()).toUri();
+> >             yield ResponseEntity.created(location).body(body);
+> >         }
+> >     };
+> > }
+> > ```
+> >
+> > Ahora el servicio **distingue** el caso: `NOT_FOUND` → `404`. En la versión anterior era un `409` igual al resto.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/enrollments \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"studentId":9,"courseId":1}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>17. Matrículas · falta un campo → <code>400</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `EnrollmentController.enroll(...)`
+> >
+> > ```java
+> > @PostMapping
+> > public ResponseEntity<EnrollmentResponse> enroll(@Valid @RequestBody EnrollmentRequest request) {
+> >     ServiceResult<EnrollmentEntity> result = service.enroll(request.studentId(), request.courseId());
+> >     return switch (result.status()) {
+> >         case NOT_FOUND -> ResponseEntity.notFound().build();
+> >         case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+> >         case OK -> {
+> >             EnrollmentResponse body = EnrollmentMapper.toResponse(result.value());
+> >             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+> >                     .path("/{id}").buildAndExpand(body.id()).toUri();
+> >             yield ResponseEntity.created(location).body(body);
+> >         }
+> >     };
+> > }
+> > ```
+> >
+> > `@NotNull` en `studentId` falla antes de ejecutar `enroll`.
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/enrollments \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"courseId":1}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 400
+> > Content-Type: application/json
+> >
+> > {
+> >   "timestamp": "2026-11-01T20:15:55.539+00:00",
+> >   "status": 400,
+> >   "error": "Bad Request",
+> >   "path": "/api/v1/enrollments"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>18. Matrículas · buscar por id → <code>200</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `EnrollmentController.findById(...)`
+> >
+> > ```java
+> > @GetMapping("/{id}")
+> > public ResponseEntity<EnrollmentResponse> findById(@PathVariable Long id) {
+> >     return service.findById(id)
+> >             .map(EnrollmentMapper::toResponse)
+> >             .map(ResponseEntity::ok)
+> >             .orElseGet(() -> ResponseEntity.notFound().build());
+> > }
+> > ```
+> >
+> > Es el destino de la cabecera `Location` del `201`.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/enrollments/1
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> >
+> > {
+> >   "id": 1,
+> >   "studentId": 1,
+> >   "studentName": "Ana Torres",
+> >   "courseId": 1,
+> >   "courseName": "Java from scratch"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>19. Matrículas · buscar un id que no existe → <code>404</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `EnrollmentController.findById(...)`
+> >
+> > ```java
+> > @GetMapping("/{id}")
+> > public ResponseEntity<EnrollmentResponse> findById(@PathVariable Long id) {
+> >     return service.findById(id)
+> >             .map(EnrollmentMapper::toResponse)
+> >             .map(ResponseEntity::ok)
+> >             .orElseGet(() -> ResponseEntity.notFound().build());
+> > }
+> > ```
+> >
+> > El `Optional` está vacío: `404`.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/enrollments/99
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>20. La ruta sin versión ya no existe → <code>404</code></strong></summary>
+> >
+> > **Método del controlador:** ninguno.
+> >
+> > No hay ningún controlador en `/api/students`: el `404` lo genera Spring antes de llegar a `StudentController`.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/students
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Type: application/json
+> >
+> > {
+> >   "timestamp": "2026-11-01T20:15:55.586+00:00",
+> >   "status": 404,
+> >   "error": "Not Found",
+> >   "path": "/api/students"
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>21. Cursos · el conteo después de matricular → <code>200</code></strong></summary>
+> >
+> > **Método del controlador que atiende la petición:** `CourseController.countEnrolled(...)`
+> >
+> > ```java
+> > @GetMapping("/{id}/enrolled")
+> > public ResponseEntity<EnrolledResponse> countEnrolled(@PathVariable Long id) {
+> >     ServiceResult<Long> result = service.countEnrolled(id);
+> >     return switch (result.status()) {
+> >         case OK -> ResponseEntity.ok(new EnrolledResponse(id, result.value()));
+> >         case NOT_FOUND, CONFLICT -> ResponseEntity.notFound().build();
+> >     };
+> > }
+> > ```
+> >
+> > Vuelve a `countEnrolled`: ahora hay una matrícula.
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/courses/1/enrolled
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> >
+> > {
+> >   "courseId": 1,
+> >   "enrolled": 1
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > > 💡 **Beneficio de este paso:** se comprueba el **contrato** completo y se ve cómo cada método del controlador traduce un resultado de negocio a un código HTTP.
+> > >
+> > > En MySQL, la columna interna sigue existiendo aunque la API no la muestre:
+> > >
+> > > ```text
+> > > mysql> select id, name, created_at is not null as has_created_at from student;
+> > > +----+------------+----------------+
+> > > | id | name       | has_created_at |
+> > > +----+------------+----------------+
+> > > |  1 | Ana Torres |              1 |
+> > > |  2 | Luis Pérez |              1 |
+> > > +----+------------+----------------+
+> > > ```
+> > >
+> > > 🗣️ **Preguntas:** ¿qué pasó con el `"id":99` que mandó el cliente? *(Nunca llegó: `StudentRequest` no tiene `id`.)* ¿Por qué el estudiante inexistente da `404` y antes daba `409`? *(Ahora el servicio devuelve `NOT_FOUND` y el controlador lo traduce.)*
+> > >
+> > > ✅ **Punto de control 7:** las respuestas coinciden con las que se muestran bajo cada comando.
+>
+> </details>
+>
+
+</details>
+
+---
+
+➡️ **Guía completa:** [02-academica-dtos.md](02-academica-dtos.md)
