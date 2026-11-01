@@ -653,9 +653,23 @@
 > >
 > > Se agregan los imports `org.hibernate.annotations.CreationTimestamp` y `java.time.LocalDateTime`. Se crea un estudiante y se mira la respuesta. **Resultado real:**
 > >
+> > Petición:
+> >
 > > ```text
 > > POST /api/students  →  201
-> > {"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com","status":"ACTIVE","createdAt":"2026-10-31T20:42:41.558465"}
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```json
+> > {
+> >   "id": 1,
+> >   "name": "Ana Torres",
+> >   "age": 22,
+> >   "email": "ana@mail.com",
+> >   "status": "ACTIVE",
+> >   "createdAt": "2026-10-31T20:42:41.558465"   // ⚠️ campo interno que se filtró
+> > }
 > > ```
 > >
 > > > ⚠️ **Nadie lo pidió.** El campo `createdAt` es de **auditoría interna**, pero el cliente ya lo recibe: la API **cambió sin que se tocara el controlador**.
@@ -668,9 +682,29 @@
 >
 > > La misma clase sirve de **entrada**: el cliente puede incluir en el JSON cualquier campo de la entidad. **Resultado real** al enviar un `createdAt` falso:
 > >
-> > ```text
-> > POST /api/students  con  {"name":"Luis","age":22,"email":"l@mail.com","status":"ACTIVE","createdAt":"2000-01-01T00:00:00"}
-> > → 201  {"id":2,"name":"Luis","age":22,"email":"l@mail.com","status":"ACTIVE","createdAt":"2026-10-31T20:42:41.612476"}
+> > Cuerpo enviado en `POST /api/students`:
+> >
+> > ```json
+> > {
+> >   "name": "Luis",
+> >   "age": 22,
+> >   "email": "l@mail.com",
+> >   "status": "ACTIVE",
+> >   "createdAt": "2000-01-01T00:00:00"   // ⚠️ valor falso enviado por el cliente
+> > }
+> > ```
+> >
+> > Respuesta `201`:
+> >
+> > ```json
+> > {
+> >   "id": 2,
+> >   "name": "Luis",
+> >   "age": 22,
+> >   "email": "l@mail.com",
+> >   "status": "ACTIVE",
+> >   "createdAt": "2026-10-31T20:42:41.612476"   // la fecha real, no la enviada
+> > }
 > > ```
 > >
 > > Hibernate lo pisó con la fecha real, **pero solo por suerte**: el código de entrada aceptó el campo. Con un campo que no se rellene solo (por ejemplo un `role` o un `balance`), el dato falso se guardaría.
