@@ -3,6 +3,8 @@
 > 👩‍🏫 **Material docente.** Proyecto pequeño, del mismo estilo que la [guía 01 del taller de cursos](../modulo-03-04/01-guia-taller-gestion-de-cursos-con-bd.md): un CRUD de **estudiantes** con Spring Data JPA y MySQL, sobre el que se agregan, **una por una**, las funcionalidades de Swagger.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
+> 📦 **Proyecto terminado:** [`students-api/`](students-api/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
+>
 > ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3, springdoc-openapi 2.6.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales. La interfaz de Swagger UI se abrió en un navegador para comprobarla.
 >
 > 🧭 **Idea central.** El código **ya describe** la API (rutas, métodos, tipos, validaciones). Swagger solo le **agrega lo que el código no puede decir**: para qué sirve cada operación, qué ejemplos usar y qué respuestas esperar. Cada paso agrega **una** funcionalidad y se ve el resultado en la interfaz.
