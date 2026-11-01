@@ -2052,21 +2052,602 @@
 > ```text
 > 📁 students-api-dto
 > ├── 📄 pom.xml
-> └── 📁 src
->     ├── 📁 main/java/com/academy
+> └── 📁 src/main
+>     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
->     │   │   ├── 📁 controller    StudentController
->     │   │   ├── 📁 dto           StudentRequest · StudentStatusRequest · StudentResponse · PageResponse
->     │   │   └── 📁 mapper        StudentMapper
+>     │   │   ├── 📁 controller
+>     │   │   │   └── 📄 StudentController.java
+>     │   │   ├── 📁 dto
+>     │   │   │   ├── 📄 StudentRequest.java
+>     │   │   │   ├── 📄 StudentStatusRequest.java
+>     │   │   │   ├── 📄 StudentResponse.java
+>     │   │   │   └── 📄 PageResponse.java
+>     │   │   └── 📁 mapper
+>     │   │       └── 📄 StudentMapper.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service       StudentService · ServiceResult · ServiceStatus
+>     │   │   └── 📁 service
+>     │   │       ├── 📄 StudentService.java
+>     │   │       ├── 📄 ServiceResult.java
+>     │   │       └── 📄 ServiceStatus.java
 >     │   └── 📁 persistence
->     │       ├── 📁 entity        StudentEntity · StudentStatus
->     │       └── 📁 repository    StudentJpaRepository
->     └── 📁 main/resources
+>     │       ├── 📁 entity
+>     │       │   ├── 📄 StudentEntity.java
+>     │       │   └── 📄 StudentStatus.java
+>     │       └── 📁 repository
+>     │           └── 📄 StudentJpaRepository.java
+>     └── 📁 resources
 >         └── 📄 application.properties
 > ```
+>
+> **Código final, paso a paso**
+>
+> <details>
+> <summary><strong>1 · 📄 pom.xml</strong></summary>
+>
+> **Ruta:** `pom.xml`
+>
+> ```xml
+> <?xml version="1.0" encoding="UTF-8"?>
+> <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+>     <modelVersion>4.0.0</modelVersion>
+>     <parent>
+>         <groupId>org.springframework.boot</groupId>
+>         <artifactId>spring-boot-starter-parent</artifactId>
+>         <version>3.3.5</version>
+>         <relativePath/>
+>     </parent>
+>     <groupId>com.academy</groupId>
+>     <artifactId>students-api-dto</artifactId>
+>     <version>0.0.1-SNAPSHOT</version>
+>
+>     <properties>
+>         <java.version>17</java.version>
+>     </properties>
+>
+>     <dependencies>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-web</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-data-jpa</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-validation</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>com.mysql</groupId>
+>             <artifactId>mysql-connector-j</artifactId>
+>             <scope>runtime</scope>
+>         </dependency>
+>     </dependencies>
+>
+>     <build>
+>         <plugins>
+>             <plugin>
+>                 <groupId>org.springframework.boot</groupId>
+>                 <artifactId>spring-boot-maven-plugin</artifactId>
+>             </plugin>
+>         </plugins>
+>     </build>
+> </project>
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>2 · 📄 application.properties</strong></summary>
+>
+> **Ruta:** `src/main/resources/application.properties`
+>
+> ```properties
+> # MySQL connection
+> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.username=root
+> spring.datasource.password=root
+>
+> # JPA and Hibernate
+> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.show-sql=true
+>
+> # Pagination limits (protect the API)
+> spring.data.web.pageable.default-page-size=10
+> spring.data.web.pageable.max-page-size=50
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>3 · 📄 AcademyApplication.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/AcademyApplication.java`
+>
+> ```java
+> package com.academy;
+>
+> import org.springframework.boot.SpringApplication;
+> import org.springframework.boot.autoconfigure.SpringBootApplication;
+>
+> @SpringBootApplication
+> public class AcademyApplication {
+>
+>     public static void main(String[] args) {
+>         SpringApplication.run(AcademyApplication.class, args);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>4 · 📄 StudentStatus.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentStatus.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> public enum StudentStatus {
+>     ACTIVE,
+>     INACTIVE
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>5 · 📄 StudentEntity.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentEntity.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> import jakarta.persistence.Column;
+> import jakarta.persistence.Entity;
+> import jakarta.persistence.EnumType;
+> import jakarta.persistence.Enumerated;
+> import jakarta.persistence.GeneratedValue;
+> import jakarta.persistence.GenerationType;
+> import jakarta.persistence.Id;
+> import jakarta.persistence.Table;
+> import org.hibernate.annotations.CreationTimestamp;
+>
+> import java.time.LocalDateTime;
+>
+> @Entity
+> @Table(name = "student")
+> public class StudentEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     @Column(nullable = false)
+>     private String name;
+>
+>     private int age;
+>
+>     @Column(nullable = false, unique = true)
+>     private String email;
+>
+>     @Enumerated(EnumType.STRING)
+>     @Column(nullable = false)
+>     private StudentStatus status;
+>
+>     @CreationTimestamp
+>     @Column(name = "created_at", updatable = false)
+>     private LocalDateTime createdAt;
+>
+>     protected StudentEntity() {
+>     }
+>
+>     public StudentEntity(Long id, String name, int age, String email, StudentStatus status) {
+>         this.id = id;
+>         this.name = name;
+>         this.age = age;
+>         this.email = email;
+>         this.status = status;
+>     }
+>
+>     public Long getId() { return id; }
+>     public String getName() { return name; }
+>     public int getAge() { return age; }
+>     public String getEmail() { return email; }
+>     public StudentStatus getStatus() { return status; }
+>     public LocalDateTime getCreatedAt() { return createdAt; }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>6 · 📄 StudentJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`
+>
+> ```java
+> package com.academy.persistence.repository;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import org.springframework.data.domain.Page;
+> import org.springframework.data.domain.Pageable;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> import java.util.Optional;
+>
+> public interface StudentJpaRepository extends JpaRepository<StudentEntity, Long> {
+>
+>     Page<StudentEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
+>
+>     Optional<StudentEntity> findByEmailIgnoreCase(String email);
+>
+>     boolean existsByEmailIgnoreCase(String email);
+>
+>     boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>7 · 📄 ServiceStatus.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/ServiceStatus.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> public enum ServiceStatus {
+>     OK,
+>     NOT_FOUND,
+>     CONFLICT
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>8 · 📄 ServiceResult.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/ServiceResult.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> public record ServiceResult<T>(ServiceStatus status, T value) {
+>
+>     public static <T> ServiceResult<T> ok(T value) {
+>         return new ServiceResult<>(ServiceStatus.OK, value);
+>     }
+>
+>     public static <T> ServiceResult<T> notFound() {
+>         return new ServiceResult<>(ServiceStatus.NOT_FOUND, null);
+>     }
+>
+>     public static <T> ServiceResult<T> conflict() {
+>         return new ServiceResult<>(ServiceStatus.CONFLICT, null);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>9 · 📄 StudentService.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.entity.StudentStatus;
+> import com.academy.persistence.repository.StudentJpaRepository;
+> import org.springframework.data.domain.Page;
+> import org.springframework.data.domain.Pageable;
+> import org.springframework.stereotype.Service;
+> import org.springframework.transaction.annotation.Transactional;
+>
+> import java.util.Optional;
+>
+> @Service
+> public class StudentService {
+>
+>     private final StudentJpaRepository students;
+>
+>     public StudentService(StudentJpaRepository students) {
+>         this.students = students;
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public Page<StudentEntity> search(String name, Pageable pageable) {
+>         if (name == null || name.isBlank()) {
+>             return students.findAll(pageable);
+>         }
+>         return students.findByNameContainingIgnoreCase(name, pageable);
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public Optional<StudentEntity> findById(Long id) {
+>         return students.findById(id);
+>     }
+>
+>     @Transactional
+>     public ServiceResult<StudentEntity> create(StudentEntity data) {
+>         if (students.existsByEmailIgnoreCase(data.getEmail())) {
+>             return ServiceResult.conflict();
+>         }
+>         StudentEntity toSave = new StudentEntity(
+>                 null, data.getName(), data.getAge(), data.getEmail(), data.getStatus());
+>         return ServiceResult.ok(students.save(toSave));
+>     }
+>
+>     @Transactional
+>     public ServiceResult<StudentEntity> update(Long id, StudentEntity data) {
+>         if (!students.existsById(id)) {
+>             return ServiceResult.notFound();
+>         }
+>         if (students.existsByEmailIgnoreCaseAndIdNot(data.getEmail(), id)) {
+>             return ServiceResult.conflict();
+>         }
+>         StudentEntity toSave = new StudentEntity(
+>                 id, data.getName(), data.getAge(), data.getEmail(), data.getStatus());
+>         return ServiceResult.ok(students.save(toSave));
+>     }
+>
+>     @Transactional
+>     public ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status) {
+>         Optional<StudentEntity> current = students.findById(id);
+>         if (current.isEmpty()) {
+>             return ServiceResult.notFound();
+>         }
+>         StudentEntity student = current.get();
+>         StudentEntity toSave = new StudentEntity(
+>                 id, student.getName(), student.getAge(), student.getEmail(), status);
+>         return ServiceResult.ok(students.save(toSave));
+>     }
+>
+>     @Transactional
+>     public boolean delete(Long id) {
+>         if (!students.existsById(id)) {
+>             return false;
+>         }
+>         students.deleteById(id);
+>         return true;
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>10 · 📄 StudentRequest.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentRequest.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import com.academy.persistence.entity.StudentStatus;
+> import jakarta.validation.constraints.Email;
+> import jakarta.validation.constraints.Max;
+> import jakarta.validation.constraints.Min;
+> import jakarta.validation.constraints.NotBlank;
+> import jakarta.validation.constraints.NotNull;
+> import jakarta.validation.constraints.Size;
+>
+> public record StudentRequest(
+>
+>         @NotBlank
+>         @Size(min = 2, max = 100)
+>         String name,
+>
+>         @Min(16)
+>         @Max(99)
+>         int age,
+>
+>         @NotBlank
+>         @Email
+>         String email,
+>
+>         @NotNull
+>         StudentStatus status
+> ) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>11 · 📄 StudentStatusRequest.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentStatusRequest.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import com.academy.persistence.entity.StudentStatus;
+> import jakarta.validation.constraints.NotNull;
+>
+> public record StudentStatusRequest(@NotNull StudentStatus status) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>12 · 📄 StudentResponse.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/StudentResponse.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import com.academy.persistence.entity.StudentStatus;
+>
+> public record StudentResponse(Long id, String name, int age, String email, StudentStatus status) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>13 · 📄 PageResponse.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/dto/PageResponse.java`
+>
+> ```java
+> package com.academy.presentation.dto;
+>
+> import java.util.List;
+>
+> public record PageResponse<T>(List<T> content, int page, int size, long totalElements, int totalPages) {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>14 · 📄 StudentMapper.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/mapper/StudentMapper.java`
+>
+> ```java
+> package com.academy.presentation.mapper;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.presentation.dto.PageResponse;
+> import com.academy.presentation.dto.StudentRequest;
+> import com.academy.presentation.dto.StudentResponse;
+> import org.springframework.data.domain.Page;
+>
+> public final class StudentMapper {
+>
+>     private StudentMapper() {
+>     }
+>
+>     public static StudentEntity toEntity(StudentRequest request) {
+>         return new StudentEntity(null, request.name(), request.age(), request.email(), request.status());
+>     }
+>
+>     public static StudentResponse toResponse(StudentEntity entity) {
+>         return new StudentResponse(entity.getId(), entity.getName(), entity.getAge(),
+>                 entity.getEmail(), entity.getStatus());
+>     }
+>
+>     public static PageResponse<StudentResponse> toPageResponse(Page<StudentEntity> page) {
+>         return new PageResponse<>(
+>                 page.getContent().stream().map(StudentMapper::toResponse).toList(),
+>                 page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages());
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>15 · 📄 StudentController.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/controller/StudentController.java`
+>
+> ```java
+> package com.academy.presentation.controller;
+>
+> import com.academy.business.service.ServiceResult;
+> import com.academy.business.service.ServiceStatus;
+> import com.academy.business.service.StudentService;
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.presentation.dto.PageResponse;
+> import com.academy.presentation.dto.StudentRequest;
+> import com.academy.presentation.dto.StudentResponse;
+> import com.academy.presentation.dto.StudentStatusRequest;
+> import com.academy.presentation.mapper.StudentMapper;
+> import jakarta.validation.Valid;
+> import org.springframework.data.domain.Pageable;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.http.ResponseEntity;
+> import org.springframework.web.bind.annotation.DeleteMapping;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PatchMapping;
+> import org.springframework.web.bind.annotation.PathVariable;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.PutMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.RequestParam;
+> import org.springframework.web.bind.annotation.RestController;
+> import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+>
+> import java.net.URI;
+>
+> @RestController
+> @RequestMapping("/api/v1/students")
+> public class StudentController {
+>
+>     private final StudentService service;
+>
+>     public StudentController(StudentService service) {
+>         this.service = service;
+>     }
+>
+>     @GetMapping
+>     public PageResponse<StudentResponse> search(@RequestParam(required = false) String name, Pageable pageable) {
+>         return StudentMapper.toPageResponse(service.search(name, pageable));
+>     }
+>
+>     @GetMapping("/{id}")
+>     public ResponseEntity<StudentResponse> findById(@PathVariable Long id) {
+>         return service.findById(id)
+>                 .map(StudentMapper::toResponse)
+>                 .map(ResponseEntity::ok)
+>                 .orElseGet(() -> ResponseEntity.notFound().build());
+>     }
+>
+>     @PostMapping
+>     public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
+>         ServiceResult<StudentEntity> result = service.create(StudentMapper.toEntity(request));
+>         if (result.status() == ServiceStatus.CONFLICT) {
+>             return ResponseEntity.status(HttpStatus.CONFLICT).build();
+>         }
+>         StudentResponse body = StudentMapper.toResponse(result.value());
+>         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+>                 .path("/{id}").buildAndExpand(body.id()).toUri();
+>         return ResponseEntity.created(location).body(body);
+>     }
+>
+>     @PutMapping("/{id}")
+>     public ResponseEntity<StudentResponse> update(@PathVariable Long id, @Valid @RequestBody StudentRequest request) {
+>         return respond(service.update(id, StudentMapper.toEntity(request)));
+>     }
+>
+>     @PatchMapping("/{id}/status")
+>     public ResponseEntity<StudentResponse> changeStatus(@PathVariable Long id,
+>                                                         @Valid @RequestBody StudentStatusRequest request) {
+>         return respond(service.changeStatus(id, request.status()));
+>     }
+>
+>     @DeleteMapping("/{id}")
+>     public ResponseEntity<Void> delete(@PathVariable Long id) {
+>         return service.delete(id)
+>                 ? ResponseEntity.noContent().build()
+>                 : ResponseEntity.notFound().build();
+>     }
+>
+>     private ResponseEntity<StudentResponse> respond(ServiceResult<StudentEntity> result) {
+>         return switch (result.status()) {
+>             case OK -> ResponseEntity.ok(StudentMapper.toResponse(result.value()));
+>             case NOT_FOUND -> ResponseEntity.notFound().build();
+>             case CONFLICT -> ResponseEntity.status(HttpStatus.CONFLICT).build();
+>         };
+>     }
+> }
+> ```
+>
+> </details>
 
 </details>
 
