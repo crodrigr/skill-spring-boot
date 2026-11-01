@@ -92,6 +92,81 @@
 </details>
 
 <details>
+<summary><strong>💬 En palabras simples: de qué trata esta mejora</strong></summary>
+
+> <details>
+> <summary><strong>🍽️ El problema: mostrar la cocina al cliente</strong></summary>
+>
+> Hasta ahora el controlador recibía y devolvía `StudentEntity`, la clase que representa la **tabla**. Es como un restaurante que saca la cocina a la mesa: el cliente ve todo, incluso lo que no debería, y hasta puede tocarlo.
+>
+> | Problema | Qué pasa |
+> |---|---|
+> | **Se filtran datos internos** | Si se agrega `createdAt` a la tabla, aparece solo en el JSON, aunque nadie lo decidió. |
+> | **El cliente manda campos que no debe** | Puede enviar `"id": 99` o un `createdAt` falso y la entidad los acepta (*asignación masiva*). |
+> | **La API queda atada a la tabla** | Si se renombra una columna, se rompen los clientes. |
+> | **Las validaciones se mezclan** | `@NotBlank` y `@Email` conviven con `@Entity` y `@Column`. |
+>
+> </details>
+>
+> <details>
+> <summary><strong>📋 La solución: el DTO es el menú del restaurante</strong></summary>
+>
+> Un **DTO** es una clase pequeña que describe **solo lo que viaja** entre el cliente y la API. El menú muestra lo que se puede pedir y lo que se entrega, sin exponer la cocina.
+>
+> - **`StudentRequest`**: lo que el cliente envía. No tiene `id`, así que no puede mandarlo.
+> - **`StudentStatusRequest`**: lo que se envía para cambiar solo el estado.
+> - **`StudentResponse`**: lo que la API devuelve. No incluye `createdAt`.
+> - **`PageResponse<T>`**: un formato propio para listas paginadas.
+>
+> </details>
+>
+> <details>
+> <summary><strong>🔁 El mapeador: el mesero que traduce</strong></summary>
+>
+> Alguien debe convertir `StudentRequest` en entidad y la entidad en `StudentResponse`. Esa tarea vive en **un solo lugar**, `StudentMapper`. Si cambia un campo, se edita ahí y no en cada método del controlador.
+>
+> </details>
+>
+> <details>
+> <summary><strong>🌐 Controladores más delgados</strong></summary>
+>
+> Un controlador hace tres cosas: **recibe** la petición, **llama** al servicio y **responde**. No contiene reglas de negocio. El servicio devuelve un `ServiceResult` (`OK`, `NOT_FOUND` o `CONFLICT`) y el método `respond(...)` lo traduce a un código HTTP.
+>
+> > 💡 `ServiceResult` es una solución **temporal**: en el Módulo 7 se reemplaza por excepciones y un manejador global.
+>
+> </details>
+>
+> <details>
+> <summary><strong>🧭 Endpoints mejor diseñados</strong></summary>
+>
+> | Mejora | Por qué importa |
+> |---|---|
+> | `/api/v1/students` | Permite una versión 2 sin romper a los clientes de la 1. |
+> | `POST` devuelve `201` y `Location` | El cliente sabe dónde quedó el recurso nuevo. |
+> | `DELETE` devuelve `204` | Se borró y no hay nada más que devolver. |
+> | `404` si no existe, `409` si el email está repetido | Cada situación tiene su código. |
+> | `PATCH /{id}/status` | Cambiar un dato no exige reenviar todo el objeto. |
+> | Tamaño de página máximo de 50 | Con `?size=1000` la API devuelve `"size": 50`. |
+>
+> </details>
+>
+> <details>
+> <summary><strong>⚖️ Antes y después</strong></summary>
+>
+> | | Antes | Después |
+> |---|---|---|
+> | Contrato de la API | La tabla | Lo que se decide mostrar |
+> | Campos internos | Se filtran | Quedan ocultos |
+> | Lo que el cliente puede enviar | Cualquier campo | Solo lo permitido |
+> | Validaciones | Dentro de la entidad | En el DTO |
+> | Controlador | Lógica mezclada | Recibe, delega y responde |
+> | Cambiar la tabla | Rompe la API | La API no cambia |
+>
+> </details>
+
+</details>
+
+<details>
 <summary><strong>⏱️ Plan de la sesión</strong></summary>
 
 > | Paso | Minutos | Actividad |
