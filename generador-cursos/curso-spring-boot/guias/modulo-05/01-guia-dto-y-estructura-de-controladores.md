@@ -30,7 +30,8 @@
 <details>
 <summary><strong>📝 Introducción: qué es un DTO</strong></summary>
 
-> ### 📦 La idea
+> <details>
+> <summary><strong>📦 La idea</strong></summary>
 >
 > **DTO** (*Data Transfer Object*) es una clase **solo de datos** que se usa para **transportar** información entre capas o entre sistemas. En una API REST, es la forma exacta de lo que **entra** (`Request`) y de lo que **sale** (`Response`).
 >
@@ -40,7 +41,10 @@
 >           └── lo que ve el cliente ──┘    └── lo que ve la base ──┘
 > ```
 >
-> ### 🔍 Entidad frente a DTO
+> </details>
+>
+> <details>
+> <summary><strong>🔍 Entidad frente a DTO</strong></summary>
 >
 > | | Entidad (`StudentEntity`) | DTO (`StudentRequest` / `StudentResponse`) |
 > |---|---|---|
@@ -50,7 +54,10 @@
 > | Puede tener | Campos internos (`created_at`, versión, notas) | **Solo** lo que el cliente debe ver o enviar |
 > | Se parece a | La tabla | Un formulario o una respuesta |
 >
-> ### 🧩 Tipos de DTO que se usan aquí
+> </details>
+>
+> <details>
+> <summary><strong>🧩 Tipos de DTO que se usan aquí</strong></summary>
 >
 > | DTO | Para qué | Campos |
 > |---|---|---|
@@ -59,11 +66,17 @@
 > | `StudentResponse` | Toda respuesta con un estudiante | `id`, `name`, `age`, `email`, `status` |
 > | `PageResponse<T>` | Una página de resultados | `content`, `page`, `size`, `totalElements`, `totalPages` |
 >
-> ### ⚖️ El costo
+> </details>
+>
+> <details>
+> <summary><strong>⚖️ El costo</strong></summary>
 >
 > Más clases (cuatro DTO y un mapeador) y campos repetidos. En un CRUD pequeño que **nadie más consume** y que no tiene campos internos, devolver la entidad es una opción válida. El DTO compensa cuando la API la usan otros equipos, cuando la tabla tiene campos internos o cuando se quiere cambiar la base sin romper a los clientes.
 >
-> ### 🛠️ Requerimientos y restricciones
+> </details>
+>
+> <details>
+> <summary><strong>🛠️ Requerimientos y restricciones</strong></summary>
 >
 > | Código | Requerimiento |
 > |---|---|
@@ -73,6 +86,8 @@
 > | **RNF-04** | Los errores de negocio se informan con un **resultado** (`ServiceResult`); traducirlos con excepciones y un manejador global se estudia en el Módulo 7. |
 > | **RNF-05** | Todos los nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-06** | Duración: 1 h 30 min. |
+>
+> </details>
 
 </details>
 
