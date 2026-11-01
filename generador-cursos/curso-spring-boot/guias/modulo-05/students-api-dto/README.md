@@ -18,8 +18,9 @@ docker run -d --name academy-mysql \
 
 ```bash
 ./mvnw spring-boot:run     # API en http://localhost:8080/api/v1/students
-./mvnw test                # pruebas del mapeador y del controlador (no necesitan MySQL)
 ```
+
+La lista de pruebas con `curl` está en el Paso 7 de la guía.
 
 ## Endpoints
 

@@ -5,7 +5,7 @@
 >
 > 📦 **Proyecto terminado:** [`students-api-dto/`](students-api-dto/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8. Las respuestas HTTP, los encabezados y las pruebas automáticas que se muestran son salidas reales.
+> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8. Las respuestas HTTP, los encabezados que se muestran son salidas reales.
 >
 > 🧭 **Idea central.** La **entidad** describe cómo se guarda un dato; el **DTO** describe cómo viaja por la API. Son dos contratos distintos que cambian por razones distintas. **Cada paso explica qué se gana con ese cambio.**
 
@@ -18,12 +18,11 @@
 >
 > - Explica **qué es un DTO**, qué problema resuelve y cuándo **no** hace falta.
 > - Distingue **DTO de entrada** (`Request`) y **de salida** (`Response`) y escribe uno por caso de uso.
-> - Escribe un **mapeador** y lo prueba sin Spring.
+> - Escribe un **mapeador** que concentra las conversiones entre DTO y entidad.
 > - Mueve las **validaciones** de la entidad al DTO de entrada.
 > - Diseña endpoints con **versión** en la ruta, **verbos** y **códigos** correctos, `Location` al crear y una **acción parcial** con `PATCH`.
 > - Devuelve **páginas** con un envoltorio y **limita** el tamaño máximo.
 > - Mantiene el controlador **delgado**: traduce HTTP, no decide reglas.
-> - Prueba el controlador con `@WebMvcTest` y un servicio simulado.
 
 </details>
 
@@ -178,10 +177,9 @@
 > | 4 | 42 – 52 | El servicio informa el resultado (`ServiceResult`) |
 > | 5 | 52 – 65 | El controlador delgado |
 > | 6 | 65 – 72 | Diseño de endpoints: versión, `Location`, `PATCH` y límites |
-> | 7 | 72 – 80 | Probar la API |
-> | 8 | 80 – 90 | Pruebas automáticas del mapeador y del controlador |
+> | 7 | 72 – 90 | Probar la API |
 >
-> > 💡 **Ritmo.** El Paso 0 puede entregarse ya escrito. El tiempo se dedica a los Pasos 1 a 8.
+> > 💡 **Ritmo.** El Paso 0 puede entregarse ya escrito. El tiempo se dedica a los Pasos 1 a 7.
 
 </details>
 
@@ -214,9 +212,6 @@
 >         └── StudentJpaRepository.java
 > 📁 src/main/resources
 > └── ✏️ application.properties                límites de paginación
-> 📁 src/test/java/com/academy/presentation
-> ├── 🆕 mapper/StudentMapperTest.java
-> └── 🆕 controller/StudentControllerTest.java
 > ```
 >
 > ```text
@@ -265,7 +260,6 @@
 > >   - **Spring Data JPA**
 > >   - **Validation**
 > >   - **MySQL Driver**
-> >   - *Spring Boot Test* (para las pruebas del Paso 8)
 > >
 > > <details>
 > > <summary><strong>📄 pom.xml (dependencias)</strong></summary>
@@ -289,11 +283,6 @@
 > >     <groupId>com.mysql</groupId>
 > >     <artifactId>mysql-connector-j</artifactId>
 > >     <scope>runtime</scope>
-> > </dependency>
-> > <dependency>
-> >     <groupId>org.springframework.boot</groupId>
-> >     <artifactId>spring-boot-starter-test</artifactId>
-> >     <scope>test</scope>
 > > </dependency>
 > > ```
 > >
@@ -1002,7 +991,7 @@
 > > > - Si se renombra un atributo de la entidad, **solo cambia este archivo**; el JSON no se entera.
 > > > - No tiene lógica de negocio: solo copia atributos.
 > > >
-> > > 💡 **Beneficio de este paso:** la traducción vive en **un solo lugar** y se prueba **sin Spring** (Paso 8). El problema 3 queda resuelto: el contrato ya no depende de los nombres de la entidad.
+> > > 💡 **Beneficio de este paso:** la traducción vive en **un solo lugar** y se puede cambiar sin tocar el controlador. El problema 3 queda resuelto: el contrato ya no depende de los nombres de la entidad.
 > > >
 > > > 🔎 **Concepto:** hacerlo a mano permite ver qué pasa. Herramientas como **MapStruct** generan este código; conviene entender primero el manual.
 >
@@ -1312,7 +1301,7 @@
 > > > | Listado: arreglo sin totales | `PageResponse` con totales |
 > > > | Importaba la entidad para recibirla | Solo usa la entidad para pasarla al servicio vía el mapeador |
 > > >
-> > > 💡 **Beneficio de este paso:** el controlador se lee **de arriba abajo en segundos** y es fácil de probar con un servicio simulado (Paso 8). Las reglas se pueden cambiar sin tocarlo.
+> > > 💡 **Beneficio de este paso:** el controlador se lee **de arriba abajo en segundos**. Las reglas se pueden cambiar sin tocarlo.
 > > >
 > > > > 🔎 **Regla de oro de un controlador delgado.** Si dentro de un método aparece un `if` que habla de **negocio** (un cupo, un correo repetido), esa decisión pertenece al servicio. Los únicos `if` aceptables son los que traducen un resultado a un código HTTP.
 >
@@ -1388,31 +1377,92 @@
 > <details>
 > <summary><strong>Paso 7.1 · Las pruebas con <code>curl</code></strong></summary>
 >
-> > Se arranca la aplicación con MySQL en marcha y se prueba cada endpoint (ejemplo):
+> > Se arranca la aplicación con MySQL en marcha (`./mvnw spring-boot:run`) y se ejecuta esta lista en otra terminal. Primero se definen dos variables para no repetir la ruta ni la cabecera:
 > >
 > > ```bash
-> > curl -i -X POST localhost:8080/api/v1/students -H "Content-Type: application/json" \
+> > B=localhost:8080/api/v1/students
+> > J='Content-Type: application/json'
+> > ```
+> >
+> > **Lista de pruebas.** Cada una indica el resultado esperado (salida real).
+> >
+> > ```bash
+> > # 1. Crear un estudiante → 201 + Location
+> > curl -i -X POST $B -H "$J" \
 > >      -d '{"name":"Ana Torres","age":22,"email":"ana@mail.com","status":"ACTIVE"}'
+> >
+> > # 2. Crear enviando campos de más (id y createdAt) → 201; ambos se ignoran
+> > curl -i -X POST $B -H "$J" \
+> >      -d '{"id":99,"name":"Luis","age":22,"email":"luis@mail.com","status":"ACTIVE","createdAt":"2000-01-01T00:00:00"}'
+> >
+> > # 3. Correo repetido (en mayúsculas) → 409
+> > curl -i -X POST $B -H "$J" \
+> >      -d '{"name":"Otra","age":30,"email":"ANA@MAIL.COM","status":"ACTIVE"}'
+> >
+> > # 4. Datos inválidos → 400
+> > curl -i -X POST $B -H "$J" \
+> >      -d '{"name":"","age":5,"email":"x","status":null}'
+> >
+> > # 5. Listar con filtro, tamaño excesivo y orden → 200 con "size":50
+> > curl -i "$B?name=a&size=1000&sort=name,asc"
+> >
+> > # 6. Buscar por id → 200
+> > curl -i $B/1
+> >
+> > # 7. Buscar un id que no existe → 404
+> > curl -i $B/99
+> >
+> > # 8. Reemplazar (PUT) con datos válidos → 200
+> > curl -i -X PUT $B/1 -H "$J" \
+> >      -d '{"name":"Ana T.","age":23,"email":"ana@mail.com","status":"ACTIVE"}'
+> >
+> > # 9. Reemplazar con el correo de otro estudiante → 409
+> > curl -i -X PUT $B/1 -H "$J" \
+> >      -d '{"name":"Ana T.","age":23,"email":"luis@mail.com","status":"ACTIVE"}'
+> >
+> > # 10. Reemplazar un id que no existe → 404
+> > curl -i -X PUT $B/99 -H "$J" \
+> >      -d '{"name":"Nadie","age":30,"email":"nadie@mail.com","status":"ACTIVE"}'
+> >
+> > # 11. Cambiar solo el estado (PATCH) → 200
+> > curl -i -X PATCH $B/1/status -H "$J" -d '{"status":"INACTIVE"}'
+> >
+> > # 12. PATCH con estado nulo → 400
+> > curl -i -X PATCH $B/1/status -H "$J" -d '{"status":null}'
+> >
+> > # 13. PATCH de un id que no existe → 404
+> > curl -i -X PATCH $B/99/status -H "$J" -d '{"status":"ACTIVE"}'
+> >
+> > # 14. Eliminar → 204
+> > curl -i -X DELETE $B/2
+> >
+> > # 15. Eliminar otra vez → 404
+> > curl -i -X DELETE $B/2
+> >
+> > # 16. La ruta sin versión ya no existe → 404
+> > curl -i localhost:8080/api/students
 > > ```
 > >
 > > **Resultados reales:**
 > >
-> > | Petición | Respuesta |
-> > |---|---|
-> > | `POST /api/v1/students` (Ana) | `201` · `Location: http://localhost:8080/api/v1/students/1` · `{"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com","status":"ACTIVE"}` |
-> > | `POST` con `"id":99` y `"createdAt":"2000-01-01…"` en el cuerpo | `201` · `Location: …/students/2` · **el `id` 99 y la fecha se ignoran**; la respuesta **no** trae `createdAt` |
-> > | `POST` con el correo de Ana en mayúsculas | `409` |
-> > | `POST` con nombre vacío, edad `5`, correo `x`, estado `null` | `400` |
-> > | `GET /api/v1/students?name=a&size=1000&sort=name,asc` | `200` · `PageResponse` con `"size":50` |
-> > | `GET /api/v1/students/1` · `GET /api/v1/students/99` | `200` · `404` |
-> > | `PUT /api/v1/students/1` con datos válidos | `200` · `{"id":1,"name":"Ana T.","age":23,…}` |
-> > | `PUT /api/v1/students/1` con el correo de Luis | `409` |
-> > | `PUT /api/v1/students/99` | `404` |
-> > | `PATCH /api/v1/students/1/status` con `{"status":"INACTIVE"}` | `200` · el estudiante con `"status":"INACTIVE"` (el nombre y la edad **no** cambian) |
-> > | `PATCH` con `{"status":null}` | `400` |
-> > | `PATCH /api/v1/students/99/status` | `404` |
-> > | `DELETE /api/v1/students/2` · otra vez | `204` · `404` |
-> > | `GET /api/students` (la ruta **sin** versión) | `404` |
+> > | # | Petición | Respuesta |
+> > |---|---|---|
+> > | 1 | `POST` (Ana) | `201` · `Location: http://localhost:8080/api/v1/students/1` · `{"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com","status":"ACTIVE"}` |
+> > | 2 | `POST` con `"id":99` y `"createdAt":"2000-01-01…"` | `201` · `Location: …/students/2` · **el `id` 99 y la fecha se ignoran**; la respuesta **no** trae `createdAt` |
+> > | 3 | `POST` con el correo de Ana en mayúsculas | `409` |
+> > | 4 | `POST` con nombre vacío, edad `5`, correo `x`, estado `null` | `400` |
+> > | 5 | `GET ?name=a&size=1000&sort=name,asc` | `200` · `PageResponse` con `"size":50` |
+> > | 6 | `GET /1` | `200` · `{"id":1,"name":"Ana Torres",…}` |
+> > | 7 | `GET /99` | `404` |
+> > | 8 | `PUT /1` con datos válidos | `200` · `{"id":1,"name":"Ana T.","age":23,…}` |
+> > | 9 | `PUT /1` con el correo de Luis | `409` |
+> > | 10 | `PUT /99` | `404` |
+> > | 11 | `PATCH /1/status` con `{"status":"INACTIVE"}` | `200` · el estudiante con `"status":"INACTIVE"` (el nombre y la edad **no** cambian) |
+> > | 12 | `PATCH` con `{"status":null}` | `400` |
+> > | 13 | `PATCH /99/status` | `404` |
+> > | 14 | `DELETE /2` | `204` |
+> > | 15 | `DELETE /2` otra vez | `404` |
+> > | 16 | `GET /api/students` (la ruta **sin** versión) | `404` |
 > >
 > > Y en MySQL, la columna interna sigue existiendo:
 > >
@@ -1439,185 +1489,6 @@
 ---
 
 <details>
-<summary><strong>✅ Paso 8 — Pruebas automáticas</strong></summary>
-
-> <details>
-> <summary><strong>Paso 8.1 · El mapeador, sin Spring</strong></summary>
->
-> > Como `StudentMapper` es una clase simple, se prueba con JUnit y **sin** arrancar nada:
-> >
-> > <details>
-> > <summary><strong>📄 StudentMapperTest.java</strong></summary>
-> >
-> > **Ruta:** `src/test/java/com/academy/presentation/mapper/StudentMapperTest.java`
-> >
-> > ```java
-> > package com.academy.presentation.mapper;
-> >
-> > import com.academy.persistence.entity.StudentEntity;
-> > import com.academy.persistence.entity.StudentStatus;
-> > import com.academy.presentation.dto.StudentRequest;
-> > import com.academy.presentation.dto.StudentResponse;
-> > import org.junit.jupiter.api.Test;
-> >
-> > import static org.junit.jupiter.api.Assertions.assertEquals;
-> > import static org.junit.jupiter.api.Assertions.assertNull;
-> >
-> > class StudentMapperTest {
-> >
-> >     @Test
-> >     void requestBecomesAnEntityWithoutId() {
-> >         StudentRequest request = new StudentRequest("Ana Torres", 22, "ana@mail.com", StudentStatus.ACTIVE);
-> >
-> >         StudentEntity entity = StudentMapper.toEntity(request);
-> >
-> >         assertNull(entity.getId());
-> >         assertEquals("Ana Torres", entity.getName());
-> >         assertEquals("ana@mail.com", entity.getEmail());
-> >     }
-> >
-> >     @Test
-> >     void entityBecomesAResponseWithTheSameData() {
-> >         StudentEntity entity = new StudentEntity(7L, "Luis Pérez", 25, "luis@mail.com", StudentStatus.INACTIVE);
-> >
-> >         StudentResponse response = StudentMapper.toResponse(entity);
-> >
-> >         assertEquals(new StudentResponse(7L, "Luis Pérez", 25, "luis@mail.com", StudentStatus.INACTIVE), response);
-> >     }
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > > 💡 **Beneficio de este paso:** la conversión (el punto donde más se cuelan los errores de copia) queda protegida por pruebas que corren en **milisegundos**.
->
-> </details>
->
->
-> <details>
-> <summary><strong>Paso 8.2 · El controlador, con un servicio simulado</strong></summary>
->
-> > `@WebMvcTest` levanta **solo la capa web** (sin base de datos). `@MockBean` reemplaza el servicio por uno simulado, y cada prueba fija lo que responde. Se comprueba **HTTP puro**: códigos, encabezados y JSON.
-> >
-> > <details>
-> > <summary><strong>📄 StudentControllerTest.java</strong></summary>
-> >
-> > **Ruta:** `src/test/java/com/academy/presentation/controller/StudentControllerTest.java`
-> >
-> > ```java
-> > package com.academy.presentation.controller;
-> >
-> > import com.academy.business.service.ServiceResult;
-> > import com.academy.business.service.StudentService;
-> > import com.academy.persistence.entity.StudentEntity;
-> > import com.academy.persistence.entity.StudentStatus;
-> > import org.junit.jupiter.api.Test;
-> > import org.springframework.beans.factory.annotation.Autowired;
-> > import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-> > import org.springframework.boot.test.mock.mockito.MockBean;
-> > import org.springframework.http.MediaType;
-> > import org.springframework.test.web.servlet.MockMvc;
-> >
-> > import java.util.Optional;
-> >
-> > import static org.mockito.ArgumentMatchers.any;
-> > import static org.mockito.ArgumentMatchers.eq;
-> > import static org.mockito.Mockito.when;
-> > import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-> > import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-> > import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-> > import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-> > import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-> > import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-> >
-> > @WebMvcTest(StudentController.class)
-> > class StudentControllerTest {
-> >
-> >     private static final String VALID_BODY =
-> >             "{\"name\":\"Ana Torres\",\"age\":22,\"email\":\"ana@mail.com\",\"status\":\"ACTIVE\"}";
-> >
-> >     @Autowired
-> >     private MockMvc mvc;
-> >
-> >     @MockBean
-> >     private StudentService service;
-> >
-> >     @Test
-> >     void createReturns201WithLocationAndNoInternalFields() throws Exception {
-> >         StudentEntity saved = new StudentEntity(5L, "Ana Torres", 22, "ana@mail.com", StudentStatus.ACTIVE);
-> >         when(service.create(any())).thenReturn(ServiceResult.ok(saved));
-> >
-> >         mvc.perform(post("/api/v1/students").contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
-> >                 .andExpect(status().isCreated())
-> >                 .andExpect(header().string("Location", "http://localhost/api/v1/students/5"))
-> >                 .andExpect(jsonPath("$.id").value(5))
-> >                 .andExpect(jsonPath("$.createdAt").doesNotExist());
-> >     }
-> >
-> >     @Test
-> >     void createReturns409WhenTheEmailExists() throws Exception {
-> >         when(service.create(any())).thenReturn(ServiceResult.conflict());
-> >
-> >         mvc.perform(post("/api/v1/students").contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
-> >                 .andExpect(status().isConflict());
-> >     }
-> >
-> >     @Test
-> >     void createReturns400WhenTheBodyIsInvalid() throws Exception {
-> >         mvc.perform(post("/api/v1/students").contentType(MediaType.APPLICATION_JSON)
-> >                         .content("{\"name\":\"\",\"age\":5,\"email\":\"x\",\"status\":null}"))
-> >                 .andExpect(status().isBadRequest());
-> >     }
-> >
-> >     @Test
-> >     void findByIdReturns404WhenItDoesNotExist() throws Exception {
-> >         when(service.findById(99L)).thenReturn(Optional.empty());
-> >
-> >         mvc.perform(get("/api/v1/students/99")).andExpect(status().isNotFound());
-> >     }
-> >
-> >     @Test
-> >     void patchChangesOnlyTheStatus() throws Exception {
-> >         StudentEntity updated = new StudentEntity(1L, "Ana Torres", 22, "ana@mail.com", StudentStatus.INACTIVE);
-> >         when(service.changeStatus(eq(1L), eq(StudentStatus.INACTIVE))).thenReturn(ServiceResult.ok(updated));
-> >
-> >         mvc.perform(patch("/api/v1/students/1/status").contentType(MediaType.APPLICATION_JSON)
-> >                         .content("{\"status\":\"INACTIVE\"}"))
-> >                 .andExpect(status().isOk())
-> >                 .andExpect(jsonPath("$.status").value("INACTIVE"));
-> >     }
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > > | Prueba | Qué demuestra |
-> > > |---|---|
-> > > | `createReturns201WithLocationAndNoInternalFields` | Código `201`, encabezado `Location` y que `createdAt` **no existe** en el JSON |
-> > > | `createReturns409WhenTheEmailExists` | `CONFLICT` del servicio → `409` |
-> > > | `createReturns400WhenTheBodyIsInvalid` | `@Valid` corta antes de llegar al servicio |
-> > > | `findByIdReturns404WhenItDoesNotExist` | `Optional` vacío → `404` |
-> > > | `patchChangesOnlyTheStatus` | El `PATCH` pasa solo el estado al servicio |
-> > >
-> > > Se ejecuta con `./mvnw test`. **Resultado real:**
-> > >
-> > > ```text
-> > > Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
-> > > BUILD SUCCESS
-> > > ```
-> > >
-> > > 💡 **Beneficio de este paso:** un controlador **delgado** se prueba fácil, porque no tiene reglas que montar: solo se verifica que traduce bien. Estas pruebas **no necesitan MySQL**.
-> > >
-> > > ⚠️ **Detalle de entorno.** Con **Java 25**, Mockito falla (`Java 25 (69) is not supported by the current version of Byte Buddy`). El `pom.xml` del proyecto agrega `-Dnet.bytebuddy.experimental=true` en el plugin *surefire*; con Java 17 o 21 no hace falta.
->
-> </details>
->
-
-</details>
-
----
-
-<details>
 <summary><strong>⚖️ Balance: antes y después</strong></summary>
 
 > | Aspecto | Antes (entidad como contrato) | Después (DTO y controlador delgado) |
@@ -1631,7 +1502,6 @@
 > | `201` | Sin `Location` | Con `Location` |
 > | Listado | Arreglo sin totales y sin tope | Página con totales y tope de 50 |
 > | Ruta | `/api/students` | `/api/v1/students` |
-> | Probar el controlador | Necesita la base | `@WebMvcTest` con un servicio simulado |
 >
 > > 🔎 **Lectura clave.** El DTO no hace la API «más corta»: la hace **más segura de cambiar**. Cuanto más grande es el proyecto y más equipos consumen la API, más se nota.
 > >
@@ -1667,7 +1537,6 @@
 > | `The constructor StudentEntity(…) is undefined` | El mapeador usa un constructor distinto del de la entidad | Alinear los parámetros (`id` primero) |
 > | `NullPointerException` en `toResponse` | Se pasó `null` (un `ServiceResult` no `OK`) | Comprobar el estado **antes** de mapear |
 > | `switch` no compila («no cubre todos los casos») | Se agregó un estado a `ServiceStatus` y falta su rama | Agregar el caso en `respond` |
-> | `Mockito cannot mock this class` / `Java 25 (69) is not supported` | Java demasiado nuevo para la versión de Byte Buddy | Usar Java 17 o 21, o `-Dnet.bytebuddy.experimental=true` |
 > | El tamaño de página no se limita | Falta `spring.data.web.pageable.max-page-size` | Agregarlo en `application.properties` |
 > | `Communications link failure` al arrancar | MySQL no está arrancado o el puerto es otro | `docker ps` y revisar la URL |
 
@@ -1705,11 +1574,8 @@
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity        StudentEntity · StudentStatus
 >     │       └── 📁 repository    StudentJpaRepository
->     ├── 📁 main/resources
->     │   └── 📄 application.properties
->     └── 📁 test/java/com/academy/presentation
->         ├── 📁 controller        StudentControllerTest
->         └── 📁 mapper            StudentMapperTest
+>     └── 📁 main/resources
+>         └── 📄 application.properties
 > ```
 
 </details>
@@ -1726,7 +1592,6 @@
 > | `@GetMapping` · `@PostMapping` · `@PutMapping` · `@PatchMapping` · `@DeleteMapping` | Controlador | Verbo HTTP de cada método |
 > | `ResponseEntity` | Controlador | Elegir código, encabezados y cuerpo |
 > | `ServletUriComponentsBuilder` | Controlador | Construir la URL del `Location` |
-> | `@WebMvcTest` · `@MockBean` · `MockMvc` | Pruebas del controlador | Capa web aislada con un servicio simulado |
 > | `spring.data.web.pageable.*` | `application.properties` | Tamaño de página por defecto y máximo |
 >
 > ```text
