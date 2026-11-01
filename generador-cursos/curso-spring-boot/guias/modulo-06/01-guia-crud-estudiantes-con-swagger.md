@@ -37,7 +37,7 @@
 > | **springdoc-openapi** | La **librería** que lee los controladores de Spring y genera el documento | La dependencia del `pom.xml` |
 >
 > ```text
-> Controladores + DTO + anotaciones ─▶ springdoc ─▶ /v3/api-docs (OpenAPI) ─▶ Swagger UI
+> Controladores + modelos + anotaciones ─▶ springdoc ─▶ /v3/api-docs (OpenAPI) ─▶ Swagger UI
 >                                                                          └──▶ Postman, generadores de clientes, etc.
 > ```
 >
@@ -60,11 +60,11 @@
 > |---|---|
 > | **RNF-01** | Java 17 o superior, Spring Boot 3.3 y Maven. |
 > | **RNF-02** | MySQL 8 (en Docker o instalado); la base `academy` debe existir. |
-> | **RNF-03** | Tres capas. Las anotaciones de **Swagger** van **solo** en `presentation` (controladores, DTO y configuración); **nunca** en la entidad. |
+> | **RNF-03** | Tres capas. Los **DTO todavía no existen**: el controlador recibe y devuelve la **entidad**. Las anotaciones de Swagger van en `presentation` (controladores y configuración) y, **mientras no haya DTO**, también en la entidad. |
 > | **RNF-04** | Todos los nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-05** | Duración: 1 h 30 min. |
 >
-> > 💡 **Alcance.** Quedan fuera: autenticación real (el esquema de seguridad solo se **documenta**), manejo de errores con excepciones propias y generación de clientes a partir del contrato.
+> > 💡 **Alcance.** Quedan fuera: los **DTO** y mapeadores (cuando existan, la documentación de los modelos se mueve a ellos; reto 9), la autenticación real (el esquema de seguridad solo se **documenta**), el manejo de errores con excepciones propias y la generación de clientes a partir del contrato.
 
 </details>
 
@@ -99,19 +99,16 @@
 > ├── 📁 presentation
 > │   ├── 📁 config
 > │   │   └── 🆕 OpenApiConfig.java              información general, seguridad y grupos
-> │   ├── 📁 controller
-> │   │   ├── ✏️ StudentController.java          @Tag · @Operation · @ApiResponse · @Parameter · @Hidden
-> │   │   └── 🆕 InternalController.java         segundo grupo del contrato
-> │   └── 📁 dto
-> │       ├── ✏️ StudentRequest.java             @Schema + validaciones
-> │       ├── ✏️ StudentResponse.java            @Schema
-> │       ├── ✏️ PageResponse.java               @Schema
-> │       └── StudentMapper.java
+> │   └── 📁 controller
+> │       ├── ✏️ StudentController.java          @Tag · @Operation · @ApiResponse · @Parameter · @Hidden
+> │       └── 🆕 InternalController.java         segundo grupo del contrato
 > ├── 📁 business
 > │   └── 📁 service
 > │       └── StudentService.java
 > └── 📁 persistence
->     ├── 📁 entity                          StudentEntity · StudentStatus   ← sin una sola anotación de Swagger
+>     ├── 📁 entity
+>     │   ├── ✏️ StudentEntity.java              @Schema + validaciones (temporal, mientras no haya DTO)
+>     │   └── StudentStatus.java
 >     └── 📁 repository
 >         └── StudentJpaRepository.java
 > 📁 src/main/resources
@@ -121,11 +118,11 @@
 > | Capa | Qué lleva de Swagger |
 > |---|---|
 > | `presentation.controller` | `@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`, `@Hidden` |
-> | `presentation.dto` | `@Schema` |
+> | `persistence.entity` | `@Schema` en `StudentEntity` (**temporal**, porque aún no hay DTO) |
 > | `presentation.config` | Beans `OpenAPI` y `GroupedOpenApi` |
-> | `business` y `persistence` | **Nada**: no saben que existe Swagger |
+> | `business` | **Nada**: no sabe que existe Swagger |
 >
-> > 🔎 **Por qué los DTO.** Si la documentación se pusiera en la entidad, la tabla y el contrato de la API quedarían atados. Con un DTO, la API se documenta y evoluciona **sin tocar** la base de datos.
+> > ⚠️ **Una decisión consciente.** Sin DTO, la entidad es a la vez **tabla**, **modelo** y **contrato de la API**, así que la documentación va en ella. Es lo más simple para aprender Swagger, pero ata el contrato a la tabla: renombrar un campo cambia la API. Cuando se implementen los DTO, las anotaciones `@Schema` se **mueven** a ellos y la entidad queda limpia.
 
 </details>
 
@@ -183,7 +180,7 @@
 > <details>
 > <summary><strong>Paso 0.2 · <code>application.properties</code> y los paquetes</strong></summary>
 >
-> > Se crean los paquetes `presentation.controller`, `presentation.dto`, `business.service`, `persistence.entity` y `persistence.repository` dentro de `com.academy`.
+> > Se crean los paquetes `presentation.controller`, `business.service`, `persistence.entity` y `persistence.repository` dentro de `com.academy`.
 > >
 > > <details>
 > > <summary><strong>📄 application.properties</strong></summary>
@@ -218,7 +215,7 @@
 > <details>
 > <summary><strong>Paso 1.1 · Persistencia y negocio</strong></summary>
 >
-> > Entidad, enumeración, repositorio de Spring Data y servicio. Es lo mismo que en la guía 01, con tres cambios: un atributo `status` (una **enumeración**, útil para ver cómo la documenta Swagger), búsqueda por nombre con **paginación** y actualización por `id`.
+> > Entidad, enumeración, repositorio de Spring Data y servicio. Es lo mismo que en la guía 01, con cuatro cambios: un atributo `status` (una **enumeración**, útil para ver cómo la documenta Swagger), **validaciones** en la entidad, búsqueda por nombre con **paginación** y actualización por `id`.
 > >
 > > <details>
 > > <summary><strong>📄 StudentStatus.java</strong></summary>
@@ -252,6 +249,12 @@
 > > import jakarta.persistence.GenerationType;
 > > import jakarta.persistence.Id;
 > > import jakarta.persistence.Table;
+> > import jakarta.validation.constraints.Email;
+> > import jakarta.validation.constraints.Max;
+> > import jakarta.validation.constraints.Min;
+> > import jakarta.validation.constraints.NotBlank;
+> > import jakarta.validation.constraints.NotNull;
+> > import jakarta.validation.constraints.Size;
 > >
 > > @Entity
 > > @Table(name = "student")
@@ -261,14 +264,21 @@
 > >     @GeneratedValue(strategy = GenerationType.IDENTITY)
 > >     private Long id;
 > >
+> >     @NotBlank
+> >     @Size(min = 2, max = 100)
 > >     @Column(nullable = false)
 > >     private String name;
 > >
+> >     @Min(16)
+> >     @Max(99)
 > >     private int age;
 > >
+> >     @NotBlank
+> >     @Email
 > >     @Column(nullable = false, unique = true)
 > >     private String email;
 > >
+> >     @NotNull
 > >     @Enumerated(EnumType.STRING)
 > >     @Column(nullable = false)
 > >     private StudentStatus status;
@@ -333,11 +343,11 @@
 > >
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.repository.StudentJpaRepository;
-> > import org.springframework.data.domain.Page;
 > > import org.springframework.data.domain.Pageable;
 > > import org.springframework.stereotype.Service;
 > > import org.springframework.transaction.annotation.Transactional;
 > >
+> > import java.util.List;
 > > import java.util.Optional;
 > >
 > > @Service
@@ -350,11 +360,11 @@
 > >     }
 > >
 > >     @Transactional(readOnly = true)
-> >     public Page<StudentEntity> search(String name, Pageable pageable) {
+> >     public List<StudentEntity> search(String name, Pageable pageable) {
 > >         if (name == null || name.isBlank()) {
-> >             return students.findAll(pageable);
+> >             return students.findAll(pageable).getContent();
 > >         }
-> >         return students.findByNameContainingIgnoreCase(name, pageable);
+> >         return students.findByNameContainingIgnoreCase(name, pageable).getContent();
 > >     }
 > >
 > >     @Transactional(readOnly = true)
@@ -372,7 +382,9 @@
 > >         if (students.existsByEmailIgnoreCase(student.getEmail())) {
 > >             return Optional.empty();
 > >         }
-> >         return Optional.of(students.save(student));
+> >         StudentEntity toSave = new StudentEntity(
+> >                 null, student.getName(), student.getAge(), student.getEmail(), student.getStatus());
+> >         return Optional.of(students.save(toSave));
 > >     }
 > >
 > >     @Transactional
@@ -404,6 +416,8 @@
 > > > |---|---|
 > > > | `@Enumerated(EnumType.STRING)` | Guarda `ACTIVE` o `INACTIVE` como texto en la columna. |
 > > > | `Page<StudentEntity> findByNameContainingIgnoreCase(name, Pageable)` | Consulta derivada con filtro y paginación. |
+> > > | `@NotBlank`, `@Size`, `@Min`, `@Max`, `@Email`, `@NotNull` | Reglas de **Bean Validation** sobre los campos; con `@Valid` en el controlador, un cuerpo inválido responde `400`. |
+> > > | `create` crea `new StudentEntity(null, …)` | **Descarta el `id`** que mande el cliente: así `save` siempre **inserta** y nadie sobrescribe una fila ajena. |
 > > > | `update` crea `new StudentEntity(id, …)` | Con `id` informado, `save` **actualiza** esa fila. |
 > > > | `@Transactional` / `readOnly = true` | Va en los métodos del **servicio**. |
 >
@@ -411,109 +425,11 @@
 >
 >
 > <details>
-> <summary><strong>Paso 1.2 · Los DTO, el mapeador y el controlador</strong></summary>
+> <summary><strong>Paso 1.2 · El controlador</strong></summary>
 >
-> > La API **no expone la entidad**: recibe un `StudentRequest` y devuelve un `StudentResponse`. `PageResponse<T>` representa una página de resultados. Las validaciones de `StudentRequest` (`@NotBlank`, `@Email`, `@Min`…) hacen que un `POST` inválido responda `400`.
+> > Todavía **no hay DTO**: el controlador recibe y devuelve directamente la entidad `StudentEntity`, como en la guía 01. El listado devuelve los estudiantes de la página pedida (`List`).
 > >
 > > El controlador **no lleva ninguna anotación de Swagger todavía**.
-> >
-> > <details>
-> > <summary><strong>📄 StudentRequest.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/presentation/dto/StudentRequest.java`
-> >
-> > ```java
-> > package com.academy.presentation.dto;
-> >
-> > import com.academy.persistence.entity.StudentStatus;
-> > import jakarta.validation.constraints.Email;
-> > import jakarta.validation.constraints.Max;
-> > import jakarta.validation.constraints.Min;
-> > import jakarta.validation.constraints.NotBlank;
-> > import jakarta.validation.constraints.NotNull;
-> > import jakarta.validation.constraints.Size;
-> >
-> > public record StudentRequest(
-> >
-> >         @NotBlank
-> >         @Size(min = 2, max = 100)
-> >         String name,
-> >
-> >         @Min(16)
-> >         @Max(99)
-> >         int age,
-> >
-> >         @NotBlank
-> >         @Email
-> >         String email,
-> >
-> >         @NotNull
-> >         StudentStatus status
-> > ) {
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > <details>
-> > <summary><strong>📄 StudentResponse.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/presentation/dto/StudentResponse.java`
-> >
-> > ```java
-> > package com.academy.presentation.dto;
-> >
-> > import com.academy.persistence.entity.StudentStatus;
-> >
-> > public record StudentResponse(Long id, String name, int age, String email, StudentStatus status) {
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > <details>
-> > <summary><strong>📄 PageResponse.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/presentation/dto/PageResponse.java`
-> >
-> > ```java
-> > package com.academy.presentation.dto;
-> >
-> > import java.util.List;
-> >
-> > public record PageResponse<T>(List<T> content, int page, int size, long totalElements, int totalPages) {
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > <details>
-> > <summary><strong>📄 StudentMapper.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/presentation/dto/StudentMapper.java`
-> >
-> > ```java
-> > package com.academy.presentation.dto;
-> >
-> > import com.academy.persistence.entity.StudentEntity;
-> >
-> > public final class StudentMapper {
-> >
-> >     private StudentMapper() {
-> >     }
-> >
-> >     public static StudentEntity toEntity(StudentRequest request) {
-> >         return new StudentEntity(null, request.name(), request.age(), request.email(), request.status());
-> >     }
-> >
-> >     public static StudentResponse toResponse(StudentEntity entity) {
-> >         return new StudentResponse(entity.getId(), entity.getName(), entity.getAge(),
-> >                 entity.getEmail(), entity.getStatus());
-> >     }
-> > }
-> > ```
-> >
-> > </details>
 > >
 > > <details>
 > > <summary><strong>📄 StudentController.java</strong></summary>
@@ -525,12 +441,7 @@
 > >
 > > import com.academy.business.service.StudentService;
 > > import com.academy.persistence.entity.StudentEntity;
-> > import com.academy.presentation.dto.PageResponse;
-> > import com.academy.presentation.dto.StudentMapper;
-> > import com.academy.presentation.dto.StudentRequest;
-> > import com.academy.presentation.dto.StudentResponse;
 > > import jakarta.validation.Valid;
-> > import org.springframework.data.domain.Page;
 > > import org.springframework.data.domain.Pageable;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.http.ResponseEntity;
@@ -544,6 +455,8 @@
 > > import org.springframework.web.bind.annotation.RequestParam;
 > > import org.springframework.web.bind.annotation.RestController;
 > >
+> > import java.util.List;
+> >
 > > @RestController
 > > @RequestMapping("/api/students")
 > > public class StudentController {
@@ -555,41 +468,38 @@
 > >     }
 > >
 > >     @GetMapping
-> >     public PageResponse<StudentResponse> search(@RequestParam(required = false) String name, Pageable pageable) {
-> >         Page<StudentEntity> page = service.search(name, pageable);
-> >         return new PageResponse<>(
-> >                 page.getContent().stream().map(StudentMapper::toResponse).toList(),
-> >                 page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages());
+> >     public List<StudentEntity> search(@RequestParam(required = false) String name, Pageable pageable) {
+> >         return service.search(name, pageable);
 > >     }
 > >
 > >     @GetMapping("/{id}")
-> >     public ResponseEntity<StudentResponse> findById(@PathVariable Long id) {
+> >     public ResponseEntity<StudentEntity> findById(@PathVariable Long id) {
 > >         return service.findById(id)
-> >                 .map(student -> ResponseEntity.ok(StudentMapper.toResponse(student)))
+> >                 .map(ResponseEntity::ok)
 > >                 .orElse(ResponseEntity.notFound().build());
 > >     }
 > >
 > >     @GetMapping("/by-email")
-> >     public ResponseEntity<StudentResponse> findByEmail(@RequestParam String email) {
+> >     public ResponseEntity<StudentEntity> findByEmail(@RequestParam String email) {
 > >         return service.findByEmail(email)
-> >                 .map(student -> ResponseEntity.ok(StudentMapper.toResponse(student)))
+> >                 .map(ResponseEntity::ok)
 > >                 .orElse(ResponseEntity.notFound().build());
 > >     }
 > >
 > >     @PostMapping
-> >     public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) {
-> >         return service.create(StudentMapper.toEntity(request))
-> >                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(StudentMapper.toResponse(created)))
+> >     public ResponseEntity<StudentEntity> create(@Valid @RequestBody StudentEntity student) {
+> >         return service.create(student)
+> >                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
 > >                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
 > >     }
 > >
 > >     @PutMapping("/{id}")
-> >     public ResponseEntity<StudentResponse> update(@PathVariable Long id, @Valid @RequestBody StudentRequest request) {
+> >     public ResponseEntity<StudentEntity> update(@PathVariable Long id, @Valid @RequestBody StudentEntity student) {
 > >         if (service.findById(id).isEmpty()) {
 > >             return ResponseEntity.notFound().build();
 > >         }
-> >         return service.update(id, StudentMapper.toEntity(request))
-> >                 .map(updated -> ResponseEntity.ok(StudentMapper.toResponse(updated)))
+> >         return service.update(id, student)
+> >                 .map(ResponseEntity::ok)
 > >                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
 > >     }
 > >
@@ -611,6 +521,8 @@
 > > > | `409` | El correo ya existe (el servicio devolvió `Optional` vacío) |
 > > > | `404` | No existe el `id` |
 > > > | `204` | Eliminado, sin cuerpo |
+> > >
+> > > 🔎 **Concepto (M2):** `Pageable` lo construye Spring a partir de `?page=0&size=2&sort=name,asc`; el controlador solo lo pasa al servicio.
 >
 > </details>
 >
@@ -630,7 +542,8 @@
 > > | `POST` Ana (correo nuevo) | `201` · `{"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com","status":"ACTIVE"}` |
 > > | `POST` con el mismo correo en mayúsculas | `409` |
 > > | `POST` con nombre vacío, edad `5` y correo `x` | `400` |
-> > | `GET /api/students?page=0&size=2` | `200` · página con `content`, `page`, `size`, `totalElements`, `totalPages` |
+> > | `GET /api/students?page=0&size=2` | `200` · un arreglo con los estudiantes de la página |
+> > | `POST` que **trae** `"id":1` en el JSON | `201` · se guarda con **otro** `id` (el servicio descarta el del cliente) |
 > > | `GET /api/students/1` · `GET /api/students/999` | `200` · `404` |
 > > | `PUT /api/students/{id}` con el correo de otro | `409` |
 > > | `DELETE /api/students/{id}` · otra vez | `204` · `404` |
@@ -690,7 +603,7 @@
 > > > | Título y versión | `OpenAPI definition` · `v0` (valores por defecto) |
 > > > | Respuestas | **Solo `200` en todas**, aun `POST` (que responde `201`) y `DELETE` (que responde `204`/`404`) |
 > > > | Paginación | Un único parámetro `pageable`, **obligatorio**, con el modelo `Pageable` |
-> > > | Modelos | `StudentRequest`, `StudentResponse`, `PageResponseStudentResponse` y `Pageable` |
+> > > | Modelos | `StudentEntity` y `Pageable` (la entidad ya trae los límites de las validaciones) |
 > > >
 > > > Los tipos, las rutas y los modelos salen de **leer el código**. Lo que el compilador no puede saber queda **mal o vacío**: los códigos reales de `ResponseEntity`, la descripción de cada operación, los ejemplos y la paginación.
 > > >
@@ -840,12 +753,12 @@
 > > @Operation(summary = "Listar estudiantes",
 > >         description = "Devuelve una página de estudiantes. Con `name` filtra por nombre (contiene, sin importar mayúsculas).")
 > > @GetMapping
-> > public PageResponse<StudentResponse> search(...) { ... }
+> > public List<StudentEntity> search(...) { ... }
 > >
 > > @Operation(summary = "Crear un estudiante",
 > >         description = "El `id` lo genera la base. Si el correo ya existe responde `409`.")
 > > @PostMapping
-> > public ResponseEntity<StudentResponse> create(...) { ... }
+> > public ResponseEntity<StudentEntity> create(...) { ... }
 > > ```
 > >
 > > </details>
@@ -875,7 +788,7 @@
 > > @ApiResponse(responseCode = "400", description = "Datos inválidos (Bean Validation)", content = @Content)
 > > @ApiResponse(responseCode = "409", description = "El correo ya está registrado", content = @Content)
 > > @PostMapping
-> > public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) { ... }
+> > public ResponseEntity<StudentEntity> create(@Valid @RequestBody StudentEntity student) { ... }
 > > ```
 > >
 > > </details>
@@ -890,7 +803,7 @@
 > > @ApiResponse(responseCode = "200", description = "Estudiante encontrado")
 > > @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
 > > @GetMapping("/{id}")
-> > public ResponseEntity<StudentResponse> findById(...) { ... }
+> > public ResponseEntity<StudentEntity> findById(...) { ... }
 > > ```
 > >
 > > </details>
@@ -937,11 +850,11 @@
 > >
 > > ```java
 > > @GetMapping("/{id}")
-> > public ResponseEntity<StudentResponse> findById(
+> > public ResponseEntity<StudentEntity> findById(
 > >         @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id) { ... }
 > >
 > > @GetMapping
-> > public PageResponse<StudentResponse> search(
+> > public List<StudentEntity> search(
 > >         @Parameter(description = "Parte del nombre a buscar", example = "ana")
 > >         @RequestParam(required = false) String name,
 > >         @ParameterObject Pageable pageable) { ... }
@@ -972,7 +885,7 @@
 > > > | `size` | query | integer | |
 > > > | `sort` | query | array | |
 > > >
-> > > Con la URL de ejemplo `?name=a&page=0&size=2&sort=name,asc` la respuesta real fue una página de dos elementos, `"totalElements":2` y `"totalPages":1`.
+> > > Con la URL de ejemplo `?name=a&page=0&size=2&sort=name,asc` la respuesta real fue un arreglo con los estudiantes que coinciden, ordenados por nombre.
 > > >
 > > > 💡 **Beneficio:** la paginación se prueba rellenando tres campos sencillos en vez de escribir un JSON a mano.
 >
@@ -994,23 +907,32 @@
 ---
 
 <details>
-<summary><strong>📐 Paso 6 — Documentar los modelos (<code>@Schema</code>) y las validaciones</strong></summary>
+<summary><strong>📐 Paso 6 — Documentar el modelo (<code>@Schema</code>) y las validaciones</strong></summary>
 
 > <details>
-> <summary><strong>Paso 6.1 · <code>@Schema</code> en los DTO</strong></summary>
+> <summary><strong>Paso 6.1 · <code>@Schema</code> en la entidad</strong></summary>
 >
-> > `@Schema` describe cada **campo** (descripción, ejemplo, obligatorio, mínimos y máximos, solo lectura). Se escribe en el **DTO**, nunca en la entidad.
+> > `@Schema` describe cada **campo** (descripción, ejemplo, obligatorio, mínimos y máximos, solo lectura). Como todavía **no hay DTO**, se escribe en `StudentEntity`, que es la clase que viaja por la API.
+> >
+> > Con `@Schema(name = "Student")` sobre la clase, el modelo se llama **Student** en el contrato (sin él se llamaría `StudentEntity`, un detalle interno).
 > >
 > > <details>
-> > <summary><strong>📄 StudentRequest.java</strong></summary>
+> > <summary><strong>📄 StudentEntity.java</strong></summary>
 > >
-> > **Ruta:** `src/main/java/com/academy/presentation/dto/StudentRequest.java`
+> > **Ruta:** `src/main/java/com/academy/persistence/entity/StudentEntity.java`
 > >
 > > ```java
-> > package com.academy.presentation.dto;
+> > package com.academy.persistence.entity;
 > >
-> > import com.academy.persistence.entity.StudentStatus;
 > > import io.swagger.v3.oas.annotations.media.Schema;
+> > import jakarta.persistence.Column;
+> > import jakarta.persistence.Entity;
+> > import jakarta.persistence.EnumType;
+> > import jakarta.persistence.Enumerated;
+> > import jakarta.persistence.GeneratedValue;
+> > import jakarta.persistence.GenerationType;
+> > import jakarta.persistence.Id;
+> > import jakarta.persistence.Table;
 > > import jakarta.validation.constraints.Email;
 > > import jakarta.validation.constraints.Max;
 > > import jakarta.validation.constraints.Min;
@@ -1018,98 +940,56 @@
 > > import jakarta.validation.constraints.NotNull;
 > > import jakarta.validation.constraints.Size;
 > >
-> > @Schema(name = "StudentRequest", description = "Datos para crear o actualizar un estudiante")
-> > public record StudentRequest(
+> > @Schema(name = "Student", description = "Estudiante de la academia")
+> > @Entity
+> > @Table(name = "student")
+> > public class StudentEntity {
 > >
-> >         @Schema(description = "Nombre completo", example = "Ana Torres", requiredMode = Schema.RequiredMode.REQUIRED)
-> >         @NotBlank
-> >         @Size(min = 2, max = 100)
-> >         String name,
+> >     @Schema(description = "Identificador generado por la base", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+> >     @Id
+> >     @GeneratedValue(strategy = GenerationType.IDENTITY)
+> >     private Long id;
 > >
-> >         @Schema(description = "Edad en años", example = "22", minimum = "16", maximum = "99")
-> >         @Min(16)
-> >         @Max(99)
-> >         int age,
+> >     @Schema(description = "Nombre completo", example = "Ana Torres", requiredMode = Schema.RequiredMode.REQUIRED)
+> >     @NotBlank
+> >     @Size(min = 2, max = 100)
+> >     @Column(nullable = false)
+> >     private String name;
 > >
-> >         @Schema(description = "Correo único (sin importar mayúsculas)", example = "ana@mail.com",
-> >                 requiredMode = Schema.RequiredMode.REQUIRED)
-> >         @NotBlank
-> >         @Email
-> >         String email,
+> >     @Schema(description = "Edad en años", example = "22", minimum = "16", maximum = "99")
+> >     @Min(16)
+> >     @Max(99)
+> >     private int age;
 > >
-> >         @Schema(description = "Estado del estudiante", example = "ACTIVE", requiredMode = Schema.RequiredMode.REQUIRED)
-> >         @NotNull
-> >         StudentStatus status
-> > ) {
-> > }
-> > ```
+> >     @Schema(description = "Correo único (sin importar mayúsculas)", example = "ana@mail.com",
+> >             requiredMode = Schema.RequiredMode.REQUIRED)
+> >     @NotBlank
+> >     @Email
+> >     @Column(nullable = false, unique = true)
+> >     private String email;
 > >
-> > </details>
+> >     @Schema(description = "Estado del estudiante", example = "ACTIVE", requiredMode = Schema.RequiredMode.REQUIRED)
+> >     @NotNull
+> >     @Enumerated(EnumType.STRING)
+> >     @Column(nullable = false)
+> >     private StudentStatus status;
 > >
-> > <details>
-> > <summary><strong>📄 StudentResponse.java</strong></summary>
+> >     protected StudentEntity() {
+> >     }
 > >
-> > **Ruta:** `src/main/java/com/academy/presentation/dto/StudentResponse.java`
+> >     public StudentEntity(Long id, String name, int age, String email, StudentStatus status) {
+> >         this.id = id;
+> >         this.name = name;
+> >         this.age = age;
+> >         this.email = email;
+> >         this.status = status;
+> >     }
 > >
-> > ```java
-> > package com.academy.presentation.dto;
-> >
-> > import com.academy.persistence.entity.StudentStatus;
-> > import io.swagger.v3.oas.annotations.media.Schema;
-> >
-> > @Schema(name = "StudentResponse", description = "Estudiante guardado en la base de datos")
-> > public record StudentResponse(
-> >
-> >         @Schema(description = "Identificador generado por la base", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
-> >         Long id,
-> >
-> >         @Schema(description = "Nombre completo", example = "Ana Torres")
-> >         String name,
-> >
-> >         @Schema(description = "Edad en años", example = "22")
-> >         int age,
-> >
-> >         @Schema(description = "Correo único", example = "ana@mail.com")
-> >         String email,
-> >
-> >         @Schema(description = "Estado del estudiante", example = "ACTIVE")
-> >         StudentStatus status
-> > ) {
-> > }
-> > ```
-> >
-> > </details>
-> >
-> > <details>
-> > <summary><strong>📄 PageResponse.java</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/presentation/dto/PageResponse.java`
-> >
-> > ```java
-> > package com.academy.presentation.dto;
-> >
-> > import io.swagger.v3.oas.annotations.media.Schema;
-> >
-> > import java.util.List;
-> >
-> > @Schema(description = "Página de resultados")
-> > public record PageResponse<T>(
-> >
-> >         @Schema(description = "Elementos de la página")
-> >         List<T> content,
-> >
-> >         @Schema(description = "Número de página (empieza en 0)", example = "0")
-> >         int page,
-> >
-> >         @Schema(description = "Tamaño de página", example = "10")
-> >         int size,
-> >
-> >         @Schema(description = "Total de elementos", example = "42")
-> >         long totalElements,
-> >
-> >         @Schema(description = "Total de páginas", example = "5")
-> >         int totalPages
-> > ) {
+> >     public Long getId() { return id; }
+> >     public String getName() { return name; }
+> >     public int getAge() { return age; }
+> >     public String getEmail() { return email; }
+> >     public StudentStatus getStatus() { return status; }
 > > }
 > > ```
 > >
@@ -1120,9 +1000,11 @@
 > > > | `description` | El texto junto al campo |
 > > > | `example` | El valor que se rellena al probar |
 > > > | `requiredMode = REQUIRED` | Marca el campo como obligatorio (asterisco rojo) |
-> > > | `accessMode = READ_ONLY` | El `id` aparece **solo en la respuesta**; no se pide al crear |
+> > > | `accessMode = READ_ONLY` | El `id` aparece **solo en la respuesta**; no se pide al crear (no sale en el ejemplo de la petición) |
 > > > | `minimum` / `maximum` | Rango de valores permitido |
-> > > | `name` (en el record) | Nombre del modelo en la sección **Schemas** |
+> > > | `name` (sobre la clase) | Nombre del modelo en la sección **Schemas** |
+> > >
+> > > > ⚠️ **Costo de hacerlo sobre la entidad.** `StudentEntity` ahora mezcla JPA, validación y Swagger, y el contrato queda atado a la tabla. Es temporal: con DTO, estas anotaciones se mueven al DTO.
 >
 > </details>
 >
@@ -1130,12 +1012,14 @@
 > <details>
 > <summary><strong>Paso 6.2 · Bean Validation pasa solo al contrato</strong></summary>
 >
-> > Las restricciones `@NotBlank`, `@Size`, `@Min`, `@Max` y `@NotNull` **no hay que repetirlas**: springdoc las lee. **Resultado real** del esquema `StudentRequest` en `/v3/api-docs`:
+> > Las restricciones `@NotBlank`, `@Size`, `@Min`, `@Max` y `@NotNull` **no hay que repetirlas**: springdoc las lee. **Resultado real** del esquema `Student` en `/v3/api-docs` (abreviado):
 > >
 > > ```json
 > > {
+> >   "description": "Estudiante de la academia",
 > >   "required": ["email", "name", "status"],
 > >   "properties": {
+> >     "id":     { "type": "integer", "format": "int64", "readOnly": true, "example": 1 },
 > >     "name":   { "type": "string", "minLength": 2, "maxLength": 100, "example": "Ana Torres" },
 > >     "age":    { "type": "integer", "format": "int32", "minimum": 16, "maximum": 99, "example": 22 },
 > >     "email":  { "type": "string", "example": "ana@mail.com" },
@@ -1162,7 +1046,7 @@
 > <details>
 > <summary><strong>Paso 6.3 · Ver el resultado</strong></summary>
 >
-> > En la sección **Schemas** (al final de la pantalla) aparecen `StudentRequest`, `StudentResponse` y `PageResponseStudentResponse`. Al expandir `StudentRequest` se ven los cuatro campos con su descripción, los obligatorios marcados y el desplegable de `status`.
+> > En la sección **Schemas** (al final de la pantalla) aparece `Student`. Al expandirlo se ven los cinco campos con su descripción, los obligatorios marcados, el `id` de solo lectura y el desplegable de `status`. En `GET /api/students`, la respuesta `200` ahora es un **arreglo de `Student`**.
 > >
 > > ✅ **Punto de control 6:** los modelos muestran descripción, ejemplos, obligatorios y el desplegable del enumerado.
 >
@@ -1198,7 +1082,7 @@
 > >                         value = "{\"name\":\"Luis Pérez\",\"age\":25,\"email\":\"luis@mail.com\",\"status\":\"INACTIVE\"}")
 > >         }))
 > > @PostMapping
-> > public ResponseEntity<StudentResponse> create(@Valid @RequestBody StudentRequest request) { ... }
+> > public ResponseEntity<StudentEntity> create(@Valid @RequestBody StudentEntity student) { ... }
 > > ```
 > >
 > > </details>
@@ -1248,7 +1132,7 @@
 > >         description = "Obsoleto: usar `GET /api/students?name=` o `GET /api/students/{id}`.",
 > >         deprecated = true)
 > > @GetMapping("/by-email")
-> > public ResponseEntity<StudentResponse> findByEmail(...) { ... }
+> > public ResponseEntity<StudentEntity> findByEmail(...) { ... }
 > > ```
 > >
 > > </details>
@@ -1665,7 +1549,150 @@
 > > | `GET` | `/internal/health` | Estado del servicio | | `200` |
 > > | `POST` | `/internal/seed` | Cargar estudiantes de ejemplo | | `200` |
 > >
-> > Esquemas: `StudentRequest`, `StudentResponse`, `PageResponseStudentResponse`. Esquema de seguridad: `bearerAuth`. La ruta `/api/students/ping` **no aparece**.
+> > Esquema: `Student`. Esquema de seguridad: `bearerAuth`. La ruta `/api/students/ping` **no aparece**.
+> >
+> > El controlador **final**, con todas las anotaciones juntas:
+> >
+> > <details>
+> > <summary><strong>📄 StudentController.java</strong></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/presentation/controller/StudentController.java`
+> >
+> > ```java
+> > package com.academy.presentation.controller;
+> >
+> > import com.academy.business.service.StudentService;
+> > import com.academy.persistence.entity.StudentEntity;
+> > import io.swagger.v3.oas.annotations.Hidden;
+> > import io.swagger.v3.oas.annotations.Operation;
+> > import io.swagger.v3.oas.annotations.Parameter;
+> > import io.swagger.v3.oas.annotations.media.Content;
+> > import io.swagger.v3.oas.annotations.media.ExampleObject;
+> > import io.swagger.v3.oas.annotations.media.Schema;
+> > import io.swagger.v3.oas.annotations.responses.ApiResponse;
+> > import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+> > import io.swagger.v3.oas.annotations.tags.Tag;
+> > import jakarta.validation.Valid;
+> > import org.springdoc.core.annotations.ParameterObject;
+> > import org.springframework.data.domain.Pageable;
+> > import org.springframework.http.HttpStatus;
+> > import org.springframework.http.ResponseEntity;
+> > import org.springframework.web.bind.annotation.DeleteMapping;
+> > import org.springframework.web.bind.annotation.GetMapping;
+> > import org.springframework.web.bind.annotation.PathVariable;
+> > import org.springframework.web.bind.annotation.PostMapping;
+> > import org.springframework.web.bind.annotation.PutMapping;
+> > import org.springframework.web.bind.annotation.RequestBody;
+> > import org.springframework.web.bind.annotation.RequestMapping;
+> > import org.springframework.web.bind.annotation.RequestParam;
+> > import org.springframework.web.bind.annotation.RestController;
+> >
+> > import java.util.List;
+> >
+> > @RestController
+> > @RequestMapping("/api/students")
+> > @Tag(name = "Students", description = "Operaciones sobre estudiantes")
+> > public class StudentController {
+> >
+> >     private final StudentService service;
+> >
+> >     public StudentController(StudentService service) {
+> >         this.service = service;
+> >     }
+> >
+> >     @Operation(summary = "Listar estudiantes",
+> >             description = "Devuelve los estudiantes de la página pedida. Con `name` filtra por nombre (contiene, sin importar mayúsculas).")
+> >     @ApiResponse(responseCode = "200", description = "Lista de estudiantes de la página pedida")
+> >     @GetMapping
+> >     public List<StudentEntity> search(
+> >             @Parameter(description = "Parte del nombre a buscar", example = "ana")
+> >             @RequestParam(required = false) String name,
+> >             @ParameterObject Pageable pageable) {
+> >         return service.search(name, pageable);
+> >     }
+> >
+> >     @Operation(summary = "Buscar un estudiante por id")
+> >     @ApiResponse(responseCode = "200", description = "Estudiante encontrado")
+> >     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
+> >     @GetMapping("/{id}")
+> >     public ResponseEntity<StudentEntity> findById(
+> >             @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id) {
+> >         return service.findById(id)
+> >                 .map(ResponseEntity::ok)
+> >                 .orElse(ResponseEntity.notFound().build());
+> >     }
+> >
+> >     @Operation(summary = "Buscar un estudiante por correo",
+> >             description = "Obsoleto: usar `GET /api/students?name=` o `GET /api/students/{id}`.",
+> >             deprecated = true)
+> >     @ApiResponse(responseCode = "200", description = "Estudiante encontrado")
+> >     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese correo", content = @Content)
+> >     @GetMapping("/by-email")
+> >     public ResponseEntity<StudentEntity> findByEmail(
+> >             @Parameter(description = "Correo exacto", example = "ana@mail.com") @RequestParam String email) {
+> >         return service.findByEmail(email)
+> >                 .map(ResponseEntity::ok)
+> >                 .orElse(ResponseEntity.notFound().build());
+> >     }
+> >
+> >     @Operation(summary = "Crear un estudiante",
+> >             description = "El `id` lo genera la base. Si el correo ya existe responde `409`.")
+> >     @io.swagger.v3.oas.annotations.parameters.RequestBody(
+> >             description = "Datos del estudiante",
+> >             content = @Content(examples = {
+> >                     @ExampleObject(name = "Estudiante activo", summary = "Un estudiante activo",
+> >                             value = "{\"name\":\"Ana Torres\",\"age\":22,\"email\":\"ana@mail.com\",\"status\":\"ACTIVE\"}"),
+> >                     @ExampleObject(name = "Estudiante inactivo", summary = "Un estudiante inactivo",
+> >                             value = "{\"name\":\"Luis Pérez\",\"age\":25,\"email\":\"luis@mail.com\",\"status\":\"INACTIVE\"}")
+> >             }))
+> >     @ApiResponse(responseCode = "201", description = "Estudiante creado")
+> >     @ApiResponse(responseCode = "400", description = "Datos inválidos (Bean Validation)", content = @Content)
+> >     @ApiResponse(responseCode = "409", description = "El correo ya está registrado", content = @Content)
+> >     @PostMapping
+> >     public ResponseEntity<StudentEntity> create(@Valid @RequestBody StudentEntity student) {
+> >         return service.create(student)
+> >                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
+> >                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+> >     }
+> >
+> >     @Operation(summary = "Actualizar un estudiante",
+> >             description = "Reemplaza todos los datos del estudiante. Responde `404` si no existe y `409` si el correo es de otro estudiante.")
+> >     @ApiResponse(responseCode = "200", description = "Estudiante actualizado")
+> >     @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
+> >     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
+> >     @ApiResponse(responseCode = "409", description = "El correo pertenece a otro estudiante", content = @Content)
+> >     @PutMapping("/{id}")
+> >     public ResponseEntity<StudentEntity> update(
+> >             @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id,
+> >             @Valid @RequestBody StudentEntity student) {
+> >         if (service.findById(id).isEmpty()) {
+> >             return ResponseEntity.notFound().build();
+> >         }
+> >         return service.update(id, student)
+> >                 .map(ResponseEntity::ok)
+> >                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+> >     }
+> >
+> >     @Operation(summary = "Eliminar un estudiante", security = @SecurityRequirement(name = "bearerAuth"))
+> >     @ApiResponse(responseCode = "204", description = "Estudiante eliminado")
+> >     @ApiResponse(responseCode = "404", description = "No existe un estudiante con ese id", content = @Content)
+> >     @DeleteMapping("/{id}")
+> >     public ResponseEntity<Void> delete(
+> >             @Parameter(description = "Identificador del estudiante", example = "1") @PathVariable Long id) {
+> >         return service.delete(id)
+> >                 ? ResponseEntity.noContent().build()
+> >                 : ResponseEntity.notFound().build();
+> >     }
+> >
+> >     @Hidden
+> >     @GetMapping("/ping")
+> >     public String ping() {
+> >         return "pong";
+> >     }
+> > }
+> > ```
+> >
+> > </details>
 > >
 > > ✅ **Punto de control 11:** el contrato coincide con la tabla.
 >
@@ -1689,7 +1716,7 @@
 > | Respuestas posibles (`201`, `404`, `409`…) | `@ApiResponse` | 4 |
 > | Descripción y ejemplo de un parámetro | `@Parameter` | 5 |
 > | Desplegar un objeto (`Pageable`) en parámetros | `@ParameterObject` | 5 |
-> | Descripción, ejemplo y obligatoriedad de un campo | `@Schema` | 6 |
+> | Descripción, ejemplo y obligatoriedad de un campo | `@Schema` (hoy en la entidad) | 6 |
 > | Campo solo de lectura | `@Schema(accessMode = READ_ONLY)` | 6 |
 > | Reglas de validación en el contrato | **Automático** desde Bean Validation | 6 |
 > | Enumerados como desplegable | **Automático** desde `enum` | 6 |
@@ -1710,7 +1737,7 @@
 <summary><strong>🏁 Cierre — preguntas de síntesis</strong></summary>
 
 > 1. ¿Qué diferencia hay entre OpenAPI, Swagger UI y springdoc? *(El contrato, la pantalla y la librería que genera el primero y sirve la segunda.)*
-> 2. ¿Por qué las anotaciones de Swagger van en los DTO y no en la entidad? *(Para que la API evolucione sin tocar la base, y al revés.)*
+> 2. ¿Qué costo tiene documentar sobre la entidad? *(La entidad mezcla tabla, validación y contrato: renombrar un campo cambia la API. Con DTO, esas anotaciones se mueven al DTO.)*
 > 3. ¿Qué parte de la documentación es automática y qué parte hay que escribir? *(Rutas, tipos, validaciones y enumerados son automáticos; descripciones, ejemplos y significados de los códigos los escribe una persona.)*
 > 4. ¿Qué pasa con `@Email`? ¿Qué se aprende de eso? *(No llega al contrato; conviene **leer** el resultado y no suponer que todo pasa.)*
 > 5. ¿`@Hidden` protege una ruta? *(No: solo la quita de la documentación.)*
@@ -1731,7 +1758,7 @@
 > | El `Pageable` se muestra como un solo cuadro JSON | Falta `@ParameterObject` | Agregarlo |
 > | El 409 aparece con un modelo de respuesta inexistente | Falta `content = @Content` en esa `@ApiResponse` | Agregarlo |
 > | Dos `@RequestBody` en el mismo parámetro no compilan | Se importaron las dos | Usar el nombre completo de la de Swagger |
-> | El `id` aparece en el ejemplo de la petición de crear | Un mismo DTO sirve de entrada y de salida | Separar `StudentRequest` y `StudentResponse`, o marcar el `id` con `accessMode = READ_ONLY` |
+> | El `id` aparece en el ejemplo de la petición de crear | El `id` no está marcado como solo lectura | Agregar `accessMode = READ_ONLY` al `@Schema` del `id` |
 > | Los cambios de documentación no se ven | Caché del navegador o no se reinició la aplicación | Reiniciar y recargar con `Ctrl+F5` |
 > | `Communications link failure` al arrancar | MySQL no está arrancado o el puerto es otro | `docker ps` y revisar la URL |
 
@@ -1748,6 +1775,7 @@
 > 6. **Un recurso nuevo.** Agregar `CourseController` (CRUD de cursos) con su propio tag y su grupo.
 > 7. **Seguridad real.** Agregar Spring Security con un token fijo y comprobar que *Authorize* ahora **sí** cambia el resultado de `DELETE`.
 > 8. **Generar un cliente.** Con el YAML exportado, generar un cliente con OpenAPI Generator.
+> 9. **Pasar a DTO.** Crear `StudentRequest` y `StudentResponse` (y un mapeador), mover los `@Schema` y las validaciones a ellos, y comprobar que el contrato queda igual salvo el nombre de los modelos. ¿Qué queda en la entidad?
 
 </details>
 
@@ -1762,8 +1790,7 @@
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
 >     │   │   ├── 📁 config        OpenApiConfig
->     │   │   ├── 📁 controller    StudentController · InternalController
->     │   │   └── 📁 dto           StudentRequest · StudentResponse · PageResponse · StudentMapper
+>     │   │   └── 📁 controller    StudentController · InternalController
 >     │   ├── 📁 business
 >     │   │   └── 📁 service       StudentService
 >     │   └── 📁 persistence
@@ -1788,18 +1815,18 @@
 > | `@Parameter` | Parámetro del método | Descripción y ejemplo |
 > | `@ParameterObject` | Parámetro `Pageable` u objeto | Despliega sus campos como parámetros |
 > | `@io.swagger…RequestBody` | Método | Documenta el cuerpo (con ejemplos) |
-> | `@Schema` | Campo del DTO | Descripción, ejemplo, obligatorio, solo lectura |
+> | `@Schema` | Clase y campos de la entidad (luego, del DTO) | Descripción, ejemplo, obligatorio, solo lectura |
 > | `@Hidden` | Método o clase | Quita la operación del contrato |
 > | `@SecurityRequirement` | Método o clase | Exige un esquema de seguridad |
 > | Beans `OpenAPI` y `GroupedOpenApi` | `presentation.config` | Información general, seguridad y grupos |
 >
 > ```text
-> persistence  ──▶  (sin Swagger)
+> persistence  ──▶  @Schema (temporal: pasará a los DTO)
 > business     ──▶  (sin Swagger)
-> presentation ──▶  @Tag · @Operation · @ApiResponse · @Parameter · @ParameterObject · @Schema · @Hidden · @SecurityRequirement + config
+> presentation ──▶  @Tag · @Operation · @ApiResponse · @Parameter · @ParameterObject · @Hidden · @SecurityRequirement + config
 > ```
 >
-> > 🔎 **Lectura clave.** Swagger vive **solo** en `presentation`. Las otras dos capas no saben que existe.
+> > 🔎 **Lectura clave.** Swagger vive en `presentation`; solo `@Schema` está, por ahora, en la entidad. `business` no sabe que existe.
 
 </details>
 
