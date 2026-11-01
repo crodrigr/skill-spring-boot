@@ -1262,6 +1262,613 @@
 >     └── 📁 resources
 >         └── 📄 application.properties
 > ```
+>
+> **Código final, paso a paso**
+>
+> ### 📁 Configuración
+>
+> <details>
+> <summary><strong>📄 pom.xml</strong></summary>
+>
+> **Ruta:** `pom.xml`
+>
+> ```xml
+> <?xml version="1.0" encoding="UTF-8"?>
+> <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+>     <modelVersion>4.0.0</modelVersion>
+>     <parent>
+>         <groupId>org.springframework.boot</groupId>
+>         <artifactId>spring-boot-starter-parent</artifactId>
+>         <version>3.3.5</version>
+>         <relativePath/>
+>     </parent>
+>     <groupId>com.academy</groupId>
+>     <artifactId>academy</artifactId>
+>     <version>0.0.1-SNAPSHOT</version>
+>     <name>academy</name>
+>     <description>Taller de gestión de cursos con base de datos</description>
+>     <properties>
+>         <java.version>17</java.version>
+>     </properties>
+>     <dependencies>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-web</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-starter-data-jpa</artifactId>
+>         </dependency>
+>         <dependency>
+>             <groupId>com.mysql</groupId>
+>             <artifactId>mysql-connector-j</artifactId>
+>             <scope>runtime</scope>
+>         </dependency>
+>         <dependency>
+>             <groupId>org.springframework.boot</groupId>
+>             <artifactId>spring-boot-devtools</artifactId>
+>             <scope>runtime</scope>
+>             <optional>true</optional>
+>         </dependency>
+>     </dependencies>
+>     <build>
+>         <plugins>
+>             <plugin>
+>                 <groupId>org.springframework.boot</groupId>
+>                 <artifactId>spring-boot-maven-plugin</artifactId>
+>             </plugin>
+>         </plugins>
+>     </build>
+> </project>
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 application.properties</strong></summary>
+>
+> **Ruta:** `src/main/resources/application.properties`
+>
+> ```properties
+> # MySQL connection
+> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.username=root
+> spring.datasource.password=root
+>
+> # JPA and Hibernate
+> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.show-sql=true
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 AcademyApplication.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/AcademyApplication.java`
+>
+> ```java
+> package com.academy;
+>
+> import org.springframework.boot.SpringApplication;
+> import org.springframework.boot.autoconfigure.SpringBootApplication;
+>
+> @SpringBootApplication
+> public class AcademyApplication {
+>
+>     public static void main(String[] args) {
+>         SpringApplication.run(AcademyApplication.class, args);
+>     }
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 persistence
+>
+> #### 📁 entity
+>
+> <details>
+> <summary><strong>📄 StudentEntity.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentEntity.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> import jakarta.persistence.Column;
+> import jakarta.persistence.Entity;
+> import jakarta.persistence.GeneratedValue;
+> import jakarta.persistence.GenerationType;
+> import jakarta.persistence.Id;
+> import jakarta.persistence.Table;
+>
+> @Entity
+> @Table(name = "student")
+> public class StudentEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String name;
+>
+>     private int age;
+>
+>     @Column(unique = true)
+>     private String email;
+>
+>     protected StudentEntity() {
+>     }
+>
+>     public StudentEntity(String name, int age, String email) {
+>         this.name = name;
+>         this.age = age;
+>         this.email = email;
+>     }
+>
+>     public Long getId() { return id; }
+>     public String getName() { return name; }
+>     public int getAge() { return age; }
+>     public String getEmail() { return email; }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 CourseEntity.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/CourseEntity.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> import jakarta.persistence.Entity;
+> import jakarta.persistence.GeneratedValue;
+> import jakarta.persistence.GenerationType;
+> import jakarta.persistence.Id;
+> import jakarta.persistence.Table;
+>
+> @Entity
+> @Table(name = "course")
+> public class CourseEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     private String name;
+>
+>     private double price;
+>
+>     private int maxCapacity;
+>
+>     protected CourseEntity() {
+>     }
+>
+>     public CourseEntity(String name, double price, int maxCapacity) {
+>         this.name = name;
+>         this.price = price;
+>         this.maxCapacity = maxCapacity;
+>     }
+>
+>     public Long getId() { return id; }
+>     public String getName() { return name; }
+>     public double getPrice() { return price; }
+>     public int getMaxCapacity() { return maxCapacity; }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 EnrollmentEntity.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/EnrollmentEntity.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> import jakarta.persistence.Entity;
+> import jakarta.persistence.GeneratedValue;
+> import jakarta.persistence.GenerationType;
+> import jakarta.persistence.Id;
+> import jakarta.persistence.JoinColumn;
+> import jakarta.persistence.ManyToOne;
+> import jakarta.persistence.Table;
+>
+> @Entity
+> @Table(name = "enrollment")
+> public class EnrollmentEntity {
+>
+>     @Id
+>     @GeneratedValue(strategy = GenerationType.IDENTITY)
+>     private Long id;
+>
+>     @ManyToOne
+>     @JoinColumn(name = "student_id")
+>     private StudentEntity student;
+>
+>     @ManyToOne
+>     @JoinColumn(name = "course_id")
+>     private CourseEntity course;
+>
+>     protected EnrollmentEntity() {
+>     }
+>
+>     public EnrollmentEntity(StudentEntity student, CourseEntity course) {
+>         this.student = student;
+>         this.course = course;
+>     }
+>
+>     public Long getId() { return id; }
+>     public StudentEntity getStudent() { return student; }
+>     public CourseEntity getCourse() { return course; }
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 repository
+>
+> <details>
+> <summary><strong>📄 StudentJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/StudentJpaRepository.java`
+>
+> ```java
+> package com.academy.persistence.repository;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> public interface StudentJpaRepository extends JpaRepository<StudentEntity, Long> {
+>
+>     boolean existsByEmailIgnoreCase(String email);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 CourseJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/CourseJpaRepository.java`
+>
+> ```java
+> package com.academy.persistence.repository;
+>
+> import com.academy.persistence.entity.CourseEntity;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> public interface CourseJpaRepository extends JpaRepository<CourseEntity, Long> {
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 EnrollmentJpaRepository.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/repository/EnrollmentJpaRepository.java`
+>
+> ```java
+> package com.academy.persistence.repository;
+>
+> import com.academy.persistence.entity.EnrollmentEntity;
+> import org.springframework.data.jpa.repository.JpaRepository;
+>
+> public interface EnrollmentJpaRepository extends JpaRepository<EnrollmentEntity, Long> {
+>
+>     boolean existsByStudentIdAndCourseId(Long studentId, Long courseId);
+>
+>     long countByCourseId(Long courseId);
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 business
+>
+> #### 📁 service
+>
+> <details>
+> <summary><strong>📄 StudentService.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.repository.StudentJpaRepository;
+> import org.springframework.stereotype.Service;
+> import org.springframework.transaction.annotation.Transactional;
+>
+> import java.util.List;
+> import java.util.Optional;
+>
+> @Service
+> public class StudentService {
+>
+>     private final StudentJpaRepository students;
+>
+>     public StudentService(StudentJpaRepository students) {
+>         this.students = students;
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public List<StudentEntity> findAll() {
+>         return students.findAll();
+>     }
+>
+>     @Transactional
+>     public Optional<StudentEntity> create(StudentEntity student) {
+>         if (students.existsByEmailIgnoreCase(student.getEmail())) {
+>             return Optional.empty();
+>         }
+>         return Optional.of(students.save(student));
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 CourseService.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/CourseService.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> import com.academy.persistence.entity.CourseEntity;
+> import com.academy.persistence.repository.CourseJpaRepository;
+> import com.academy.persistence.repository.EnrollmentJpaRepository;
+> import org.springframework.stereotype.Service;
+> import org.springframework.transaction.annotation.Transactional;
+>
+> import java.util.List;
+> import java.util.Optional;
+>
+> @Service
+> public class CourseService {
+>
+>     private final CourseJpaRepository courses;
+>     private final EnrollmentJpaRepository enrollments;
+>
+>     public CourseService(CourseJpaRepository courses, EnrollmentJpaRepository enrollments) {
+>         this.courses = courses;
+>         this.enrollments = enrollments;
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public List<CourseEntity> findAll() {
+>         return courses.findAll();
+>     }
+>
+>     @Transactional
+>     public Optional<CourseEntity> create(CourseEntity course) {
+>         if (course.getPrice() <= 0 || course.getMaxCapacity() <= 0) {
+>             return Optional.empty();
+>         }
+>         return Optional.of(courses.save(course));
+>     }
+>
+>     @Transactional(readOnly = true)
+>     public Optional<Long> countEnrolled(Long courseId) {
+>         if (!courses.existsById(courseId)) {
+>             return Optional.empty();
+>         }
+>         return Optional.of(enrollments.countByCourseId(courseId));
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 EnrollmentService.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/service/EnrollmentService.java`
+>
+> ```java
+> package com.academy.business.service;
+>
+> import com.academy.persistence.entity.CourseEntity;
+> import com.academy.persistence.entity.EnrollmentEntity;
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.repository.CourseJpaRepository;
+> import com.academy.persistence.repository.EnrollmentJpaRepository;
+> import com.academy.persistence.repository.StudentJpaRepository;
+> import org.springframework.stereotype.Service;
+> import org.springframework.transaction.annotation.Transactional;
+>
+> import java.util.Optional;
+>
+> @Service
+> public class EnrollmentService {
+>
+>     private final StudentJpaRepository students;
+>     private final CourseJpaRepository courses;
+>     private final EnrollmentJpaRepository enrollments;
+>
+>     public EnrollmentService(StudentJpaRepository students, CourseJpaRepository courses,
+>                              EnrollmentJpaRepository enrollments) {
+>         this.students = students;
+>         this.courses = courses;
+>         this.enrollments = enrollments;
+>     }
+>
+>     @Transactional
+>     public Optional<EnrollmentEntity> enroll(Long studentId, Long courseId) {
+>         Optional<StudentEntity> student = students.findById(studentId);
+>         Optional<CourseEntity> course = courses.findById(courseId);
+>
+>         if (student.isEmpty() || course.isEmpty()) {
+>             return Optional.empty();
+>         }
+>         if (enrollments.existsByStudentIdAndCourseId(studentId, courseId)) {
+>             return Optional.empty();
+>         }
+>         if (enrollments.countByCourseId(courseId) >= course.get().getMaxCapacity()) {
+>             return Optional.empty();
+>         }
+>         return Optional.of(enrollments.save(new EnrollmentEntity(student.get(), course.get())));
+>     }
+> }
+> ```
+>
+> </details>
+>
+> ---
+>
+> ### 📁 presentation
+>
+> #### 📁 controller
+>
+> <details>
+> <summary><strong>📄 StudentController.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/controller/StudentController.java`
+>
+> ```java
+> package com.academy.presentation.controller;
+>
+> import com.academy.business.service.StudentService;
+> import com.academy.persistence.entity.StudentEntity;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.http.ResponseEntity;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> import java.util.List;
+>
+> @RestController
+> @RequestMapping("/api/students")
+> public class StudentController {
+>
+>     private final StudentService service;
+>
+>     public StudentController(StudentService service) {
+>         this.service = service;
+>     }
+>
+>     @GetMapping
+>     public List<StudentEntity> findAll() {
+>         return service.findAll();
+>     }
+>
+>     @PostMapping
+>     public ResponseEntity<StudentEntity> create(@RequestBody StudentEntity student) {
+>         return service.create(student)
+>                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
+>                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 CourseController.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/controller/CourseController.java`
+>
+> ```java
+> package com.academy.presentation.controller;
+>
+> import com.academy.business.service.CourseService;
+> import com.academy.persistence.entity.CourseEntity;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.http.ResponseEntity;
+> import org.springframework.web.bind.annotation.GetMapping;
+> import org.springframework.web.bind.annotation.PathVariable;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestBody;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> import java.util.List;
+>
+> @RestController
+> @RequestMapping("/api/courses")
+> public class CourseController {
+>
+>     private final CourseService service;
+>
+>     public CourseController(CourseService service) {
+>         this.service = service;
+>     }
+>
+>     @GetMapping
+>     public List<CourseEntity> findAll() {
+>         return service.findAll();
+>     }
+>
+>     @PostMapping
+>     public ResponseEntity<CourseEntity> create(@RequestBody CourseEntity course) {
+>         return service.create(course)
+>                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
+>                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+>     }
+>
+>     @GetMapping("/{id}/enrolled")
+>     public ResponseEntity<Long> countEnrolled(@PathVariable Long id) {
+>         return service.countEnrolled(id)
+>                 .map(ResponseEntity::ok)
+>                 .orElse(ResponseEntity.notFound().build());
+>     }
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 EnrollmentController.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/controller/EnrollmentController.java`
+>
+> ```java
+> package com.academy.presentation.controller;
+>
+> import com.academy.business.service.EnrollmentService;
+> import com.academy.persistence.entity.EnrollmentEntity;
+> import org.springframework.http.HttpStatus;
+> import org.springframework.http.ResponseEntity;
+> import org.springframework.web.bind.annotation.PostMapping;
+> import org.springframework.web.bind.annotation.RequestMapping;
+> import org.springframework.web.bind.annotation.RequestParam;
+> import org.springframework.web.bind.annotation.RestController;
+>
+> @RestController
+> @RequestMapping("/api/enrollments")
+> public class EnrollmentController {
+>
+>     private final EnrollmentService service;
+>
+>     public EnrollmentController(EnrollmentService service) {
+>         this.service = service;
+>     }
+>
+>     @PostMapping
+>     public ResponseEntity<EnrollmentEntity> enroll(@RequestParam Long studentId, @RequestParam Long courseId) {
+>         return service.enroll(studentId, courseId)
+>                 .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created))
+>                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
+>     }
+> }
+> ```
+>
+> </details>
 
 </details>
 
