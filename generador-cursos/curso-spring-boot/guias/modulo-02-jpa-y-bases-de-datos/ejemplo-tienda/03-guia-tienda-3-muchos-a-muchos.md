@@ -435,7 +435,7 @@
 <summary><strong>🚀 Reto</strong></summary>
 
 > Imaginá que además querés guardar **la fecha** en que el cliente marcó cada favorito. Con `@ManyToMany` simple **no hay dónde ponerla**. ¿Qué entidad habría que crear? *(Pista: una entidad intermedia `Favorito`, con dos `@ManyToOne` y el atributo `fecha`: el
-> [Ejemplo 04 del M4](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).)*
+> [Ejemplo 04 del M4](../../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).)*
 
 </details>
 
@@ -448,8 +448,8 @@
 > | 2 | `Pedido`, `DetallePedido` | Uno a muchos y muchos a uno |
 > | 3 | `Cliente` | Muchos a muchos con `Producto` |
 >
-> > 📚 **Para profundizar:** [Relacionamiento entre clases](../../03-introduccion-a-jpa/material/ejemplos/03-relacionamiento-entre-clases.md) · [ManyToMany y entidad intermedia](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).
+> > 📚 **Para profundizar:** [Relacionamiento entre clases](../../../03-introduccion-a-jpa/material/ejemplos/03-relacionamiento-entre-clases.md) · [ManyToMany y entidad intermedia](../../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/04-manyToMany-y-entidad-intermedia.md).
 
 </details>
 
-⬅️ [Guía 2](03-guia-tienda-2-uno-a-muchos.md) · ➡️ **Siguiente (opcional):** [Guía 4 — Fase II: buenas prácticas](05-guia-tienda-fase-2-buenas-practicas.md)
+⬅️ [Guía 2](02-guia-tienda-2-uno-a-muchos.md) · ➡️ **Siguiente (opcional):** [Guía 4 — Fase II: buenas prácticas](04-guia-tienda-fase-2-buenas-practicas.md)

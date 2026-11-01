@@ -1,6 +1,6 @@
 # 📘 Guía paso a paso — Academia con DTO, mapeadores y controladores delgados
 
-> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 05](01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 03-04](../modulo-03-04/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 05](01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 03-04](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
 > 📦 **Proyecto terminado:** [`academica-dtos/`](codigo/academica-dtos/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-dtos-codigo-completo.md`](03-academica-dtos-codigo-completo.md).
@@ -146,7 +146,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · El proyecto</strong></summary>
 >
-> > Se parte del proyecto que se termina en la [guía 01 del módulo 03-04](../modulo-03-04/01-guia-taller-gestion-de-cursos-con-bd.md) (su sección **Estructura final esperada** trae todo el código). Si hace falta, se crea la base:
+> > Se parte del proyecto que se termina en la [guía 01 del módulo 03-04](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) (su sección **Estructura final esperada** trae todo el código). Si hace falta, se crea la base:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
@@ -2127,7 +2127,7 @@
 > | Listados | Todo el contenido | Página con tope de 50 |
 > | Cambiar una columna | Rompe a los clientes | Solo cambia el mapeador |
 >
-> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-03-04/03-guia-taller-gestion-de-cursos-una-version-profesional.md).
+> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-02-jpa-y-bases-de-datos/02-guia-taller-gestion-de-cursos-una-version-profesional.md).
 
 </details>
 
@@ -2169,7 +2169,7 @@
 > 5. **Cupos disponibles.** Agregar `available` a `EnrolledResponse` (cupo máximo menos matriculados).
 > 6. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409`. ¿Qué cambiaría al llegar al Módulo 7?
 > 7. **MapStruct.** Reemplazar los tres mapeadores por interfaces de MapStruct y comparar.
-> 8. **Documentarla.** Agregar Swagger siguiendo la [guía del Módulo 06](../modulo-06/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO.
+> 8. **Documentarla.** Agregar Swagger siguiendo la [guía del Módulo 06](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO.
 
 </details>
 

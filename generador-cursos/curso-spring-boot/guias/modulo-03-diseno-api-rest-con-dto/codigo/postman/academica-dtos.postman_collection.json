@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Módulo 05 · academica-dtos",
-    "description": "Academia (estudiantes, cursos y matrículas) con DTO. Ejecutar en orden (Runner). Guía: modulo-05/02-academica-dtos.md",
+    "description": "Academia (estudiantes, cursos y matrículas) con DTO. Ejecutar en orden (Runner). Guía: modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

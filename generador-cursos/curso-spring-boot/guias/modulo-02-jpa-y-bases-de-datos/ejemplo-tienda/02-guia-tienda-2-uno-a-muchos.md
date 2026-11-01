@@ -1,7 +1,7 @@
 # 🛒 Guía 2 — Tienda en línea: pedidos y detalles (uno a muchos)
 
 > 🎯 **Qué vas a hacer:** relacionar un **pedido** con **varios detalles** (`@OneToMany` / `@ManyToOne`) y cada detalle con un **producto** de la guía 1.
-> ⏱️ **Tiempo:** unos 30 minutos. 🧱 **Parte de:** el proyecto de la [Guía 1](02-guia-tienda-1-crud-productos.md).
+> ⏱️ **Tiempo:** unos 30 minutos. 🧱 **Parte de:** el proyecto de la [Guía 1](01-guia-tienda-1-crud-productos.md).
 
 <details open>
 <summary><strong>📦 Dependencias</strong></summary>
@@ -451,10 +451,10 @@
 <summary><strong>🚀 Reto</strong></summary>
 
 > Agregá `cascade = CascadeType.ALL` y `orphanRemoval = true` a `Pedido.detalles` y creá `DELETE /pedidos/{id}`. ¿Qué pasa con sus detalles?
-> *([Cascade y orphanRemoval](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/05-cascade-y-orphanRemoval.md).)*
+> *([Cascade y orphanRemoval](../../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/05-cascade-y-orphanRemoval.md).)*
 >
-> > 📚 **Para profundizar:** [OneToMany, ManyToOne y fetch](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md).
+> > 📚 **Para profundizar:** [OneToMany, ManyToOne y fetch](../../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/03-oneToMany-manyToOne-y-fetch.md).
 
 </details>
 
-⬅️ [Guía 1](02-guia-tienda-1-crud-productos.md) · ➡️ **Siguiente:** [Guía 3 — Relación muchos a muchos](04-guia-tienda-3-muchos-a-muchos.md)
+⬅️ [Guía 1](01-guia-tienda-1-crud-productos.md) · ➡️ **Siguiente:** [Guía 3 — Relación muchos a muchos](03-guia-tienda-3-muchos-a-muchos.md)

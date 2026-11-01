@@ -1,7 +1,7 @@
 # academica-swagger
 
 Taller de gestión de cursos (estudiantes, cursos y matrículas) con **DTO** y documentado con **Swagger** (springdoc-openapi 2.6.0).
-Parte del proyecto [`academica-dtos`](../../../modulo-05/codigo/academica-dtos/) del Módulo 05 y le agrega la documentación.
+Parte del proyecto [`academica-dtos`](../../../modulo-03-diseno-api-rest-con-dto/codigo/academica-dtos/) del Módulo 05 y le agrega la documentación.
 Guía: [`02-academica-swagger.md`](../../02-academica-swagger.md) · Código completo: [`03-academica-swagger-codigo-completo.md`](../../03-academica-swagger-codigo-completo.md).
 
 Colección de Postman: [`academica-swagger.postman_collection.json`](../postman/academica-swagger.postman_collection.json) (con su [entorno](../postman/academy-local.postman_environment.json) y [README](../postman/README.md)).

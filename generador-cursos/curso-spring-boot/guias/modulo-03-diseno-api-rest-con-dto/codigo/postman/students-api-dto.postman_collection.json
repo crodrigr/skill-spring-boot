@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Módulo 05 · students-api-dto",
-    "description": "Estudiantes con DTO, mapeador y controlador delgado. Ejecutar en orden (Runner): cada petición guarda los ids que necesita la siguiente. Guía: modulo-05/01-guia-dto-y-estructura-de-controladores.md",
+    "description": "Estudiantes con DTO, mapeador y controlador delgado. Ejecutar en orden (Runner): cada petición guarda los ids que necesita la siguiente. Guía: modulo-03-diseno-api-rest-con-dto/01-guia-dto-y-estructura-de-controladores.md",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

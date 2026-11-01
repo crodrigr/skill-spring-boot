@@ -1,6 +1,6 @@
 # 📘 Guía paso a paso — Academia con DTO documentada con Swagger (OpenAPI)
 
-> 👩‍🏫 **Material docente.** Aplica la [guía del Módulo 06](01-guia-crud-estudiantes-con-swagger.md) al proyecto de la academia ya con DTO ([`02-academica-dtos`](../modulo-05/02-academica-dtos.md), Módulo 05): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica la [guía del Módulo 06](01-guia-crud-estudiantes-con-swagger.md) al proyecto de la academia ya con DTO ([`02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md), Módulo 05): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.
 >
 > 📦 **Proyecto terminado:** [`academica-swagger/`](codigo/academica-swagger/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-swagger-codigo-completo.md`](03-academica-swagger-codigo-completo.md).
@@ -157,7 +157,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · El proyecto</strong></summary>
 >
-> > No se crea un proyecto nuevo: se parte de [`academica-dtos`](../modulo-05/codigo/academica-dtos/), que se termina en la [guía `02-academica-dtos`](../modulo-05/02-academica-dtos.md) del Módulo 05.
+> > No se crea un proyecto nuevo: se parte de [`academica-dtos`](../modulo-03-diseno-api-rest-con-dto/codigo/academica-dtos/), que se termina en la [guía `02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md) del Módulo 05.
 > >
 > > ```bash
 > > cp -r academica-dtos academica-swagger
@@ -2342,4 +2342,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía `02-academica-dtos` del Módulo 05](../modulo-05/02-academica-dtos.md) · **Código completo:** [03-academica-swagger-codigo-completo.md](03-academica-swagger-codigo-completo.md)
+➡️ **Anterior:** [Guía `02-academica-dtos` del Módulo 05](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md) · **Código completo:** [03-academica-swagger-codigo-completo.md](03-academica-swagger-codigo-completo.md)

@@ -1447,4 +1447,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía 01 — Taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) · **Misma idea en otro proyecto:** [Guía 05 — Tienda, Fase II](05-guia-tienda-fase-2-buenas-practicas.md)
+➡️ **Anterior:** [Guía 01 — Taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) · **Misma idea en otro proyecto:** [Guía 05 — Tienda, Fase II](ejemplo-tienda/04-guia-tienda-fase-2-buenas-practicas.md)

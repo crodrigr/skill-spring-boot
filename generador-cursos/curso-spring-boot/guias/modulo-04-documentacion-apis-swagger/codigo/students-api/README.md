@@ -1,7 +1,7 @@
 # students-api
 
 CRUD de estudiantes con **DTO**, Spring Boot 3.3, Spring Data JPA y MySQL 8, documentado con Swagger (springdoc-openapi 2.6.0).
-Parte del proyecto del módulo 05 ([`students-api-dto`](../../../modulo-05/codigo/students-api-dto/)) y le agrega la documentación.
+Parte del proyecto del módulo 05 ([`students-api-dto`](../../../modulo-03-diseno-api-rest-con-dto/codigo/students-api-dto/)) y le agrega la documentación.
 Código final de la guía [`01-guia-crud-estudiantes-con-swagger.md`](../../01-guia-crud-estudiantes-con-swagger.md).
 
 Colección de Postman: [`students-api.postman_collection.json`](../postman/students-api.postman_collection.json) (con su [entorno](../postman/academy-local.postman_environment.json) y [README](../postman/README.md)).

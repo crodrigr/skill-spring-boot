@@ -4,7 +4,7 @@
 
 🎯 **Qué se aprende:** a declarar las tres relaciones de JPA, **desde las entidades**, en **un sentido** y en **doble sentido**, y qué significa cada notación.
 
-⏱️ **Tiempo:** unos 20 minutos de lectura y 25 de práctica. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](03-guia-tienda-2-uno-a-muchos.md).
+⏱️ **Tiempo:** unos 20 minutos de lectura y 25 de práctica. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](ejemplo-tienda/02-guia-tienda-2-uno-a-muchos.md).
 
 ✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que se muestran son reales.
 
@@ -1415,7 +1415,7 @@
 > 2. **Siempre se escribe del lado dueño.** El inverso solo sirve para **leer**.
 > 3. **`mappedBy` lleva el nombre exacto** del atributo del dueño (`"docente"`, `"carnet"`, `"cursos"`).
 > 4. **Con `@Data` y doble sentido, se excluye el lado inverso** con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`: si no, `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Así están las clases de esta guía.
-> 5. Al devolver entidades como **JSON**, el doble sentido genera un bucle infinito: por eso en la [guía 2 de la tienda](03-guia-tienda-2-uno-a-muchos.md) se usa `@JsonIgnore`, y en la [Fase II](05-guia-tienda-fase-2-buenas-practicas.md) se separan modelo y entidad.
+> 5. Al devolver entidades como **JSON**, el doble sentido genera un bucle infinito: por eso en la [guía 2 de la tienda](ejemplo-tienda/02-guia-tienda-2-uno-a-muchos.md) se usa `@JsonIgnore`, y en la [Fase II](ejemplo-tienda/04-guia-tienda-fase-2-buenas-practicas.md) se separan modelo y entidad.
 
 </details>
 
@@ -1669,7 +1669,7 @@
 > <details open>
 > <summary><strong>2️⃣ Paso 2 — Levantar MySQL y configurar la conexión</strong></summary>
 >
-> > **a) Levantar MySQL.** Con Docker (un solo comando; ver también «Preparar MySQL» en la [guía 1 de la tienda](02-guia-tienda-1-crud-productos.md)):
+> > **a) Levantar MySQL.** Con Docker (un solo comando; ver también «Preparar MySQL» en la [guía 1 de la tienda](ejemplo-tienda/01-guia-tienda-1-crud-productos.md)):
 > >
 > > ```bash
 > > docker run --name mysql-academia -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:8

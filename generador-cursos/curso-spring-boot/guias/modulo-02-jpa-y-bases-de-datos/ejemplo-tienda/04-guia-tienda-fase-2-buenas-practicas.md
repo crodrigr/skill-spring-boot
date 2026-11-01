@@ -1,8 +1,8 @@
 # 🛒 Guía 4 — Tienda en línea · Fase II: buenas prácticas (modelo, entidad y mapeador)
 
 > 🎯 **Qué vas a hacer:** mejorar la tienda terminada en las guías 1 a 3 separando el **modelo** del negocio de las **entidades** de la base de datos, con **mapeadores** y repositorios que **delegan** en Spring Data. La API **no cambia**: mismos endpoints, mismas respuestas.
-> ⏱️ **Tiempo:** 45 a 60 minutos. 🧱 **Parte de:** el proyecto de las [guías 1, 2 y 3](04-guia-tienda-3-muchos-a-muchos.md).
-> 📚 **Es el mismo diseño** de la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md), aplicado a la tienda.
+> ⏱️ **Tiempo:** 45 a 60 minutos. 🧱 **Parte de:** el proyecto de las [guías 1, 2 y 3](03-guia-tienda-3-muchos-a-muchos.md).
+> 📚 **Es el mismo diseño** de la [guía del taller «Gestión de cursos» con base de datos](../01-guia-taller-gestion-de-cursos-con-bd.md), aplicado a la tienda.
 
 <details open>
 <summary><strong>🤔 ¿Por qué una Fase II? El problema de la Fase I</strong></summary>
@@ -31,7 +31,7 @@
 > <details>
 > <summary><strong>✅ ¿Es correcto que <code>RepositorioProductosEnBD</code> delegue en <code>ProductoJpaRepository</code> y use un mapeador?</strong></summary>
 >
-> > **Sí.** Es el patrón *Repository* implementado como **puerto y adaptador**: el contrato pertenece al negocio y el adaptador (`…EnBD`) pertenece a la persistencia. Tiene tres matices que esta guía corrige respecto de la [guía de «Gestión de cursos»](01-guia-taller-gestion-de-cursos-con-bd.md):
+> > **Sí.** Es el patrón *Repository* implementado como **puerto y adaptador**: el contrato pertenece al negocio y el adaptador (`…EnBD`) pertenece a la persistencia. Tiene tres matices que esta guía corrige respecto de la [guía de «Gestión de cursos»](../01-guia-taller-gestion-de-cursos-con-bd.md):
 > >
 > > | Matiz | Cómo lo resuelve la Fase II |
 > > |---|---|
@@ -979,7 +979,7 @@
 <details open>
 <summary><strong>🧪 Probar: todo debe dar lo mismo que en las guías 1 a 3</strong></summary>
 
-> Con MySQL en marcha (ver la [guía 1](02-guia-tienda-1-crud-productos.md)), **ejecutá los mismos `curl`** de las guías 1, 2 y 3 y compará con la columna «Esperado». Debe dar **idéntico**: mismos códigos y el mismo JSON.
+> Con MySQL en marcha (ver la [guía 1](01-guia-tienda-1-crud-productos.md)), **ejecutá los mismos `curl`** de las guías 1, 2 y 3 y compará con la columna «Esperado». Debe dar **idéntico**: mismos códigos y el mismo JSON.
 >
 > | Guía | Qué repetir | Debe dar |
 > |:-:|---|---|
@@ -1033,8 +1033,8 @@
 > 3. **Otra tecnología:** creá `RepositorioProductosEnMemoria` (con una `List`) que cumpla el mismo contrato y dejá solo una anotada con `@Repository`. ¿Cuántos archivos fuera de `persistence` cambian? *(Ninguno.)*
 > 4. **Un caso nuevo:** agregá `GET /productos/agotados` (stock `0`): ¿qué piezas tocás y en qué orden? *(Contrato → `ProductoJpaRepository` con `findByStock` → adaptador → servicio → controlador.)*
 >
-> > 📚 **Para profundizar:** [Anotaciones en JPA](../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md) · [CRUD completo](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md).
+> > 📚 **Para profundizar:** [Anotaciones en JPA](../../../03-introduccion-a-jpa/material/ejemplos/08-anotaciones-en-jpa.md) · [CRUD completo](../../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md).
 
 </details>
 
-⬅️ [Guía 3](04-guia-tienda-3-muchos-a-muchos.md)
+⬅️ [Guía 3](03-guia-tienda-3-muchos-a-muchos.md)

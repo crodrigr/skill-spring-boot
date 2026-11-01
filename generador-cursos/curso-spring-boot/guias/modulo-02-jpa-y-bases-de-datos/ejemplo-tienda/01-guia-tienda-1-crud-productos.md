@@ -452,8 +452,8 @@
 
 > Agregá `GET /productos/agotados` que devuelva los productos con `stock` igual a `0`. *(Pista: método derivado `findByStock(int stock)` en el repositorio.)*
 >
-> > 📚 **Para profundizar:** [Uso básico de Spring Data JPA](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md) · [CRUD completo](../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md).
+> > 📚 **Para profundizar:** [Uso básico de Spring Data JPA](../../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md) · [CRUD completo](../../../04-gestion-de-bases-de-datos-mediante-jpa/material/ejemplos/06-crud-completo.md).
 
 </details>
 
-➡️ **Siguiente:** [Guía 2 — Relación uno a muchos](03-guia-tienda-2-uno-a-muchos.md)
+➡️ **Siguiente:** [Guía 2 — Relación uno a muchos](02-guia-tienda-2-uno-a-muchos.md)

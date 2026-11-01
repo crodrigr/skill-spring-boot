@@ -1,6 +1,6 @@
 # 🧱 Guía paso a paso — DTO y una mejor estructura de controladores (endpoints)
 
-> 👩‍🏫 **Material docente.** Se parte de un CRUD de **estudiantes** con Spring Data JPA y MySQL (el estilo de la [guía 01 del taller de cursos](../modulo-03-04/01-guia-taller-gestion-de-cursos-con-bd.md)) cuyo controlador **recibe y devuelve la entidad**, y se mejora paso a paso: **DTO**, mapeador, servicio que informa el resultado y controlador delgado con endpoints bien diseñados.
+> 👩‍🏫 **Material docente.** Se parte de un CRUD de **estudiantes** con Spring Data JPA y MySQL (el estilo de la [guía 01 del taller de cursos](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md)) cuyo controlador **recibe y devuelve la entidad**, y se mejora paso a paso: **DTO**, mapeador, servicio que informa el resultado y controlador delgado con endpoints bien diseñados.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
 > 📦 **Proyecto terminado:** [`students-api-dto/`](codigo/students-api-dto/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
@@ -1995,7 +1995,7 @@
 >
 > > 🔎 **Lectura clave.** El DTO no hace la API «más corta»: la hace **más segura de cambiar**. Cuanto más grande es el proyecto y más equipos consumen la API, más se nota.
 > >
-> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` de validación trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme (por ejemplo `ProblemDetail`) y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-03-04/03-guia-taller-gestion-de-cursos-una-version-profesional.md).
+> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` de validación trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme (por ejemplo `ProblemDetail`) y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-02-jpa-y-bases-de-datos/02-guia-taller-gestion-de-cursos-una-version-profesional.md).
 
 </details>
 
@@ -2042,7 +2042,7 @@
 > 5. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409` del controlador. ¿Qué cambiaría al llegar a las excepciones del Módulo 7?
 > 6. **Un recurso nuevo.** Repetir el patrón completo para `Course` (DTO, mapeador, servicio, controlador) y comprobar cuánto código se puede **reutilizar** (`PageResponse`, `ServiceResult`).
 > 7. **MapStruct.** Reemplazar `StudentMapper` por una interfaz de MapStruct y comparar.
-> 8. **Contrato de la API.** Documentar este proyecto con Swagger siguiendo la [guía del Módulo 06](../modulo-06/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO y la entidad no se toca.
+> 8. **Contrato de la API.** Documentar este proyecto con Swagger siguiendo la [guía del Módulo 06](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO y la entidad no se toca.
 
 </details>
 
@@ -2700,4 +2700,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía 01 del módulo 03-04 — Taller «Gestión de cursos» con base de datos](../modulo-03-04/01-guia-taller-gestion-de-cursos-con-bd.md) · **Siguiente:** [Guía del Módulo 06 — CRUD de estudiantes con Swagger](../modulo-06/01-guia-crud-estudiantes-con-swagger.md)
+➡️ **Anterior:** [Guía 01 del módulo 03-04 — Taller «Gestión de cursos» con base de datos](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) · **Siguiente:** [Guía del Módulo 06 — CRUD de estudiantes con Swagger](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md)
