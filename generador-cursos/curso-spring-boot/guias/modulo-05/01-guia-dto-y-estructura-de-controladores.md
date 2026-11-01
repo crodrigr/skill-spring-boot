@@ -2142,10 +2142,6 @@
 >
 > </details>
 >
-> ---
->
-> ### ☕ Paquete `com.academy`
->
 > <details>
 > <summary><strong>2 · 📄 AcademyApplication.java</strong></summary>
 >
@@ -2170,7 +2166,7 @@
 >
 > ---
 >
-> ### 🌐 `presentation/controller`
+> ### 🌐 Capa de presentación (`presentation`)
 >
 > <details>
 > <summary><strong>3 · 📄 StudentController.java</strong></summary>
@@ -2272,10 +2268,6 @@
 >
 > </details>
 >
-> ---
->
-> ### 🌐 `presentation/dto`
->
 > <details>
 > <summary><strong>4 · 📄 StudentRequest.java</strong></summary>
 >
@@ -2363,10 +2355,6 @@
 >
 > </details>
 >
-> ---
->
-> ### 🌐 `presentation/mapper`
->
 > <details>
 > <summary><strong>8 · 📄 StudentMapper.java</strong></summary>
 >
@@ -2407,7 +2395,7 @@
 >
 > ---
 >
-> ### 💼 `business/service`
+> ### 💼 Capa de negocio (`business`)
 >
 > <details>
 > <summary><strong>9 · 📄 StudentService.java</strong></summary>
@@ -2542,7 +2530,7 @@
 >
 > ---
 >
-> ### 🗄️ `persistence/entity`
+> ### 🗄️ Capa de persistencia (`persistence`)
 >
 > <details>
 > <summary><strong>12 · 📄 StudentEntity.java</strong></summary>
@@ -2626,10 +2614,6 @@
 >
 > </details>
 >
-> ---
->
-> ### 🗄️ `persistence/repository`
->
 > <details>
 > <summary><strong>14 · 📄 StudentJpaRepository.java</strong></summary>
 >
@@ -2661,7 +2645,7 @@
 >
 > ---
 >
-> ### ⚙️ `resources`
+> ### ⚙️ Recursos (`resources`)
 >
 > <details>
 > <summary><strong>15 · 📄 application.properties</strong></summary>
