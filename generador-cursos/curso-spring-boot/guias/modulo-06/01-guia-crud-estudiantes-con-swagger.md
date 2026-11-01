@@ -3,7 +3,7 @@
 > 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 05 — DTO y estructura de controladores](../modulo-05/01-guia-dto-y-estructura-de-controladores.md): el proyecto de partida **ya tiene** DTO, mapeador, `ServiceResult`, rutas con versión (`/api/v1`) y un controlador delgado. Sobre él se agregan, **una por una**, las funcionalidades de Swagger.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.
 >
-> 📦 **Proyecto terminado:** [`students-api/`](students-api/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
+> 📦 **Proyecto terminado:** [`students-api/`](../codigo/students-api/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
 > ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3, springdoc-openapi 2.6.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
 >
@@ -180,7 +180,7 @@
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >
-> > **Proyecto.** No se crea uno nuevo: se parte del que se terminó en la [guía del Módulo 05](../modulo-05/01-guia-dto-y-estructura-de-controladores.md) (carpeta [`students-api-dto`](../modulo-05/students-api-dto/)).
+> > **Proyecto.** No se crea uno nuevo: se parte del que se terminó en la [guía del Módulo 05](../modulo-05/01-guia-dto-y-estructura-de-controladores.md) (carpeta [`students-api-dto`](../codigo/students-api-dto/)).
 > >
 > > ```bash
 > > cp -r students-api-dto students-api
@@ -188,7 +188,7 @@
 > >
 > > En el `pom.xml` de la copia se cambia solo el nombre: `<artifactId>students-api</artifactId>`.
 > >
-> > > 💡 Quien no tenga el proyecto del Módulo 05 puede abrir [`students-api-dto/`](../modulo-05/students-api-dto/) y usarlo tal cual: es el punto de partida.
+> > > 💡 Quien no tenga el proyecto del Módulo 05 puede abrir [`students-api-dto/`](../codigo/students-api-dto/) y usarlo tal cual: es el punto de partida.
 > >
 > > > | Lo que **ya existe** | Dónde |
 > > > |---|---|

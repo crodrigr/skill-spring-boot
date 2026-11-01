@@ -1,7 +1,7 @@
 # students-api-dto
 
 CRUD de estudiantes con Spring Boot 3.3, Spring Data JPA y MySQL 8, con **DTO** y controladores delgados.
-Código final de la guía [`01-guia-dto-y-estructura-de-controladores.md`](../01-guia-dto-y-estructura-de-controladores.md).
+Código final de la guía [`01-guia-dto-y-estructura-de-controladores.md`](../../modulo-05/01-guia-dto-y-estructura-de-controladores.md).
 
 ## Requisitos
 

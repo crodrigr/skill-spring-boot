@@ -1,8 +1,8 @@
 # students-api
 
 CRUD de estudiantes con **DTO**, Spring Boot 3.3, Spring Data JPA y MySQL 8, documentado con Swagger (springdoc-openapi 2.6.0).
-Parte del proyecto del módulo 05 ([`students-api-dto`](../../modulo-05/students-api-dto/)) y le agrega la documentación.
-Código final de la guía [`01-guia-crud-estudiantes-con-swagger.md`](../01-guia-crud-estudiantes-con-swagger.md).
+Parte del proyecto del módulo 05 ([`students-api-dto`](../students-api-dto/)) y le agrega la documentación.
+Código final de la guía [`01-guia-crud-estudiantes-con-swagger.md`](../../modulo-06/01-guia-crud-estudiantes-con-swagger.md).
 
 ## Requisitos
 
