@@ -254,7 +254,18 @@
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >
-> > **Proyecto.** En [start.spring.io](https://start.spring.io): **Maven · Java 17 o superior · Group** `com.academy` · **Artifact** `students-api-dto` · dependencias **Spring Web**, **Spring Data JPA**, **Validation**, **MySQL Driver** (y *Spring Boot Test*).
+> > **Proyecto.** En [start.spring.io](https://start.spring.io):
+> >
+> > - **Project:** Maven
+> > - **Java:** 17 o superior
+> > - **Group:** `com.academy`
+> > - **Artifact:** `students-api-dto`
+> > - **Dependencias:**
+> >   - **Spring Web**
+> >   - **Spring Data JPA**
+> >   - **Validation**
+> >   - **MySQL Driver**
+> >   - *Spring Boot Test* (para las pruebas del Paso 8)
 > >
 > > <details>
 > > <summary><strong>📄 pom.xml (dependencias)</strong></summary>
