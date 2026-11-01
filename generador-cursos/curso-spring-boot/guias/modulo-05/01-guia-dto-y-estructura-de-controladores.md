@@ -1377,92 +1377,326 @@
 > <details>
 > <summary><strong>Paso 7.1 · Las pruebas con <code>curl</code></strong></summary>
 >
-> > Se arranca la aplicación con MySQL en marcha (`./mvnw spring-boot:run`) y se ejecuta esta lista en otra terminal. Primero se definen dos variables para no repetir la ruta ni la cabecera:
+> > Se arranca la aplicación con MySQL en marcha (`./mvnw spring-boot:run`) y se ejecuta cada comando en otra terminal. Debajo de cada uno está la **respuesta real**.
+> >
+> > > 💡 La API devuelve el JSON en una sola línea; aquí se muestra con sangría para leerlo mejor. Los `404` y `409` del controlador llegan **sin cuerpo**; los `400` de validación traen el cuerpo genérico de Spring Boot.
+> >
+> > **1. Crear un estudiante → `201` y la cabecera `Location`**
 > >
 > > ```bash
-> > B=localhost:8080/api/v1/students
-> > J='Content-Type: application/json'
-> > ```
-> >
-> > **Lista de pruebas.** Cada una indica el resultado esperado (salida real).
-> >
-> > ```bash
-> > # 1. Crear un estudiante → 201 + Location
-> > curl -i -X POST $B -H "$J" \
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
 > >      -d '{"name":"Ana Torres","age":22,"email":"ana@mail.com","status":"ACTIVE"}'
-> >
-> > # 2. Crear enviando campos de más (id y createdAt) → 201; ambos se ignoran
-> > curl -i -X POST $B -H "$J" \
-> >      -d '{"id":99,"name":"Luis","age":22,"email":"luis@mail.com","status":"ACTIVE","createdAt":"2000-01-01T00:00:00"}'
-> >
-> > # 3. Correo repetido (en mayúsculas) → 409
-> > curl -i -X POST $B -H "$J" \
-> >      -d '{"name":"Otra","age":30,"email":"ANA@MAIL.COM","status":"ACTIVE"}'
-> >
-> > # 4. Datos inválidos → 400
-> > curl -i -X POST $B -H "$J" \
-> >      -d '{"name":"","age":5,"email":"x","status":null}'
-> >
-> > # 5. Listar con filtro, tamaño excesivo y orden → 200 con "size":50
-> > curl -i "$B?name=a&size=1000&sort=name,asc"
-> >
-> > # 6. Buscar por id → 200
-> > curl -i $B/1
-> >
-> > # 7. Buscar un id que no existe → 404
-> > curl -i $B/99
-> >
-> > # 8. Reemplazar (PUT) con datos válidos → 200
-> > curl -i -X PUT $B/1 -H "$J" \
-> >      -d '{"name":"Ana T.","age":23,"email":"ana@mail.com","status":"ACTIVE"}'
-> >
-> > # 9. Reemplazar con el correo de otro estudiante → 409
-> > curl -i -X PUT $B/1 -H "$J" \
-> >      -d '{"name":"Ana T.","age":23,"email":"luis@mail.com","status":"ACTIVE"}'
-> >
-> > # 10. Reemplazar un id que no existe → 404
-> > curl -i -X PUT $B/99 -H "$J" \
-> >      -d '{"name":"Nadie","age":30,"email":"nadie@mail.com","status":"ACTIVE"}'
-> >
-> > # 11. Cambiar solo el estado (PATCH) → 200
-> > curl -i -X PATCH $B/1/status -H "$J" -d '{"status":"INACTIVE"}'
-> >
-> > # 12. PATCH con estado nulo → 400
-> > curl -i -X PATCH $B/1/status -H "$J" -d '{"status":null}'
-> >
-> > # 13. PATCH de un id que no existe → 404
-> > curl -i -X PATCH $B/99/status -H "$J" -d '{"status":"ACTIVE"}'
-> >
-> > # 14. Eliminar → 204
-> > curl -i -X DELETE $B/2
-> >
-> > # 15. Eliminar otra vez → 404
-> > curl -i -X DELETE $B/2
-> >
-> > # 16. La ruta sin versión ya no existe → 404
-> > curl -i localhost:8080/api/students
 > > ```
 > >
-> > **Resultados reales:**
+> > Respuesta:
 > >
-> > | # | Petición | Respuesta |
-> > |---|---|---|
-> > | 1 | `POST` (Ana) | `201` · `Location: http://localhost:8080/api/v1/students/1` · `{"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com","status":"ACTIVE"}` |
-> > | 2 | `POST` con `"id":99` y `"createdAt":"2000-01-01…"` | `201` · `Location: …/students/2` · **el `id` 99 y la fecha se ignoran**; la respuesta **no** trae `createdAt` |
-> > | 3 | `POST` con el correo de Ana en mayúsculas | `409` |
-> > | 4 | `POST` con nombre vacío, edad `5`, correo `x`, estado `null` | `400` |
-> > | 5 | `GET ?name=a&size=1000&sort=name,asc` | `200` · `PageResponse` con `"size":50` |
-> > | 6 | `GET /1` | `200` · `{"id":1,"name":"Ana Torres",…}` |
-> > | 7 | `GET /99` | `404` |
-> > | 8 | `PUT /1` con datos válidos | `200` · `{"id":1,"name":"Ana T.","age":23,…}` |
-> > | 9 | `PUT /1` con el correo de Luis | `409` |
-> > | 10 | `PUT /99` | `404` |
-> > | 11 | `PATCH /1/status` con `{"status":"INACTIVE"}` | `200` · el estudiante con `"status":"INACTIVE"` (el nombre y la edad **no** cambian) |
-> > | 12 | `PATCH` con `{"status":null}` | `400` |
-> > | 13 | `PATCH /99/status` | `404` |
-> > | 14 | `DELETE /2` | `204` |
-> > | 15 | `DELETE /2` otra vez | `404` |
-> > | 16 | `GET /api/students` (la ruta **sin** versión) | `404` |
+> > ```text
+> > HTTP/1.1 201
+> > Location: http://localhost:8080/api/v1/students/1
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> >
+> > {
+> >   "id": 1,
+> >   "name": "Ana Torres",
+> >   "age": 22,
+> >   "email": "ana@mail.com",
+> >   "status": "ACTIVE"
+> > }
+> > ```
+> >
+> > **2. Crear enviando campos de más (`id` y `createdAt`) → `201`; ambos se ignoran**
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"id":99,"name":"Luis","age":22,"email":"luis@mail.com","status":"ACTIVE","createdAt":"2000-01-01T00:00:00"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 201
+> > Location: http://localhost:8080/api/v1/students/2
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> >
+> > {
+> >   "id": 2,
+> >   "name": "Luis",
+> >   "age": 22,
+> >   "email": "luis@mail.com",
+> >   "status": "ACTIVE"
+> > }
+> > ```
+> >
+> > **3. Correo repetido, en mayúsculas → `409`**
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"Otra","age":30,"email":"ANA@MAIL.COM","status":"ACTIVE"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 409
+> > Content-Length: 0
+> > ```
+> >
+> > **4. Datos inválidos → `400`**
+> >
+> > ```bash
+> > curl -i -X POST http://localhost:8080/api/v1/students \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"","age":5,"email":"x","status":null}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 400
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> > Connection: close
+> >
+> > {
+> >   "timestamp": "2026-11-01T16:58:06.438+00:00",
+> >   "status": 400,
+> >   "error": "Bad Request",
+> >   "path": "/api/v1/students"
+> > }
+> > ```
+> >
+> > **5. Listar con filtro, tamaño excesivo y orden → `200` con `"size":50`**
+> >
+> > ```bash
+> > curl -i "http://localhost:8080/api/v1/students?name=a&size=1000&sort=name,asc"
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> >
+> > {
+> >   "content": [
+> >     {
+> >       "id": 1,
+> >       "name": "Ana Torres",
+> >       "age": 22,
+> >       "email": "ana@mail.com",
+> >       "status": "ACTIVE"
+> >     }
+> >   ],
+> >   "page": 0,
+> >   "size": 50,
+> >   "totalElements": 1,
+> >   "totalPages": 1
+> > }
+> > ```
+> >
+> > **6. Buscar por id → `200`**
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/students/1
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> >
+> > {
+> >   "id": 1,
+> >   "name": "Ana Torres",
+> >   "age": 22,
+> >   "email": "ana@mail.com",
+> >   "status": "ACTIVE"
+> > }
+> > ```
+> >
+> > **7. Buscar un id que no existe → `404`**
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/v1/students/99
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > **8. Reemplazar (`PUT`) con datos válidos → `200`**
+> >
+> > ```bash
+> > curl -i -X PUT http://localhost:8080/api/v1/students/1 \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"Ana T.","age":23,"email":"ana@mail.com","status":"ACTIVE"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> >
+> > {
+> >   "id": 1,
+> >   "name": "Ana T.",
+> >   "age": 23,
+> >   "email": "ana@mail.com",
+> >   "status": "ACTIVE"
+> > }
+> > ```
+> >
+> > **9. Reemplazar con el correo de otro estudiante → `409`**
+> >
+> > ```bash
+> > curl -i -X PUT http://localhost:8080/api/v1/students/1 \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"Ana T.","age":23,"email":"luis@mail.com","status":"ACTIVE"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 409
+> > Content-Length: 0
+> > ```
+> >
+> > **10. Reemplazar un id que no existe → `404`**
+> >
+> > ```bash
+> > curl -i -X PUT http://localhost:8080/api/v1/students/99 \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"name":"Nadie","age":30,"email":"nadie@mail.com","status":"ACTIVE"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > **11. Cambiar solo el estado (`PATCH`) → `200`; el nombre y la edad no cambian**
+> >
+> > ```bash
+> > curl -i -X PATCH http://localhost:8080/api/v1/students/1/status \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"status":"INACTIVE"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 200
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> >
+> > {
+> >   "id": 1,
+> >   "name": "Ana T.",
+> >   "age": 23,
+> >   "email": "ana@mail.com",
+> >   "status": "INACTIVE"
+> > }
+> > ```
+> >
+> > **12. `PATCH` con estado nulo → `400`**
+> >
+> > ```bash
+> > curl -i -X PATCH http://localhost:8080/api/v1/students/1/status \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"status":null}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 400
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> > Connection: close
+> >
+> > {
+> >   "timestamp": "2026-11-01T16:58:06.741+00:00",
+> >   "status": 400,
+> >   "error": "Bad Request",
+> >   "path": "/api/v1/students/1/status"
+> > }
+> > ```
+> >
+> > **13. `PATCH` de un id que no existe → `404`**
+> >
+> > ```bash
+> > curl -i -X PATCH http://localhost:8080/api/v1/students/99/status \
+> >      -H "Content-Type: application/json" \
+> >      -d '{"status":"ACTIVE"}'
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > **14. Eliminar → `204`**
+> >
+> > ```bash
+> > curl -i -X DELETE http://localhost:8080/api/v1/students/2
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 204
+> > ```
+> >
+> > **15. Eliminar otra vez → `404`**
+> >
+> > ```bash
+> > curl -i -X DELETE http://localhost:8080/api/v1/students/2
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Length: 0
+> > ```
+> >
+> > **16. La ruta sin versión ya no existe → `404`**
+> >
+> > ```bash
+> > curl -i http://localhost:8080/api/students
+> > ```
+> >
+> > Respuesta:
+> >
+> > ```text
+> > HTTP/1.1 404
+> > Content-Type: application/json
+> > Transfer-Encoding: chunked
+> >
+> > {
+> >   "timestamp": "2026-11-01T16:58:06.807+00:00",
+> >   "status": 404,
+> >   "error": "Not Found",
+> >   "path": "/api/students"
+> > }
+> > ```
 > >
 > > Y en MySQL, la columna interna sigue existiendo:
 > >
@@ -1505,7 +1739,7 @@
 >
 > > 🔎 **Lectura clave.** El DTO no hace la API «más corta»: la hace **más segura de cambiar**. Cuanto más grande es el proyecto y más equipos consumen la API, más se nota.
 > >
-> > ⚠️ **Lo que aún no está resuelto.** El `400` de validación y los `404`/`409` **no traen cuerpo** explicativo (solo el código). Un formato de error uniforme (por ejemplo `ProblemDetail`) y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-03-04/03-guia-taller-gestion-de-cursos-una-version-profesional.md).
+> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` de validación trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme (por ejemplo `ProblemDetail`) y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-03-04/03-guia-taller-gestion-de-cursos-una-version-profesional.md).
 
 </details>
 
