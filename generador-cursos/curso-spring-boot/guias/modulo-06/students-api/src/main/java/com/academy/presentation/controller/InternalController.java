@@ -1,5 +1,6 @@
 package com.academy.presentation.controller;
 
+import com.academy.business.service.ServiceStatus;
 import com.academy.business.service.StudentService;
 import com.academy.persistence.entity.StudentEntity;
 import com.academy.persistence.entity.StudentStatus;
@@ -39,7 +40,7 @@ public class InternalController {
                 new StudentEntity(null, "María Gómez", 31, "maria@mail.com", StudentStatus.INACTIVE)
         };
         for (StudentEntity sample : samples) {
-            if (service.create(sample).isPresent()) {
+            if (service.create(sample).status() == ServiceStatus.OK) {
                 created++;
             }
         }

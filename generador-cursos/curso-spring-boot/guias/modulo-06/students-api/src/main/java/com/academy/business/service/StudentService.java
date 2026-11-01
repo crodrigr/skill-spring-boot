@@ -1,12 +1,13 @@
 package com.academy.business.service;
 
 import com.academy.persistence.entity.StudentEntity;
+import com.academy.persistence.entity.StudentStatus;
 import com.academy.persistence.repository.StudentJpaRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,11 +20,11 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public List<StudentEntity> search(String name, Pageable pageable) {
+    public Page<StudentEntity> search(String name, Pageable pageable) {
         if (name == null || name.isBlank()) {
-            return students.findAll(pageable).getContent();
+            return students.findAll(pageable);
         }
-        return students.findByNameContainingIgnoreCase(name, pageable).getContent();
+        return students.findByNameContainingIgnoreCase(name, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -37,25 +38,38 @@ public class StudentService {
     }
 
     @Transactional
-    public Optional<StudentEntity> create(StudentEntity student) {
-        if (students.existsByEmailIgnoreCase(student.getEmail())) {
-            return Optional.empty();
+    public ServiceResult<StudentEntity> create(StudentEntity data) {
+        if (students.existsByEmailIgnoreCase(data.getEmail())) {
+            return ServiceResult.conflict();
         }
         StudentEntity toSave = new StudentEntity(
-                null, student.getName(), student.getAge(), student.getEmail(), student.getStatus());
-        return Optional.of(students.save(toSave));
+                null, data.getName(), data.getAge(), data.getEmail(), data.getStatus());
+        return ServiceResult.ok(students.save(toSave));
     }
 
     @Transactional
-    public Optional<StudentEntity> update(Long id, StudentEntity data) {
+    public ServiceResult<StudentEntity> update(Long id, StudentEntity data) {
         if (!students.existsById(id)) {
-            return Optional.empty();
+            return ServiceResult.notFound();
         }
         if (students.existsByEmailIgnoreCaseAndIdNot(data.getEmail(), id)) {
-            return Optional.empty();
+            return ServiceResult.conflict();
         }
-        return Optional.of(students.save(new StudentEntity(
-                id, data.getName(), data.getAge(), data.getEmail(), data.getStatus())));
+        StudentEntity toSave = new StudentEntity(
+                id, data.getName(), data.getAge(), data.getEmail(), data.getStatus());
+        return ServiceResult.ok(students.save(toSave));
+    }
+
+    @Transactional
+    public ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status) {
+        Optional<StudentEntity> current = students.findById(id);
+        if (current.isEmpty()) {
+            return ServiceResult.notFound();
+        }
+        StudentEntity student = current.get();
+        StudentEntity toSave = new StudentEntity(
+                id, student.getName(), student.getAge(), student.getEmail(), status);
+        return ServiceResult.ok(students.save(toSave));
     }
 
     @Transactional

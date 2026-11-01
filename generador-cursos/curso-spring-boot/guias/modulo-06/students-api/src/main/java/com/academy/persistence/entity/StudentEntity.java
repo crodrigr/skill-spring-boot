@@ -1,6 +1,5 @@
 package com.academy.persistence.entity;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,46 +8,33 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.CreationTimestamp;
 
-@Schema(name = "Student", description = "Estudiante de la academia")
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "student")
 public class StudentEntity {
 
-    @Schema(description = "Identificador generado por la base", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Schema(description = "Nombre completo", example = "Ana Torres", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank
-    @Size(min = 2, max = 100)
     @Column(nullable = false)
     private String name;
 
-    @Schema(description = "Edad en años", example = "22", minimum = "16", maximum = "99")
-    @Min(16)
-    @Max(99)
     private int age;
 
-    @Schema(description = "Correo único (sin importar mayúsculas)", example = "ana@mail.com",
-            requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank
-    @Email
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Schema(description = "Estado del estudiante", example = "ACTIVE", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private StudentStatus status;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     protected StudentEntity() {
     }
@@ -66,4 +52,5 @@ public class StudentEntity {
     public int getAge() { return age; }
     public String getEmail() { return email; }
     public StudentStatus getStatus() { return status; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }

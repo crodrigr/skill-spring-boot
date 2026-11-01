@@ -22,7 +22,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Academy API")
                         .version("1.0.0")
-                        .description("CRUD de estudiantes con Spring Boot, JPA y MySQL, documentado con OpenAPI.")
+                        .description("CRUD de estudiantes con DTO, Spring Boot, JPA y MySQL, documentado con OpenAPI.")
                         .contact(new Contact().name("Equipo Academy").email("academy@mail.com"))
                         .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")))
                 .servers(List.of(new Server().url("http://localhost:8080").description("Local")))
@@ -38,7 +38,7 @@ public class OpenApiConfig {
         return GroupedOpenApi.builder()
                 .group("students")
                 .displayName("Students")
-                .pathsToMatch("/api/students/**")
+                .pathsToMatch("/api/v1/students/**")
                 .build();
     }
 

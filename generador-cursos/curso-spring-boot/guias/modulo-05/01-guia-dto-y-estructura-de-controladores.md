@@ -2042,7 +2042,7 @@
 > 5. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409` del controlador. ¿Qué cambiaría al llegar a las excepciones del Módulo 7?
 > 6. **Un recurso nuevo.** Repetir el patrón completo para `Course` (DTO, mapeador, servicio, controlador) y comprobar cuánto código se puede **reutilizar** (`PageResponse`, `ServiceResult`).
 > 7. **MapStruct.** Reemplazar `StudentMapper` por una interfaz de MapStruct y comparar.
-> 8. **Contrato de la API.** Agregar Swagger (ver la [guía del Módulo 06](../modulo-06/01-guia-crud-estudiantes-con-swagger.md)) y mover los `@Schema` a los DTO.
+> 8. **Contrato de la API.** Documentar este proyecto con Swagger siguiendo la [guía del Módulo 06](../modulo-06/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO y la entidad no se toca.
 
 </details>
 

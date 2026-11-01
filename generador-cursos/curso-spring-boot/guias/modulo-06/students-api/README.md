@@ -1,6 +1,7 @@
 # students-api
 
-CRUD de estudiantes con Spring Boot 3.3, Spring Data JPA y MySQL 8, documentado con Swagger (springdoc-openapi 2.6.0).
+CRUD de estudiantes con **DTO**, Spring Boot 3.3, Spring Data JPA y MySQL 8, documentado con Swagger (springdoc-openapi 2.6.0).
+Parte del proyecto del módulo 05 ([`students-api-dto`](../../modulo-05/students-api-dto/)) y le agrega la documentación.
 Código final de la guía [`01-guia-crud-estudiantes-con-swagger.md`](../01-guia-crud-estudiantes-con-swagger.md).
 
 ## Requisitos
@@ -27,6 +28,7 @@ docker run -d --name academy-mysql \
 | Contrato OpenAPI (JSON) | http://localhost:8080/api-docs |
 | Contrato OpenAPI (YAML) | http://localhost:8080/api-docs.yaml |
 | Contrato de un grupo | http://localhost:8080/api-docs/students · `/api-docs/internal` |
+| API | http://localhost:8080/api/v1/students |
 
 Datos de ejemplo: `POST http://localhost:8080/internal/seed`.
 
@@ -43,9 +45,11 @@ src/main/java/com/academy
 ├── AcademyApplication.java
 ├── presentation
 │   ├── config/OpenApiConfig.java
-│   └── controller/StudentController.java · InternalController.java
-├── business/service/StudentService.java
+│   ├── controller/StudentController.java · InternalController.java
+│   ├── dto/StudentRequest · StudentStatusRequest · StudentResponse · PageResponse   (con @Schema)
+│   └── mapper/StudentMapper.java
+├── business/service/StudentService · ServiceResult · ServiceStatus
 └── persistence
-    ├── entity/StudentEntity.java · StudentStatus.java
-    └── repository/StudentJpaRepository.java
+    ├── entity/StudentEntity · StudentStatus
+    └── repository/StudentJpaRepository
 ```
