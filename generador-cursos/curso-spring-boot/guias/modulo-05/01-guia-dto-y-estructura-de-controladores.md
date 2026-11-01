@@ -2084,7 +2084,12 @@
 >
 > ---
 >
-> ### 📁 Raíz del proyecto
+> ```text
+> 📁 students-api-dto
+> ├── 📄 pom.xml
+> └── 📁 src/main/java/com/academy
+>     └── 📄 AcademyApplication.java
+> ```
 >
 > <details>
 > <summary><strong>1 · 📄 pom.xml</strong></summary>
@@ -2166,9 +2171,18 @@
 >
 > ---
 >
-> ### 🌐 Capa de presentación (`presentation`)
->
-> #### 📁 `controller`
+> ```text
+> 📁 presentation
+> ├── 📁 controller
+> │   └── 📄 StudentController.java
+> ├── 📁 dto
+> │   ├── 📄 StudentRequest.java
+> │   ├── 📄 StudentStatusRequest.java
+> │   ├── 📄 StudentResponse.java
+> │   └── 📄 PageResponse.java
+> └── 📁 mapper
+>     └── 📄 StudentMapper.java
+> ```
 >
 > <details>
 > <summary><strong>3 · 📄 StudentController.java</strong></summary>
@@ -2270,8 +2284,6 @@
 >
 > </details>
 >
-> #### 📁 `dto`
->
 > <details>
 > <summary><strong>4 · 📄 StudentRequest.java</strong></summary>
 >
@@ -2359,8 +2371,6 @@
 >
 > </details>
 >
-> #### 📁 `mapper`
->
 > <details>
 > <summary><strong>8 · 📄 StudentMapper.java</strong></summary>
 >
@@ -2401,9 +2411,13 @@
 >
 > ---
 >
-> ### 💼 Capa de negocio (`business`)
->
-> #### 📁 `service`
+> ```text
+> 📁 business
+> └── 📁 service
+>     ├── 📄 StudentService.java
+>     ├── 📄 ServiceResult.java
+>     └── 📄 ServiceStatus.java
+> ```
 >
 > <details>
 > <summary><strong>9 · 📄 StudentService.java</strong></summary>
@@ -2538,9 +2552,14 @@
 >
 > ---
 >
-> ### 🗄️ Capa de persistencia (`persistence`)
->
-> #### 📁 `entity`
+> ```text
+> 📁 persistence
+> ├── 📁 entity
+> │   ├── 📄 StudentEntity.java
+> │   └── 📄 StudentStatus.java
+> └── 📁 repository
+>     └── 📄 StudentJpaRepository.java
+> ```
 >
 > <details>
 > <summary><strong>12 · 📄 StudentEntity.java</strong></summary>
@@ -2624,8 +2643,6 @@
 >
 > </details>
 >
-> #### 📁 `repository`
->
 > <details>
 > <summary><strong>14 · 📄 StudentJpaRepository.java</strong></summary>
 >
@@ -2657,7 +2674,10 @@
 >
 > ---
 >
-> ### ⚙️ Recursos (`resources`)
+> ```text
+> 📁 resources
+> └── 📄 application.properties
+> ```
 >
 > <details>
 > <summary><strong>15 · 📄 application.properties</strong></summary>
