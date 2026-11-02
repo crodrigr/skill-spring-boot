@@ -2,72 +2,100 @@
 
 ## 🌍 Contexto
 
-Ya sabés qué es una excepción (Ejemplo 01). Ahora falta entender por qué
-esto importa específicamente en una API REST como las que construiste en
-el Módulo 5, y en qué parte del código conviene lanzar y manejar cada
-una.
+El Ejemplo 01 explicó qué es una excepción. Este ejemplo muestra por qué importa en una API REST como la del Módulo 5, y en qué capa conviene lanzar y manejar cada error.
 
-**Qué busca demostrar este ejemplo**: por qué manejar excepciones es
-importante en una API REST, y en qué capa de la arquitectura (`Controller`/
-`Service`/`Repository`) se origina cada tipo de error.
+**Qué busca demostrar este ejemplo**: por qué manejar excepciones es importante en una API REST y en qué capa (`Controller`, `Service` o `Repository`) se origina cada tipo de error.
 
 ![Una excepción lanzada en el servicio sube al controlador. Con ControllerAdvice la captura un manejador global que devuelve un código HTTP y un cuerpo JSON claros; sin ningún manejo, el cliente recibe un 500 genérico.](../imagenes/flujo-excepcion-api.svg)
 
 ## 🧠 Por qué importa manejar excepciones en una API REST
 
-En una API REST, los errores no son fallos inesperados: son situaciones
-normales del flujo de la aplicación. Por ejemplo:
+En una API REST, los errores no son fallos raros: son **situaciones normales** del flujo. Por ejemplo:
 
 - Un recurso no existe.
 - Se intenta crear un registro duplicado.
 - Los datos enviados son inválidos.
-- No se cumplen reglas de negocio.
+- No se cumple una regla de negocio.
 
-Si estos casos no se gestionan correctamente:
+Sin un manejo adecuado:
 
-- La API responde con errores genéricos (`500`).
+- La API responde con un error genérico (`500`).
 - El cliente no entiende qué ocurrió.
 - El código se llena de bloques `try/catch` innecesarios.
 
-El manejo de excepciones permite transformar errores internos en
-respuestas HTTP claras, controladas y consistentes — exactamente lo que
-falta en `ControladorLibros` del Módulo 5, que todavía construye sus
-respuestas de error a mano.
+El manejo de excepciones **transforma errores internos en respuestas HTTP claras y consistentes**. Es justo lo que le falta a `ControladorLibros` del Módulo 5, que todavía arma sus respuestas de error a mano.
 
-## 🧠 Dónde se producen las excepciones en una arquitectura en capas
+## 🧠 Dónde se producen las excepciones
 
 ```mermaid
 flowchart TD
     Controller["Controller<br/>exposición HTTP"] --> Service["Service<br/>reglas de negocio"]
-    Service --> Repository["Repository<br/>errores de base de datos"]
+    Service --> Repository["Repository<br/>acceso a la base de datos"]
 ```
 
-| Capa | Tipo de error que origina |
+| Capa | Qué errores origina |
 |---|---|
 | `Repository` | Errores de base de datos (conexión, restricciones violadas). |
 | `Service` | Reglas de negocio (recurso no encontrado, duplicado, validaciones). |
-| `Controller` | Exposición HTTP (no debería originar errores de negocio, solo traducirlos). |
+| `Controller` | Ninguno de negocio: solo expone HTTP y **traduce** los errores. |
 
-**Buena práctica**: las excepciones se lanzan desde el `Service` (donde
-vive la regla de negocio) y se manejan a nivel del `Controller` o,
-preferentemente, de forma global — nunca al revés.
+**Regla del módulo**: la excepción se **lanza en el `Service`** (donde vive la regla) y se **maneja** en el `Controller` o, preferiblemente, de forma global. Nunca al revés.
 
-## 🧭 Explicación paso a paso
+## 🧭 Explicación
 
-1. Los cuatro ejemplos de error (recurso inexistente, duplicado, datos
-   inválidos, regla de negocio incumplida) tienen algo en común: todos
-   son parte esperable del negocio, no errores de programación.
-2. Sin manejo adecuado, cualquiera de estos casos termina en una
-   excepción no capturada, que Spring Boot traduce en un `500 Internal
-   Server Error` — el mismo código para cualquier problema, sin importar
-   la causa real.
-3. La arquitectura en capas del Módulo 5 (Ejemplo 03) ya definía la
-   responsabilidad de cada capa; el manejo de excepciones sigue esa misma
-   separación: el `Service` sabe **por qué** falló algo (conoce la regla
-   de negocio), el `Controller` sabe **cómo** comunicarlo por HTTP.
-4. Este módulo va a mostrar tres formas de lograr esa traducción
-   (`@ResponseStatus`, `@ExceptionHandler`, `@ControllerAdvice`), todas
-   respetando esta misma regla: la excepción se lanza en el `Service`.
+### 1. ¿Cómo se ejecuta? El recorrido de una excepción
+
+Ejemplo: `GET /libros/999`, un libro que no existe.
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente
+    participant K as Controller
+    participant S as Service
+    participant SP as Spring
+    C->>K: GET /libros/999
+    K->>S: buscarPorId(999)
+    S--xK: lanza una excepción (el libro no existe)
+    K--xSP: la excepción sale del controlador
+    alt sin manejo
+        SP-->>C: 500 Internal Server Error (genérico)
+    else con manejo (próximos ejemplos)
+        SP-->>C: 404 Not Found + mensaje claro
+    end
+```
+
+1. El cliente envía la petición y el `Controller` la delega al `Service`.
+2. El `Service` detecta el problema y **lanza** la excepción. El método se interrumpe.
+3. La excepción **sube** por las capas: sale del `Service` y luego del `Controller`.
+4. Si nadie la captura, llega a Spring, que responde `500` sin importar la causa real.
+5. Si hay un manejador, Spring lo invoca y responde con el **código y el mensaje adecuados**.
+
+### 2. ¿Por qué `500` es un problema?
+
+El `500` significa "el servidor falló", pero un libro inexistente **no es un fallo del servidor**: es un error del cliente que la API debería explicar.
+
+| Situación | Respuesta sin manejo | Respuesta adecuada |
+|---|---|---|
+| Libro inexistente | `500` | `404 Not Found` |
+| Libro duplicado | `500` | `409 Conflict` |
+| Datos inválidos | `500` | `400 Bad Request` |
+
+### 3. Separación de responsabilidades
+
+- El `Service` sabe **por qué** falló algo, porque conoce la regla de negocio.
+- El `Controller` sabe **cómo** comunicarlo por HTTP.
+
+Esta división es la misma arquitectura en capas del Módulo 5 (Ejemplo 03).
+
+### 4. ¿Qué sigue?
+
+Los próximos ejemplos muestran tres formas de lograr esa traducción. Las tres respetan la regla anterior: la excepción se lanza en el `Service`.
+
+| Mecanismo | Qué hace | Ejemplo |
+|---|---|---|
+| `@ResponseStatus` | Asocia una excepción con un código HTTP | 03 y 04 |
+| `@ExceptionHandler` | Controla el código **y el cuerpo** de la respuesta en un controlador | 05 |
+| `@ControllerAdvice` | Lo mismo, pero compartido por **todos** los controladores | 06 |
 
 ## ❓ Preguntas de repaso
 
@@ -88,7 +116,7 @@ de una API REST, no fallos inesperados.
 
 </details>
 
-**2. [Selección múltiple]** Seleccioná **todas** las afirmaciones
+**2. [Selección múltiple]** Seleccionar **todas** las afirmaciones
 correctas sobre dónde se originan los errores en una arquitectura en
 capas.
 
