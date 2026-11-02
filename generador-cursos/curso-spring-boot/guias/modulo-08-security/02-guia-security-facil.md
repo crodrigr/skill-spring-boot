@@ -101,7 +101,7 @@
 > <summary><strong>🔒 Las clases de la carpeta <code>security</code></strong></summary>
 >
 > > <details>
-> > <summary><strong>1️⃣ 🧂 PasswordConfig — la trituradora de contraseñas</strong></summary>
+> > <summary><strong>1️⃣ PasswordConfig — la trituradora de contraseñas</strong></summary>
 > >
 > > Entrega a toda la aplicación **la trituradora de contraseñas** (BCrypt).
 > >
@@ -112,7 +112,7 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>2️⃣ 🌱 AccountSeeder — el que da de alta a los primeros usuarios</strong></summary>
+> > <summary><strong>2️⃣ AccountSeeder — el que da de alta a los primeros usuarios</strong></summary>
 > >
 > > **Da de alta a los dos primeros usuarios** (`admin` y `ana`) cada vez que arranca la aplicación, si todavía no existen. Sin él, la tabla estaría vacía y nadie podría iniciar sesión.
 > >
@@ -121,7 +121,7 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>3️⃣ 🎟️ JwtService — la máquina que fabrica y revisa los pases</strong></summary>
+> > <summary><strong>3️⃣ JwtService — la máquina que fabrica y revisa los pases</strong></summary>
 > >
 > > | Método | Qué hace |
 > > |---|---|
@@ -135,7 +135,7 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>4️⃣ 🧑‍💼 AuthService — el empleado del mostrador del login</strong></summary>
+> > <summary><strong>4️⃣ AuthService — el empleado del mostrador del login</strong></summary>
 > >
 > > Hace tres preguntas en orden:
 > >
@@ -148,7 +148,7 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>5️⃣ 💂 JwtAuthenticationFilter (el filtro) — el guardia de cada puerta</strong></summary>
+> > <summary><strong>5️⃣ JwtAuthenticationFilter (el filtro) — el guardia de cada puerta</strong></summary>
 > >
 > > Se ejecuta **en cada petición**, antes de que llegue al código de la API:
 > >
@@ -164,7 +164,7 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>6️⃣ 📜 SecurityConfig — el reglamento del edificio</strong></summary>
+> > <summary><strong>6️⃣ SecurityConfig — el reglamento del edificio</strong></summary>
 > >
 > > Es la clase más importante. Dice:
 > >
@@ -181,7 +181,7 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>7️⃣ 💬 SecurityErrorHandler — quien explica por qué no se puede pasar</strong></summary>
+> > <summary><strong>7️⃣ SecurityErrorHandler — quien explica por qué no se puede pasar</strong></summary>
 > >
 > > Responde con el mismo formato de error de toda la API (`ErrorResponse`):
 > >
