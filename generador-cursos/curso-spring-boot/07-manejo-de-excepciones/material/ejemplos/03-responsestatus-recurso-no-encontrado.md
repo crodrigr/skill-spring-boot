@@ -34,9 +34,7 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros`/`ServicioLibros`/
 ```
 
 <details>
-<summary>📄 Ver código completo de <code>Libro.java</code>, <code>RepositorioLibros.java</code> y <code>application.properties</code> (reutilizados del Módulo 3)</summary>
-
-## 💻 Archivo: `Libro.java`
+<summary>📄 Ver código completo de <code>Libro.java</code> (reutilizado del Módulo 3)</summary>
 
 ```java
 package com.biblioteca.negocio.model;
@@ -68,7 +66,10 @@ public class Libro {
 }
 ```
 
-## 💻 Archivo: `RepositorioLibros.java`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>RepositorioLibros.java</code> (reutilizado del Módulo 3)</summary>
 
 ```java
 package com.biblioteca.persistence.repository;
@@ -80,7 +81,10 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 }
 ```
 
-## 💻 Archivo: `application.properties`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>application.properties</code> (reutilizado del Módulo 3)</summary>
 
 ```properties
 spring.datasource.url=jdbc:h2:mem:biblioteca;DB_CLOSE_DELAY=-1
