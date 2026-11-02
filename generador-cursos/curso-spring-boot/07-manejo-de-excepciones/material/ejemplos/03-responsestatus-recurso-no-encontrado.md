@@ -34,6 +34,9 @@ Biblioteca Universitaria: `Libro`/`RepositorioLibros`/`ServicioLibros`/
 ```
 
 <details>
+<summary>💻 <b>Código fuente</b> (reutilizado del Módulo 3)</summary>
+
+<details>
 <summary>📄 Ver código completo de <code>Libro.java</code> (reutilizado del Módulo 3)</summary>
 
 ```java
@@ -94,6 +97,8 @@ spring.datasource.password=
 spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.jpa.hibernate.ddl-auto=update
 ```
+
+</details>
 
 </details>
 
