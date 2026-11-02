@@ -67,6 +67,126 @@
 
 </details>
 
+<details>
+<summary><strong>🧩 Qué hace cada clase (con un edificio)</strong></summary>
+
+> Para entender las clases conviene imaginar un edificio con portería:
+>
+> | En el edificio | En la API |
+> |---|---|
+> | Mostrar el carnet en la portería | **Login** (usuario y contraseña) |
+> | El pase que da la portería | **El token (JWT)** |
+> | El guardia que revisa el pase en cada puerta | **El filtro** |
+> | Las reglas «aquí entran todos, aquí solo el administrador» | **`SecurityConfig`** |
+>
+> ```text
+> 1) LOGIN:   usuario + contraseña ──▶ AuthService ──▶ JwtService crea el TOKEN ──▶ el cliente lo guarda
+> 2) DESPUÉS: cualquier petición + TOKEN ──▶ JwtAuthenticationFilter lo revisa ──▶ SecurityConfig decide si pasa
+> ```
+>
+> <details>
+> <summary><strong>🧱 Las clases que guardan a las personas</strong></summary>
+>
+> > | Clase | Qué es, en simple |
+> > |---|---|
+> > | **`Role`** | Una lista con dos palabras: `ADMIN` y `USER`. Es la etiqueta del pase: «administrador» o «usuario normal». |
+> > | **`UserAccountEntity`** | **La ficha de una persona** en la base: su nombre de usuario, su rol y su contraseña. Es una entidad más, como `StudentEntity`. |
+> > | **`UserAccountJpaRepository`** | **El que busca fichas.** Solo sabe hacer una pregunta: «¿hay alguien con este nombre de usuario?» (`findByUsername`). |
+> >
+> > > ⚠️ **La contraseña nunca se guarda tal cual.** Se guarda cifrada (`$2a$10$TJq93…`). Si alguien robara la base, no vería `admin123`.
+>
+> </details>
+>
+> <details>
+> <summary><strong>🔒 Las clases de la carpeta <code>security</code></strong></summary>
+>
+> > **`PasswordConfig`** — entrega a toda la aplicación **la trituradora de contraseñas** (BCrypt).
+> >
+> > - Al **guardar**: «admin123» entra y sale como una tira de símbolos.
+> > - Al **comparar** (en el login): se tritura lo que escribió la persona y se mira si da **la misma tira**.
+> > - **No se puede deshacer**: de la tira no se vuelve a «admin123». Solo se puede comparar.
+> >
+> > **`AccountSeeder`** — **da de alta a los dos primeros usuarios** (`admin` y `ana`) cada vez que arranca la aplicación, si todavía no existen. Sin él, la tabla estaría vacía y nadie podría iniciar sesión. *(Solo para practicar: en un proyecto real no se escriben contraseñas en el código.)*
+> >
+> > **`JwtService`** — **la máquina que fabrica y revisa los pases**:
+> >
+> > | Método | Qué hace |
+> > |---|---|
+> > | `create` | Fabrica el token con **quién eres, tu rol y hasta cuándo vale**, y lo **firma** con la clave secreta |
+> > | `read` | Revisa que la firma y la fecha estén bien. Si alguien **cambió una letra** o el token **venció**, avisa con un error |
+> >
+> > La **clave secreta** es como el sello de la portería: solo ella puede estamparlo, así que un pase falsificado se nota.
+> >
+> > > 💡 Dentro del token hay texto que cualquiera puede leer. **No se pone nada secreto ahí.** La firma no lo oculta; solo garantiza que **nadie lo modificó**.
+> >
+> > **`AuthService`** — **el empleado del mostrador que atiende el login**. Hace tres preguntas en orden:
+> >
+> > 1. ¿Existe ese usuario? Si no, error.
+> > 2. ¿La contraseña (triturada) coincide con la guardada? Si no, error.
+> > 3. Si todo está bien, le pide a `JwtService` un token y lo entrega.
+> >
+> > En los dos errores dice **lo mismo** («usuario o contraseña incorrectos»): no revela cuál falló, para no ayudar a quien prueba cuentas ajenas.
+> >
+> > **`JwtAuthenticationFilter` (el filtro)** — **el guardia de cada puerta**. Se ejecuta **en cada petición**, antes de que llegue al código de la API:
+> >
+> > 1. Mira si la petición trae `Authorization: Bearer <token>`.
+> > 2. Si lo trae, le pide a `JwtService` que lo revise.
+> > 3. Si el token es bueno, **anota «esta persona es ana, rol USER»** y la deja seguir.
+> > 4. Si el token es malo (falso, alterado o vencido) o **no hay token**, **no anota a nadie**.
+> >
+> > El guardia **no decide** si se rechaza: solo anota quién es. Quien rechaza es `SecurityConfig`.
+> >
+> > > ⚠️ Esta clase **no lleva `@Component`** a propósito. Si lo llevara, Spring pondría **dos guardias** en la misma puerta.
+> >
+> > **`SecurityConfig`** — **el reglamento del edificio**. Es la clase más importante:
+> >
+> > | Regla | Quién entra |
+> > |---|---|
+> > | `permitAll()` | **Todos**: el login, `/internal/health` y Swagger |
+> > | `hasRole("ADMIN")` | **Solo administradores**: borrar estudiantes y `/internal/**` |
+> > | `anyRequest().authenticated()` | **Todo lo demás**: cualquiera **con pase** |
+> >
+> > Además configura: **sin sesiones** (`STATELESS`: cada petición trae su pase), **sin CSRF** (esa defensa es para páginas con cookies), **pone al guardia** (`addFilterBefore`) y **dice a quién avisar cuando hay un error** (`exceptionHandling`).
+> >
+> > > 🔎 **El orden importa.** Las reglas se leen de arriba hacia abajo y gana **la primera** que coincide. Por eso `anyRequest()` va siempre al final.
+> >
+> > **`SecurityErrorHandler`** — **quien explica por qué no se puede pasar**, con el mismo formato de error de toda la API (`ErrorResponse`):
+> >
+> > | Situación | Código | Mensaje |
+> > |---|:-:|---|
+> > | **No hay pase**, o es falso o venció | `401` | «Falta el token o no es válido» |
+> > | **Hay pase bueno**, pero no alcanza (un `USER` quiere borrar) | `403` | «No tiene permisos para realizar esta operación» |
+> >
+> > Existe porque estos errores ocurren **en la puerta**, antes de llegar a los controladores. Por eso el `GlobalExceptionHandler` de siempre **no los ve** y hace falta una clase aparte.
+>
+> </details>
+>
+> <details>
+> <summary><strong>🚪 Las clases que ve el cliente</strong></summary>
+>
+> > | Clase | Qué es, en simple |
+> > |---|---|
+> > | **`AuthController`** | **La ventanilla del login**: `POST /api/v1/auth/login`. Recibe usuario y contraseña, se los pasa a `AuthService` y devuelve el token. No decide nada: solo recibe y entrega. |
+> > | **`LoginRequest`** | El formulario que se **envía**: `username` y `password`, ambos obligatorios. |
+> > | **`LoginResponse`** | El formulario que se **recibe**: `token`, el tipo `Bearer` y cuántos segundos dura. |
+> > | **`GlobalExceptionHandler`** (el método nuevo) | Cuando la contraseña está mal, `AuthService` **lanza un error dentro de un controlador**. Este método lo atrapa y lo convierte en un `401` con mensaje. Sin él, ese error terminaba como `500`, como si el servidor se hubiera roto. |
+>
+> </details>
+>
+> <details>
+> <summary><strong>🧠 Para recordar</strong></summary>
+>
+> > | | `401` | `403` |
+> > |---|---|---|
+> > | Significa | «**No sé quién eres**» | «**Sé quién eres, pero no puedes**» |
+> > | Ejemplo | Sin token, token falso o vencido | `ana` (`USER`) intenta borrar |
+> >
+> > Y una regla para todo: **`StudentService` no se tocó nunca**. La seguridad se pone **alrededor** del negocio, como una portería alrededor de un edificio: por dentro, el edificio sigue igual.
+>
+> </details>
+
+</details>
+
 ---
 
 <details>
