@@ -218,29 +218,122 @@ public class ControladorLibros {
 }
 ```
 
-## 🧭 Explicación paso a paso
+## 🧠 ¿Qué es `@ExceptionHandler`? (explicación desde cero)
 
-1. `@ExceptionHandler(LibroNoEncontradoException.class)` marca un método
-   de `ControladorLibros` como el responsable de manejar esa excepción
-   **para este controlador únicamente** — si existiera otro controlador
-   (por ejemplo, `ControladorAutores`) que también pudiera lanzar una
-   excepción de ese mismo tipo, este método no lo cubriría.
-2. El método recibe la excepción como parámetro (`ex`), y construye
-   explícitamente el `ResponseEntity`: tanto el código de estado (`404`,
-   repetido acá aunque `LibroNoEncontradoException` ya tenga
-   `@ResponseStatus`) como el cuerpo (`{"error": "<mensaje>"}"`, ahora sí
-   con el formato del Módulo 5).
-3. **Sobre la precedencia**: `LibroNoEncontradoException` sigue teniendo
-   `@ResponseStatus(HttpStatus.NOT_FOUND)` (Ejemplo 03), pero como
-   `ControladorLibros` ahora define un `@ExceptionHandler` específico
-   para esa excepción, es **este método** el que se ejecuta al lanzarla
-   — no el mecanismo de `@ResponseStatus`. Cuando ambos mecanismos
-   podrían aplicar a la misma excepción, `@ExceptionHandler` (más
-   específico) toma precedencia sobre la anotación de clase.
-4. `LibroDuplicadoException` **no** tiene un `@ExceptionHandler` en este
-   controlador todavía: sigue devolviendo el cuerpo por defecto de
-   `@ResponseStatus`, ya que este ejemplo se concentra en un solo caso
-   para mostrar el contraste con claridad.
+### 1. El problema que resuelve
+
+Cuando alguien pide `GET /libros/999`, el servicio no encuentra el libro y **lanza** una excepción:
+
+```java
+throw new LibroNoEncontradoException(999L);
+```
+
+Una excepción es un "grito de error" que sube por las capas (servicio → controlador → Spring). Si **nadie la atrapa**, Spring decide qué responder por su cuenta. Con solo `@ResponseStatus` (Ejemplo 03) logramos el código correcto (`404`), pero **el cuerpo lo arma Spring**:
+
+```json
+{ "timestamp": "...", "status": 404, "error": "Not Found", "path": "/libros/999" }
+```
+
+Nosotros queremos otro cuerpo: `{"error": "No existe un libro con id 999"}`. Para eso necesitamos **ser nosotros quienes atrapen la excepción y escriban la respuesta**.
+
+### 2. Qué es y qué función cumple
+
+`@ExceptionHandler` es una anotación que se pone sobre un método y dice:
+
+> *"Si en este controlador se lanza una excepción de **este tipo**, no la dejes subir: **ejecutá este método** y usá lo que devuelva como respuesta HTTP."*
+
+Es el equivalente, en el mundo web, de un `try/catch`. La diferencia: el `catch` no está dentro del método que falla, sino **en un método aparte** que Spring invoca por vos.
+
+| Idea | `try/catch` normal | `@ExceptionHandler` |
+|---|---|---|
+| Dónde se escribe | Alrededor del código que puede fallar | En un método aparte del controlador |
+| Quién lo ejecuta | El flujo del programa | **Spring**, cuando detecta la excepción |
+| Qué produce | Lo que vos decidas | **La respuesta HTTP** (código + cuerpo) |
+
+> 🏪 **Analogía:** el controlador es un mostrador de atención. `buscarPorId` es el empleado que busca el libro. Si no lo encuentra, no le grita al cliente: levanta la mano (lanza la excepción) y el **supervisor** (`@ExceptionHandler`) viene, habla con el cliente y le da una respuesta con el formato oficial.
+
+### 3. Cómo se ejecuta, paso a paso
+
+Seguimos la petición `GET /libros/999`:
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente
+    participant D as DispatcherServlet (Spring)
+    participant K as ControladorLibros
+    participant S as ServicioLibros
+    participant H as manejarLibroNoEncontrado (@ExceptionHandler)
+    C->>D: GET /libros/999
+    D->>K: buscarPorId(999)
+    K->>S: buscarPorId(999)
+    S--xK: throw LibroNoEncontradoException
+    K--xD: la excepción sale del controlador
+    Note over D: Spring NO la deja llegar al cliente.<br/>Busca un manejador para este tipo.
+    D->>H: manejarLibroNoEncontrado(ex)
+    H-->>D: ResponseEntity(404, {"error": "..."})
+    D-->>C: 404 + {"error": "No existe un libro con id 999"}
+```
+
+En palabras:
+
+1. **Llega la petición** y Spring llama a `buscarPorId(999)`.
+2. El servicio **lanza** `LibroNoEncontradoException`. El método `buscarPorId` se interrumpe: el `return` nunca ocurre.
+3. La excepción **sale del controlador**. Spring la atrapa (vos no escribiste ningún `catch`).
+4. Spring **busca en `ControladorLibros`** un método con `@ExceptionHandler` cuyo tipo coincida con la excepción lanzada (o sea una **superclase** de ella).
+5. Encuentra `manejarLibroNoEncontrado` y lo **invoca pasándole la excepción** como parámetro `ex`.
+6. Lo que ese método **devuelve** (`ResponseEntity`) se trata **igual que el retorno de cualquier método del controlador**: Spring lo convierte a JSON y lo envía al cliente.
+7. Como la excepción ya fue "manejada", **termina ahí**: no se muestra la página/cuerpo de error por defecto.
+
+> 🔑 Fijate en un detalle importante: el método anotado **nunca lo llamás vos**. No existe ningún `manejarLibroNoEncontrado(...)` en tu código. Lo invoca Spring, igual que invoca `buscarPorId` cuando llega la petición.
+
+### 4. Leyendo el código línea por línea
+
+```java
+@ExceptionHandler(LibroNoEncontradoException.class)          // (a)
+public ResponseEntity<RespuestaError> manejarLibroNoEncontrado(  // (b)
+        LibroNoEncontradoException ex) {                       // (c)
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)                       // (d)
+            .body(new RespuestaError(ex.getMessage()));         // (e)
+}
+```
+
+| Marca | Qué es | Para qué sirve |
+|:-:|---|---|
+| (a) | `@ExceptionHandler(X.class)` | **Cuándo** se ejecuta: solo si se lanza `X` (o una subclase) |
+| (b) | Retorno `ResponseEntity<RespuestaError>` | **Qué** se responde: código HTTP + cuerpo. El nombre del método es libre |
+| (c) | Parámetro `ex` | Spring te **entrega la excepción lanzada**, para que leas su mensaje o datos |
+| (d) | `.status(NOT_FOUND)` | El código HTTP. Hay que ponerlo vos: **ya no lo decide `@ResponseStatus`** (ver sección 5) |
+| (e) | `.body(new RespuestaError(...))` | El cuerpo. `ex.getMessage()` es el texto que se pasó al `super(...)` de la excepción: *"No existe un libro con id 999"* |
+
+### 5. ¿Y el `@ResponseStatus` de la excepción? ¿Cuál gana?
+
+`LibroNoEncontradoException` sigue teniendo `@ResponseStatus(NOT_FOUND)`, y ahora además hay un `@ExceptionHandler`. Gana **el `@ExceptionHandler`**. La razón es el orden en que Spring prueba sus "resolvedores de excepciones":
+
+1. 🥇 `@ExceptionHandler` (controlador, o `@ControllerAdvice` en el Ejemplo 06)
+2. 🥈 `@ResponseStatus` en la clase de la excepción
+3. 🥉 El comportamiento por defecto de Spring
+
+**Se usa el primero que sepa manejar la excepción y los demás ya no se consultan.** Por eso en el método repetimos `NOT_FOUND`: el `@ResponseStatus` quedó "tapado" y el código HTTP ahora sale de nuestro `.status(...)`.
+
+### 6. ¿Hasta dónde llega? (alcance)
+
+El método vive **dentro de `ControladorLibros`**, así que solo atrapa excepciones lanzadas por los métodos **de ese controlador**:
+
+| Situación | ¿Lo atrapa? |
+|---|---|
+| `GET /libros/999` (ControladorLibros → servicio → excepción) | ✅ Sí |
+| `GET /autores/999` lanza una excepción desde `ControladorAutores` | ❌ No, aunque fuera del mismo tipo |
+| `LibroDuplicadoException` lanzada en `POST /libros` | ❌ No: este handler solo declara `LibroNoEncontradoException`; esa sigue con su `@ResponseStatus` |
+
+Por eso el siguiente ejemplo (06) introduce `@ControllerAdvice`: un manejador **compartido por todos los controladores**.
+
+### 7. Prueba mental (comprobá que lo entendiste)
+
+Si borrás el método `manejarLibroNoEncontrado` de `ControladorLibros`, ¿qué responde `GET /libros/999`?
+→ `404` (por el `@ResponseStatus`), pero con el cuerpo por defecto de Spring (`timestamp`, `status`, ...) y **no** `{"error": "..."}`.
+
+Si agregás el método de vuelta, vuelve el cuerpo personalizado. Esa diferencia **es** lo que aporta `@ExceptionHandler`.
 
 > 💡 **¿Por qué un DTO y no un `Map`?** `RespuestaError` es un *Data Transfer Object*: una clase (aquí un `record`) que declara qué datos viajan en la respuesta de la API. Vive en `presentacion/dto` porque describe lo que sale por HTTP, no una regla de negocio. El JSON es el mismo (`{"error": "<mensaje>"}`), pero el contrato queda escrito en código y el compilador lo verifica.
 
