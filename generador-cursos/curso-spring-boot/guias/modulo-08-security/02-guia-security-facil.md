@@ -5,6 +5,8 @@
 >
 > 📦 **Proyecto terminado:** [`students-api-security-facil/`](codigo/students-api-security-facil/) (se ejecuta con `./mvnw spring-boot:run`).
 >
+> 🧾 **Todo el código final, listo para copiar:** [`03-security-facil-codigo-completo.md`](03-security-facil-codigo-completo.md).
+>
 > ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3.5, Java 17 y MySQL 8. Las respuestas que se muestran son reales; lo que se cuenta de la pantalla de Swagger UI (Paso 7) se deduce del contrato.
 
 <details>
