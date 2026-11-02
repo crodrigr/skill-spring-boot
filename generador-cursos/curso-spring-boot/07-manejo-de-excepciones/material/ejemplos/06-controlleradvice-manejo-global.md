@@ -2,25 +2,19 @@
 
 ## 🌍 Contexto
 
-El Ejemplo 05 dejó el manejo de `LibroNoEncontradoException` dentro de
-`ControladorLibros`. Si `LibroDuplicadoException` necesitara el mismo
-tratamiento, o si el proyecto agregara un controlador nuevo, habría que
-repetir el mismo código en cada lugar. Este ejemplo lo centraliza.
+El Ejemplo 05 dejó el manejo de `LibroNoEncontradoException` dentro de `ControladorLibros`. Si otra excepción necesitara el mismo tratamiento, o si el proyecto agregara un controlador nuevo, habría que repetir ese código en cada lugar. Este ejemplo lo centraliza.
 
-**Qué busca demostrar este ejemplo**: crear
-`ManejadorGlobalDeExcepciones` (`@ControllerAdvice`) que maneja
-`LibroNoEncontradoException` y `LibroDuplicadoException` para toda la
-aplicación, dejando `ControladorLibros` sin ningún método de manejo de
-errores.
+**Qué busca demostrar este ejemplo**: crear `ManejadorGlobalDeExcepciones`, anotada con `@ControllerAdvice`, que maneje `LibroNoEncontradoException` y `LibroDuplicadoException` para **toda la aplicación**, y dejar `ControladorLibros` sin ningún método de manejo de errores.
 
 ## 📚 Caso de estudio
 
-Biblioteca Universitaria: mismo proyecto de los Ejemplos 03-05.
+Biblioteca Universitaria: mismo proyecto de los Ejemplos 03 al 05.
 
 <details>
-<summary>📄 Ver código completo de <code>Libro.java</code>, <code>RepositorioLibros.java</code>, <code>LibroNoEncontradoException.java</code>, <code>LibroDuplicadoException.java</code> y <code>ServicioLibros.java</code> (reutilizados de los Ejemplos 03-05)</summary>
+<summary>💻 <b>Código fuente</b> (reutilizado de los Ejemplos 03 al 05)</summary>
 
-## 💻 Archivo: `Libro.java`
+<details>
+<summary>📄 Ver código completo de <code>Libro.java</code></summary>
 
 ```java
 package com.biblioteca.negocio.model;
@@ -52,7 +46,10 @@ public class Libro {
 }
 ```
 
-## 💻 Archivo: `RepositorioLibros.java`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>RepositorioLibros.java</code></summary>
 
 ```java
 package com.biblioteca.persistence.repository;
@@ -64,7 +61,10 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 }
 ```
 
-## 💻 Archivo: `LibroNoEncontradoException.java`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>LibroNoEncontradoException.java</code></summary>
 
 ```java
 package com.biblioteca.negocio.excepcion;
@@ -78,7 +78,10 @@ public class LibroNoEncontradoException extends RuntimeException {
 }
 ```
 
-## 💻 Archivo: `LibroDuplicadoException.java`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>LibroDuplicadoException.java</code></summary>
 
 ```java
 package com.biblioteca.negocio.excepcion;
@@ -92,7 +95,10 @@ public class LibroDuplicadoException extends RuntimeException {
 }
 ```
 
-## 💻 Archivo: `ServicioLibros.java`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>ServicioLibros.java</code></summary>
 
 ```java
 package com.biblioteca.negocio.service;
@@ -147,7 +153,22 @@ public class ServicioLibros {
 
 </details>
 
-## 💻 Archivo: `ControladorLibros.java` (sin ningún `@ExceptionHandler`)
+<details>
+<summary>📄 Ver código completo de <code>RespuestaError.java</code></summary>
+
+```java
+package com.biblioteca.presentacion.dto;
+
+public record RespuestaError(String error) {
+}
+```
+
+</details>
+
+</details>
+
+<details>
+<summary>💻 Archivo: <code>ControladorLibros.java</code> (sin ningún <code>@ExceptionHandler</code>)</summary>
 
 ```java
 package com.biblioteca.presentacion.controlador;
@@ -201,18 +222,11 @@ public class ControladorLibros {
 }
 ```
 
-## Archivo: `RespuestaError.java` (`com.biblioteca.presentacion.dto`, nueva)
+</details>
 
-El mismo DTO del Ejemplo 05: el manejador global lo devuelve como cuerpo de error, en lugar de un `Map<String, String>`.
 
-```java
-package com.biblioteca.presentacion.dto;
-
-public record RespuestaError(String error) {
-}
-```
-
-## 💻 Archivo: `ManejadorGlobalDeExcepciones.java`
+<details>
+<summary>💻 Archivo: <code>ManejadorGlobalDeExcepciones.java</code> (nuevo)</summary>
 
 ```java
 package com.biblioteca.presentacion.excepcion;
@@ -236,27 +250,72 @@ public class ManejadorGlobalDeExcepciones {
 }
 ```
 
-## 🧭 Explicación paso a paso — qué cambió respecto al Ejemplo 05
+</details>
 
-1. **Antes** (Ejemplo 05): `manejarLibroNoEncontrado` vivía **dentro** de
-   `ControladorLibros`, como un método `@ExceptionHandler` más.
-   **Ahora**: se movió, sin cambiar una línea de su lógica, a una clase
-   nueva `ManejadorGlobalDeExcepciones`, anotada con `@ControllerAdvice`
-   en vez de vivir dentro de un controlador — `ControladorLibros` queda
-   completamente libre de código de manejo de errores.
-2. `@ControllerAdvice` hace que Spring registre esta clase como un
-   manejador que aplica a **todos** los controladores de la aplicación,
-   no solo a `ControladorLibros`.
-3. Se agregó, de paso, el manejo de `LibroDuplicadoException` (que en el
-   Ejemplo 05 todavía usaba el cuerpo por defecto) — ambas excepciones
-   quedan con el mismo formato de cuerpo, consistente en toda la API.
-4. Si este proyecto agregara mañana un controlador nuevo (por ejemplo,
-   uno para `Editorial`) que también pudiera lanzar
-   `LibroNoEncontradoException` o `LibroDuplicadoException`, quedaría
-   cubierto automáticamente por este mismo `ManejadorGlobalDeExcepciones`
-   — sin escribir ningún código de manejo adicional en ese controlador
-   nuevo. Esa es la diferencia clave frente a `@ExceptionHandler` local
-   (Ejemplo 05), que habría que repetir en cada controlador nuevo.
+## 🧭 Explicación
+
+### 1. ¿Qué cambió respecto al Ejemplo 05?
+
+| | Ejemplo 05 | Este ejemplo |
+|---|---|---|
+| Dónde vive el `@ExceptionHandler` | **Dentro** de `ControladorLibros` | En una clase aparte: `ManejadorGlobalDeExcepciones` |
+| Alcance | Solo `ControladorLibros` | **Todos** los controladores |
+| `LibroDuplicadoException` | Cuerpo por defecto de Spring | Cuerpo `{"error": "..."}`, igual que la otra excepción |
+| `ControladorLibros` | Contiene código de manejo de errores | No contiene ninguno |
+
+La lógica de los métodos **no cambió**: solo se trasladaron de lugar.
+
+### 2. ¿Qué hace `@ControllerAdvice`?
+
+```java
+@ControllerAdvice
+public class ManejadorGlobalDeExcepciones { ... }
+```
+
+Marca una clase como un **manejador compartido**: sus métodos `@ExceptionHandler` valen para cualquier controlador de la aplicación. Spring la detecta por sí solo (es un componente más), sin registrarla en ningún lugar.
+
+| Anotación | Dónde se declara | Alcance |
+|---|---|---|
+| `@ExceptionHandler` | En un método **de un controlador** | Solo ese controlador |
+| `@ExceptionHandler` | En un método **de una clase `@ControllerAdvice`** | Toda la aplicación |
+
+> 🔑 `@ControllerAdvice` no reemplaza a `@ExceptionHandler`: lo sigue necesitando. Solo cambia **dónde vive** el método.
+
+### 3. ¿Cómo se ejecuta? (`GET /libros/999`)
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente
+    participant K as ControladorLibros
+    participant S as ServicioLibros
+    participant SP as Spring
+    participant M as ManejadorGlobalDeExcepciones
+    C->>K: GET /libros/999
+    K->>S: buscarPorId(999)
+    S--xK: throw LibroNoEncontradoException
+    K--xSP: la excepción sale del controlador
+    SP->>SP: ¿ControladorLibros tiene un @ExceptionHandler para este tipo? No
+    SP->>M: busca en las clases @ControllerAdvice
+    M-->>SP: manejarLibroNoEncontrado → 404 + {"error": "..."}
+    SP-->>C: 404 Not Found + {"error": "No existe un libro con id 999"}
+```
+
+1. El cliente envía `GET /libros/999` y el servicio **lanza** `LibroNoEncontradoException`.
+2. La excepción sale del controlador sin ser capturada.
+3. Spring busca primero un `@ExceptionHandler` **dentro del propio controlador**. No hay ninguno.
+4. Spring busca entonces en las clases `@ControllerAdvice` y encuentra `manejarLibroNoEncontrado`, cuyo tipo coincide.
+5. Spring invoca ese método, que construye el `ResponseEntity` con el código `404` y el cuerpo `{"error": ...}`.
+6. Esa respuesta es la que recibe el cliente.
+
+Con `LibroDuplicadoException` ocurre lo mismo, pero Spring invoca `manejarLibroDuplicado` y responde `409`.
+
+### 4. ¿Qué ocurre si hay un manejador local y uno global?
+
+Gana el **local**: Spring revisa primero el controlador y, solo si no encuentra un manejador allí, consulta las clases `@ControllerAdvice`. Esto permite un tratamiento especial para un controlador concreto sin afectar al resto.
+
+### 5. Ventaja principal
+
+Si el proyecto agrega un controlador nuevo (por ejemplo, para `Editorial`) que también lanza estas excepciones, queda cubierto **sin escribir código de manejo adicional**. Con `@ExceptionHandler` local habría que repetirlo en cada controlador.
 
 > 💡 **¿Por qué un DTO y no un `Map`?** `RespuestaError` (Ejemplo 05) es un *Data Transfer Object*: una clase (aquí un `record`) que declara qué datos viajan en la respuesta de la API. Vive en `presentacion/dto` porque describe lo que sale por HTTP, no una regla de negocio. El JSON es el mismo (`{"error": "<mensaje>"}`), pero el contrato queda escrito en código y el compilador lo verifica.
 
@@ -303,7 +362,7 @@ manejador global, aplicable a todos los controladores.
 
 </details>
 
-**2. [Selección múltiple]** Sobre este ejemplo, seleccioná **todas** las
+**2. [Selección múltiple]** Sobre este ejemplo, seleccionar **todas** las
 afirmaciones correctas.
 
 - **A.** `ControladorLibros` ya no tiene ningún método `@ExceptionHandler` propio.
@@ -323,7 +382,7 @@ aplica a todos los controladores de la aplicación, no solo a uno.
 claramente superior a `@ExceptionHandler` local, ¿por qué este módulo
 enseñó primero el local, en vez de ir directo al global?".
 
-**Pregunta**: ¿Qué le responderías?
+**Pregunta**: ¿Qué respuesta corresponde?
 
 <details>
 <summary>🔑 Ver respuesta modelo</summary>
