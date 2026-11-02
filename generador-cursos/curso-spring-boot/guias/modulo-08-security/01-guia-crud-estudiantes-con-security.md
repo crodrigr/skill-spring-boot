@@ -5,6 +5,8 @@
 >
 > 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
 >
+> 🧪 **Probar todas las rutas con `curl`:** [`04-curl-probar-todas-las-apis.md`](04-curl-probar-todas-las-apis.md) (y el script [`probar-apis.sh`](codigo/probar-apis.sh)).
+>
 > 📦 **Proyecto terminado:** [`students-api-security/`](codigo/students-api-security/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
 > ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, Spring Security 7.1, JJWT 0.12.6, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas HTTP, el contenido del token, el contrato OpenAPI y la tabla de cuentas que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
