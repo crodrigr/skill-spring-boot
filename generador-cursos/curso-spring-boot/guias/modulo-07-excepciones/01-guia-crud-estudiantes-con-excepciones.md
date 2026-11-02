@@ -1549,13 +1549,11 @@
 >         └── 📄 application-prod.properties
 > ```
 >
-> > ✅ Es el mismo árbol del Módulo 06, **sin** `ServiceResult` ni `ServiceStatus`, **con** `business/exception`, `presentation/exception` y `ErrorResponse`.
->
-> **Código final, listo para copiar**
-
+> **Código final, paso a paso**
 >
 > ### 📁 Configuración
 >
+
 > <details>
 > <summary><strong>📄 pom.xml</strong></summary>
 >
@@ -1616,7 +1614,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 application.properties</strong></summary>
@@ -1654,7 +1651,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 application-prod.properties</strong></summary>
@@ -1667,7 +1663,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 AcademyApplication.java</strong></summary>
@@ -1690,10 +1685,28 @@
 > ```
 >
 > </details>
-
 >
+> ---
 >
-> ### 📁 persistence (sin cambios)
+> ### 📁 persistence
+>
+> #### 📁 entity
+>
+> <details>
+> <summary><strong>📄 StudentStatus.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentStatus.java`
+>
+> ```java
+> package com.academy.persistence.entity;
+>
+> public enum StudentStatus {
+>     ACTIVE,
+>     INACTIVE
+> }
+> ```
+>
+> </details>
 >
 > <details>
 > <summary><strong>📄 StudentEntity.java</strong></summary>
@@ -1760,24 +1773,8 @@
 > ```
 >
 > </details>
-
 >
-> <details>
-> <summary><strong>📄 StudentStatus.java</strong></summary>
->
-> **Ruta:** `src/main/java/com/academy/persistence/entity/StudentStatus.java`
->
-> ```java
-> package com.academy.persistence.entity;
->
-> public enum StudentStatus {
->     ACTIVE,
->     INACTIVE
-> }
-> ```
->
-> </details>
-
+> #### 📁 repository
 >
 > <details>
 > <summary><strong>📄 StudentJpaRepository.java</strong></summary>
@@ -1807,10 +1804,12 @@
 > ```
 >
 > </details>
-
 >
+> ---
 >
-> ### 📁 business — excepciones y servicio
+> ### 📁 business
+>
+> #### 📁 exception
 >
 > <details>
 > <summary><strong>📄 StudentNotFoundException.java</strong></summary>
@@ -1837,7 +1836,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 StudentEmailAlreadyExistsException.java</strong></summary>
@@ -1856,7 +1854,8 @@
 > ```
 >
 > </details>
-
+>
+> #### 📁 service
 >
 > <details>
 > <summary><strong>📄 StudentService.java</strong></summary>
@@ -1944,10 +1943,12 @@
 > ```
 >
 > </details>
-
 >
+> ---
 >
-> ### 📁 presentation — DTO y mapeador
+> ### 📁 presentation
+>
+> #### 📁 dto
 >
 > <details>
 > <summary><strong>📄 ErrorResponse.java</strong></summary>
@@ -2010,7 +2011,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 StudentRequest.java</strong></summary>
@@ -2055,7 +2055,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 StudentStatusRequest.java</strong></summary>
@@ -2080,7 +2079,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 StudentResponse.java</strong></summary>
@@ -2115,7 +2113,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 PageResponse.java</strong></summary>
@@ -2151,49 +2148,8 @@
 > ```
 >
 > </details>
-
 >
-> <details>
-> <summary><strong>📄 StudentMapper.java</strong></summary>
->
-> **Ruta:** `src/main/java/com/academy/presentation/mapper/StudentMapper.java`
->
-> ```java
-> package com.academy.presentation.mapper;
->
-> import com.academy.persistence.entity.StudentEntity;
-> import com.academy.presentation.dto.PageResponse;
-> import com.academy.presentation.dto.StudentRequest;
-> import com.academy.presentation.dto.StudentResponse;
-> import org.springframework.data.domain.Page;
->
-> public final class StudentMapper {
->
->     private StudentMapper() {
->     }
->
->     public static StudentEntity toEntity(StudentRequest request) {
->         return new StudentEntity(null, request.name(), request.age(), request.email(), request.status());
->     }
->
->     public static StudentResponse toResponse(StudentEntity entity) {
->         return new StudentResponse(entity.getId(), entity.getName(), entity.getAge(),
->                 entity.getEmail(), entity.getStatus());
->     }
->
->     public static PageResponse<StudentResponse> toPageResponse(Page<StudentEntity> page) {
->         return new PageResponse<>(
->                 page.getContent().stream().map(StudentMapper::toResponse).toList(),
->                 page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages());
->     }
-> }
-> ```
->
-> </details>
-
->
->
-> ### 📁 presentation — el manejo global
+> #### 📁 exception
 >
 > <details>
 > <summary><strong>📄 GlobalExceptionHandler.java</strong></summary>
@@ -2328,10 +2284,156 @@
 > ```
 >
 > </details>
-
 >
+> #### 📁 mapper
 >
-> ### 📁 presentation — controladores y configuración
+> <details>
+> <summary><strong>📄 StudentMapper.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/mapper/StudentMapper.java`
+>
+> ```java
+> package com.academy.presentation.mapper;
+>
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.presentation.dto.PageResponse;
+> import com.academy.presentation.dto.StudentRequest;
+> import com.academy.presentation.dto.StudentResponse;
+> import org.springframework.data.domain.Page;
+>
+> public final class StudentMapper {
+>
+>     private StudentMapper() {
+>     }
+>
+>     public static StudentEntity toEntity(StudentRequest request) {
+>         return new StudentEntity(null, request.name(), request.age(), request.email(), request.status());
+>     }
+>
+>     public static StudentResponse toResponse(StudentEntity entity) {
+>         return new StudentResponse(entity.getId(), entity.getName(), entity.getAge(),
+>                 entity.getEmail(), entity.getStatus());
+>     }
+>
+>     public static PageResponse<StudentResponse> toPageResponse(Page<StudentEntity> page) {
+>         return new PageResponse<>(
+>                 page.getContent().stream().map(StudentMapper::toResponse).toList(),
+>                 page.getNumber(), page.getSize(), page.getTotalElements(), page.getTotalPages());
+>     }
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 config
+>
+> <details>
+> <summary><strong>📄 OpenApiConfig.java</strong></summary>
+>
+> **Ruta:** `src/main/java/com/academy/presentation/config/OpenApiConfig.java`
+>
+> ```java
+> package com.academy.presentation.config;
+>
+> import com.academy.presentation.dto.ErrorResponse;
+> import io.swagger.v3.core.converter.ModelConverters;
+> import io.swagger.v3.oas.models.Components;
+> import io.swagger.v3.oas.models.OpenAPI;
+> import io.swagger.v3.oas.models.info.Contact;
+> import io.swagger.v3.oas.models.info.Info;
+> import io.swagger.v3.oas.models.info.License;
+> import io.swagger.v3.oas.models.media.Content;
+> import io.swagger.v3.oas.models.media.MediaType;
+> import io.swagger.v3.oas.models.media.Schema;
+> import io.swagger.v3.oas.models.responses.ApiResponse;
+> import io.swagger.v3.oas.models.security.SecurityScheme;
+> import io.swagger.v3.oas.models.servers.Server;
+> import org.springdoc.core.models.GroupedOpenApi;
+> import org.springframework.context.annotation.Bean;
+> import org.springframework.context.annotation.Configuration;
+>
+> import java.util.LinkedHashMap;
+> import java.util.List;
+> import java.util.Map;
+>
+> @Configuration
+> public class OpenApiConfig {
+>
+>     @Bean
+>     public OpenAPI academyOpenApi() {
+>         return new OpenAPI()
+>                 .info(new Info()
+>                         .title("Academy API")
+>                         .version("1.0.0")
+>                         .description("CRUD de estudiantes con DTO, Spring Boot, JPA y MySQL, documentado con OpenAPI.")
+>                         .contact(new Contact().name("Equipo Academy").email("academy@mail.com"))
+>                         .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")))
+>                 .servers(List.of(new Server().url("http://localhost:8080").description("Local")))
+>                 .components(components());
+>     }
+>
+>     private Components components() {
+>         Components components = new Components()
+>                 .addSecuritySchemes("bearerAuth", new SecurityScheme()
+>                         .type(SecurityScheme.Type.HTTP)
+>                         .scheme("bearer")
+>                         .bearerFormat("JWT"))
+>                 .addResponses("BadRequest", errorResponse("La petición no es válida",
+>                         example(400, "Bad Request", "Los datos enviados no son válidos", "/api/v1/students",
+>                                 List.of(Map.of("field", "email", "message", "no tiene formato de correo electrónico")))))
+>                 .addResponses("NotFound", errorResponse("El recurso no existe",
+>                         example(404, "Not Found", "No existe un estudiante con id 999", "/api/v1/students/999", null)))
+>                 .addResponses("Conflict", errorResponse("El correo ya está registrado",
+>                         example(409, "Conflict", "El correo ana@mail.com ya está registrado", "/api/v1/students", null)));
+>         // El esquema ErrorResponse se agrega a mano porque ninguna operación lo declara como tipo de retorno.
+>         ModelConverters.getInstance().readAll(ErrorResponse.class).forEach(components::addSchemas);
+>         return components;
+>     }
+>
+>     private Map<String, Object> example(int status, String error, String message, String path, List<?> details) {
+>         Map<String, Object> example = new LinkedHashMap<>();
+>         example.put("timestamp", "2026-11-01T10:15:30.123Z");
+>         example.put("status", status);
+>         example.put("error", error);
+>         example.put("message", message);
+>         example.put("path", path);
+>         if (details != null) {
+>             example.put("details", details);
+>         }
+>         return example;
+>     }
+>
+>     private ApiResponse errorResponse(String description, Map<String, Object> example) {
+>         return new ApiResponse()
+>                 .description(description)
+>                 .content(new Content().addMediaType("application/json", new MediaType()
+>                         .schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
+>                         .example(example)));
+>     }
+>
+>     @Bean
+>     public GroupedOpenApi studentsGroup() {
+>         return GroupedOpenApi.builder()
+>                 .group("students")
+>                 .displayName("Students")
+>                 .pathsToMatch("/api/v1/students/**")
+>                 .build();
+>     }
+>
+>     @Bean
+>     public GroupedOpenApi internalGroup() {
+>         return GroupedOpenApi.builder()
+>                 .group("internal")
+>                 .displayName("Internal")
+>                 .pathsToMatch("/internal/**")
+>                 .build();
+>     }
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 controller
 >
 > <details>
 > <summary><strong>📄 StudentController.java</strong></summary>
@@ -2487,7 +2589,6 @@
 > ```
 >
 > </details>
-
 >
 > <details>
 > <summary><strong>📄 InternalController.java</strong></summary>
@@ -2550,114 +2651,5 @@
 > ```
 >
 > </details>
-
->
-> <details>
-> <summary><strong>📄 OpenApiConfig.java</strong></summary>
->
-> **Ruta:** `src/main/java/com/academy/presentation/config/OpenApiConfig.java`
->
-> ```java
-> package com.academy.presentation.config;
->
-> import com.academy.presentation.dto.ErrorResponse;
-> import io.swagger.v3.core.converter.ModelConverters;
-> import io.swagger.v3.oas.models.Components;
-> import io.swagger.v3.oas.models.OpenAPI;
-> import io.swagger.v3.oas.models.info.Contact;
-> import io.swagger.v3.oas.models.info.Info;
-> import io.swagger.v3.oas.models.info.License;
-> import io.swagger.v3.oas.models.media.Content;
-> import io.swagger.v3.oas.models.media.MediaType;
-> import io.swagger.v3.oas.models.media.Schema;
-> import io.swagger.v3.oas.models.responses.ApiResponse;
-> import io.swagger.v3.oas.models.security.SecurityScheme;
-> import io.swagger.v3.oas.models.servers.Server;
-> import org.springdoc.core.models.GroupedOpenApi;
-> import org.springframework.context.annotation.Bean;
-> import org.springframework.context.annotation.Configuration;
->
-> import java.util.LinkedHashMap;
-> import java.util.List;
-> import java.util.Map;
->
-> @Configuration
-> public class OpenApiConfig {
->
->     @Bean
->     public OpenAPI academyOpenApi() {
->         return new OpenAPI()
->                 .info(new Info()
->                         .title("Academy API")
->                         .version("1.0.0")
->                         .description("CRUD de estudiantes con DTO, Spring Boot, JPA y MySQL, documentado con OpenAPI.")
->                         .contact(new Contact().name("Equipo Academy").email("academy@mail.com"))
->                         .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")))
->                 .servers(List.of(new Server().url("http://localhost:8080").description("Local")))
->                 .components(components());
->     }
->
->     private Components components() {
->         Components components = new Components()
->                 .addSecuritySchemes("bearerAuth", new SecurityScheme()
->                         .type(SecurityScheme.Type.HTTP)
->                         .scheme("bearer")
->                         .bearerFormat("JWT"))
->                 .addResponses("BadRequest", errorResponse("La petición no es válida",
->                         example(400, "Bad Request", "Los datos enviados no son válidos", "/api/v1/students",
->                                 List.of(Map.of("field", "email", "message", "no tiene formato de correo electrónico")))))
->                 .addResponses("NotFound", errorResponse("El recurso no existe",
->                         example(404, "Not Found", "No existe un estudiante con id 999", "/api/v1/students/999", null)))
->                 .addResponses("Conflict", errorResponse("El correo ya está registrado",
->                         example(409, "Conflict", "El correo ana@mail.com ya está registrado", "/api/v1/students", null)));
->         // El esquema ErrorResponse se agrega a mano porque ninguna operación lo declara como tipo de retorno.
->         ModelConverters.getInstance().readAll(ErrorResponse.class).forEach(components::addSchemas);
->         return components;
->     }
->
->     private Map<String, Object> example(int status, String error, String message, String path, List<?> details) {
->         Map<String, Object> example = new LinkedHashMap<>();
->         example.put("timestamp", "2026-11-01T10:15:30.123Z");
->         example.put("status", status);
->         example.put("error", error);
->         example.put("message", message);
->         example.put("path", path);
->         if (details != null) {
->             example.put("details", details);
->         }
->         return example;
->     }
->
->     private ApiResponse errorResponse(String description, Map<String, Object> example) {
->         return new ApiResponse()
->                 .description(description)
->                 .content(new Content().addMediaType("application/json", new MediaType()
->                         .schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
->                         .example(example)));
->     }
->
->     @Bean
->     public GroupedOpenApi studentsGroup() {
->         return GroupedOpenApi.builder()
->                 .group("students")
->                 .displayName("Students")
->                 .pathsToMatch("/api/v1/students/**")
->                 .build();
->     }
->
->     @Bean
->     public GroupedOpenApi internalGroup() {
->         return GroupedOpenApi.builder()
->                 .group("internal")
->                 .displayName("Internal")
->                 .pathsToMatch("/internal/**")
->                 .build();
->     }
-> }
-> ```
->
-> </details>
-
->
 
 </details>
