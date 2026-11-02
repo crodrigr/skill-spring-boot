@@ -100,15 +100,28 @@
 > <details>
 > <summary><strong>🔒 Las clases de la carpeta <code>security</code></strong></summary>
 >
-> > **`PasswordConfig`** — entrega a toda la aplicación **la trituradora de contraseñas** (BCrypt).
+> > <details>
+> > <summary><strong>🧂 PasswordConfig — la trituradora de contraseñas</strong></summary>
+> >
+> > Entrega a toda la aplicación **la trituradora de contraseñas** (BCrypt).
 > >
 > > - Al **guardar**: «admin123» entra y sale como una tira de símbolos.
 > > - Al **comparar** (en el login): se tritura lo que escribió la persona y se mira si da **la misma tira**.
 > > - **No se puede deshacer**: de la tira no se vuelve a «admin123». Solo se puede comparar.
 > >
-> > **`AccountSeeder`** — **da de alta a los dos primeros usuarios** (`admin` y `ana`) cada vez que arranca la aplicación, si todavía no existen. Sin él, la tabla estaría vacía y nadie podría iniciar sesión. *(Solo para practicar: en un proyecto real no se escriben contraseñas en el código.)*
+> > </details>
 > >
-> > **`JwtService`** — **la máquina que fabrica y revisa los pases**:
+> > <details>
+> > <summary><strong>🌱 AccountSeeder — el que da de alta a los primeros usuarios</strong></summary>
+> >
+> > **Da de alta a los dos primeros usuarios** (`admin` y `ana`) cada vez que arranca la aplicación, si todavía no existen. Sin él, la tabla estaría vacía y nadie podría iniciar sesión.
+> >
+> > > ⚠️ Es solo para practicar: en un proyecto real no se escriben contraseñas en el código.
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>🎟️ JwtService — la máquina que fabrica y revisa los pases</strong></summary>
 > >
 > > | Método | Qué hace |
 > > |---|---|
@@ -119,7 +132,12 @@
 > >
 > > > 💡 Dentro del token hay texto que cualquiera puede leer. **No se pone nada secreto ahí.** La firma no lo oculta; solo garantiza que **nadie lo modificó**.
 > >
-> > **`AuthService`** — **el empleado del mostrador que atiende el login**. Hace tres preguntas en orden:
+> > </details>
+> >
+> > <details>
+> > <summary><strong>🧑‍💼 AuthService — el empleado del mostrador del login</strong></summary>
+> >
+> > Hace tres preguntas en orden:
 > >
 > > 1. ¿Existe ese usuario? Si no, error.
 > > 2. ¿La contraseña (triturada) coincide con la guardada? Si no, error.
@@ -127,7 +145,12 @@
 > >
 > > En los dos errores dice **lo mismo** («usuario o contraseña incorrectos»): no revela cuál falló, para no ayudar a quien prueba cuentas ajenas.
 > >
-> > **`JwtAuthenticationFilter` (el filtro)** — **el guardia de cada puerta**. Se ejecuta **en cada petición**, antes de que llegue al código de la API:
+> > </details>
+> >
+> > <details>
+> > <summary><strong>💂 JwtAuthenticationFilter (el filtro) — el guardia de cada puerta</strong></summary>
+> >
+> > Se ejecuta **en cada petición**, antes de que llegue al código de la API:
 > >
 > > 1. Mira si la petición trae `Authorization: Bearer <token>`.
 > > 2. Si lo trae, le pide a `JwtService` que lo revise.
@@ -138,7 +161,12 @@
 > >
 > > > ⚠️ Esta clase **no lleva `@Component`** a propósito. Si lo llevara, Spring pondría **dos guardias** en la misma puerta.
 > >
-> > **`SecurityConfig`** — **el reglamento del edificio**. Es la clase más importante:
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📜 SecurityConfig — el reglamento del edificio</strong></summary>
+> >
+> > Es la clase más importante. Dice:
 > >
 > > | Regla | Quién entra |
 > > |---|---|
@@ -150,7 +178,12 @@
 > >
 > > > 🔎 **El orden importa.** Las reglas se leen de arriba hacia abajo y gana **la primera** que coincide. Por eso `anyRequest()` va siempre al final.
 > >
-> > **`SecurityErrorHandler`** — **quien explica por qué no se puede pasar**, con el mismo formato de error de toda la API (`ErrorResponse`):
+> > </details>
+> >
+> > <details>
+> > <summary><strong>💬 SecurityErrorHandler — quien explica por qué no se puede pasar</strong></summary>
+> >
+> > Responde con el mismo formato de error de toda la API (`ErrorResponse`):
 > >
 > > | Situación | Código | Mensaje |
 > > |---|:-:|---|
@@ -158,6 +191,8 @@
 > > | **Hay pase bueno**, pero no alcanza (un `USER` quiere borrar) | `403` | «No tiene permisos para realizar esta operación» |
 > >
 > > Existe porque estos errores ocurren **en la puerta**, antes de llegar a los controladores. Por eso el `GlobalExceptionHandler` de siempre **no los ve** y hace falta una clase aparte.
+> >
+> > </details>
 >
 > </details>
 >
