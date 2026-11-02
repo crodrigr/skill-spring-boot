@@ -53,6 +53,53 @@
 > </details>
 >
 > <details>
+> <summary><strong>⚙️ Cómo se ejecuta: el recorrido de una excepción</strong></summary>
+>
+> Ejemplo: `GET /api/v1/students/999`, un estudiante que no existe.
+>
+> ```mermaid
+> sequenceDiagram
+>     participant C as Cliente
+>     participant K as StudentController
+>     participant S as StudentService
+>     participant SP as Spring MVC
+>     participant H as GlobalExceptionHandler
+>     C->>K: GET /api/v1/students/999
+>     K->>S: findById(999)
+>     S--xK: throw StudentNotFoundException
+>     K--xSP: la excepción sale del controlador
+>     SP->>H: busca un @ExceptionHandler para ese tipo
+>     H-->>SP: ResponseEntity(404, ErrorResponse)
+>     SP-->>C: 404 + JSON
+> ```
+>
+> 1. El servicio no encuentra el estudiante y **lanza** `StudentNotFoundException`. El método se interrumpe: el `return` nunca se ejecuta.
+> 2. El controlador **no la captura** (no tiene `try/catch`), así que la excepción sale de él.
+> 3. Spring MVC la recibe y **busca quién la maneje**, en este orden:
+>
+>    | Orden | Quién | Qué hace |
+>    |:-:|---|---|
+>    | 1 | `@ExceptionHandler` (en el controlador y, después, en un `@RestControllerAdvice`) | Construye la respuesta completa: código y cuerpo |
+>    | 2 | `@ResponseStatus` en la clase de la excepción | Fija solo el código; el cuerpo es el de Spring |
+>    | 3 | Comportamiento por defecto de Spring | Excepciones propias de Spring MVC → su código; el resto → `500` |
+>
+>    **Se usa el primero que sepa manejarla**; los demás ya no se consultan.
+> 4. El método manejador **recibe la excepción como parámetro** y devuelve un `ResponseEntity`. Spring lo trata como el retorno de cualquier método de un controlador y lo escribe como JSON.
+> 5. Como la excepción quedó manejada, el recorrido termina ahí: nadie más la ve.
+>
+> > 🔑 **Ningún método llama al manejador.** Lo invoca Spring cuando detecta la excepción, igual que invoca al controlador cuando llega una petición. Por eso el controlador queda solo con el camino feliz.
+>
+> Las tres herramientas de esta guía son tres lugares donde puede estar el paso 3:
+>
+> | Herramienta | Dónde está | Alcance |
+> |---|---|---|
+> | `@ResponseStatus` | Sobre la clase de la excepción | Solo el código HTTP |
+> | `@ExceptionHandler` | En un método de **un** controlador | Ese controlador |
+> | `@RestControllerAdvice` | En una clase aparte | **Todos** los controladores |
+>
+> </details>
+>
+> <details>
 > <summary><strong>🎓 El proyecto</strong></summary>
 >
 > La API de estudiantes del Módulo 06, con las tres capas (`presentation`, `business`, `persistence`), nombres en inglés, MySQL y Swagger.
