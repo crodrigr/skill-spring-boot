@@ -12,7 +12,7 @@ dependencia de documentación. Te piden agregarla.
 <dependencies>
     <dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
+        <artifactId>spring-boot-starter-webmvc</artifactId>
     </dependency>
     <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -28,7 +28,7 @@ dependencia de documentación. Te piden agregarla.
 ```
 
 Agregá la dependencia `springdoc-openapi-starter-webmvc-ui` (versión
-2.6.0) al bloque `<dependencies>`, sin modificar ninguna de las
+3.2.0) al bloque `<dependencies>`, sin modificar ninguna de las
 dependencias ya existentes ni ninguna clase Java del proyecto.
 
 ## 📏 Criterios de evaluación de la solución
@@ -37,7 +37,7 @@ dependencias ya existentes ni ninguna clase Java del proyecto.
   cambios.
 - Se agrega exactamente un bloque `<dependency>` nuevo, con
   `groupId=org.springdoc`, `artifactId=springdoc-openapi-starter-webmvc-ui`
-  y `version=2.6.0`.
+  y `version=3.2.0`.
 - No se modifica ninguna clase Java (`ControladorAutores`,
   `ServicioAutores`, etc.).
 

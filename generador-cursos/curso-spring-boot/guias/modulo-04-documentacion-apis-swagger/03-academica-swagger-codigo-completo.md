@@ -2,7 +2,7 @@
 
 > 🧾 **Solo el código.** Versión final de la [guía `02-academica-swagger`](02-academica-swagger.md), con el árbol (🆕 nuevo · ✏️ cambia) y el código completo sin explicaciones, seguido del **Paso 11 — Probar la documentación**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
-> 📦 **Código fuente:** [`academica-swagger/`](codigo/academica-swagger/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado y ejecutado con Spring Boot 3.3, springdoc-openapi 2.6.0 y MySQL 8.
+> 📦 **Código fuente:** [`academica-swagger/`](codigo/academica-swagger/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8.
 
 <details>
 <summary><strong>📁 Estructura final esperada</strong></summary>
@@ -73,7 +73,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -82,12 +82,12 @@
 >     <name>academy</name>
 >     <description>Taller de gestión de cursos con base de datos</description>
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
@@ -100,7 +100,7 @@
 >         <dependency>
 >             <groupId>org.springdoc</groupId>
 >             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
->             <version>2.6.0</version>
+>             <version>3.2.0</version>
 >         </dependency>
 >         <dependency>
 >             <groupId>com.mysql</groupId>
@@ -1498,7 +1498,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:30.574+00:00",
+> >   "timestamp": "2026-11-01T20:43:30.574Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/v3/api-docs"
@@ -1558,7 +1558,7 @@
 > >
 > > ```text
 > > {
-> >   "openapi": "3.0.1",
+> >   "openapi": "3.1.0",
 > >   "info": {
 > >     "title": "Academy API",
 > >     "description": "Estudiantes, cursos y matrículas con DTO, Spring Boot, JPA y MySQL, documentado con OpenAPI.",
@@ -1662,7 +1662,7 @@
 > > Respuesta:
 > >
 > > ```text
-> > openapi: 3.0.1
+> > openapi: 3.1.0
 > > info:
 > >   title: Academy API
 > >   description: "Estudiantes, cursos y matrículas con DTO, Spring Boot, JPA y MySQL,\
@@ -1833,7 +1833,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:31.098+00:00",
+> >   "timestamp": "2026-11-01T20:43:31.098Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/courses"
@@ -1858,7 +1858,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:40.546+00:00",
+> >   "timestamp": "2026-11-01T20:43:40.546Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/api-docs"
@@ -1883,7 +1883,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:40.567+00:00",
+> >   "timestamp": "2026-11-01T20:43:40.567Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/swagger-ui.html"

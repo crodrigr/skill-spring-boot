@@ -10,7 +10,7 @@ Módulo 5 corresponde `paths`.
 ## 💻 Código o contexto de partida
 
 ```yaml
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: API de MediSalud
   version: "1.0"

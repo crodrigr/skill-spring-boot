@@ -5,7 +5,7 @@
 >
 > 📦 **Proyecto terminado:** [`academica-dtos/`](codigo/academica-dtos/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-dtos-codigo-completo.md`](03-academica-dtos-codigo-completo.md).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8. Las respuestas HTTP, los encabezados y el contenido de la tabla que se muestran son salidas reales.
+> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2 y MySQL 8. Las respuestas HTTP, los encabezados y el contenido de la tabla que se muestran son salidas reales.
 >
 > 🧭 **Idea central.** El Módulo 05 enseñó el patrón con un solo recurso. Aquí se repite con **tres recursos relacionados**, y aparece un caso nuevo: la **matrícula**, que en la entidad lleva **dos entidades anidadas** y en el DTO se aplana.
 
@@ -72,7 +72,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 17 o superior, Spring Boot 3.3, Maven y MySQL 8 (base `academy`). |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2, Maven y MySQL 8 (base `academy`). |
 > | **RNF-02** | **Ningún controlador importa nada de `jakarta.persistence`** ni devuelve una entidad. |
 > | **RNF-03** | Los DTO son `record`. Las validaciones de forma viven **solo** en los DTO de entrada. |
 > | **RNF-04** | Los errores de negocio se informan con `ServiceResult`; las excepciones propias y un manejador global se estudian en el Módulo 7. |
@@ -1430,7 +1430,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.151+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.151Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/students"
@@ -1626,7 +1626,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.257+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.257Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/courses"
@@ -1946,7 +1946,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.539+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.539Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/enrollments"
@@ -2041,7 +2041,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.586+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.586Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/api/students"

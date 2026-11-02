@@ -211,7 +211,7 @@ Fases de build fijas: `validate → compile → test → package`.
 
 ```groovy
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 }
 ```
 

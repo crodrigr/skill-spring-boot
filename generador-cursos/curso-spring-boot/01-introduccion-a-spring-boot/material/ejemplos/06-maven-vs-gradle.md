@@ -33,7 +33,7 @@ Maven y luego con Gradle, con las mismas dependencias.
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -49,14 +49,14 @@ Maven y luego con Gradle, con las mismas dependencias.
 ```groovy
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.0'
+    id 'org.springframework.boot' version '4.1.2'
 }
 
 group = 'com.medisalud'
 version = '1.0.0'
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 ```
@@ -83,7 +83,7 @@ dependencies {
 |---|---|---|
 | `plugins { }` | Bloque que activa *plugins*: cada uno agrega tareas y convenciones al build. | — |
 | `id 'java'` | Plugin que sabe compilar código Java, ejecutar pruebas y generar el `.jar`. | `java` |
-| `id 'org.springframework.boot' version '…'` | Plugin de Spring Boot: permite empaquetar la aplicación como `.jar` ejecutable. Aquí se fija su versión. | `3.3.0` |
+| `id 'org.springframework.boot' version '…'` | Plugin de Spring Boot: permite empaquetar la aplicación como `.jar` ejecutable. Aquí se fija su versión. | `4.1.2` |
 | `group` | Equivale a `groupId` de Maven. | `com.medisalud` |
 | `version` | Equivale a `<version>` de Maven. | `1.0.0` |
 | `dependencies { }` | Bloque con las dependencias, una línea por cada una, con la forma `configuración 'grupo:artefacto'`. | — |

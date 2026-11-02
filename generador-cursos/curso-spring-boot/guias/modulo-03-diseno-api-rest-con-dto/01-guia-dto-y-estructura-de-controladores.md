@@ -5,7 +5,7 @@
 >
 > 📦 **Proyecto terminado:** [`students-api-dto/`](codigo/students-api-dto/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8. Las respuestas HTTP, los encabezados que se muestran son salidas reales.
+> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2 y MySQL 8. Las respuestas HTTP, los encabezados que se muestran son salidas reales.
 >
 > 🧭 **Idea central.** La **entidad** describe cómo se guarda un dato; el **DTO** describe cómo viaja por la API. Son dos contratos distintos que cambian por razones distintas. **Cada paso explica qué se gana con ese cambio.**
 
@@ -79,7 +79,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 17 o superior, Spring Boot 3.3 y Maven. MySQL 8 con la base `academy`. |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. MySQL 8 con la base `academy`. |
 > | **RNF-02** | **El controlador no importa nada de `jakarta.persistence`** y nunca devuelve una entidad. |
 > | **RNF-03** | Los DTO son `record` (inmutables). Las validaciones viven **solo** en el DTO de entrada. |
 > | **RNF-04** | Los errores de negocio se informan con un **resultado** (`ServiceResult`); traducirlos con excepciones y un manejador global se estudia en el Módulo 7. |
@@ -269,7 +269,7 @@
 > > ```xml
 > > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
-> >     <artifactId>spring-boot-starter-web</artifactId>
+> >     <artifactId>spring-boot-starter-webmvc</artifactId>
 > > </dependency>
 > > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
@@ -1545,7 +1545,7 @@
 > > Connection: close
 > >
 > > {
-> >   "timestamp": "2026-11-01T16:58:06.438+00:00",
+> >   "timestamp": "2026-11-01T16:58:06.438Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/students"
@@ -1832,7 +1832,7 @@
 > > Connection: close
 > >
 > > {
-> >   "timestamp": "2026-11-01T16:58:06.741+00:00",
+> >   "timestamp": "2026-11-01T16:58:06.741Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/students/1/status"
@@ -1945,7 +1945,7 @@
 > > Transfer-Encoding: chunked
 > >
 > > {
-> >   "timestamp": "2026-11-01T16:58:06.807+00:00",
+> >   "timestamp": "2026-11-01T16:58:06.807Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/api/students"
@@ -2096,7 +2096,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -2104,13 +2104,13 @@
 >     <version>0.0.1-SNAPSHOT</version>
 >
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>

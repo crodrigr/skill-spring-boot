@@ -2,7 +2,7 @@
 
 > 🧾 **Solo el código.** Versión final de la [guía `02-academica-dtos`](02-academica-dtos.md), con el árbol (🆕 nuevo · ✏️ cambia) y el código completo sin explicaciones, seguido del **Paso 7 — Probar la API**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
-> 📦 **Código fuente:** [`academica-dtos/`](codigo/academica-dtos/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado y ejecutado con Spring Boot 3.3 y MySQL 8.
+> 📦 **Código fuente:** [`academica-dtos/`](codigo/academica-dtos/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2 y MySQL 8.
 
 <details>
 <summary><strong>📁 Estructura final esperada</strong></summary>
@@ -69,7 +69,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -78,12 +78,12 @@
 >     <name>academy</name>
 >     <description>Taller de gestión de cursos con base de datos</description>
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
@@ -1242,7 +1242,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.151+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.151Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/students"
@@ -1438,7 +1438,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.257+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.257Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/courses"
@@ -1758,7 +1758,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.539+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.539Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/enrollments"
@@ -1853,7 +1853,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:15:55.586+00:00",
+> >   "timestamp": "2026-11-01T20:15:55.586Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/api/students"

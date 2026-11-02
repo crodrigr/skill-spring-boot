@@ -30,7 +30,7 @@ en YAML.
 ## 💻 Fragmento ilustrativo (YAML)
 
 ```yaml
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: API de Biblioteca Universitaria
   version: "1.0"

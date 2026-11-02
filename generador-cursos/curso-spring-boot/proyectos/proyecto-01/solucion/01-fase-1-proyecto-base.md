@@ -102,7 +102,7 @@ El `pom.xml` declara las dependencias. Cada una cumple un papel:
 
 Los tres drivers conviven en el proyecto: **solo se usa el de la base que actives** (paso 1.6).
 Además, `spring-boot-starter-parent` fija las versiones de todas las dependencias, y
-`java.version` en `17` hace que el proyecto compile para Java 17 aunque tengas un JDK más
+`java.version` en `21` hace que el proyecto compile para Java 21 aunque tengas un JDK más
 nuevo.
 
 **📄 `pom.xml`**
@@ -117,7 +117,7 @@ nuevo.
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
 
@@ -128,13 +128,13 @@ nuevo.
     <description>API REST de reservas de salas y espacios de trabajo</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -618,7 +618,7 @@ conexión se establezca. (En PostgreSQL, `ConnectionImpl` aparece como
 |---|---|---|
 | `Port 8080 was already in use` | Otro programa usa el puerto 8080 | Agregá `server.port=8081` a `application.properties`, o cerrá el otro programa |
 | `Failed to determine a suitable driver class` | Falta la dependencia de la base, o el perfil `h2` no está activo | Revisá el `pom.xml` y `spring.profiles.active` |
-| `release version 17 not supported` | Tu JDK es anterior a 17 | Instalá JDK 17 o superior |
+| `release version 21 not supported` | Tu JDK es anterior a 21 | Instalá JDK 21 o superior |
 | `Communications link failure` (MySQL) o `Connection to localhost:5432 refused` (PostgreSQL) | La base no está levantada, o el puerto es otro | `docker compose ps`; revisá el puerto (`COWORKHUB_DB_PORT`) |
 | `Access denied for user 'coworkhub'@...` (MySQL) o `password authentication failed for user "coworkhub"` (PostgreSQL) | Usuario o contraseña distintos a los que creó la base | Revisá `coworkhub.db.usuario` y `.contrasena` |
 | `Access denied for user ... to database 'x'` (MySQL) o `database "x" does not exist` (PostgreSQL) | La base no existe, o el usuario no tiene permisos sobre ella | Creala y otorgá permisos (paso 1.7, opción B), o revisá `coworkhub.db.nombre` |

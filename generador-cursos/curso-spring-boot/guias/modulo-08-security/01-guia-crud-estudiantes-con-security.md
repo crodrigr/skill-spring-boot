@@ -7,7 +7,7 @@
 >
 > 📦 **Proyecto terminado:** [`students-api-security/`](codigo/students-api-security/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3.5, Spring Security 6.3, JJWT 0.12.6, springdoc-openapi 2.6.0, Java 17 y MySQL 8. Las respuestas HTTP, el contenido del token, el contrato OpenAPI y la tabla de cuentas que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
+> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, Spring Security 7.1, JJWT 0.12.6, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas HTTP, el contenido del token, el contrato OpenAPI y la tabla de cuentas que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
 >
 > 🧭 **Idea central.** Seguridad son **dos preguntas distintas**: *¿quién eres?* (**autenticación**, responde `401`) y *¿puedes hacer esto?* (**autorización**, responde `403`). Y se agrega **sin tocar la lógica de negocio**: `StudentService` y el CRUD no cambian; toda la novedad vive en clases nuevas.
 
@@ -128,7 +128,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 17+, Spring Boot 3.3, Spring Security 6, JJWT 0.12.6, MySQL 8 y springdoc 2.6.0. |
+> | **RNF-01** | Java 21+, Spring Boot 4.1.2, Spring Security 7, JJWT 0.12.6, MySQL 8 y springdoc 3.2.0. |
 > | **RNF-02** | La API es **stateless**: sin sesión (`SessionCreationPolicy.STATELESS`) y sin CSRF (no hay cookies de sesión que proteger). |
 > | **RNF-03** | Las contraseñas se guardan **solo** como hash BCrypt; nunca en texto plano. |
 > | **RNF-04** | La clave de firma del JWT viene de una propiedad (`app.jwt.secret`, reemplazable con la variable `JWT_SECRET`). **La del código es solo para fines educativos.** |
@@ -302,7 +302,7 @@
 > > ```text
 > > HTTP/1.1 401
 > > Set-Cookie: JSESSIONID=4F2573FDFE55CB9308B9666FEFB26304; Path=/; HttpOnly
-> > WWW-Authenticate: Basic realm="Realm"
+> > WWW-Authenticate: Basic realm="Realm", charset="UTF-8"
 > > Content-Length: 0
 > > ```
 > >
@@ -1111,13 +1111,22 @@
 > > | 2 | `ana` → `GET /students/1` | `200` |
 > > | 3 | `ana` → `DELETE /students/3` | `403` · cuerpo vacío |
 > > | 4 | `admin` → `DELETE /students/3` | `204` |
-> > | 5 | token con la **última letra cambiada** → `GET /students/1` | `403` · cuerpo vacío |
+> > | 5 | token con **una letra de la carga cambiada** → `GET /students/1` | `403` · cuerpo vacío |
 > > | 6 | `Authorization: Bearer basura` → `GET /students/1` | `403` · cuerpo vacío |
 > > | 7 | **sin** token → `GET /students` | `403` · cuerpo vacío |
 > > | 8 | login con contraseña mala | **`500`** · `Ocurrió un error inesperado…` |
 > > | 9 | login con campos vacíos | `400` · `details` de `password` y `username` |
 > >
 > > > ✅ **Lo que funciona.** El token **manipulado** (fila 5) se rechaza: al cambiar un carácter la firma ya no coincide, y el servidor lo descubre **sin consultar nada**.
+> >
+> > Para fabricar el token alterado de la fila 5 se cambia la primera letra de la carga (la segunda parte, entre los dos puntos):
+> >
+> > ```bash
+> > TAMPERED=$(echo "$ADMIN" | sed -E 's/^([^.]*\.)./\1X/')
+> > curl -i -H "Authorization: Bearer $TAMPERED" localhost:8080/api/v1/students/1
+> > ```
+> >
+> > > ⚠️ **No conviene cambiar la última letra del token.** En Base64 esa letra lleva bits sin uso, y a veces el cambio **no se nota** (en una prueba, el token «alterado» siguió siendo válido). Cambiar una letra de la carga siempre rompe la firma.
 >
 > </details>
 >
@@ -1169,7 +1178,7 @@
 > > package com.academy.security;
 > >
 > > import com.academy.presentation.dto.ErrorResponse;
-> > import com.fasterxml.jackson.databind.ObjectMapper;
+> > import tools.jackson.databind.ObjectMapper;
 > > import jakarta.servlet.http.HttpServletRequest;
 > > import jakarta.servlet.http.HttpServletResponse;
 > > import org.springframework.http.HttpStatus;
@@ -1205,6 +1214,8 @@
 > > </details>
 > >
 > > > 💡 Usa el `ObjectMapper` de Spring Boot, así que el `timestamp` sale con el mismo formato que en el resto de la API.
+> > >
+> > > ⚠️ **Cambio de Spring Boot 4.** Ahora el `ObjectMapper` es el de **Jackson 3** y se importa de `tools.jackson.databind.ObjectMapper`. Con Spring Boot 3 era `com.fasterxml.jackson.databind.ObjectMapper`: si se deja ese `import`, la aplicación **no arranca** (`required a bean of type 'com.fasterxml.jackson.databind.ObjectMapper' that could not be found`). Las anotaciones (`@JsonInclude`…) siguen en `com.fasterxml.jackson.annotation`.
 >
 > </details>
 >
@@ -1735,7 +1746,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -1743,13 +1754,13 @@
 >     <version>0.0.1-SNAPSHOT</version>
 >
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
@@ -1766,7 +1777,7 @@
 >         <dependency>
 >             <groupId>org.springdoc</groupId>
 >             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
->             <version>2.6.0</version>
+>             <version>3.2.0</version>
 >         </dependency>
 >         <dependency>
 >             <groupId>io.jsonwebtoken</groupId>
@@ -1842,8 +1853,6 @@
 > springdoc.swagger-ui.persist-authorization=true
 > springdoc.default-produces-media-type=application/json
 > springdoc.default-consumes-media-type=application/json
-> # Conserva ErrorResponse: solo lo usan las respuestas reutilizables de components
-> springdoc.remove-broken-reference-definitions=false
 > ```
 >
 > </details>
@@ -2505,7 +2514,7 @@
 > package com.academy.security;
 >
 > import com.academy.presentation.dto.ErrorResponse;
-> import com.fasterxml.jackson.databind.ObjectMapper;
+> import tools.jackson.databind.ObjectMapper;
 > import jakarta.servlet.http.HttpServletRequest;
 > import jakarta.servlet.http.HttpServletResponse;
 > import org.springframework.http.HttpStatus;
@@ -2979,7 +2988,7 @@
 > import org.slf4j.Logger;
 > import org.slf4j.LoggerFactory;
 > import org.springframework.beans.TypeMismatchException;
-> import org.springframework.data.mapping.PropertyReferenceException;
+> import org.springframework.data.core.PropertyReferenceException;
 > import org.springframework.http.HttpHeaders;
 > import org.springframework.http.HttpStatus;
 > import org.springframework.http.HttpStatusCode;

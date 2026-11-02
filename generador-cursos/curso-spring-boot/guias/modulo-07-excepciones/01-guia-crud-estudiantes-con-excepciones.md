@@ -5,7 +5,7 @@
 >
 > 📦 **Proyecto terminado:** [`students-api-excepciones/`](codigo/students-api-excepciones/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3.5, springdoc-openapi 2.6.0, Java 17 y MySQL 8. Las respuestas HTTP, el contrato OpenAPI y el mensaje del registro (*log*) que se muestran son salidas reales de la aplicación.
+> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas HTTP, el contrato OpenAPI y el mensaje del registro (*log*) que se muestran son salidas reales de la aplicación.
 >
 > 🧭 **Idea central.** Un error de negocio («no existe», «ya existe») **no es un valor que se devuelve: es algo que ocurrió**. El servicio **lo lanza** como excepción, y **un solo lugar** decide qué código HTTP y qué cuerpo ve el cliente. El controlador deja de preguntar «¿salió bien?» y la capa de negocio deja de saber qué es HTTP.
 
@@ -106,7 +106,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 17 o superior, Spring Boot 3.3, Maven, MySQL 8 y springdoc 2.6.0 (los del Módulo 06). |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2, Maven, MySQL 8 y springdoc 3.2.0 (los del Módulo 06). |
 > | **RNF-02** | Las **excepciones propias** viven en `business.exception`, extienden `RuntimeException` y **no** importan nada de `org.springframework.web` ni `org.springframework.http`. |
 > | **RNF-03** | El **manejador global** y el DTO `ErrorResponse` viven en `presentation` (`exception` y `dto`). |
 > | **RNF-04** | **Todo** error de la API tiene el mismo cuerpo: `ErrorResponse`. |
@@ -173,7 +173,7 @@
 >     │   │       └── 🗑️ ServiceStatus.java
 >     │   └── 📁 persistence                        sin cambios
 >     └── 📁 resources
->         └── ✏️ application.properties             springdoc.remove-broken-reference-definitions
+>         └── 📄 application.properties             sin cambios
 > ```
 >
 > | Capa | Qué aporta a las excepciones |
@@ -567,7 +567,7 @@
 > > HTTP/1.1 404
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-01T23:55:43.737+00:00","status":404,"error":"Not Found","path":"/api/v1/students/999"}
+> > {"timestamp":"2026-11-01T23:55:43.737Z","status":404,"error":"Not Found","path":"/api/v1/students/999"}
 > > ```
 > >
 > > ```bash
@@ -579,7 +579,7 @@
 > > HTTP/1.1 409
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-01T23:55:43.862+00:00","status":409,"error":"Conflict","path":"/api/v1/students"}
+> > {"timestamp":"2026-11-01T23:55:43.862Z","status":409,"error":"Conflict","path":"/api/v1/students"}
 > > ```
 > >
 > > Y `POST /internal/seed` repetido devuelve `{"created":0}`: no falla aunque los tres ya existen.
@@ -724,7 +724,7 @@
 > > $ curl -i localhost:8080/api/v1/students/999
 > > HTTP/1.1 404
 > >
-> > {"timestamp":"2026-11-01T23:56:30.364+00:00","status":404,"error":"Not Found","path":"/api/v1/students/999"}
+> > {"timestamp":"2026-11-01T23:56:30.364Z","status":404,"error":"Not Found","path":"/api/v1/students/999"}
 > > ```
 > >
 > > **Sigue con el cuerpo genérico de Spring**: no tiene `message` y su formato es otro.
@@ -775,7 +775,7 @@
 > > import jakarta.servlet.http.HttpServletRequest;
 > > import org.slf4j.Logger;
 > > import org.slf4j.LoggerFactory;
-> > import org.springframework.data.mapping.PropertyReferenceException;
+> > import org.springframework.data.core.PropertyReferenceException;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.http.ResponseEntity;
 > > import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -858,6 +858,8 @@
 > > | `handleTypeMismatch` | `MethodArgumentTypeMismatchException` | `400` |
 > > | `handleUnknownSortProperty` | `PropertyReferenceException` | `400` |
 > > | `handleUnexpected` | `Exception` (todo lo demás) | `500` + *log* |
+> >
+> > > ⚠️ **Cambio de Spring Boot 4.** `PropertyReferenceException` ahora está en `org.springframework.data.core` (con Spring Boot 3 estaba en `org.springframework.data.mapping`). Con el `import` viejo, el proyecto **no compila**.
 > >
 > > > 🔎 **Cuál se elige.** Si una excepción encaja con varios manejadores, Spring usa **el más específico** (el de la clase más cercana). Por eso `Exception.class` solo atrapa lo que **nadie más** manejó.
 > >
@@ -1039,7 +1041,7 @@
 > > import org.slf4j.Logger;
 > > import org.slf4j.LoggerFactory;
 > > import org.springframework.beans.TypeMismatchException;
-> > import org.springframework.data.mapping.PropertyReferenceException;
+> > import org.springframework.data.core.PropertyReferenceException;
 > > import org.springframework.http.HttpHeaders;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.http.HttpStatusCode;
@@ -1297,24 +1299,15 @@
 > </details>
 >
 > <details>
-> <summary><strong>Paso 6.3 · Dos tropiezos reales (y su arreglo)</strong></summary>
+> <summary><strong>Paso 6.3 · Un tropiezo real (y su arreglo)</strong></summary>
 >
-> > Al armar esta documentación aparecieron **dos problemas**. Conviene mostrarlos.
+> > Al armar esta documentación apareció **un aviso** en el *log*. Conviene mostrarlo.
 > >
 > > | Síntoma | Causa | Arreglo |
 > > |---|---|---|
-> > | En `/api-docs`, la lista de esquemas **no incluye `ErrorResponse`** y en el *log* aparece `Java 8 date/time type java.time.OffsetDateTime not supported by default` | El `timestamp` es un `Instant`: Swagger lo modela como `date-time` y el ejemplo se vuelve `OffsetDateTime`, que su serializador no sabe escribir | Declarar el campo como texto: `@Schema(type = "string", example = "2026-11-01T10:15:30.123Z")` (ya está en `ErrorResponse`) |
-> > | Con eso arreglado, `ErrorResponse` **sigue sin aparecer** aunque las respuestas lo referencian | springdoc **quita los esquemas que no están referenciados desde las operaciones**, y aquí solo los referencian las respuestas de `components` | En `application.properties`: `springdoc.remove-broken-reference-definitions=false` |
+> > | En el *log* aparece `Json Processing Exception occurred: Java 8 date/time type java.time.OffsetDateTime not supported by default` al pedir `/api-docs` | El `timestamp` es un `Instant`: Swagger lo modela como `date-time` y su ejemplo se vuelve `OffsetDateTime`, que su serializador no sabe escribir | Declarar el campo como texto: `@Schema(type = "string", example = "2026-11-01T10:15:30.123Z")` (ya está en `ErrorResponse`) |
 > >
-> > <details>
-> > <summary><strong>📄 application.properties (agregar)</strong> <em>(solo el cambio)</em></summary>
-> >
-> > ```properties
-> > # Conserva ErrorResponse: solo lo usan las respuestas reutilizables de components
-> > springdoc.remove-broken-reference-definitions=false
-> > ```
-> >
-> > </details>
+> > > 💡 **Una versión menos de problemas.** Con springdoc **2.x** (Spring Boot 3) había un segundo tropiezo: el esquema `ErrorResponse` desaparecía del contrato porque solo lo usaban las respuestas de `components`, y hacía falta `springdoc.remove-broken-reference-definitions=false`. Con springdoc **3.2.0** (Spring Boot 4) ya **no** hace falta: `ErrorResponse` aparece solo.
 >
 > </details>
 >
@@ -1485,7 +1478,6 @@
 > | El *log* se llena de trazas por un `404` | El mismo caso anterior: se registra como error inesperado | Igual |
 > | El cliente ve la traza o el SQL | Se devolvió `ex.getMessage()` en el `500` | Mensaje genérico en el cliente y `log.error(..., ex)` |
 > | El `catch` del servicio se traga el error | Un `catch (Exception e)` que no relanza | Capturar solo lo que se sabe resolver, o relanzar |
-> | `ErrorResponse` no aparece en `/api-docs` | El esquema solo lo usan respuestas de `components` | `springdoc.remove-broken-reference-definitions=false` |
 > | `OffsetDateTime not supported by default` en el *log* | `timestamp` modelado como `date-time` | `@Schema(type = "string", …)` |
 > | `details` aparece vacío en el JSON | Falta `@JsonInclude(NON_EMPTY)` en el campo | Agregarlo |
 > | El mensaje de validación sale en inglés | Se usa el mensaje por defecto de Bean Validation | Escribir `message = "…"` en la anotación |
@@ -1566,7 +1558,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -1574,13 +1566,13 @@
 >     <version>0.0.1-SNAPSHOT</version>
 >
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
@@ -1593,7 +1585,7 @@
 >         <dependency>
 >             <groupId>org.springdoc</groupId>
 >             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
->             <version>2.6.0</version>
+>             <version>3.2.0</version>
 >         </dependency>
 >         <dependency>
 >             <groupId>com.mysql</groupId>
@@ -1646,8 +1638,6 @@
 > springdoc.swagger-ui.try-it-out-enabled=true
 > springdoc.default-produces-media-type=application/json
 > springdoc.default-consumes-media-type=application/json
-> # Conserva ErrorResponse: solo lo usan las respuestas reutilizables de components
-> springdoc.remove-broken-reference-definitions=false
 > ```
 >
 > </details>
@@ -2166,7 +2156,7 @@
 > import org.slf4j.Logger;
 > import org.slf4j.LoggerFactory;
 > import org.springframework.beans.TypeMismatchException;
-> import org.springframework.data.mapping.PropertyReferenceException;
+> import org.springframework.data.core.PropertyReferenceException;
 > import org.springframework.http.HttpHeaders;
 > import org.springframework.http.HttpStatus;
 > import org.springframework.http.HttpStatusCode;

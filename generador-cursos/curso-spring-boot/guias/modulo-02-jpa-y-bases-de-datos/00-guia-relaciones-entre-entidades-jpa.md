@@ -6,7 +6,7 @@
 
 ⏱️ **Tiempo:** unos 20 minutos de lectura y 25 de práctica. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](ejemplo-tienda/02-guia-tienda-2-uno-a-muchos.md).
 
-✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que se muestran son reales.
+✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que se muestran son reales. ⚠️ **Los requisitos de esta guía ya están en Java 21 y Spring Boot 4.1.2, pero este código no se volvió a ejecutar con esa versión** (los proyectos Maven de los módulos 03 a 08 sí).
 
 </div>
 
@@ -1616,7 +1616,7 @@
 
 > Se construye **desde cero** un proyecto Spring Boot con las cuatro entidades de esta guía **en un solo sentido**, sus repositorios y una clase `main` que **guarda** datos y los **consulta** en MySQL, con las tres relaciones a la vez. Al final se ven las tablas y se compara con lo que explican las secciones anteriores.
 >
-> **Se necesita:** JDK 17 o superior, Maven (o el `mvnw` que trae el proyecto), Docker (o un MySQL instalado) y un IDE. Tiempo: unos 25 minutos.
+> **Se necesita:** JDK 21 o superior, Maven (o el `mvnw` que trae el proyecto), Docker (o un MySQL instalado) y un IDE. Tiempo: unos 25 minutos.
 >
 > <details open>
 > <summary><strong>1️⃣ Paso 1 — Crear el proyecto</strong></summary>
@@ -1647,7 +1647,7 @@
 > > >
 > > > ```xml
 > > > <properties>
-> > >     <java.version>17</java.version>
+> > >     <java.version>21</java.version>
 > > >     <lombok.version>1.18.44</lombok.version>
 > > > </properties>
 > > > ```

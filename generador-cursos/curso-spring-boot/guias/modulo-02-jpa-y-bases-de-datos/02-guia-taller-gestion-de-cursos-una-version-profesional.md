@@ -3,7 +3,7 @@
 > 👩‍🏫 **Material docente.** Continúa la [guía 01](01-guia-taller-gestion-de-cursos-con-bd.md): se parte de su proyecto terminado y se separa **el modelo del negocio** de **la entidad de la base de datos**.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8. Las respuestas de la API, el fallo de seguridad de la Fase I y las pruebas unitarias que se muestran son salidas reales.
+> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8. Las respuestas de la API, el fallo de seguridad de la Fase I y las pruebas unitarias que se muestran son salidas reales. ⚠️ **Los requisitos de esta guía ya están en Java 21 y Spring Boot 4.1.2, pero este código no se volvió a ejecutar con esa versión** (los proyectos Maven de los módulos 03 a 08 sí).
 >
 > 🧭 **Idea central.** En la Fase I una sola clase (`StudentEntity`) es a la vez **tabla**, **regla de negocio** y **JSON**. En la Fase II cada trabajo tiene su clase: `Student` (negocio), `StudentEntity` (tabla) y `StudentMapper` (el puente).
 > **Cada paso explica qué se gana con ese cambio.**

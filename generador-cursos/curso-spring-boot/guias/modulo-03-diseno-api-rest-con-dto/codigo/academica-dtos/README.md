@@ -8,7 +8,7 @@ Colección de Postman: [`academica-dtos.postman_collection.json`](../postman/aca
 
 ## Requisitos
 
-- Java 17 o superior · Maven 3.9+ (o el wrapper `./mvnw`)
+- Java 21 o superior · Maven 3.9+ (o el wrapper `./mvnw`)
 - MySQL 8 con la base `academy`
 
 ```bash

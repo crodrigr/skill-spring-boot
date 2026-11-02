@@ -5,7 +5,7 @@
 >
 > 📦 **Proyecto terminado:** [`students-api/`](codigo/students-api/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3, springdoc-openapi 2.6.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
+> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
 >
 > 🧭 **Idea central.** El código **ya describe** la API (rutas, métodos, tipos, validaciones). Swagger solo le **agrega lo que el código no puede decir**: para qué sirve cada operación, qué ejemplos usar y qué respuestas esperar. Y como ahora hay DTO, esa documentación vive en el **contrato** (los DTO y el controlador), **no en la entidad**.
 
@@ -81,7 +81,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 17 o superior, Spring Boot 3.3 y Maven. |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. |
 > | **RNF-02** | MySQL 8 (en Docker o instalado); la base `academy` debe existir. |
 > | **RNF-03** | Las anotaciones de Swagger van **solo en `presentation`**: controladores, DTO y configuración. `business` y `persistence` **no saben** que existe Swagger. |
 > | **RNF-04** | Todos los nombres del código en **inglés**. Inyección por constructor. |
@@ -256,7 +256,7 @@
 > > <dependency>
 > >     <groupId>org.springdoc</groupId>
 > >     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-> >     <version>2.6.0</version>
+> >     <version>3.2.0</version>
 > > </dependency>
 > > ```
 > >
@@ -265,7 +265,7 @@
 > > > | Pieza | Qué trae |
 > > > |---|---|
 > > > | `springdoc-openapi-starter-webmvc-ui` | El generador del contrato **y** la interfaz de Swagger UI (para Spring MVC) |
-> > > | `2.6.0` | La línea 2.x es la de **Spring Boot 3**; la 1.x era para Boot 2 |
+> > > | `3.2.0` | La línea 3.x es la de **Spring Boot 4**; la 2.x era para Boot 3 y la 1.x para Boot 2 |
 > > >
 > > > Se reinicia la aplicación y se abren dos direcciones:
 > > >
@@ -303,13 +303,13 @@
 > > >   "properties": {
 > > >     "name":   { "type": "string", "minLength": 2, "maxLength": 100 },
 > > >     "age":    { "type": "integer", "format": "int32", "minimum": 16, "maximum": 99 },
-> > >     "email":  { "type": "string" },
+> > >     "email":  { "type": "string", "format": "email", "minLength": 1 },
 > > >     "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"] }
 > > >   }
 > > > }
 > > > ```
 > > >
-> > > - Las **validaciones** (`@NotBlank`, `@Size`, `@Min`, `@Max`, `@NotNull`) ya aparecen: springdoc las lee de Bean Validation.
+> > > - Las **validaciones** (`@NotBlank`, `@Email`, `@Size`, `@Min`, `@Max`, `@NotNull`) ya aparecen: springdoc las lee de Bean Validation. `@Email` llega como `format: email` y `@NotBlank` como `minLength: 1`.
 > > > - **No hay `id` ni `createdAt`**: el DTO de entrada no los tiene, así que el contrato nunca los pide.
 > > >
 > > > **🕳️ Lo que falta**
@@ -811,7 +811,7 @@
 > >   "properties": {
 > >     "name":   { "type": "string", "minLength": 2, "maxLength": 100, "description": "Nombre completo", "example": "Ana Torres" },
 > >     "age":    { "type": "integer", "format": "int32", "minimum": 16, "maximum": 99, "description": "Edad en años", "example": 22 },
-> >     "email":  { "type": "string", "description": "Correo electrónico, único entre estudiantes", "example": "ana@mail.com" },
+> >     "email":  { "type": "string", "format": "email", "minLength": 1, "description": "Correo electrónico, único entre estudiantes", "example": "ana@mail.com" },
 > >     "status": { "type": "string", "enum": ["ACTIVE", "INACTIVE"], "description": "Estado académico", "example": "ACTIVE" }
 > >   }
 > > }
@@ -823,12 +823,13 @@
 > > | `@Size(min = 2, max = 100)` | `minLength` y `maxLength` |
 > > | `@Min(16)` · `@Max(99)` | `minimum` y `maximum` |
 > > | `enum StudentStatus` | `enum: ["ACTIVE","INACTIVE"]`: en Swagger UI, un **desplegable** |
-> > | `@Email` | **No** aparece como `format` en esta versión: la validación funciona en el servidor, pero el contrato no lo dice |
+> > | `@Email` | `format: email` (springdoc 3.x lo traduce solo; con springdoc 2.x no aparecía) |
+> > | `@NotBlank` | Además de `required`, `minLength: 1` |
 > > | `int age` (tipo primitivo) | **No** entra en `required`, aunque siempre tiene valor |
 > >
 > > > 💡 **Beneficio de este paso:** **una sola fuente de verdad**. La regla se escribe una vez (en la validación) y sirve para **rechazar** datos y para **documentar**. El contrato no puede contradecir al código.
 > > >
-> > > ⚠️ **Lectura crítica.** No todo pasa: `@Email` no llega al contrato y un `int` no se marca obligatorio. Si importa que el cliente lo sepa, se agrega a mano con `@Schema(format = "email")` o `@Schema(requiredMode = REQUIRED)`.
+> > > ⚠️ **Lectura crítica.** Aun así, no todo pasa: un `int` (tipo primitivo) no se marca obligatorio, y el tope de 50 por página (`spring.data.web.pageable.max-page-size`) tampoco llega al contrato. Si importa que el cliente lo sepa, se agrega a mano con `@Schema(requiredMode = REQUIRED)` o se dice en la descripción.
 >
 > </details>
 >
@@ -1315,7 +1316,7 @@
 > > **Resultado real** (inicio del YAML):
 > >
 > > ```text
-> > openapi: 3.0.1
+> > openapi: 3.1.0
 > > info:
 > >   title: Academy API
 > >   description: "CRUD de estudiantes con DTO, Spring Boot, JPA y MySQL, documentado\
@@ -1609,7 +1610,7 @@
 > 1. ¿Qué diferencia hay entre OpenAPI, Swagger UI y springdoc? *(El contrato, la pantalla y la librería que genera el primero y sirve la segunda.)*
 > 2. ¿Por qué `@Schema` va en los DTO y no en la entidad? *(La entidad es la tabla; el DTO es el contrato. Documentar el contrato en el DTO deja la entidad libre y evita que renombrar una columna cambie la API.)*
 > 3. ¿Qué parte de la documentación es automática y qué parte hay que escribir? *(Rutas, tipos, validaciones, enumerados y nombres de modelos son automáticos; descripciones, ejemplos y significados de los códigos los escribe una persona.)*
-> 4. ¿Qué pasa con `@Email` y con el tope de 50 por página? ¿Qué se aprende de eso? *(Ninguno llega al contrato; conviene **leer** el resultado y no suponer que todo pasa.)*
+> 4. ¿Qué pasa con `@Email` y con el tope de 50 por página? ¿Qué se aprende de eso? *(`@Email` sí llega al contrato (`format: email`); el tope de 50 no. Conviene **leer** el resultado y no suponer ni que todo pasa ni que nada pasa.)*
 > 5. ¿`@Hidden` protege una ruta? *(No: solo la quita de la documentación.)*
 > 6. ¿Qué hace realmente el botón *Authorize* aquí? *(Guarda un token y lo envía; como no hay Spring Security, nadie lo valida.)*
 > 7. ¿Por qué se apaga Swagger en producción? *(Revela la API completa; se desactiva con propiedades y un perfil.)*
@@ -1639,7 +1640,7 @@
 <details>
 <summary><strong>🚀 Retos finales (para quien termine antes)</strong></summary>
 
-> 1. **`@Email` en el contrato.** Agregar `format = "email"` al `@Schema` de `email` y comprobar que aparece en `/api-docs`.
+> 1. **Leer el contrato.** Abrir `/api-docs/students`, ubicar `StudentRequest` y anotar qué reglas de validación llegaron (`required`, `minLength`, `format`…) y cuáles no.
 > 2. **`age` obligatorio.** Agregar `requiredMode = REQUIRED` al `@Schema` de `age` y comprobar que entra en `required`.
 > 3. **Caso de error con ejemplo.** Agregar un tercer `@ExampleObject` con nombre vacío para provocar el `400` desde Swagger UI.
 > 4. **El tope de 50 en el contrato.** Buscar cómo declarar el máximo de `size` y comprobar que aparece en `/api-docs`.
@@ -1706,7 +1707,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -1714,13 +1715,13 @@
 >     <version>0.0.1-SNAPSHOT</version>
 >
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
@@ -1733,7 +1734,7 @@
 >         <dependency>
 >             <groupId>org.springdoc</groupId>
 >             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
->             <version>2.6.0</version>
+>             <version>3.2.0</version>
 >         </dependency>
 >         <dependency>
 >             <groupId>com.mysql</groupId>

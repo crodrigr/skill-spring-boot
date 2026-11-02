@@ -4,7 +4,7 @@
 > Aplica lo visto en el [Módulo 03](../../03-introduccion-a-jpa/) y el [Módulo 04](../../04-gestion-de-bases-de-datos-mediante-jpa/).
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
-> ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8: las tablas, las consultas derivadas y la persistencia entre reinicios que se muestran son salidas reales.
+> ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8: las tablas, las consultas derivadas y la persistencia entre reinicios que se muestran son salidas reales. ⚠️ **Los requisitos de esta guía ya están en Java 21 y Spring Boot 4.1.2, pero este código no se volvió a ejecutar con esa versión** (los proyectos Maven de los módulos 03 a 08 sí).
 >
 > 🧭 **Idea central.** Cada capa tiene una sola responsabilidad: `persistence` guarda (**entidades** y **repositorios de Spring Data**), `business` decide (**servicios** con las reglas) y `presentation` atiende HTTP (**controladores**).
 > El modelo del negocio (DTO) y los mapeadores **no se trabajan aquí**: se resuelven en otra guía.
@@ -49,7 +49,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 17 o superior, Spring Boot 3 y Maven. |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4 y Maven. |
 > | **RNF-02** | Persistencia con **Spring Data JPA** y **MySQL 8** (en Docker o instalado). La base `academy` debe existir antes de arrancar. |
 > | **RNF-03** | Tres capas: `presentation` → `business` → `persistence`. Las anotaciones de JPA van **solo** en `persistence.entity`; las de Spring Web, **solo** en `presentation.controller`. |
 > | **RNF-04** | Inyección por constructor. Todos los nombres del código (paquetes, clases, atributos, tablas) en **inglés**. |
@@ -175,7 +175,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · Crear el proyecto con las dependencias</strong></summary>
 >
-> > Se crea un proyecto nuevo en [start.spring.io](https://start.spring.io): **Maven · Java 17 o superior · Group** `com.academy` · **Artifact** `academy` ·
+> > Se crea un proyecto nuevo en [start.spring.io](https://start.spring.io): **Maven · Java 21 o superior · Group** `com.academy` · **Artifact** `academy` ·
 > > dependencias **Spring Web**, **Spring Data JPA**, **MySQL Driver** y **Spring Boot DevTools**.
 > >
 > > En el `pom.xml` quedan estas cuatro dependencias:
@@ -183,7 +183,7 @@
 > > ```xml
 > > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
-> >     <artifactId>spring-boot-starter-web</artifactId>
+> >     <artifactId>spring-boot-starter-webmvc</artifactId>
 > > </dependency>
 > > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
@@ -204,7 +204,7 @@
 > >
 > > > 🔎 **Concepto (M3 y M4):**
 > > >
-> > > - `spring-boot-starter-web` trae Spring MVC y un **Tomcat embebido**: es la base para los controladores REST de `presentation.controller`. En esta guía todavía no hay ninguno.
+> > > - `spring-boot-starter-webmvc` trae Spring MVC y un **Tomcat embebido**: es la base para los controladores REST de `presentation.controller`. En esta guía todavía no hay ninguno.
 > > > - `spring-boot-starter-data-jpa` trae JPA, **Hibernate** y Spring Data.
 > > > - `mysql-connector-j` es el **driver** de MySQL; `runtime` indica que solo hace falta al ejecutar.
 > > > - `spring-boot-devtools` **reinicia la aplicación** al recompilar (en el IDE, *Build Project*). Solo se usa en desarrollo.
@@ -266,7 +266,7 @@
 > > | `spring.jpa.hibernate.ddl-auto=update` | Hibernate **crea o actualiza las tablas** al arrancar, sin borrar datos ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
 > > | `spring.jpa.show-sql=true` | Imprime en la consola **el SQL** que ejecuta Hibernate: sirve para ver el ORM trabajando. |
 > >
-> > > 💡 **Diferencia con el Módulo 3.** Allí se declaraba `spring.jpa.database-platform=…` con el dialecto. Con Hibernate 6 (Spring Boot 3)
+> > > 💡 **Diferencia con el Módulo 3.** Allí se declaraba `spring.jpa.database-platform=…` con el dialecto. Con Hibernate 7 (Spring Boot 4)
 > > > el dialecto se **detecta solo** a partir de la conexión (aquí, MySQL), así que se omite; dejarlo no rompe nada, pero produce un aviso en el arranque.
 >
 > </details>
@@ -1279,7 +1279,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -1288,12 +1288,12 @@
 >     <name>academy</name>
 >     <description>Taller de gestión de cursos con base de datos</description>
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>

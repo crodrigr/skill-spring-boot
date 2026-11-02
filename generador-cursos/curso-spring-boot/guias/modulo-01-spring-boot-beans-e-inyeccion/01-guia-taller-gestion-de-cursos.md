@@ -124,7 +124,7 @@
 > >
 > > | Código | Requerimiento |
 > > |---|---|
-> > | **RNF-01** | Tecnologías: Java 21 o superior, Spring Boot 3 y Maven. |
+> > | **RNF-01** | Tecnologías: Java 21 o superior, Spring Boot 4 y Maven. |
 > > | **RNF-02** | **Sin base de datos ni JPA**: los datos viven en listas en memoria y se pierden al reiniciar. |
 > > | **RNF-03** | Organización en **tres capas** (presentación, negocio y persistencia), con la regla de dependencia presentación → negocio → persistencia. |
 > > | **RNF-04** | Las dependencias se resuelven con **inyección por constructor** y los repositorios se usan a través de **interfaces**. |
@@ -287,7 +287,7 @@
 > > ```xml
 > > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
-> >     <artifactId>spring-boot-starter-web</artifactId>
+> >     <artifactId>spring-boot-starter-webmvc</artifactId>
 > > </dependency>
 > > ```
 > >
@@ -1711,7 +1711,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academia</groupId>
@@ -1725,7 +1725,7 @@
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >     </dependencies>
 >     <build>

@@ -1,6 +1,6 @@
 # academica-swagger
 
-Taller de gestión de cursos (estudiantes, cursos y matrículas) con **DTO** y documentado con **Swagger** (springdoc-openapi 2.6.0).
+Taller de gestión de cursos (estudiantes, cursos y matrículas) con **DTO** y documentado con **Swagger** (springdoc-openapi 3.2.0).
 Parte del proyecto [`academica-dtos`](../../../modulo-03-diseno-api-rest-con-dto/codigo/academica-dtos/) del Módulo 05 y le agrega la documentación.
 Guía: [`02-academica-swagger.md`](../../02-academica-swagger.md) · Código completo: [`03-academica-swagger-codigo-completo.md`](../../03-academica-swagger-codigo-completo.md).
 
@@ -8,7 +8,7 @@ Colección de Postman: [`academica-swagger.postman_collection.json`](../postman/
 
 ## Requisitos
 
-- Java 17 o superior · Maven 3.9+ (o el wrapper `./mvnw`)
+- Java 21 o superior · Maven 3.9+ (o el wrapper `./mvnw`)
 - MySQL 8 con la base `academy`
 
 ```bash

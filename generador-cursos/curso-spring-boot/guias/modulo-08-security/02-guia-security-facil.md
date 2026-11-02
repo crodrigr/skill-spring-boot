@@ -7,7 +7,7 @@
 >
 > 🧾 **Todo el código final, listo para copiar:** [`03-security-facil-codigo-completo.md`](03-security-facil-codigo-completo.md).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3.5, Java 17 y MySQL 8. Las respuestas que se muestran son reales; lo que se cuenta de la pantalla de Swagger UI (Paso 7) se deduce del contrato.
+> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2 y MySQL 8. Las respuestas que se muestran son reales; lo que se cuenta de la pantalla de Swagger UI (Paso 7) se deduce del contrato.
 
 <details>
 <summary><strong>🎯 Qué se va a lograr</strong></summary>
@@ -311,7 +311,7 @@
 >
 > ```text
 > HTTP/1.1 401
-> WWW-Authenticate: Basic realm="Realm"
+> WWW-Authenticate: Basic realm="Realm", charset="UTF-8"
 > ```
 >
 > ✅ **Listo si** responde `401`. Con **solo agregar la librería**, Spring Security ya **cierra todas las puertas**. Hasta Swagger y `/internal/health` quedan cerradas. Ahora hay que decirle quién puede entrar.
@@ -890,7 +890,8 @@
 > curl -i -H "Authorization: Bearer $ANA"   -X DELETE localhost:8080/api/v1/students/3  # ana borra
 > curl -i -H "Authorization: Bearer $ADMIN" -X POST localhost:8080/internal/seed        # admin
 > curl -i localhost:8080/api/v1/students                                                # sin token
-> curl -i -H "Authorization: Bearer ${ADMIN%?}X" localhost:8080/api/v1/students          # token con 1 letra cambiada
+> TAMPERED=$(echo "$ADMIN" | sed -E 's/^([^.]*\.)./\1X/')                              # cambia 1 letra de la carga
+> curl -i -H "Authorization: Bearer $TAMPERED" localhost:8080/api/v1/students           # token alterado
 > ```
 >
 > | # | Quién | Pide | Respuesta |
@@ -931,7 +932,7 @@
 > package com.academy.security;
 >
 > import com.academy.presentation.dto.ErrorResponse;
-> import com.fasterxml.jackson.databind.ObjectMapper;
+> import tools.jackson.databind.ObjectMapper;
 > import jakarta.servlet.http.HttpServletRequest;
 > import jakarta.servlet.http.HttpServletResponse;
 > import org.springframework.http.HttpStatus;
@@ -988,6 +989,8 @@
 > | `commence` | **No** hay token, o no sirve (falso, alterado, vencido) | `401` |
 > | `handle` | Hay token bueno, pero el **rol no alcanza** | `403` |
 >
+> > ⚠️ **Cambio de Spring Boot 4.** El `ObjectMapper` ahora es el de **Jackson 3** y se importa de `tools.jackson.databind.ObjectMapper` (con Spring Boot 3 era `com.fasterxml.jackson.databind.ObjectMapper`). Con el `import` viejo la aplicación **no arranca**.
+>
 > <details>
 > <summary><strong>📄 SecurityConfig.java (agregar al final de la cadena)</strong></summary>
 >
@@ -1032,7 +1035,7 @@
 > HTTP/1.1 401
 > {"timestamp":"2026-11-02T01:46:42.054Z","status":401,"error":"Unauthorized","message":"Falta el token o no es válido (puede haber vencido)","path":"/api/v1/students"}
 >
-> $ curl -i -H "Authorization: Bearer ${ADMIN%?}X" localhost:8080/api/v1/students   # token alterado
+> $ curl -i -H "Authorization: Bearer $TAMPERED" localhost:8080/api/v1/students   # token alterado
 > HTTP/1.1 401
 > {"timestamp":"2026-11-02T01:46:42.418Z","status":401,"error":"Unauthorized","message":"Falta el token o no es válido (puede haber vencido)","path":"/api/v1/students"}
 >
@@ -1226,7 +1229,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -1234,13 +1237,13 @@
 >     <version>0.0.1-SNAPSHOT</version>
 >
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
@@ -1274,7 +1277,7 @@
 >         <dependency>
 >             <groupId>org.springdoc</groupId>
 >             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
->             <version>2.6.0</version>
+>             <version>3.2.0</version>
 >         </dependency>
 >         <dependency>
 >             <groupId>com.mysql</groupId>
@@ -1332,8 +1335,6 @@
 > springdoc.swagger-ui.try-it-out-enabled=true
 > springdoc.default-produces-media-type=application/json
 > springdoc.default-consumes-media-type=application/json
-> # Conserva ErrorResponse: solo lo usan las respuestas reutilizables de components
-> springdoc.remove-broken-reference-definitions=false
 > ```
 >
 > </details>
@@ -1963,7 +1964,7 @@
 > package com.academy.security;
 >
 > import com.academy.presentation.dto.ErrorResponse;
-> import com.fasterxml.jackson.databind.ObjectMapper;
+> import tools.jackson.databind.ObjectMapper;
 > import jakarta.servlet.http.HttpServletRequest;
 > import jakarta.servlet.http.HttpServletResponse;
 > import org.springframework.http.HttpStatus;
@@ -2338,7 +2339,7 @@
 > import org.slf4j.Logger;
 > import org.slf4j.LoggerFactory;
 > import org.springframework.beans.TypeMismatchException;
-> import org.springframework.data.mapping.PropertyReferenceException;
+> import org.springframework.data.core.PropertyReferenceException;
 > import org.springframework.http.HttpHeaders;
 > import org.springframework.http.HttpStatus;
 > import org.springframework.http.HttpStatusCode;

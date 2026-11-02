@@ -108,7 +108,7 @@ Antes de programar, entregá un documento de análisis con:
 
 | Código | Categoría | Requisito |
 |---|---|---|
-| **RNF-01** | Tecnología | Java 17, Spring Boot 3.x, Maven, Spring Data JPA y H2 en memoria. Debe ejecutarse solo con `mvn spring-boot:run`, sin instalar nada más. |
+| **RNF-01** | Tecnología | Java 21, Spring Boot 4.x, Maven, Spring Data JPA y H2 en memoria. Debe ejecutarse solo con `mvn spring-boot:run`, sin instalar nada más. |
 | **RNF-02** | Arquitectura | Arquitectura por capas (presentación, negocio y persistencia), con los paquetes `presentacion` (`controlador`, `dto`, `excepcion`), `negocio` (`model`, `service`, `excepcion`) y `persistence` (`repository`). `config` y `jwt` son paquetes transversales. Los datos de entrada llegan como DTO (no como entidades); el controlador solo depende del servicio, y el servicio solo del repositorio. |
 | **RNF-03** | Diseño | Toda la lógica de negocio vive en `negocio`. La inyección de dependencias es por constructor. El cálculo de costos es un bean propio (`@Component`) inyectado en el servicio de reservas. |
 | **RNF-04** | Consistencia | Las operaciones que escriben más de una entidad (crear o cancelar una reserva) son transaccionales. Una falla no deja datos a medias. |

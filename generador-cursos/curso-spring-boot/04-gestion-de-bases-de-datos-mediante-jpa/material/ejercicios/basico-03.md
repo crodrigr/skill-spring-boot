@@ -11,7 +11,7 @@ anteriores del curso.
 Ninguno: este ejercicio empieza sin ningún proyecto previo.
 
 1. Creá un proyecto Spring Boot nuevo con Spring Initializr (Maven, Java
-   17, Spring Boot 3.x), agregando las dependencias `Spring Data JPA` y
+   21, Spring Boot 4.x), agregando las dependencias `Spring Data JPA` y
    `H2 Database`.
 2. Configurá `application.properties` para conectar el proyecto a una base
    de datos H2 en memoria llamada `biblioteca`, con

@@ -41,7 +41,7 @@ Al ejecutar `Main.java` del Ejemplo 01 con la configuración de arriba:
   '  |____| .__|_| |_|_| |_\__, | / / / /
  =========|_|==============|___/=/_/_/_/
 
-INFO --- [           main] c.m.gestionbdjpa.Main    : Starting Main using Java 17
+INFO --- [           main] c.m.gestionbdjpa.Main    : Starting Main using Java 21
 INFO --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories
 INFO --- [           main] o.hibernate.jpa.internal.util.LogHelper : HHH000204: Processing PersistenceUnitInfo
 INFO --- [           main] org.hibernate.Version                   : HHH000412: Hibernate ORM core version 6.x
@@ -79,7 +79,7 @@ Al ejecutar `Main.java` con esta versión (nótese `h2:memm` en vez de
 `h2:mem`):
 
 ```text
-INFO --- [           main] c.m.gestionbdjpa.Main    : Starting Main using Java 17
+INFO --- [           main] c.m.gestionbdjpa.Main    : Starting Main using Java 21
 INFO --- [           main] com.zaxxer.hikari.HikariDataSource      : HikariPool-1 - Starting...
 ERROR --- [           main] com.zaxxer.hikari.pool.HikariPool      : HikariPool-1 - Exception during pool initialization.
 org.h2.jdbc.JdbcSQLNonTransientConnectionException: Unknown URL format "jdbc:h2:memm:medisalud"

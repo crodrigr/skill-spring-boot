@@ -6,7 +6,7 @@
 <details open>
 <summary><strong>📦 Dependencias</strong></summary>
 
-> El proyecto se crea en [start.spring.io](https://start.spring.io) con **Maven · Java 21 · Spring Boot 3.x · Group `com.tienda` · Artifact `tienda`** y estas **cuatro** dependencias:
+> El proyecto se crea en [start.spring.io](https://start.spring.io) con **Maven · Java 21 · Spring Boot 4.x · Group `com.tienda` · Artifact `tienda`** y estas **cuatro** dependencias:
 >
 > | Dependencia | Para qué sirve en esta guía |
 > |---|---|

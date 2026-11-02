@@ -36,8 +36,8 @@ repositorios directamente porque todavía no existe `negocio/service` (junto con
 ## 🪜 Pasos
 
 1. **Crear el proyecto Spring Boot**: generá un proyecto nuevo con
-   [start.spring.io](https://start.spring.io) (Maven, Java 17, Spring Boot
-   3.x, Group `com.medisalud`, Artifact `taller-facturacion`), con las
+   [start.spring.io](https://start.spring.io) (Maven, Java 21, Spring Boot
+   4.x, Group `com.medisalud`, Artifact `taller-facturacion`), con las
    dependencias **Spring Data JPA** y **H2 Database**, igual que en el
    Ejemplo 01.
 2. **Definir la estructura de paquetes**: descomprimí el proyecto y

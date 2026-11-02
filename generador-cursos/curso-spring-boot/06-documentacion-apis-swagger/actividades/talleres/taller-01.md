@@ -16,7 +16,7 @@ y la configuración de springdoc-openapi.
 ## 🪜 Pasos
 
 1. **Agregar la dependencia**: agregá
-   `springdoc-openapi-starter-webmvc-ui` (versión `2.6.0`) al `pom.xml`
+   `springdoc-openapi-starter-webmvc-ui` (versión `3.2.0`) al `pom.xml`
    del proyecto de `ControladorPacientes`, siguiendo el mismo patrón del
    Ejemplo 04.
 2. **Configurar `application.properties`**: agregá
@@ -43,7 +43,7 @@ uses el mismo estilo en el resto del entregable:
 <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version>2.6.0</version>
+    <version>3.2.0</version>
 </dependency>
 ```
 

@@ -392,12 +392,12 @@ aplica una política de cancelación y protege la API con JWT y roles.
 
 ## Tecnologías
 
-Java 17 · Spring Boot 3.3 · Spring Data JPA · H2 (por defecto), MySQL o PostgreSQL ·
+Java 21 · Spring Boot 4.1 · Spring Data JPA · H2 (por defecto), MySQL o PostgreSQL ·
 Spring Security + JWT · springdoc-openapi (Swagger UI) · Maven
 
 ## Cómo ejecutarlo
 
-Requisitos: JDK 17 o superior y Maven 3.6.3 o superior.
+Requisitos: JDK 21 o superior y Maven 3.6.3 o superior.
 
 ```bash
 mvn spring-boot:run

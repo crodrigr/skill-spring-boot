@@ -2,7 +2,7 @@
 
 > 🧾 **Solo el código.** Versión final de la [guía fácil `02-guia-security-facil`](02-guia-security-facil.md), con el árbol (🆕 nuevo · ✏️ cambia · 📄 sin cambios) y el código completo sin explicaciones, seguido de las pruebas. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
-> 📦 **Código fuente:** [`students-api-security-facil/`](codigo/students-api-security-facil/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado y ejecutado con Spring Boot 3.3.5, JJWT 0.12.6, Java 17 y MySQL 8.
+> 📦 **Código fuente:** [`students-api-security-facil/`](codigo/students-api-security-facil/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2, JJWT 0.12.6 y MySQL 8.
 >
 > ⚠️ **Solo para fines educativos.** La clave del token y las contraseñas de `admin` y `ana` están escritas en el código para poder practicar. En un proyecto real **no** se hace.
 
@@ -81,7 +81,7 @@
 >     <parent>
 >         <groupId>org.springframework.boot</groupId>
 >         <artifactId>spring-boot-starter-parent</artifactId>
->         <version>3.3.5</version>
+>         <version>4.1.2</version>
 >         <relativePath/>
 >     </parent>
 >     <groupId>com.academy</groupId>
@@ -89,13 +89,13 @@
 >     <version>0.0.1-SNAPSHOT</version>
 >
 >     <properties>
->         <java.version>17</java.version>
+>         <java.version>21</java.version>
 >     </properties>
 >
 >     <dependencies>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
->             <artifactId>spring-boot-starter-web</artifactId>
+>             <artifactId>spring-boot-starter-webmvc</artifactId>
 >         </dependency>
 >         <dependency>
 >             <groupId>org.springframework.boot</groupId>
@@ -129,7 +129,7 @@
 >         <dependency>
 >             <groupId>org.springdoc</groupId>
 >             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
->             <version>2.6.0</version>
+>             <version>3.2.0</version>
 >         </dependency>
 >         <dependency>
 >             <groupId>com.mysql</groupId>
@@ -187,8 +187,6 @@
 > springdoc.swagger-ui.try-it-out-enabled=true
 > springdoc.default-produces-media-type=application/json
 > springdoc.default-consumes-media-type=application/json
-> # Conserva ErrorResponse: solo lo usan las respuestas reutilizables de components
-> springdoc.remove-broken-reference-definitions=false
 > ```
 >
 > </details>
@@ -818,7 +816,7 @@
 > package com.academy.security;
 >
 > import com.academy.presentation.dto.ErrorResponse;
-> import com.fasterxml.jackson.databind.ObjectMapper;
+> import tools.jackson.databind.ObjectMapper;
 > import jakarta.servlet.http.HttpServletRequest;
 > import jakarta.servlet.http.HttpServletResponse;
 > import org.springframework.http.HttpStatus;
@@ -1193,7 +1191,7 @@
 > import org.slf4j.Logger;
 > import org.slf4j.LoggerFactory;
 > import org.springframework.beans.TypeMismatchException;
-> import org.springframework.data.mapping.PropertyReferenceException;
+> import org.springframework.data.core.PropertyReferenceException;
 > import org.springframework.http.HttpHeaders;
 > import org.springframework.http.HttpStatus;
 > import org.springframework.http.HttpStatusCode;
@@ -1758,12 +1756,13 @@
 >   -d '{"username":"admin","password":"admin123"}' | python3 -c "import sys,json;print(json.load(sys.stdin)['token'])")
 > ANA=$(curl -s -X POST localhost:8080/api/v1/auth/login -H 'Content-Type: application/json' \
 >   -d '{"username":"ana","password":"ana123"}' | python3 -c "import sys,json;print(json.load(sys.stdin)['token'])")
+> TAMPERED=$(echo "$ADMIN" | sed -E 's/^([^.]*\.)./\1X/')   # token con una letra de la carga cambiada
 > ```
 >
 > | # | Petición | Respuesta |
 > |:-:|---|---|
 > | 1 | `curl -i localhost:8080/api/v1/students` (sin token) | `401` · `Falta el token o no es válido (puede haber vencido)` |
-> | 2 | `curl -i -H "Authorization: Bearer ${ADMIN%?}X" localhost:8080/api/v1/students` (token alterado) | `401` |
+> | 2 | `curl -i -H "Authorization: Bearer $TAMPERED" localhost:8080/api/v1/students` (token alterado) | `401` |
 > | 3 | `curl -i -H "Authorization: Bearer $ANA" localhost:8080/api/v1/students` | `200` |
 > | 4 | `curl -i -H "Authorization: Bearer $ANA" -X POST localhost:8080/internal/seed` | `403` · `No tiene permisos para realizar esta operación` |
 > | 5 | `curl -i -H "Authorization: Bearer $ADMIN" -X POST localhost:8080/internal/seed` | `200` · `{"created":3}` |

@@ -8,7 +8,7 @@ arranca y no sé por qué".
 ## 💻 Código o contexto de partida
 
 ```text
-INFO --- [           main] c.b.gestionbdjpa.Main    : Starting Main using Java 17
+INFO --- [           main] c.b.gestionbdjpa.Main    : Starting Main using Java 21
 INFO --- [           main] com.zaxxer.hikari.HikariDataSource      : HikariPool-1 - Starting...
 ERROR --- [           main] com.zaxxer.hikari.pool.HikariPool      : HikariPool-1 - Exception during pool initialization.
 org.h2.jdbc.JdbcSQLNonTransientConnectionException: Unknown URL format "jdbc:h3:mem:biblioteca"

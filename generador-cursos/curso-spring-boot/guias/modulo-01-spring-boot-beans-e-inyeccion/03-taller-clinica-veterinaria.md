@@ -160,7 +160,7 @@
 
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Tecnologías: Java 21 o superior, Spring Boot 3 y Maven (se ejecuta con `./mvnw`). |
+> | **RNF-01** | Tecnologías: Java 21 o superior, Spring Boot 4 y Maven (se ejecuta con `./mvnw`). |
 > | **RNF-02** | **Sin base de datos ni JPA**: los datos viven en listas en memoria y se pierden al reiniciar. |
 > | **RNF-03** | Organización en **tres capas** (presentación, negocio y persistencia), con la regla de dependencia presentación → negocio → persistencia. |
 > | **RNF-04** | Las dependencias se resuelven con **inyección por constructor**; los repositorios se usan a través de **interfaces** y las implementaciones en memoria llevan el sufijo `EnMemoria`. |

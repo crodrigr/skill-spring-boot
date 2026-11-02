@@ -5,7 +5,7 @@
 >
 > 📦 **Proyecto terminado:** [`academica-swagger/`](codigo/academica-swagger/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-swagger-codigo-completo.md`](03-academica-swagger-codigo-completo.md).
 >
-> ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3, springdoc-openapi 2.6.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
+> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
 >
 > 🧭 **Idea central.** Con tres recursos, Swagger aporta algo que con uno no se nota: **ordena** una API de varios controladores (etiquetas, nombres de operación únicos, grupos). Y como hay DTO, la documentación de los modelos va en ellos, **no en las entidades**.
 
@@ -33,7 +33,7 @@
 >
 > | Pieza | Igual que en la [guía 01 del módulo 06](01-guia-crud-estudiantes-con-swagger.md) |
 > |---|---|
-> | Dependencia | `springdoc-openapi-starter-webmvc-ui` 2.6.0 |
+> | Dependencia | `springdoc-openapi-starter-webmvc-ui` 3.2.0 |
 > | Anotaciones | `@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`, `@ParameterObject`, `@Hidden`, `@SecurityRequirement` |
 > | `@Schema` | Va en los **DTO**; las entidades no se tocan |
 > | Configuración | Bean `OpenAPI`, `GroupedOpenApi` y propiedades `springdoc.*` |
@@ -76,7 +76,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 17 o superior, Spring Boot 3.3 y Maven. |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. |
 > | **RNF-02** | MySQL 8 (en Docker o instalado); la base `academy` debe existir. |
 > | **RNF-03** | Las anotaciones de Swagger van **solo en `presentation`**: controladores, DTO y configuración. `business` y `persistence` **no saben** que existe Swagger. |
 > | **RNF-04** | Nombres del código en **inglés**. Inyección por constructor. |
@@ -206,7 +206,7 @@
 > > <dependency>
 > >     <groupId>org.springdoc</groupId>
 > >     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-> >     <version>2.6.0</version>
+> >     <version>3.2.0</version>
 > > </dependency>
 > > ```
 > >
@@ -863,7 +863,7 @@
 > >   "required": ["name"],
 > >   "properties": {
 > >     "name":        { "type": "string", "minLength": 2, "maxLength": 100, "description": "Nombre del curso", "example": "Java desde cero" },
-> >     "price":       { "type": "number", "format": "double", "description": "Precio en pesos; debe ser mayor que cero", "example": 150000 },
+> >     "price":       { "type": "number", "format": "double", "exclusiveMinimum": 0, "description": "Precio en pesos; debe ser mayor que cero", "example": 150000 },
 > >     "maxCapacity": { "type": "integer", "format": "int32", "minimum": 1, "description": "Cupo máximo de matriculados; al menos 1", "example": 30 }
 > >   }
 > > }
@@ -874,13 +874,13 @@
 > > | `@NotBlank` | `name` en `required` |
 > > | `@Size(min = 2, max = 100)` | `minLength` y `maxLength` |
 > > | `@Min(1)` | `minimum: 1` |
-> > | `@Positive` en `price` | **No aparece**: el contrato no dice que debe ser mayor que cero (solo lo dice la descripción que se escribió) |
+> > | `@Positive` en `price` | `exclusiveMinimum: 0` (springdoc 3.x lo traduce solo; con springdoc 2.x no aparecía y solo lo decía la descripción) |
 > > | `double price` e `int maxCapacity` (primitivos) | **No** entran en `required`, aunque siempre tienen valor |
-> > | `@Email` (en `StudentRequest`) | **No** aparece como `format` |
+> > | `@Email` (en `StudentRequest`) | `format: email`, y `@NotBlank` agrega `minLength: 1` |
 > >
 > > > 💡 **Beneficio de este paso:** **una sola fuente de verdad**. La regla se escribe una vez (en la validación) y sirve para **rechazar** datos y para **documentar**.
 > > >
-> > > ⚠️ **Lectura crítica.** No todo pasa: `@Positive` y `@Email` no llegan al contrato. Por eso las descripciones de `price` («debe ser mayor que cero») y de `maxCapacity` («al menos 1») **dicen la regla con palabras**. Si importa que el cliente lo sepa de forma formal, se agrega con `@Schema(exclusiveMinimum = true, minimum = "0")` o `@Schema(format = "email")`.
+> > > ⚠️ **Lectura crítica.** `@Positive` y `@Email` sí llegan al contrato, pero la descripción de `price` («debe ser mayor que cero») y la de `maxCapacity` («al menos 1») **siguen siendo útiles**: dicen la regla **con palabras**, y es lo primero que lee quien abre Swagger UI. Lo que **no** llega es que un tipo primitivo (`double`, `int`) siempre tiene valor: no se marca obligatorio.
 >
 > </details>
 >
@@ -1796,7 +1796,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:30.574+00:00",
+> >   "timestamp": "2026-11-01T20:43:30.574Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/v3/api-docs"
@@ -1856,7 +1856,7 @@
 > >
 > > ```text
 > > {
-> >   "openapi": "3.0.1",
+> >   "openapi": "3.1.0",
 > >   "info": {
 > >     "title": "Academy API",
 > >     "description": "Estudiantes, cursos y matrículas con DTO, Spring Boot, JPA y MySQL, documentado con OpenAPI.",
@@ -1960,7 +1960,7 @@
 > > Respuesta:
 > >
 > > ```text
-> > openapi: 3.0.1
+> > openapi: 3.1.0
 > > info:
 > >   title: Academy API
 > >   description: "Estudiantes, cursos y matrículas con DTO, Spring Boot, JPA y MySQL,\
@@ -2131,7 +2131,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:31.098+00:00",
+> >   "timestamp": "2026-11-01T20:43:31.098Z",
 > >   "status": 400,
 > >   "error": "Bad Request",
 > >   "path": "/api/v1/courses"
@@ -2156,7 +2156,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:40.546+00:00",
+> >   "timestamp": "2026-11-01T20:43:40.546Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/api-docs"
@@ -2181,7 +2181,7 @@
 > > Content-Type: application/json
 > >
 > > {
-> >   "timestamp": "2026-11-01T20:43:40.567+00:00",
+> >   "timestamp": "2026-11-01T20:43:40.567Z",
 > >   "status": 404,
 > >   "error": "Not Found",
 > >   "path": "/swagger-ui.html"
@@ -2273,7 +2273,7 @@
 
 > 1. ¿Por qué aparecían `findAll_1` y `findById_2`, y cómo se arreglan? *(Los tres controladores repiten nombres de método; `operationId` en `@Operation` da un nombre único a cada operación.)*
 > 2. ¿Por qué `@Schema` va en los DTO y no en las entidades? *(La entidad es la tabla; el DTO es el contrato. Así renombrar una columna no cambia la API.)*
-> 3. ¿Qué reglas de validación **no** llegan al contrato? *(`@Positive` y `@Email`; y los tipos primitivos no se marcan obligatorios. Se dicen en la descripción o se agregan con `@Schema`.)*
+> 3. ¿Qué reglas de validación llegan al contrato y cuáles no? *(`@NotBlank`, `@Size`, `@Min`, `@Positive` y `@Email` llegan (`required`, `minLength`/`maxLength`, `minimum`, `exclusiveMinimum`, `format`); los tipos primitivos no se marcan obligatorios. Se dicen en la descripción o se agregan con `@Schema`.)*
 > 4. ¿Qué distingue el `404` del `409` en la matrícula, y dónde se documenta? *(«No existe» frente a «ya existe o no hay cupo»; en las `@ApiResponse` de `enroll`.)*
 > 5. ¿`@Hidden` protege una ruta? *(No: solo la quita de la documentación; `ping` sigue respondiendo.)*
 > 6. ¿Qué hace el botón *Authorize* aquí? *(Guarda un token y lo envía; nadie lo valida, así que crear un curso sin token responde `201`.)*
@@ -2303,7 +2303,7 @@
 <details>
 <summary><strong>🚀 Retos finales (para quien termine antes)</strong></summary>
 
-> 1. **`@Email` y `@Positive` en el contrato.** Agregar `format = "email"` al `@Schema` de `email` y `exclusiveMinimum` al de `price`; comprobar que aparecen en `/api-docs`.
+> 1. **Obligatorio de verdad.** Agregar `requiredMode = REQUIRED` al `@Schema` de `price` y de `maxCapacity` (son primitivos) y comprobar que entran en `required` en `/api-docs`.
 > 2. **Campos obligatorios.** Agregar `requiredMode = REQUIRED` al `@Schema` de `price` y de `maxCapacity`.
 > 3. **Caso de error con ejemplo.** Agregar un ejemplo de `StudentRequest` con nombre vacío para provocar el `400` desde Swagger UI.
 > 4. **El tope de 50 en el contrato.** Buscar cómo declarar el máximo de `size` y comprobar que aparece en `/api-docs`.

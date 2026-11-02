@@ -129,11 +129,11 @@ Agregá al `pom.xml`, dentro de `<dependencies>`, esta dependencia:
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version>
+            <version>3.2.0</version>
         </dependency>
 ```
 
-> La versión `2.6.0` de springdoc es la compatible con Spring Boot 3.3.x. Si usás otra
+> La versión `3.2.0` de springdoc es la compatible con Spring Boot 4.1.x. Si usás otra
 > versión de Boot, consultá la tabla de compatibilidad de springdoc antes de cambiarla.
 
 ### Paso 5.2 — Propiedades
