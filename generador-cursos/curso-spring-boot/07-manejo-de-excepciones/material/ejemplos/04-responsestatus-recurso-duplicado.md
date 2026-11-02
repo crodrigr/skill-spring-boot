@@ -2,23 +2,19 @@
 
 ## 🌍 Contexto
 
-Hasta ahora, `ServicioLibros.crear(...)` guardaba cualquier `Libro`
-recibido, sin verificar si su `isbn` ya existía en el catálogo — una
-regla de negocio que faltaba desde el Módulo 5. Este ejemplo la agrega.
+Hasta el Módulo 5, `ServicioLibros.crear(...)` guardaba cualquier `Libro` recibido, incluso si su `isbn` ya existía en el catálogo. Faltaba esa regla de negocio. Este ejemplo la agrega.
 
-**Qué busca demostrar este ejemplo**: crear `LibroDuplicadoException`
-anotada con `@ResponseStatus(HttpStatus.CONFLICT)`, y agregar la
-verificación de duplicados a `ServicioLibros.crear`, reutilizando
-`findByIsbn` (ya existente desde el Módulo 3).
+**Qué busca demostrar este ejemplo**: crear `LibroDuplicadoException`, anotada con `@ResponseStatus(HttpStatus.CONFLICT)`, y verificar el duplicado en `ServicioLibros.crear` con `findByIsbn` (ya existente desde el Módulo 3).
 
 ## 📚 Caso de estudio
 
 Biblioteca Universitaria: mismo proyecto del Ejemplo 03.
 
 <details>
-<summary>📄 Ver código completo de <code>Libro.java</code>, <code>RepositorioLibros.java</code> y <code>LibroNoEncontradoException.java</code> (reutilizados del Ejemplo 03)</summary>
+<summary>💻 <b>Código fuente</b> (reutilizado del Ejemplo 03)</summary>
 
-## 💻 Archivo: `Libro.java`
+<details>
+<summary>📄 Ver código completo de <code>Libro.java</code> (reutilizado del Ejemplo 03)</summary>
 
 ```java
 package com.biblioteca.negocio.model;
@@ -50,7 +46,10 @@ public class Libro {
 }
 ```
 
-## 💻 Archivo: `RepositorioLibros.java`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>RepositorioLibros.java</code> (reutilizado del Ejemplo 03)</summary>
 
 ```java
 package com.biblioteca.persistence.repository;
@@ -62,7 +61,10 @@ public interface RepositorioLibros extends JpaRepository<Libro, Long> {
 }
 ```
 
-## 💻 Archivo: `LibroNoEncontradoException.java`
+</details>
+
+<details>
+<summary>📄 Ver código completo de <code>LibroNoEncontradoException.java</code> (reutilizado del Ejemplo 03)</summary>
 
 ```java
 package com.biblioteca.negocio.excepcion;
@@ -78,7 +80,10 @@ public class LibroNoEncontradoException extends RuntimeException {
 
 </details>
 
-## 💻 Archivo: `LibroDuplicadoException.java`
+</details>
+
+<details>
+<summary>💻 Archivo: <code>LibroDuplicadoException.java</code></summary>
 
 ```java
 package com.biblioteca.negocio.excepcion;
@@ -92,7 +97,10 @@ public class LibroDuplicadoException extends RuntimeException {
 }
 ```
 
-## 💻 Archivo: `ServicioLibros.java` (método `crear` modificado)
+</details>
+
+<details>
+<summary>💻 Archivo: <code>ServicioLibros.java</code> (método <code>crear</code> modificado)</summary>
 
 ```java
 public Libro crear(Libro libro) {
@@ -104,30 +112,71 @@ public Libro crear(Libro libro) {
 }
 ```
 
-(El resto de `ServicioLibros` — `listarTodos`, `buscarPorId`,
-`buscarPorIsbn`, `actualizar`, `eliminar` — queda igual que en el
-Ejemplo 03.)
+El resto de `ServicioLibros` (`listarTodos`, `buscarPorId`, `buscarPorIsbn`, `actualizar`, `eliminar`) queda igual que en el Ejemplo 03.
 
-## 🧭 Explicación paso a paso — qué cambió respecto al Módulo 5
+</details>
 
-1. **Antes** (Módulo 5): `ServicioLibros.crear(libro)` guardaba
-   cualquier `Libro` recibido sin ninguna verificación previa — ni
-   siquiera comprobaba si el isbn ya existía.
-   **Ahora**: `crear` primero llama a `findByIsbn` (ya existente desde el
-   Módulo 3, nunca antes usado para esta verificación) y, si encuentra un
-   libro con ese isbn, lanza `LibroDuplicadoException` **antes** de
-   guardar nada.
-2. `ifPresent(...)` con una lambda que lanza la excepción es un patrón
-   común para "verificar y fallar" sin necesitar una variable intermedia
-   ni un `if` explícito.
-3. `@ResponseStatus(HttpStatus.CONFLICT)` traduce esta excepción a `409`,
-   el código estándar para "la solicitud entra en conflicto con el
-   estado actual del recurso" — distinto del `404` de
-   `LibroNoEncontradoException`, aunque ambas excepciones siguen
-   exactamente el mismo mecanismo.
-4. Esta regla de negocio nueva no existía en ningún ejemplo anterior del
-   curso: es la primera vez que `ServicioLibros.crear` rechaza una
-   solicitud por una razón distinta a un error técnico.
+## 🧭 Explicación
+
+### 1. ¿Qué cambió respecto al Módulo 5?
+
+| | Antes (Módulo 5) | Ahora (este ejemplo) |
+|---|---|---|
+| `ServicioLibros.crear` | Guarda cualquier libro, sin verificar nada | Verifica el `isbn` y **lanza** `LibroDuplicadoException` si ya existe |
+| Resultado ante un `isbn` repetido | Se intentaba guardar el duplicado | Se rechaza con `409`, sin guardar nada |
+
+### 2. ¿Qué hace el código?
+
+```java
+repositorioLibros.findByIsbn(libro.getIsbn())      // (a) busca un libro con ese isbn
+        .ifPresent(existente -> {                   // (b) si lo encuentra...
+            throw new LibroDuplicadoException(...); // (c) ...lanza la excepción
+        });
+return repositorioLibros.save(libro);               // (d) solo se llega aquí si no hubo duplicado
+```
+
+- `findByIsbn` devuelve un `Optional<Libro>`: vacío si no hay coincidencia.
+- `ifPresent(...)` ejecuta la lambda **solo si el `Optional` tiene valor**. Es una forma breve de "verificar y fallar" sin un `if` explícito.
+- Al lanzarse la excepción, el método se interrumpe: `save` **nunca se ejecuta**.
+
+### 3. ¿Qué hace `@ResponseStatus(CONFLICT)`?
+
+Asocia `LibroDuplicadoException` con el código `409 Conflict`: la solicitud es válida, pero **choca con el estado actual** de los datos (ya existe ese libro). Funciona igual que `LibroNoEncontradoException` del Ejemplo 03; solo cambia el código.
+
+### 4. ¿Cómo se ejecuta? (`POST /libros` con un `isbn` repetido)
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente
+    participant K as ControladorLibros
+    participant S as ServicioLibros
+    participant R as RepositorioLibros
+    participant SP as Spring
+    C->>K: POST /libros {isbn repetido}
+    K->>S: crear(libro)
+    S->>R: findByIsbn(isbn)
+    R-->>S: Optional con el libro existente
+    S--xK: throw LibroDuplicadoException
+    Note over S,R: save(...) no se ejecuta
+    K--xSP: la excepción sale del controlador
+    SP->>SP: lee @ResponseStatus de la clase → 409
+    SP-->>C: 409 Conflict (cuerpo por defecto)
+```
+
+1. El cliente envía `POST /libros` con un libro cuyo `isbn` ya está registrado.
+2. El controlador delega en `ServicioLibros.crear(libro)`.
+3. El servicio consulta `findByIsbn`: encuentra el libro existente.
+4. `ifPresent` ejecuta la lambda y **lanza** `LibroDuplicadoException`. No se guarda nada.
+5. Ningún método captura la excepción, así que sale del controlador.
+6. Spring lee `@ResponseStatus(CONFLICT)` en la clase de la excepción y responde **`409`**.
+
+Si el `isbn` **no** existe, `findByIsbn` devuelve un `Optional` vacío, `ifPresent` no hace nada y `save` guarda el libro con normalidad (`201 Created`).
+
+> 💡 La columna `isbn` también es `@Column(unique = true)`: la base de datos rechazaría el duplicado como última defensa. La verificación del servicio permite además un **error claro y controlado** (`409`) en lugar de una falla de base de datos.
+
+### 5. Límite de este enfoque
+
+Igual que en el Ejemplo 03, `@ResponseStatus` fija **solo el código**; el cuerpo es el que Spring Boot genera por defecto. Para personalizarlo se usa `@ExceptionHandler` (Ejemplo 05).
 
 ## ✅ Resultado esperado
 
@@ -169,7 +218,7 @@ un duplicado).
 
 </details>
 
-**2. [Selección múltiple]** Sobre este ejemplo, seleccioná **todas** las
+**2. [Selección múltiple]** Sobre este ejemplo, seleccionar **todas** las
 afirmaciones correctas.
 
 - **A.** `ServicioLibros.crear` verifica el isbn antes de guardar, usando `findByIsbn`.
@@ -185,11 +234,11 @@ desde el Módulo 3; este ejemplo solo lo reutiliza con un propósito nuevo.
 
 </details>
 
-**3. [Abierta]** Un compañero te pregunta: "¿por qué no lanzar
+**3. [Abierta]** Un compañero pregunta: "¿por qué no lanzar
 simplemente `LibroNoEncontradoException` también para el caso de
 duplicado, para no crear una clase nueva?".
 
-**Pregunta**: ¿Qué le responderías?
+**Pregunta**: ¿Qué respuesta corresponde?
 
 <details>
 <summary>🔑 Ver respuesta modelo</summary>
