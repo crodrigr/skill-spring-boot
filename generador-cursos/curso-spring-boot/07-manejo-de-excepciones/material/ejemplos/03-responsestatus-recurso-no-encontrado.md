@@ -209,31 +209,58 @@ public class ControladorLibros {
 }
 ```
 
-## 🧭 Explicación paso a paso — qué cambió respecto al Módulo 5
+## 🧭 Explicación
 
-1. **Antes** (Módulo 5): `ServicioLibros.buscarPorId` devolvía
-   `Optional<Libro>`; `ControladorLibros.buscarPorId` decidía, con
-   `.map(...)`/`.orElseGet(...)`, si respondía `200` o construía
-   `ResponseEntity.notFound()` manualmente.
-   **Ahora**: `ServicioLibros.buscarPorId` devuelve `Libro` directamente,
-   y lanza `LibroNoEncontradoException` si no existe
-   (`orElseThrow(...)`); `ControladorLibros.buscarPorId` ya ni siquiera
-   necesita `ResponseEntity`: devuelve `Libro` directo, y Spring Boot
-   construye el `404` automáticamente al propagarse la excepción,
-   gracias a `@ResponseStatus(HttpStatus.NOT_FOUND)` en la clase de la
-   excepción.
-2. `actualizar` y `eliminar` también cambiaron: antes manejaban su propio
-   caso de "no encontrado" con `Optional`/`existsById`; ahora reutilizan
-   `buscarPorId(id)` (que ya lanza si no existe), evitando repetir la
-   misma verificación tres veces.
-3. `@ResponseStatus` se declara sobre la **clase** de la excepción, no
-   sobre el método del controlador — por eso alcanza con lanzarla desde
-   cualquier lugar (incluido el `Service`) para que Spring la traduzca al
-   código correcto.
-4. El cuerpo de la respuesta ante este error sigue siendo el que Spring
-   Boot genera por defecto (con `timestamp`, `status`, `error`, `path`),
-   no un cuerpo personalizado — eso se resuelve en el Ejemplo 05 con
-   `@ExceptionHandler`.
+### 1. ¿Qué cambió respecto al Módulo 5?
+
+| | Módulo 5 (antes) | Este ejemplo (ahora) |
+|---|---|---|
+| `ServicioLibros.buscarPorId` | Devuelve `Optional<Libro>` | Devuelve `Libro` y **lanza** `LibroNoEncontradoException` si no existe |
+| `ControladorLibros.buscarPorId` | Decide con `.map(...)`/`.orElseGet(...)` y construye `ResponseEntity.notFound()` | Solo devuelve `Libro`; no decide nada sobre errores |
+| Quién produce el `404` | El controlador, de forma manual | La excepción, mediante `@ResponseStatus` |
+
+`actualizar` y `eliminar` también se simplifican: reutilizan `buscarPorId(id)`, que ya lanza la excepción, y se evita repetir la misma verificación.
+
+### 2. ¿Qué hace `@ResponseStatus`?
+
+```java
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class LibroNoEncontradoException extends RuntimeException { ... }
+```
+
+La anotación **asocia una excepción con un código HTTP**. Se declara sobre la **clase de la excepción**, no sobre un método. Por eso basta con lanzarla desde cualquier lugar (incluido el servicio) para que Spring la traduzca al código correcto.
+
+### 3. ¿Cómo se ejecuta? (`GET /libros/999`)
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente
+    participant K as ControladorLibros
+    participant S as ServicioLibros
+    participant R as RepositorioLibros
+    participant SP as Spring
+    C->>K: GET /libros/999
+    K->>S: buscarPorId(999)
+    S->>R: findById(999)
+    R-->>S: Optional vacío
+    S--xK: throw LibroNoEncontradoException
+    K--xSP: la excepción sale del controlador
+    SP->>SP: lee @ResponseStatus de la clase → 404
+    SP-->>C: 404 Not Found (cuerpo por defecto)
+```
+
+1. El cliente envía `GET /libros/999` y Spring llama a `ControladorLibros.buscarPorId(999)`.
+2. El controlador delega en `ServicioLibros.buscarPorId(999)`.
+3. El servicio consulta `findById(999)`. No hay libro: el `Optional` llega vacío.
+4. `orElseThrow(...)` **lanza** `LibroNoEncontradoException`. El método se interrumpe y el `return` nunca se ejecuta.
+5. La excepción **no se captura** en ningún punto, así que sale del controlador.
+6. Spring detecta la excepción, encuentra `@ResponseStatus(NOT_FOUND)` en su clase y arma la respuesta con **código `404`**.
+
+> 🔑 Ningún método llama explícitamente a una respuesta `404`: es Spring quien la produce al ver la excepción.
+
+### 4. Límite de este enfoque
+
+`@ResponseStatus` define **solo el código**. El cuerpo lo genera Spring Boot por defecto (`timestamp`, `status`, `error`, `path`) y **no se puede personalizar** con esta anotación. Para controlar el cuerpo se usa `@ExceptionHandler` (Ejemplo 05).
 
 ## ✅ Resultado esperado
 
@@ -269,7 +296,7 @@ propaga sin ser capturada.
 </details>
 
 **2. [Selección múltiple]** Sobre el cambio de este ejemplo respecto al
-Módulo 5, seleccioná **todas** las afirmaciones correctas.
+Módulo 5, seleccionar **todas** las afirmaciones correctas.
 
 - **A.** `ServicioLibros.buscarPorId` ya no devuelve `Optional<Libro>`.
 - **B.** `ControladorLibros.buscarPorId` sigue construyendo `ResponseEntity.notFound()` manualmente.
@@ -284,11 +311,11 @@ código manual que este ejemplo elimina.
 
 </details>
 
-**3. [Abierta]** Un compañero te pregunta: "si `@ResponseStatus` ya
+**3. [Abierta]** Un compañero pregunta: "si `@ResponseStatus` ya
 resuelve el código de estado automáticamente, ¿para qué existen
 `@ExceptionHandler` y `@ControllerAdvice`?".
 
-**Pregunta**: ¿Qué le responderías, pensando en el cuerpo de la
+**Pregunta**: ¿Qué respuesta corresponde, considerando el cuerpo de la
 respuesta de este ejemplo?
 
 <details>
