@@ -3,6 +3,8 @@
 > 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 07 — CRUD de estudiantes con excepciones](../modulo-07-excepciones/01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo.
 >
+> 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
+>
 > 📦 **Proyecto terminado:** [`students-api-security/`](codigo/students-api-security/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
 > ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3.5, Spring Security 6.3, JJWT 0.12.6, springdoc-openapi 2.6.0, Java 17 y MySQL 8. Las respuestas HTTP, el contenido del token, el contrato OpenAPI y la tabla de cuentas que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
