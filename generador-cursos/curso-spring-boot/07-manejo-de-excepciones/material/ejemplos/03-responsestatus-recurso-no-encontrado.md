@@ -102,7 +102,8 @@ spring.jpa.hibernate.ddl-auto=update
 
 </details>
 
-## 💻 Archivo: `LibroNoEncontradoException.java`
+<details>
+<summary>💻 Archivo: <code>LibroNoEncontradoException.java</code></summary>
 
 ```java
 package com.biblioteca.negocio.excepcion;
@@ -116,7 +117,10 @@ public class LibroNoEncontradoException extends RuntimeException {
 }
 ```
 
-## 💻 Archivo: `ServicioLibros.java` (modificada: `buscarPorId` ya no devuelve `Optional`)
+</details>
+
+<details>
+<summary>💻 Archivo: <code>ServicioLibros.java</code> (modificada: <code>buscarPorId</code> ya no devuelve <code>Optional</code>)</summary>
 
 ```java
 package com.biblioteca.negocio.service;
@@ -164,7 +168,10 @@ public class ServicioLibros {
 }
 ```
 
-## 💻 Archivo: `ControladorLibros.java` (modificada: `buscarPorId` ya no construye `ResponseEntity.notFound()`)
+</details>
+
+<details>
+<summary>💻 Archivo: <code>ControladorLibros.java</code> (modificada: <code>buscarPorId</code> ya no construye <code>ResponseEntity.notFound()</code>)</summary>
 
 ```java
 package com.biblioteca.presentacion.controlador;
@@ -217,6 +224,8 @@ public class ControladorLibros {
     }
 }
 ```
+
+</details>
 
 ## 🧭 Explicación
 
