@@ -120,6 +120,8 @@ curl -X DELETE http://localhost:8080/api/v1/students/4 -H "Authorization: Bearer
 | `409` | ❌ Choca con algo que ya existe (correo repetido) |
 
 > 💡 Para ver **todo** de una vez: [`codigo/probar-apis.sh`](codigo/probar-apis.sh) corre las 54 pruebas y marca cada una con ✅ o ❌.
+>
+> 📮 ¿Se prefiere una interfaz? La [colección de Postman](codigo/postman/) trae las mismas pruebas listas para importar.
 
 ---
 

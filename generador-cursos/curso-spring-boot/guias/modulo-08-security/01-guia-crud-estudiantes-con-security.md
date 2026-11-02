@@ -5,6 +5,8 @@
 >
 > 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
 >
+> 📮 **Colección de Postman:** [`codigo/postman/`](codigo/postman/) (41 peticiones con sus pruebas).
+>
 > 🧪 **Probar todas las rutas con `curl`:** [`04-curl-probar-todas-las-apis.md`](04-curl-probar-todas-las-apis.md) (y el script [`probar-apis.sh`](codigo/probar-apis.sh)).
 >
 > 📦 **Proyecto terminado:** [`students-api-security/`](codigo/students-api-security/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
