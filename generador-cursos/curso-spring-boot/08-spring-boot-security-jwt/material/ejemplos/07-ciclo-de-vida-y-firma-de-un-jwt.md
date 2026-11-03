@@ -29,7 +29,7 @@ sequenceDiagram
     S->>S: Valida la firma del JWT
     S-->>C: 200 OK + datos
 
-    Note over C,S: Cada solicitud repite el mismo token;<br/>el servidor no recuerda nada entre solicitudes
+    Note over C,S: Cada solicitud repite el mismo token,<br/>el servidor no recuerda nada entre solicitudes
 ```
 
 ## 🧭 Explicación paso a paso
