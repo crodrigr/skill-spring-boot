@@ -1,4 +1,4 @@
-# 💡 Ejemplo 08 — Pruebas en Insomnia
+# 💡 Ejemplo 08 — Pruebas con curl
 
 ## 🌍 Contexto
 
@@ -8,9 +8,9 @@ terminado, hace falta verificar que cada uno responde exactamente como se
 espera — no alcanza con que el código compile.
 
 **Qué busca demostrar este ejemplo**: probar los seis endpoints de
-`ControladorLibros` con Insomnia (o cualquier cliente HTTP equivalente),
-documentando método, URL, cuerpo, código de estado y respuesta de cada
-uno, incluyendo un caso de error `404`.
+`ControladorLibros` con `curl` desde la terminal, documentando el
+comando, el código de estado y la respuesta de cada uno, incluyendo un
+caso de error `404`.
 
 ## 📚 Caso de estudio
 
@@ -76,19 +76,24 @@ public class ControladorLibros {
 
 </details>
 
-## 🧪 Pruebas en Insomnia
+## 🧪 Pruebas con curl
+
+Con la aplicación en marcha (`mvn spring-boot:run`), se ejecuta cada comando en otra terminal. La opción `-i` muestra el código de estado junto con la respuesta.
 
 **1. Crear un libro (`POST`)**
 
+```bash
+curl -i -X POST http://localhost:8080/libros \
+  -H 'Content-Type: application/json' \
+  -d '{"isbn":"978-0-13-468599-1","titulo":"Effective Java"}'
+```
+
+**Respuesta esperada:**
+
 ```text
-Método: POST
-URL: http://localhost:8080/libros
-Cuerpo:
-{
-  "isbn": "978-0-13-468599-1",
-  "titulo": "Effective Java"
-}
-Respuesta: 201 Created
+HTTP/1.1 201
+Content-Type: application/json
+
 {
   "id": 1,
   "isbn": "978-0-13-468599-1",
@@ -98,10 +103,16 @@ Respuesta: 201 Created
 
 **2. Listar todos (`GET`)**
 
+```bash
+curl -i http://localhost:8080/libros
+```
+
+**Respuesta esperada:**
+
 ```text
-Método: GET
-URL: http://localhost:8080/libros
-Respuesta: 200 OK
+HTTP/1.1 200
+Content-Type: application/json
+
 [
   {
     "id": 1,
@@ -113,10 +124,16 @@ Respuesta: 200 OK
 
 **3. Buscar por id (`GET`)**
 
+```bash
+curl -i http://localhost:8080/libros/1
+```
+
+**Respuesta esperada:**
+
 ```text
-Método: GET
-URL: http://localhost:8080/libros/1
-Respuesta: 200 OK
+HTTP/1.1 200
+Content-Type: application/json
+
 {
   "id": 1,
   "isbn": "978-0-13-468599-1",
@@ -126,10 +143,16 @@ Respuesta: 200 OK
 
 **4. Buscar por isbn (`GET` + `@RequestParam`)**
 
+```bash
+curl -i 'http://localhost:8080/libros/buscar?isbn=978-0-13-468599-1'
+```
+
+**Respuesta esperada:**
+
 ```text
-Método: GET
-URL: http://localhost:8080/libros/buscar?isbn=978-0-13-468599-1
-Respuesta: 200 OK
+HTTP/1.1 200
+Content-Type: application/json
+
 {
   "id": 1,
   "isbn": "978-0-13-468599-1",
@@ -139,15 +162,18 @@ Respuesta: 200 OK
 
 **5. Actualizar (`PUT`)**
 
+```bash
+curl -i -X PUT http://localhost:8080/libros/1 \
+  -H 'Content-Type: application/json' \
+  -d '{"isbn":"978-0-13-468599-1","titulo":"Effective Java (3rd Edition)"}'
+```
+
+**Respuesta esperada:**
+
 ```text
-Método: PUT
-URL: http://localhost:8080/libros/1
-Cuerpo:
-{
-  "isbn": "978-0-13-468599-1",
-  "titulo": "Effective Java (3rd Edition)"
-}
-Respuesta: 200 OK
+HTTP/1.1 200
+Content-Type: application/json
+
 {
   "id": 1,
   "isbn": "978-0-13-468599-1",
@@ -157,17 +183,27 @@ Respuesta: 200 OK
 
 **6. Eliminar (`DELETE`) y caso de error (`404`)**
 
-```text
-Método: DELETE
-URL: http://localhost:8080/libros/1
-Respuesta: 200 OK
+```bash
+curl -i -X DELETE http://localhost:8080/libros/1
 ```
 
+**Respuesta esperada:**
+
 ```text
-Método: GET
-URL: http://localhost:8080/libros/1
-Respuesta: 404 Not Found
+HTTP/1.1 200
 ```
+
+```bash
+curl -i http://localhost:8080/libros/1
+```
+
+**Respuesta esperada:**
+
+```text
+HTTP/1.1 404
+```
+
+> 💡 Las comillas simples `'...'` evitan que la terminal interprete los símbolos del JSON o de la URL (como `?`).
 
 ## 🧭 Explicación paso a paso
 
@@ -180,9 +216,9 @@ Respuesta: 404 Not Found
 3. La prueba 4 verifica específicamente el endpoint con `@RequestParam`
    del Ejemplo 07, que es fácil de olvidar probar porque no forma parte
    del CRUD "clásico" de cinco operaciones.
-4. Cada prueba documentada acá es exactamente lo que se vería en la
-   pestaña de respuesta de Insomnia: el código de estado en la parte
-   superior, y el cuerpo JSON (si lo hay) debajo.
+4. Cada prueba documentada acá es exactamente lo que `curl -i` imprime
+   en la terminal: el código de estado en la primera línea, y el cuerpo
+   JSON (si lo hay) debajo.
 
 ## ✅ Resultado esperado
 
@@ -195,7 +231,7 @@ el caso de error `404` tras eliminar un recurso.
 **1. [Selección]** ¿Por qué la prueba 6 incluye un `GET` después del
 `DELETE`, en vez de probar solo el `DELETE`?
 
-- **A.** Porque Insomnia lo exige.
+- **A.** Porque `curl` lo exige.
 - **B.** Para confirmar que el recurso realmente desapareció de la base de datos, no solo que el `DELETE` respondió `200`.
 - **C.** Porque `DELETE` nunca funciona sin un `GET` previo.
 - **D.** No hay ninguna razón; es un paso opcional sin valor.

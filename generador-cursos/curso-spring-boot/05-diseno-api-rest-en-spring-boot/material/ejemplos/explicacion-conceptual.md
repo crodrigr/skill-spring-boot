@@ -82,9 +82,9 @@ Cuando el recurso no existe, el controlador devuelve `404` (con
 
 📎 Ver en la práctica: [Ejemplo 06 — Controlador REST: endpoints GET](06-controlador-rest-endpoints-get.md) · [Ejemplo 07 — Controlador REST: endpoints POST, PUT, DELETE](07-controlador-rest-endpoints-post-put-delete.md)
 
-Cada endpoint se prueba con un cliente HTTP (Insomnia): documentando
+Cada endpoint se prueba con un cliente HTTP (`curl`): documentando
 método, URL, cuerpo (si aplica), código de estado y cuerpo de la
 respuesta, para cada operación CRUD — incluyendo al menos un caso de
 error (`404`), no solo los casos de éxito.
 
-📎 Ver en la práctica: [Ejemplo 08 — Pruebas en Insomnia](08-pruebas-en-insomnia.md)
+📎 Ver en la práctica: [Ejemplo 08 — Pruebas con curl](08-pruebas-con-curl.md)
