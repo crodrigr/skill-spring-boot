@@ -28,11 +28,10 @@ Así el controlador solo cuenta el caso feliz, y todos los errores tienen **el m
 | 2 | Lanzar excepciones propias + `@ResponseStatus` |
 | 3 | Controlar el cuerpo con `@ExceptionHandler` |
 | 4 | Centralizar con `@RestControllerAdvice` |
-| 5 | Cubrir los errores de Spring (`ResponseEntityExceptionHandler`) |
-| 6 | Documentar los errores en Swagger |
-| 7 | Probar todo, incluido un `500` real |
+| 5 | Documentar los errores en Swagger |
+| 6 | Probar todo, incluido un `500` real |
 
-⏱️ Unos 160 minutos. El Paso 0 puede entregarse ya hecho.
+⏱️ Unos 140 minutos. El Paso 0 puede entregarse ya hecho.
 
 <details>
 <summary><strong>⚙️ ¿Cómo viaja una excepción? (<code>GET /api/v1/students/999</code>)</strong></summary>
@@ -688,10 +687,10 @@ sequenceDiagram
 > <details>
 > <summary><strong>Paso 4.1 · Mover el manejo a un solo lugar</strong></summary>
 >
-> > Se **borra** el `@ExceptionHandler` del `StudentController` (y sus imports) y se crea la clase global. Esta primera versión maneja las dos excepciones propias, la validación, el JSON roto, el tipo equivocado, el orden inválido y **cualquier otra** (`500`).
+> > Se **borra** el `@ExceptionHandler` del `StudentController` (y sus imports) y se crea la clase global. Maneja las dos excepciones propias, la validación, el JSON roto, el tipo equivocado, el parámetro faltante, el orden inválido, las rutas o métodos que no existen y **cualquier otra** (`500`).
 > >
 > > <details>
-> > <summary><strong>📄 GlobalExceptionHandler.java (versión del Paso 4)</strong></summary>
+> > <summary><strong>📄 GlobalExceptionHandler.java</strong></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/presentation/exception/GlobalExceptionHandler.java`
 > >
@@ -710,10 +709,12 @@ sequenceDiagram
 > > import org.springframework.http.ResponseEntity;
 > > import org.springframework.http.converter.HttpMessageNotReadableException;
 > > import org.springframework.web.bind.MethodArgumentNotValidException;
+> > import org.springframework.web.bind.MissingServletRequestParameterException;
 > > import org.springframework.web.bind.annotation.ExceptionHandler;
 > > import org.springframework.web.bind.annotation.RestControllerAdvice;
 > > import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 > >
+> > import java.util.Comparator;
 > > import java.util.List;
 > >
 > > @RestControllerAdvice
@@ -737,6 +738,7 @@ sequenceDiagram
 > >                                                           HttpServletRequest request) {
 > >         List<FieldIssue> details = ex.getBindingResult().getFieldErrors().stream()
 > >                 .map(error -> new FieldIssue(error.getField(), error.getDefaultMessage()))
+> >                 .sorted(Comparator.comparing(FieldIssue::field).thenComparing(FieldIssue::message))
 > >                 .toList();
 > >         ErrorResponse body = ErrorResponse.of(HttpStatus.BAD_REQUEST,
 > >                 "Los datos enviados no son válidos", request.getRequestURI(), details);
@@ -757,6 +759,13 @@ sequenceDiagram
 > >                 "El parámetro '" + ex.getName() + "' tiene un valor no válido: " + ex.getValue(), request);
 > >     }
 > >
+> >     @ExceptionHandler(MissingServletRequestParameterException.class)
+> >     public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException ex,
+> >                                                                 HttpServletRequest request) {
+> >         return build(HttpStatus.BAD_REQUEST,
+> >                 "Falta el parámetro obligatorio '" + ex.getParameterName() + "'", request);
+> >     }
+> >
 > >     @ExceptionHandler(PropertyReferenceException.class)
 > >     public ResponseEntity<ErrorResponse> handleUnknownSortProperty(PropertyReferenceException ex,
 > >                                                                    HttpServletRequest request) {
@@ -766,6 +775,17 @@ sequenceDiagram
 > >
 > >     @ExceptionHandler(Exception.class)
 > >     public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
+> >         // Ruta inexistente (404), método no permitido (405)...: Spring ya sabe su código; no es un 500.
+> >         if (ex instanceof org.springframework.web.ErrorResponse springError) {
+> >             HttpStatus status = HttpStatus.valueOf(springError.getStatusCode().value());
+> >             String message = switch (status) {
+> >                 case NOT_FOUND -> "No existe el recurso solicitado";
+> >                 case METHOD_NOT_ALLOWED -> "Ese método HTTP no está permitido en esta ruta";
+> >                 default -> status.getReasonPhrase();
+> >             };
+> >             return ResponseEntity.status(status).headers(springError.getHeaders())
+> >                     .body(ErrorResponse.of(status, message, request.getRequestURI()));
+> >         }
 > >         log.error("Error inesperado en {}", request.getRequestURI(), ex);
 > >         return build(HttpStatus.INTERNAL_SERVER_ERROR,
 > >                 "Ocurrió un error inesperado. Intentar de nuevo más tarde.", request);
@@ -786,12 +806,15 @@ sequenceDiagram
 > > | `handleValidation` | `MethodArgumentNotValidException` (`@Valid`) | `400` + `details` |
 > > | `handleUnreadableBody` | `HttpMessageNotReadableException` | `400` |
 > > | `handleTypeMismatch` | `MethodArgumentTypeMismatchException` | `400` |
+> > | `handleMissingParameter` | `MissingServletRequestParameterException` | `400` |
 > > | `handleUnknownSortProperty` | `PropertyReferenceException` | `400` |
-> > | `handleUnexpected` | `Exception` (todo lo demás) | `500` + *log* |
+> > | `handleUnexpected` | `Exception` (todo lo demás) | `404`/`405` de Spring, o `500` + *log* |
 > >
 > > > ⚠️ **Cambio de Spring Boot 4.** `PropertyReferenceException` ahora está en `org.springframework.data.core` (con Spring Boot 3 estaba en `org.springframework.data.mapping`). Con el `import` viejo, el proyecto **no compila**.
 > >
 > > > 🔎 Si varios manejadores encajan, Spring usa el más específico. Por eso `Exception.class` solo atrapa lo que nadie más manejó.
+> >
+> > > 🧠 **¿Por qué el `if` en `handleUnexpected`?** Spring lanza sus propias excepciones para una ruta inexistente (`404`) o un método no permitido (`405`), y ya trae su código. Sin ese `if`, el `catch-all` las convertiría en `500`.
 > >
 > > > ⚠️ **El `500` no cuenta nada.** Al cliente le llega un mensaje genérico; la **traza completa** va al *log* con `log.error(..., ex)` (RNF-05).
 >
@@ -890,7 +913,7 @@ sequenceDiagram
 > > HTTP/1.1 400
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-01T23:57:10.657Z","status":400,"error":"Bad Request","message":"Los datos enviados no son válidos","path":"/api/v1/students","details":[{"field":"email","message":"no tiene formato de correo electrónico"},{"field":"name","message":"debe tener entre 2 y 100 caracteres"},{"field":"age","message":"debe ser 16 o más"},{"field":"name","message":"es obligatorio"}]}
+> > {"timestamp":"2026-11-01T23:57:10.657Z","status":400,"error":"Bad Request","message":"Los datos enviados no son válidos","path":"/api/v1/students","details":[{"field":"age","message":"debe ser 16 o más"},{"field":"email","message":"no tiene formato de correo electrónico"},{"field":"name","message":"debe tener entre 2 y 100 caracteres"},{"field":"name","message":"es obligatorio"}]}
 > > ```
 > >
 > > Los **cuatro `400` que antes eran iguales** ahora se distinguen:
@@ -903,223 +926,29 @@ sequenceDiagram
 > > | `PATCH` con `{}` | `Los datos enviados no son válidos` + `{"field":"status","message":"es obligatorio"}` |
 > > | `GET /students/abc` | `El parámetro 'id' tiene un valor no válido: abc` |
 > > | `GET /students?sort=foo` | `No se puede ordenar por 'foo'` — **ya es `400`, no `500`** |
+> > | `GET /students/by-email` (falta `email`) | `Falta el parámetro obligatorio 'email'` |
 > >
-> > > 🔎 **Detalle.** El orden de `details` no está garantizado en esta versión (las validaciones se evalúan en cualquier orden). El Paso 5 lo ordena.
 >
 > </details>
 >
 > <details>
-> <summary><strong>Paso 4.5 · Lo que se escapa: un <code>catch-all</code> que se traga demasiado</strong></summary>
+> <summary><strong>Paso 4.5 · Rutas y métodos que no existen</strong></summary>
 >
 > > ```bash
 > > curl -i localhost:8080/api/v1/nope
 > > curl -i -X DELETE localhost:8080/api/v1/students
-> > curl -i localhost:8080/api/v1/students/by-email
-> > ```
-> >
-> > **Resultado real, las tres:**
-> >
-> > ```text
-> > HTTP/1.1 500
-> > {"timestamp":"2026-11-01T23:57:10.774Z","status":500,"error":"Internal Server Error","message":"Ocurrió un error inesperado. Intentar de nuevo más tarde.","path":"/api/v1/nope"}
-> > ```
-> >
-> > | Petición | Debería ser | Es |
-> > |---|:-:|:-:|
-> > | `GET /api/v1/nope` (ruta que no existe) | `404` | **`500`** |
-> > | `DELETE /api/v1/students` (método no permitido) | `405` | **`500`** |
-> > | `GET /students/by-email` (falta `email`) | `400` | **`500`** |
-> >
-> > > ⚠️ **La trampa.** Spring MVC lanza excepciones propias para estos casos (`NoResourceFoundException`, `HttpRequestMethodNotSupportedException`, `MissingServletRequestParameterException`). Antes de este paso Spring las convertía en el código correcto; ahora **`@ExceptionHandler(Exception.class)` las atrapa primero** y las vuelve `500`. Además llenan el *log* de errores falsos.
->
-> </details>
-
-</details>
-
----
-
-<details>
-<summary><strong>🧰 Paso 5 — Las excepciones de Spring MVC: <code>ResponseEntityExceptionHandler</code></strong></summary>
-
-> > 💬 `ResponseEntityExceptionHandler` es una clase base que ya conoce el código correcto de las excepciones de Spring MVC. Basta con extenderla.
->
-> <details>
-> <summary><strong>Paso 5.1 · Extender la clase base</strong></summary>
->
-> > Tres cambios sobre la versión del Paso 4:
-> >
-> > | Cambio | Por qué |
-> > |---|---|
-> > | `extends ResponseEntityExceptionHandler` | La clase base ya trae un `@ExceptionHandler` para las excepciones de Spring MVC |
-> > | `handleValidation`, `handleUnreadableBody` y `handleTypeMismatch` pasan de `@ExceptionHandler` a **`@Override`** | Declarar un `@ExceptionHandler` para una excepción que la clase base ya maneja produce el error **`Ambiguous @ExceptionHandler method`** |
-> > | Se agrega `handleExceptionInternal` | **Un único punto** por el que pasan todas las demás excepciones de Spring MVC (`404` de ruta, `405`, `415`…) |
-> >
-> > También se agrega `handleMissingServletRequestParameter` y se **ordenan** los `details`.
-> >
-> > <details>
-> > <summary><strong>📄 GlobalExceptionHandler.java (versión final)</strong></summary>
-> >
-> > **Ruta:** `src/main/java/com/academy/presentation/exception/GlobalExceptionHandler.java`
-> >
-> > ```java
-> > package com.academy.presentation.exception;
-> >
-> > import com.academy.business.exception.StudentEmailAlreadyExistsException;
-> > import com.academy.business.exception.StudentNotFoundException;
-> > import com.academy.presentation.dto.ErrorResponse;
-> > import com.academy.presentation.dto.ErrorResponse.FieldIssue;
-> > import org.slf4j.Logger;
-> > import org.slf4j.LoggerFactory;
-> > import org.springframework.beans.TypeMismatchException;
-> > import org.springframework.data.core.PropertyReferenceException;
-> > import org.springframework.http.HttpHeaders;
-> > import org.springframework.http.HttpStatus;
-> > import org.springframework.http.HttpStatusCode;
-> > import org.springframework.http.ResponseEntity;
-> > import org.springframework.http.converter.HttpMessageNotReadableException;
-> > import org.springframework.web.bind.MethodArgumentNotValidException;
-> > import org.springframework.web.bind.MissingServletRequestParameterException;
-> > import org.springframework.web.bind.annotation.ExceptionHandler;
-> > import org.springframework.web.bind.annotation.RestControllerAdvice;
-> > import org.springframework.web.context.request.ServletWebRequest;
-> > import org.springframework.web.context.request.WebRequest;
-> > import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-> >
-> > import java.util.Comparator;
-> > import java.util.List;
-> >
-> > @RestControllerAdvice
-> > public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-> >
-> >     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-> >
-> >     // ---------- Excepciones de la aplicación ----------
-> >
-> >     @ExceptionHandler(StudentNotFoundException.class)
-> >     public ResponseEntity<Object> handleNotFound(StudentNotFoundException ex, WebRequest request) {
-> >         return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
-> >     }
-> >
-> >     @ExceptionHandler(StudentEmailAlreadyExistsException.class)
-> >     public ResponseEntity<Object> handleDuplicateEmail(StudentEmailAlreadyExistsException ex, WebRequest request) {
-> >         return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
-> >     }
-> >
-> >     @ExceptionHandler(PropertyReferenceException.class)
-> >     public ResponseEntity<Object> handleUnknownSortProperty(PropertyReferenceException ex, WebRequest request) {
-> >         return build(HttpStatus.BAD_REQUEST, "No se puede ordenar por '" + ex.getPropertyName() + "'", request, null);
-> >     }
-> >
-> >     @ExceptionHandler(Exception.class)
-> >     public ResponseEntity<Object> handleUnexpected(Exception ex, WebRequest request) {
-> >         log.error("Error inesperado en {}", path(request), ex);
-> >         return build(HttpStatus.INTERNAL_SERVER_ERROR,
-> >                 "Ocurrió un error inesperado. Intentar de nuevo más tarde.", request, null);
-> >     }
-> >
-> >     // ---------- Excepciones de Spring MVC (las maneja la clase base; aquí se les da el cuerpo propio) ----------
-> >
-> >     @Override
-> >     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-> >                                                                   HttpHeaders headers, HttpStatusCode status,
-> >                                                                   WebRequest request) {
-> >         List<FieldIssue> details = ex.getBindingResult().getFieldErrors().stream()
-> >                 .map(error -> new FieldIssue(error.getField(), error.getDefaultMessage()))
-> >                 .sorted(Comparator.comparing(FieldIssue::field).thenComparing(FieldIssue::message))
-> >                 .toList();
-> >         return build(HttpStatus.BAD_REQUEST, "Los datos enviados no son válidos", request, details);
-> >     }
-> >
-> >     @Override
-> >     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-> >                                                                   HttpHeaders headers, HttpStatusCode status,
-> >                                                                   WebRequest request) {
-> >         return build(HttpStatus.BAD_REQUEST,
-> >                 "El cuerpo de la petición no es un JSON válido o tiene un valor no permitido", request, null);
-> >     }
-> >
-> >     @Override
-> >     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
-> >                                                         HttpStatusCode status, WebRequest request) {
-> >         return build(HttpStatus.BAD_REQUEST,
-> >                 "El parámetro '" + ex.getPropertyName() + "' tiene un valor no válido: " + ex.getValue(),
-> >                 request, null);
-> >     }
-> >
-> >     @Override
-> >     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-> >                                                                           HttpHeaders headers, HttpStatusCode status,
-> >                                                                           WebRequest request) {
-> >         return build(HttpStatus.BAD_REQUEST,
-> >                 "Falta el parámetro obligatorio '" + ex.getParameterName() + "'", request, null);
-> >     }
-> >
-> >     // Todas las demás excepciones de Spring MVC (ruta inexistente, método no permitido...) pasan por aquí.
-> >     @Override
-> >     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
-> >                                                              HttpStatusCode statusCode, WebRequest request) {
-> >         HttpStatus status = HttpStatus.valueOf(statusCode.value());
-> >         String message = switch (status) {
-> >             case NOT_FOUND -> "No existe el recurso solicitado";
-> >             case METHOD_NOT_ALLOWED -> "Ese método HTTP no está permitido en esta ruta";
-> >             case UNSUPPORTED_MEDIA_TYPE -> "El tipo de contenido enviado no está soportado";
-> >             case NOT_ACCEPTABLE -> "No se puede responder en el formato pedido";
-> >             default -> status.getReasonPhrase();
-> >         };
-> >         ResponseEntity<Object> response = build(status, message, request, null);
-> >         return ResponseEntity.status(status).headers(headers).body(response.getBody());
-> >     }
-> >
-> >     // ---------- Apoyo ----------
-> >
-> >     private ResponseEntity<Object> build(HttpStatus status, String message, WebRequest request,
-> >                                          List<FieldIssue> details) {
-> >         ErrorResponse body = details == null
-> >                 ? ErrorResponse.of(status, message, path(request))
-> >                 : ErrorResponse.of(status, message, path(request), details);
-> >         return ResponseEntity.status(status).body(body);
-> >     }
-> >
-> >     private String path(WebRequest request) {
-> >         return request instanceof ServletWebRequest servletRequest
-> >                 ? servletRequest.getRequest().getRequestURI()
-> >                 : "";
-> >     }
-> > }
-> > ```
-> >
-> > </details>
->
-> </details>
->
-> <details>
-> <summary><strong>Paso 5.2 · Ver el resultado</strong></summary>
->
-> > ```bash
-> > curl -i localhost:8080/api/v1/nope
-> > curl -i -X DELETE localhost:8080/api/v1/students
-> > curl -i localhost:8080/api/v1/students/by-email
 > > ```
 > >
 > > ```text
 > > HTTP/1.1 404
-> > {"timestamp":"2026-11-01T23:57:49.863Z","status":404,"error":"Not Found","message":"No existe el recurso solicitado","path":"/api/v1/nope"}
+> > {"timestamp":"2026-11-03T02:37:14.682Z","status":404,"error":"Not Found","message":"No existe el recurso solicitado","path":"/api/v1/nope"}
 > >
 > > HTTP/1.1 405
-> > Allow: GET, POST
-> > {"timestamp":"2026-11-01T23:57:49.879Z","status":405,"error":"Method Not Allowed","message":"Ese método HTTP no está permitido en esta ruta","path":"/api/v1/students"}
-> >
-> > HTTP/1.1 400
-> > {"timestamp":"2026-11-01T23:57:49.894Z","status":400,"error":"Bad Request","message":"Falta el parámetro obligatorio 'email'","path":"/api/v1/students/by-email"}
+> > Allow: POST, GET
+> > {"timestamp":"2026-11-03T02:37:14.696Z","status":405,"error":"Method Not Allowed","message":"Ese método HTTP no está permitido en esta ruta","path":"/api/v1/students"}
 > > ```
 > >
-> > Y la validación, ahora con los `details` **ordenados** por campo:
-> >
-> > ```text
-> > "details":[{"field":"age","message":"debe ser 16 o más"},{"field":"email","message":"no tiene formato de correo electrónico"},{"field":"name","message":"debe tener entre 2 y 100 caracteres"},{"field":"name","message":"es obligatorio"}]
-> > ```
-> >
-> > > ✅ **Punto de control.** Ya **no hay ningún `500` falso**. Las demás respuestas del Paso 4 no cambiaron.
+> > > ✅ **Punto de control.** Ya no hay ningún `500` falso: el `500` queda solo para fallos reales.
 >
 > </details>
 
@@ -1128,12 +957,12 @@ sequenceDiagram
 ---
 
 <details>
-<summary><strong>📚 Paso 6 — Documentar los errores en Swagger</strong></summary>
+<summary><strong>📚 Paso 5 — Documentar los errores en Swagger</strong></summary>
 
 > > 💬 Antes los `400`, `404` y `409` se documentaban sin cuerpo. Ahora existe `ErrorResponse` y se documenta una sola vez.
 >
 > <details>
-> <summary><strong>Paso 6.1 · Respuestas de error reutilizables en el contrato</strong></summary>
+> <summary><strong>Paso 5.1 · Respuestas de error reutilizables en el contrato</strong></summary>
 >
 > > En vez de repetir el modelo en cada `@ApiResponse`, se declaran **tres respuestas** en `components.responses` (`BadRequest`, `NotFound`, `Conflict`) que apuntan al esquema `ErrorResponse`, con un ejemplo real cada una.
 > >
@@ -1192,7 +1021,7 @@ sequenceDiagram
 > </details>
 >
 > <details>
-> <summary><strong>Paso 6.2 · Usarlas con <code>@ApiResponse(ref = …)</code></strong></summary>
+> <summary><strong>Paso 5.2 · Usarlas con <code>@ApiResponse(ref = …)</code></strong></summary>
 >
 > > <details>
 > > <summary><strong>📄 StudentController.java</strong> <em>(solo el cambio)</em></summary>
@@ -1227,7 +1056,7 @@ sequenceDiagram
 > </details>
 >
 > <details>
-> <summary><strong>Paso 6.3 · Un tropiezo real (y su arreglo)</strong></summary>
+> <summary><strong>Paso 5.3 · Un tropiezo real (y su arreglo)</strong></summary>
 >
 > > Al armar esta documentación apareció **un aviso** en el *log*. Conviene mostrarlo.
 > >
@@ -1238,7 +1067,7 @@ sequenceDiagram
 > </details>
 >
 > <details>
-> <summary><strong>Paso 6.4 · Ver el resultado</strong></summary>
+> <summary><strong>Paso 5.4 · Ver el resultado</strong></summary>
 >
 > > `GET http://localhost:8080/api-docs/students`:
 > >
@@ -1276,10 +1105,10 @@ sequenceDiagram
 ---
 
 <details>
-<summary><strong>🧪 Paso 7 — Probar la API y un <code>500</code> real</strong></summary>
+<summary><strong>🧪 Paso 6 — Probar la API y un <code>500</code> real</strong></summary>
 
 > <details>
-> <summary><strong>Paso 7.1 · Prueba de punta a punta</strong></summary>
+> <summary><strong>Paso 6.1 · Prueba de punta a punta</strong></summary>
 >
 > > Con la aplicación recién arrancada y la base vacía:
 > >
@@ -1295,7 +1124,7 @@ sequenceDiagram
 > > | 8 | `GET /students/abc` | `400` · `El parámetro 'id' tiene un valor no válido: abc` |
 > > | 9 | `GET /students?sort=foo` | `400` · `No se puede ordenar por 'foo'` |
 > > | 10 | `GET /nope` bajo `/api/v1` | `404` · `No existe el recurso solicitado` |
-> > | 11 | `DELETE /students` | `405` · cabecera `Allow: GET, POST` |
+> > | 11 | `DELETE /students` | `405` · cabecera `Allow` |
 > > | 12 | `GET /students/by-email` | `400` · `Falta el parámetro obligatorio 'email'` |
 > > | 13 | `DELETE /students/3` y de nuevo `DELETE /students/3` | `204` y luego `404` |
 > >
@@ -1311,7 +1140,7 @@ sequenceDiagram
 > </details>
 >
 > <details>
-> <summary><strong>Paso 7.2 · Un <code>500</code> de verdad: se cae la base</strong></summary>
+> <summary><strong>Paso 6.2 · Un <code>500</code> de verdad: se cae la base</strong></summary>
 >
 > > Se detiene MySQL y se pide un estudiante que existe:
 > >
@@ -1361,9 +1190,8 @@ sequenceDiagram
 > | Un error de negocio con un único significado HTTP y sin necesidad de cuerpo propio | `@ResponseStatus` | Sobre la clase de la excepción | 2 |
 > | Un caso **propio de un controlador**, con cuerpo personalizado | `@ExceptionHandler` | Método del controlador | 3 |
 > | Un formato de error **igual para toda la API** | `@RestControllerAdvice` | Clase en `presentation.exception` | 4 |
-> | Validación (`@Valid`), JSON roto, tipo equivocado | `@ExceptionHandler` / `@Override` en el *advice* | `presentation.exception` | 4 y 5 |
-> | `404` de ruta, `405`, `415`… | `ResponseEntityExceptionHandler` | Clase base del *advice* | 5 |
-> | Cualquier fallo no previsto | `@ExceptionHandler(Exception.class)` + *log* | `presentation.exception` | 4 |
+> | Validación (`@Valid`), JSON roto, tipo equivocado | `@ExceptionHandler` en el *advice* | `presentation.exception` | 4 |
+> > | Cualquier fallo no previsto | `@ExceptionHandler(Exception.class)` + *log* | `presentation.exception` | 4 |
 > | Avisar de un caso ya conocido y seguir (seed) | `try/catch` | Donde se decide qué hacer | 2 |
 > | Documentar el error en el contrato | `@ApiResponse(ref = …)` + `components.responses` | `OpenApiConfig` y el controlador | 6 |
 >
@@ -1372,7 +1200,7 @@ sequenceDiagram
 > | Nivel | La excepción | Un controlador | Toda la aplicación |
 > | Controla el cuerpo | No | Sí | Sí |
 > | Evita repetir | Parcial | No | **Sí** |
-> | En esta guía | Paso 2 (luego se retira) | Paso 3 (luego se mueve) | Pasos 4 y 5 (queda) |
+> | En esta guía | Paso 2 (luego se retira) | Paso 3 (luego se mueve) | Paso 4 (queda) |
 >
 > > 🔎 Se empezó con el más simple y se terminó con el más general, porque los errores de toda la API deben verse iguales.
 
@@ -1386,7 +1214,7 @@ sequenceDiagram
 > 3. ¿Por qué `@ResponseStatus` no alcanza? *(No permite personalizar el cuerpo y deja al negocio conociendo HTTP.)*
 > 4. ¿Qué excepción gana cuando una clase tiene `@ResponseStatus` y hay un `@ExceptionHandler` para ella? *(El manejador.)*
 > 5. ¿Qué diferencia hay entre `@ExceptionHandler` en un controlador y en un `@RestControllerAdvice`? *(El alcance: un controlador frente a toda la aplicación.)*
-> 6. ¿Por qué `GET /nope` devolvía `500` con el primer *advice*? *(El manejador de `Exception.class` atrapaba las excepciones de Spring MVC antes de que se convirtieran en `404`, `405` o `400`.)*
+> 6. ¿Para qué sirve el `if` de `handleUnexpected`? *(Spring lanza sus propias excepciones para una ruta inexistente o un método no permitido; sin el `if`, el `catch-all` las volvería `500`.)*
 > 7. ¿Por qué el `500` no cuenta nada al cliente, pero sí al *log*? *(Detalles internos son una fuga de información; la traza es lo que necesita el equipo.)*
 > 8. ¿Qué cambia en la documentación al tener un `ErrorResponse` único? *(Se documenta una vez en `components` y cada operación solo lo referencia.)*
 
@@ -1399,8 +1227,7 @@ sequenceDiagram
 > |---|---|---|
 > | Un `404` o `409` llega **sin `message`** | La excepción tiene solo `@ResponseStatus` y ningún manejador | Agregar el `@ExceptionHandler` o el `@RestControllerAdvice` |
 > | El manejador **no se ejecuta** | La clase del *advice* no tiene `@RestControllerAdvice` (o está fuera del paquete escaneado) | Anotarla y dejarla bajo `com.academy` |
-> | `Ambiguous @ExceptionHandler method mapped for …` al arrancar | Se declaró un `@ExceptionHandler` para una excepción que `ResponseEntityExceptionHandler` ya maneja | Sustituirlo por un `@Override` del método `handleXxx` |
-> | Rutas inexistentes o métodos no permitidos devuelven `500` | `@ExceptionHandler(Exception.class)` sin extender `ResponseEntityExceptionHandler` | Extenderla (Paso 5) |
+> | Rutas inexistentes o métodos no permitidos devuelven `500` | Falta el `if` de `ErrorResponse` de Spring en `handleUnexpected` | Agregarlo (Paso 4.1) |
 > | El *log* se llena de trazas por un `404` | El mismo caso anterior: se registra como error inesperado | Igual |
 > | El cliente ve la traza o el SQL | Se devolvió `ex.getMessage()` en el `500` | Mensaje genérico en el cliente y `log.error(..., ex)` |
 > | El `catch` del servicio se traga el error | Un `catch (Exception e)` que no relanza | Capturar solo lo que se sabe resolver, o relanzar |
@@ -1418,7 +1245,7 @@ sequenceDiagram
 > 2. **Choque de correos en la base.** Dos peticiones simultáneas con el mismo correo pasan la verificación y chocan en la restricción `UNIQUE`: Spring lanza `DataIntegrityViolationException`. Manejarla como `409`.
 > 3. **`ProblemDetail`.** Reemplazar `ErrorResponse` por `ProblemDetail` (RFC 7807) y comparar el JSON.
 > 4. **Un identificador de seguimiento.** Agregar un `traceId` al `ErrorResponse` y escribirlo también en el *log* para cruzar cliente y equipo.
-> 5. **Prueba automática.** Con `MockMvc`, escribir una prueba por cada fila de la tabla del Paso 7.1.
+> 5. **Prueba automática.** Con `MockMvc`, escribir una prueba por cada fila de la tabla del Paso 6.1.
 > 6. **Un recurso nuevo.** Repetir el patrón para `Course`: `CourseNotFoundException` y su manejador (¿hay que tocar algo más?).
 > 7. **Menos repetición en Swagger.** Agregar la respuesta `500` a **todas** las operaciones con un `OpenApiCustomizer`.
 > 8. **Un manejador local con sentido.** Encontrar un caso que **sí** convenga dejar en un `@ExceptionHandler` de controlador y justificar por qué.
@@ -2079,122 +1906,98 @@ sequenceDiagram
 > import com.academy.business.exception.StudentNotFoundException;
 > import com.academy.presentation.dto.ErrorResponse;
 > import com.academy.presentation.dto.ErrorResponse.FieldIssue;
+> import jakarta.servlet.http.HttpServletRequest;
 > import org.slf4j.Logger;
 > import org.slf4j.LoggerFactory;
-> import org.springframework.beans.TypeMismatchException;
 > import org.springframework.data.core.PropertyReferenceException;
-> import org.springframework.http.HttpHeaders;
 > import org.springframework.http.HttpStatus;
-> import org.springframework.http.HttpStatusCode;
 > import org.springframework.http.ResponseEntity;
 > import org.springframework.http.converter.HttpMessageNotReadableException;
 > import org.springframework.web.bind.MethodArgumentNotValidException;
 > import org.springframework.web.bind.MissingServletRequestParameterException;
 > import org.springframework.web.bind.annotation.ExceptionHandler;
 > import org.springframework.web.bind.annotation.RestControllerAdvice;
-> import org.springframework.web.context.request.ServletWebRequest;
-> import org.springframework.web.context.request.WebRequest;
-> import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+> import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 >
 > import java.util.Comparator;
 > import java.util.List;
 >
 > @RestControllerAdvice
-> public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+> public class GlobalExceptionHandler {
 >
 >     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 >
->     // ---------- Excepciones de la aplicación ----------
->
 >     @ExceptionHandler(StudentNotFoundException.class)
->     public ResponseEntity<Object> handleNotFound(StudentNotFoundException ex, WebRequest request) {
->         return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+>     public ResponseEntity<ErrorResponse> handleNotFound(StudentNotFoundException ex, HttpServletRequest request) {
+>         return build(HttpStatus.NOT_FOUND, ex.getMessage(), request);
 >     }
 >
 >     @ExceptionHandler(StudentEmailAlreadyExistsException.class)
->     public ResponseEntity<Object> handleDuplicateEmail(StudentEmailAlreadyExistsException ex, WebRequest request) {
->         return build(HttpStatus.CONFLICT, ex.getMessage(), request, null);
+>     public ResponseEntity<ErrorResponse> handleDuplicateEmail(StudentEmailAlreadyExistsException ex,
+>                                                               HttpServletRequest request) {
+>         return build(HttpStatus.CONFLICT, ex.getMessage(), request);
 >     }
 >
->     @ExceptionHandler(PropertyReferenceException.class)
->     public ResponseEntity<Object> handleUnknownSortProperty(PropertyReferenceException ex, WebRequest request) {
->         return build(HttpStatus.BAD_REQUEST, "No se puede ordenar por '" + ex.getPropertyName() + "'", request, null);
->     }
->
->     @ExceptionHandler(Exception.class)
->     public ResponseEntity<Object> handleUnexpected(Exception ex, WebRequest request) {
->         log.error("Error inesperado en {}", path(request), ex);
->         return build(HttpStatus.INTERNAL_SERVER_ERROR,
->                 "Ocurrió un error inesperado. Intentar de nuevo más tarde.", request, null);
->     }
->
->     // ---------- Excepciones de Spring MVC (las maneja la clase base; aquí se les da el cuerpo propio) ----------
->
->     @Override
->     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
->                                                                   HttpHeaders headers, HttpStatusCode status,
->                                                                   WebRequest request) {
+>     @ExceptionHandler(MethodArgumentNotValidException.class)
+>     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex,
+>                                                           HttpServletRequest request) {
 >         List<FieldIssue> details = ex.getBindingResult().getFieldErrors().stream()
 >                 .map(error -> new FieldIssue(error.getField(), error.getDefaultMessage()))
 >                 .sorted(Comparator.comparing(FieldIssue::field).thenComparing(FieldIssue::message))
 >                 .toList();
->         return build(HttpStatus.BAD_REQUEST, "Los datos enviados no son válidos", request, details);
+>         ErrorResponse body = ErrorResponse.of(HttpStatus.BAD_REQUEST,
+>                 "Los datos enviados no son válidos", request.getRequestURI(), details);
+>         return ResponseEntity.badRequest().body(body);
 >     }
 >
->     @Override
->     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
->                                                                   HttpHeaders headers, HttpStatusCode status,
->                                                                   WebRequest request) {
+>     @ExceptionHandler(HttpMessageNotReadableException.class)
+>     public ResponseEntity<ErrorResponse> handleUnreadableBody(HttpMessageNotReadableException ex,
+>                                                               HttpServletRequest request) {
 >         return build(HttpStatus.BAD_REQUEST,
->                 "El cuerpo de la petición no es un JSON válido o tiene un valor no permitido", request, null);
+>                 "El cuerpo de la petición no es un JSON válido o tiene un valor no permitido", request);
 >     }
 >
->     @Override
->     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
->                                                         HttpStatusCode status, WebRequest request) {
+>     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+>     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
+>                                                             HttpServletRequest request) {
 >         return build(HttpStatus.BAD_REQUEST,
->                 "El parámetro '" + ex.getPropertyName() + "' tiene un valor no válido: " + ex.getValue(),
->                 request, null);
+>                 "El parámetro '" + ex.getName() + "' tiene un valor no válido: " + ex.getValue(), request);
 >     }
 >
->     @Override
->     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
->                                                                           HttpHeaders headers, HttpStatusCode status,
->                                                                           WebRequest request) {
+>     @ExceptionHandler(MissingServletRequestParameterException.class)
+>     public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException ex,
+>                                                                 HttpServletRequest request) {
 >         return build(HttpStatus.BAD_REQUEST,
->                 "Falta el parámetro obligatorio '" + ex.getParameterName() + "'", request, null);
+>                 "Falta el parámetro obligatorio '" + ex.getParameterName() + "'", request);
 >     }
 >
->     // Todas las demás excepciones de Spring MVC (ruta inexistente, método no permitido...) pasan por aquí.
->     @Override
->     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
->                                                              HttpStatusCode statusCode, WebRequest request) {
->         HttpStatus status = HttpStatus.valueOf(statusCode.value());
->         String message = switch (status) {
->             case NOT_FOUND -> "No existe el recurso solicitado";
->             case METHOD_NOT_ALLOWED -> "Ese método HTTP no está permitido en esta ruta";
->             case UNSUPPORTED_MEDIA_TYPE -> "El tipo de contenido enviado no está soportado";
->             case NOT_ACCEPTABLE -> "No se puede responder en el formato pedido";
->             default -> status.getReasonPhrase();
->         };
->         ResponseEntity<Object> response = build(status, message, request, null);
->         return ResponseEntity.status(status).headers(headers).body(response.getBody());
+>     @ExceptionHandler(PropertyReferenceException.class)
+>     public ResponseEntity<ErrorResponse> handleUnknownSortProperty(PropertyReferenceException ex,
+>                                                                    HttpServletRequest request) {
+>         return build(HttpStatus.BAD_REQUEST,
+>                 "No se puede ordenar por '" + ex.getPropertyName() + "'", request);
 >     }
 >
->     // ---------- Apoyo ----------
->
->     private ResponseEntity<Object> build(HttpStatus status, String message, WebRequest request,
->                                          List<FieldIssue> details) {
->         ErrorResponse body = details == null
->                 ? ErrorResponse.of(status, message, path(request))
->                 : ErrorResponse.of(status, message, path(request), details);
->         return ResponseEntity.status(status).body(body);
+>     @ExceptionHandler(Exception.class)
+>     public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
+>         // Ruta inexistente (404), método no permitido (405)...: Spring ya sabe su código; no es un 500.
+>         if (ex instanceof org.springframework.web.ErrorResponse springError) {
+>             HttpStatus status = HttpStatus.valueOf(springError.getStatusCode().value());
+>             String message = switch (status) {
+>                 case NOT_FOUND -> "No existe el recurso solicitado";
+>                 case METHOD_NOT_ALLOWED -> "Ese método HTTP no está permitido en esta ruta";
+>                 default -> status.getReasonPhrase();
+>             };
+>             return ResponseEntity.status(status).headers(springError.getHeaders())
+>                     .body(ErrorResponse.of(status, message, request.getRequestURI()));
+>         }
+>         log.error("Error inesperado en {}", request.getRequestURI(), ex);
+>         return build(HttpStatus.INTERNAL_SERVER_ERROR,
+>                 "Ocurrió un error inesperado. Intentar de nuevo más tarde.", request);
 >     }
 >
->     private String path(WebRequest request) {
->         return request instanceof ServletWebRequest servletRequest
->                 ? servletRequest.getRequest().getRequestURI()
->                 : "";
+>     private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, HttpServletRequest request) {
+>         return ResponseEntity.status(status).body(ErrorResponse.of(status, message, request.getRequestURI()));
 >     }
 > }
 > ```
