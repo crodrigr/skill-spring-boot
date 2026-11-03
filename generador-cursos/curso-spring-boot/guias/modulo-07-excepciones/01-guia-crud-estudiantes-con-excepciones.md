@@ -945,7 +945,19 @@ sequenceDiagram
 > > HTTP/1.1 400
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-01T23:57:10.657Z","status":400,"error":"Bad Request","message":"Los datos enviados no son válidos","path":"/api/v1/students","details":[{"field":"age","message":"debe ser 16 o más"},{"field":"email","message":"no tiene formato de correo electrónico"},{"field":"name","message":"debe tener entre 2 y 100 caracteres"},{"field":"name","message":"es obligatorio"}]}
+> > {
+> >   "timestamp": "2026-11-01T23:57:10.657Z",
+> >   "status": 400,
+> >   "error": "Bad Request",
+> >   "message": "Los datos enviados no son válidos",
+> >   "path": "/api/v1/students",
+> >   "details": [
+> >     {"field": "age",   "message": "debe ser 16 o más"},
+> >     {"field": "email", "message": "no tiene formato de correo electrónico"},
+> >     {"field": "name",  "message": "debe tener entre 2 y 100 caracteres"},
+> >     {"field": "name",  "message": "es obligatorio"}
+> >   ]
+> > }
 > > ```
 > >
 > > Los **cuatro `400` que antes eran iguales** ahora se distinguen:
