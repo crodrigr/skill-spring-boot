@@ -31,8 +31,6 @@ Así el controlador solo cuenta el caso feliz, y todos los errores tienen **el m
 | 5 | Documentar los errores en Swagger |
 | 6 | Probar todo, incluido un `500` real |
 
-⏱️ Unos 140 minutos. El Paso 0 puede entregarse ya hecho.
-
 <details>
 <summary><strong>⚙️ ¿Cómo viaja una excepción? (<code>GET /api/v1/students/999</code>)</strong></summary>
 
