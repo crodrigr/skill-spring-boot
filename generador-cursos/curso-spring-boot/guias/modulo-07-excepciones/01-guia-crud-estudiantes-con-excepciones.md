@@ -536,6 +536,48 @@ sequenceDiagram
 > <details>
 > <summary><strong>Paso 3.1 · El cuerpo de error: <code>ErrorResponse</code></strong></summary>
 >
+> > **¿Para qué sirve?** Cuando algo falla, la API responde con un JSON. `ErrorResponse` es el **molde** de ese JSON: define qué datos lleva un error. Como **todos** los errores usan el mismo molde, quien consume la API siempre sabe qué esperar.
+> >
+> > **Ejemplo:** pedir un estudiante que no existe (`GET /students/999`) devuelve:
+> >
+> > ```json
+> > {
+> >   "timestamp": "2026-11-01T10:15:30.123Z",
+> >   "status": 404,
+> >   "error": "Not Found",
+> >   "message": "No existe un estudiante con id 999",
+> >   "path": "/api/v1/students/999"
+> > }
+> > ```
+> >
+> > | Campo | Qué dice | En el ejemplo |
+> > |---|---|---|
+> > | `timestamp` | **Cuándo** ocurrió | `2026-11-01T10:15:30.123Z` |
+> > | `status` | El **número** del código HTTP | `404` |
+> > | `error` | El **nombre** de ese código | `Not Found` |
+> > | `message` | **Qué pasó**, en español claro | `No existe un estudiante con id 999` |
+> > | `path` | **Dónde** falló (la ruta pedida) | `/api/v1/students/999` |
+> > | `details` | **Opcional.** Lista de campos inválidos | Solo aparece en errores de validación |
+> >
+> > Cuando hay errores de validación, `details` dice cuál campo falló y por qué:
+> >
+> > ```json
+> > "details": [
+> >   {"field": "age",   "message": "debe ser 16 o más"},
+> >   {"field": "email", "message": "no tiene formato de correo electrónico"}
+> > ]
+> > ```
+> >
+> > **Cómo leer el código** (no hace falta entender cada anotación):
+> >
+> > - `public record ErrorResponse(...)`: una clase pensada para **solo guardar datos**. Cada línea entre paréntesis es un campo de la tabla.
+> > - `record FieldIssue(field, message)`: el molde de **un** problema dentro de `details` (un campo y su razón).
+> > - `ErrorResponse.of(...)`: un **atajo para crearlo**. Se le da el código, el mensaje y la ruta, y él pone la fecha y el nombre del código.
+> > - `@Schema(...)`: solo sirve para que **Swagger** muestre la descripción y un ejemplo. No cambia cómo funciona.
+> > - `@JsonInclude(NON_EMPTY)`: si `details` está vacío, **no se muestra** en el JSON. Por eso solo aparece en la validación.
+> >
+> > > 💡 El error no incluye la traza ni el nombre de la clase de la excepción: el cliente no debe verlos.
+> >
 > > <details>
 > > <summary><strong>📄 ErrorResponse.java</strong></summary>
 > >
@@ -600,14 +642,6 @@ sequenceDiagram
 > >
 > > </details>
 > >
-> > | Campo | Para qué |
-> > |---|---|
-> > | `status`, `error` | El código y su nombre, para quien solo lee el JSON |
-> > | `message` | **Qué pasó**, en español claro |
-> > | `path` | Qué petición falló (útil en un *log* o en un reporte) |
-> > | `details` | Lista de `{field, message}`; **desaparece** del JSON cuando está vacía (`@JsonInclude`) |
-> >
-> > > 💡 No lleva la traza ni el nombre de la clase de la excepción: el cliente no debe verlos.
 >
 > </details>
 >
