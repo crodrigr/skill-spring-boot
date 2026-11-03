@@ -25,7 +25,7 @@ sequenceDiagram
 
     Note over C: El cliente guarda el JWT<br/>(no hay sesión en el servidor)
 
-    C->>S: GET /libros (Authorization: Bearer <JWT>)
+    C->>S: GET /libros (Authorization: Bearer JWT)
     S->>S: Valida la firma del JWT
     S-->>C: 200 OK + datos
 
