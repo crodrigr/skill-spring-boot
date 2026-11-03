@@ -1,233 +1,120 @@
 # 🚨 Guía paso a paso — CRUD de estudiantes con manejo de excepciones
 
-> 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 06 — CRUD de estudiantes con Swagger](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): el proyecto de partida **ya tiene** DTO, mapeador, `ServiceResult`, rutas con versión (`/api/v1`), un controlador delgado y la documentación con Swagger. Sobre él se reemplaza, **paso a paso**, el manejo de errores hecho a mano por **excepciones**, con las tres herramientas del [Módulo 07](../../07-manejo-de-excepciones/material/ejemplos/explicacion-conceptual.md): `@ResponseStatus`, `@ExceptionHandler` y `@ControllerAdvice`.
-> Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo.
->
-> 📦 **Proyecto terminado:** [`students-api-excepciones/`](codigo/students-api-excepciones/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
->
-> ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas HTTP, el contrato OpenAPI y el mensaje del registro (*log*) que se muestran son salidas reales de la aplicación.
->
-> 🧭 **Idea central.** Un error de negocio («no existe», «ya existe») **no es un valor que se devuelve: es algo que ocurrió**. El servicio **lo lanza** como excepción, y **un solo lugar** decide qué código HTTP y qué cuerpo ve el cliente. El controlador deja de preguntar «¿salió bien?» y la capa de negocio deja de saber qué es HTTP.
+> 👩‍🏫 **Material docente** (contiene el código completo; no se entrega antes de resolver el módulo).
+> Continúa la [guía del Módulo 06](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md). 📦 Proyecto terminado: [`students-api-excepciones/`](codigo/students-api-excepciones/) (`./mvnw spring-boot:run`).
+> ✅ **Verificada** con Java 21, Spring Boot 4.1.2 y MySQL 8: las respuestas que se muestran son reales.
+
+## 🧭 La idea en un minuto
+
+Hoy, cuando algo sale mal (por ejemplo, el estudiante no existe), el servicio **devuelve un valor** y el controlador decide qué responder. Eso obliga a repetir `if` y `switch` en cada controlador.
+
+En esta guía el servicio **lanza una excepción** y **un solo lugar** decide qué responde la API:
+
+```text
+Servicio ── lanza StudentNotFoundException ──▶ Controlador (no hace nada)
+                                                   │
+                                                   ▼
+                                  GlobalExceptionHandler ──▶ 404 + JSON con el mensaje
+```
+
+Así el controlador solo cuenta el caso feliz, y todos los errores tienen **el mismo formato**.
+
+## 🎯 Qué se hace
+
+| Paso | Qué se aprende |
+|:-:|---|
+| 0 | Partir del proyecto del Módulo 06 |
+| 1 | Ver qué falla en el manejo manual |
+| 2 | Lanzar excepciones propias + `@ResponseStatus` |
+| 3 | Controlar el cuerpo con `@ExceptionHandler` |
+| 4 | Centralizar con `@RestControllerAdvice` |
+| 5 | Cubrir los errores de Spring (`ResponseEntityExceptionHandler`) |
+| 6 | Documentar los errores en Swagger |
+| 7 | Probar todo, incluido un `500` real |
+
+⏱️ Unos 160 minutos. El Paso 0 puede entregarse ya hecho.
 
 <details>
-<summary><strong>🎯 Objetivo</strong></summary>
+<summary><strong>⚙️ ¿Cómo viaja una excepción? (<code>GET /api/v1/students/999</code>)</strong></summary>
 
-> Pasar la API de estudiantes del Módulo 06 de «los errores son valores (`ServiceResult`) y salen como respuestas vacías» a «los errores son **excepciones** y salen como un **cuerpo JSON uniforme**».
->
-> Al terminar, el estudiante:
->
-> - Reconoce **cinco problemas** del manejo de errores hecho a mano (respuestas vacías, `400` indistinguibles, un `500` que no lo es…).
-> - Crea **excepciones propias** de la capa de negocio y hace que el servicio **las lance** en vez de devolver `ServiceResult`.
-> - Asocia una excepción a un código HTTP con **`@ResponseStatus`** y ve **qué no puede hacer** (no controla el cuerpo).
-> - Personaliza el cuerpo con **`@ExceptionHandler`** en un controlador y ve **hasta dónde llega** (solo ese controlador).
-> - Centraliza el manejo con **`@RestControllerAdvice`** y devuelve un `ErrorResponse` **igual para todos los errores**.
-> - Devuelve `400` con el **detalle campo por campo** para la validación (`@Valid`) y para JSON roto, ids mal escritos y ordenamientos inválidos.
-> - Evita que un `catch-all` convierta un `404` o un `405` de Spring en un `500` (**`ResponseEntityExceptionHandler`**).
-> - Mantiene la capa de negocio **sin conocer HTTP**.
-> - **Documenta** los errores en Swagger con un modelo reutilizable (`ErrorResponse`).
-> - Elige el mecanismo apropiado según el escenario.
+```mermaid
+sequenceDiagram
+    participant C as Cliente
+    participant K as StudentController
+    participant S as StudentService
+    participant H as GlobalExceptionHandler
+    C->>K: GET /api/v1/students/999
+    K->>S: findById(999)
+    S--xK: lanza StudentNotFoundException
+    K--xH: Spring la entrega al manejador
+    H-->>C: 404 + JSON
+```
+
+1. El servicio **lanza** la excepción y el método se corta.
+2. El controlador no la captura, así que sale de él.
+3. **Spring** busca quién la maneje y usa el primero que encuentre: un `@ExceptionHandler`, luego un `@ResponseStatus`, y si no, su comportamiento por defecto.
+4. El manejador devuelve la respuesta (código + cuerpo).
+
+> 🔑 Nadie llama al manejador a mano: lo invoca Spring.
+
+| Herramienta | Dónde se escribe | Alcance |
+|---|---|---|
+| `@ResponseStatus` | Sobre la clase de la excepción | Solo el código HTTP |
+| `@ExceptionHandler` | En un método de un controlador | Ese controlador |
+| `@RestControllerAdvice` | En una clase aparte | Todos los controladores |
 
 </details>
 
 <details>
-<summary><strong>📝 Introducción: qué cambia respecto al Módulo 06</strong></summary>
+<summary><strong>📏 Los errores que la API debe distinguir</strong></summary>
 
-> <details>
-> <summary><strong>🧩 Tres ideas que se confunden</strong></summary>
->
-> | Idea | Qué es | Dónde vive en este proyecto |
-> |---|---|---|
-> | **Excepción** | Un objeto que **interrumpe** el flujo normal y sube por las capas hasta que alguien la captura | Clases de `business.exception` |
-> | **Código HTTP** | El número que el **cliente** lee (`404`, `409`, `400`, `500`) | Lo decide el manejador, en `presentation` |
-> | **Cuerpo de error** | El JSON que explica **qué pasó** | `ErrorResponse` (DTO) |
->
-> ```text
-> Repository ─▶ Service ──── throw StudentNotFoundException ───▶ Controller (no la captura)
->                                                                     │
->                                                                     ▼
->                                              @RestControllerAdvice  ─▶  404 + ErrorResponse (JSON)
-> ```
->
-> > 🧠 **Jerarquía.** `Throwable` → `Exception` → `RuntimeException`. Las excepciones propias de esta guía extienden **`RuntimeException`** (no obligan a declarar `throws` en cada método): son errores de **uso de la API**, no fallos del sistema. `Error` (por ejemplo, `OutOfMemoryError`) no se captura.
->
-> </details>
->
-> <details>
-> <summary><strong>⚙️ Cómo se ejecuta: el recorrido de una excepción</strong></summary>
->
-> Ejemplo: `GET /api/v1/students/999`, un estudiante que no existe.
->
-> ```mermaid
-> sequenceDiagram
->     participant C as Cliente
->     participant K as StudentController
->     participant S as StudentService
->     participant SP as Spring MVC
->     participant H as GlobalExceptionHandler
->     C->>K: GET /api/v1/students/999
->     K->>S: findById(999)
->     S--xK: throw StudentNotFoundException
->     K--xSP: la excepción sale del controlador
->     SP->>H: busca un @ExceptionHandler para ese tipo
->     H-->>SP: ResponseEntity(404, ErrorResponse)
->     SP-->>C: 404 + JSON
-> ```
->
-> 1. El servicio no encuentra el estudiante y **lanza** `StudentNotFoundException`. El método se interrumpe: el `return` nunca se ejecuta.
-> 2. El controlador **no la captura** (no tiene `try/catch`), así que la excepción sale de él.
-> 3. Spring MVC la recibe y **busca quién la maneje**, en este orden:
->
->    | Orden | Quién | Qué hace |
->    |:-:|---|---|
->    | 1 | `@ExceptionHandler` (en el controlador y, después, en un `@RestControllerAdvice`) | Construye la respuesta completa: código y cuerpo |
->    | 2 | `@ResponseStatus` en la clase de la excepción | Fija solo el código; el cuerpo es el de Spring |
->    | 3 | Comportamiento por defecto de Spring | Excepciones propias de Spring MVC → su código; el resto → `500` |
->
->    **Se usa el primero que sepa manejarla**; los demás ya no se consultan.
-> 4. El método manejador **recibe la excepción como parámetro** y devuelve un `ResponseEntity`. Spring lo trata como el retorno de cualquier método de un controlador y lo escribe como JSON.
-> 5. Como la excepción quedó manejada, el recorrido termina ahí: nadie más la ve.
->
-> > 🔑 **Ningún método llama al manejador.** Lo invoca Spring cuando detecta la excepción, igual que invoca al controlador cuando llega una petición. Por eso el controlador queda solo con el camino feliz.
->
-> Las tres herramientas de esta guía son tres lugares donde puede estar el paso 3:
->
-> | Herramienta | Dónde está | Alcance |
-> |---|---|---|
-> | `@ResponseStatus` | Sobre la clase de la excepción | Solo el código HTTP |
-> | `@ExceptionHandler` | En un método de **un** controlador | Ese controlador |
-> | `@RestControllerAdvice` | En una clase aparte | **Todos** los controladores |
->
-> </details>
->
-> <details>
-> <summary><strong>🎓 El proyecto</strong></summary>
->
-> La API de estudiantes del Módulo 06, con las tres capas (`presentation`, `business`, `persistence`), nombres en inglés, MySQL y Swagger.
->
-> | Operación | Ruta | Errores que debe distinguir |
-> |---|---|---|
-> | Listar con filtro y paginación | `GET /api/v1/students?name=&page=&size=&sort=` | `400` (orden o página inválidos) |
-> | Buscar por id | `GET /api/v1/students/{id}` | `400` (id no numérico) · `404` |
-> | Buscar por correo (obsoleta) | `GET /api/v1/students/by-email?email=` | `400` (falta el correo) · `404` |
-> | Crear | `POST /api/v1/students` | `400` (datos o JSON inválidos) · `409` |
-> | Reemplazar | `PUT /api/v1/students/{id}` | `400` · `404` · `409` |
-> | Cambiar el estado | `PATCH /api/v1/students/{id}/status` | `400` · `404` |
-> | Eliminar | `DELETE /api/v1/students/{id}` | `404` |
->
-> </details>
->
-> <details>
-> <summary><strong>🔁 Antes y después</strong></summary>
->
-> | Pieza | Módulo 06 (valores) | Esta guía (excepciones) |
-> |---|---|---|
-> | Servicio | Devuelve `ServiceResult<T>` o `Optional<T>` | Devuelve el dato y **lanza** si no puede |
-> | `ServiceResult` / `ServiceStatus` | Existen | **Se eliminan** |
-> | Controlador | `switch` sobre el estado y `ResponseEntity.notFound()` | Solo el camino feliz |
-> | `404` y `409` | Sin cuerpo | `ErrorResponse` con mensaje |
-> | `400` | Cuerpo genérico de Spring, igual para cualquier causa | `ErrorResponse` con la causa y, si aplica, el detalle por campo |
-> | Rutas inexistentes, métodos no permitidos | Cuerpo genérico de Spring | `ErrorResponse` |
-> | Swagger | `404`/`409`/`400` sin modelo (`content = @Content`) | Referencia a un modelo de error reutilizable |
->
-> </details>
->
-> <details>
-> <summary><strong>📏 Situaciones de error y su respuesta</strong></summary>
->
-> | Código | Situación | Excepción que la origina | HTTP |
-> |---|---|---|:-:|
-> | **RN-01** | No existe un estudiante con ese id o correo | `StudentNotFoundException` (propia) | `404` |
-> | **RN-02** | El correo ya pertenece a otro estudiante | `StudentEmailAlreadyExistsException` (propia) | `409` |
-> | **RN-03** | Un campo no cumple su validación | `MethodArgumentNotValidException` (Spring) | `400` + detalle |
-> | **RN-04** | El cuerpo no es JSON o trae un valor que no existe (`"status":"XYZ"`) | `HttpMessageNotReadableException` (Spring) | `400` |
-> | **RN-05** | Un parámetro tiene un tipo equivocado (`/students/abc`) | `MethodArgumentTypeMismatchException` (Spring) | `400` |
-> | **RN-06** | Se ordena por una propiedad que no existe (`?sort=foo`) | `PropertyReferenceException` (Spring Data) | `400` |
-> | **RN-07** | Falta un parámetro obligatorio | `MissingServletRequestParameterException` (Spring) | `400` |
-> | **RN-08** | Ruta inexistente / método no permitido | `NoResourceFoundException` / `HttpRequestMethodNotSupportedException` (Spring) | `404` / `405` |
-> | **RN-09** | Cualquier otro fallo (por ejemplo, se cae la base) | `Exception` | `500` |
->
-> </details>
->
-> <details>
-> <summary><strong>🛠️ Requerimientos y restricciones</strong></summary>
->
-> | Código | Requerimiento |
-> |---|---|
-> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2, Maven, MySQL 8 y springdoc 3.2.0 (los del Módulo 06). |
-> | **RNF-02** | Las **excepciones propias** viven en `business.exception`, extienden `RuntimeException` y **no** importan nada de `org.springframework.web` ni `org.springframework.http`. |
-> | **RNF-03** | El **manejador global** y el DTO `ErrorResponse` viven en `presentation` (`exception` y `dto`). |
-> | **RNF-04** | **Todo** error de la API tiene el mismo cuerpo: `ErrorResponse`. |
-> | **RNF-05** | Un error inesperado (`500`) **no revela** detalles al cliente y **sí** se registra en el *log* con su traza. |
-> | **RNF-06** | Los controladores no tienen `try/catch` ni construyen respuestas de error. |
-> | **RNF-07** | Los errores quedan documentados en Swagger. |
-> | **RNF-08** | Nombres del código en **inglés**; mensajes para el cliente en **español**. |
->
-> > 💡 **Alcance.** `@Valid` ya venía del Módulo 05: aquí **no se agrega** validación, solo se **maneja** la excepción que lanza. Quedan fuera: `ProblemDetail` (RFC 7807), internacionalización de mensajes y autenticación.
->
-> </details>
+| Situación | Excepción | HTTP |
+|---|---|:-:|
+| No existe el estudiante (id o correo) | `StudentNotFoundException` (propia) | `404` |
+| El correo ya está registrado | `StudentEmailAlreadyExistsException` (propia) | `409` |
+| Un campo no cumple su validación | `MethodArgumentNotValidException` | `400` + detalle |
+| JSON roto o valor de enumerado inexistente | `HttpMessageNotReadableException` | `400` |
+| Parámetro con tipo equivocado (`/students/abc`) | `MethodArgumentTypeMismatchException` | `400` |
+| Orden por una propiedad inexistente (`?sort=foo`) | `PropertyReferenceException` | `400` |
+| Falta un parámetro obligatorio | `MissingServletRequestParameterException` | `400` |
+| Ruta inexistente / método no permitido | `NoResourceFoundException` / `HttpRequestMethodNotSupportedException` | `404` / `405` |
+| Cualquier otro fallo (se cae la base) | `Exception` | `500` |
 
 </details>
 
 <details>
-<summary><strong>⏱️ Plan de la sesión</strong></summary>
+<summary><strong>🛠️ Reglas del proyecto</strong></summary>
 
-> | Paso | Minutos | Actividad |
-> |---|---:|---|
-> | 0 | 0 – 10 | Punto de partida: el proyecto del Módulo 06 |
-> | 1 | 10 – 25 | **Ver los problemas** del manejo manual |
-> | 2 | 25 – 50 | Excepciones propias y `@ResponseStatus` |
-> | 3 | 50 – 70 | `@ExceptionHandler` y el cuerpo de error |
-> | 4 | 70 – 100 | `@RestControllerAdvice`: el manejo global |
-> | 5 | 100 – 120 | Las excepciones de Spring MVC |
-> | 6 | 120 – 140 | Documentar los errores en Swagger |
-> | 7 | 140 – 160 | Probar la API y un `500` real |
->
-> > 💡 **Ritmo.** El Paso 0 es la base y puede entregarse ya hecho; el tiempo se dedica a los Pasos 1 a 7.
+- Las excepciones propias viven en `business.exception`, extienden `RuntimeException` y **no importan nada de Spring Web** (RNF-02).
+- El manejador global y `ErrorResponse` viven en `presentation` (RNF-03).
+- **Todo** error tiene el mismo cuerpo: `ErrorResponse` (RNF-04).
+- Un `500` **no revela detalles** al cliente, pero **sí** guarda la traza en el *log* (RNF-05).
+- Los controladores no tienen `try/catch` (RNF-06) y los errores se documentan en Swagger (RNF-07).
+- Código en **inglés**; mensajes al cliente en **español** (RNF-08).
+
+> 💡 `@Valid` ya venía del Módulo 05: aquí solo se **maneja** su excepción. Quedan fuera `ProblemDetail`, internacionalización y autenticación.
 
 </details>
 
 <details>
-<summary><strong>🏗️ Arquitectura: el árbol de archivos (🆕 nuevo · ✏️ cambia · 🗑️ se elimina)</strong></summary>
+<summary><strong>🏗️ Archivos del proyecto (🆕 nuevo · ✏️ cambia · 🗑️ se elimina)</strong></summary>
 
-> ```text
-> 📁 students-api-excepciones
-> └── 📁 src/main
->     ├── 📁 java/com/academy
->     │   ├── 📄 AcademyApplication.java
->     │   ├── 📁 presentation
->     │   │   ├── 📁 config
->     │   │   │   └── ✏️ OpenApiConfig.java         respuestas de error reutilizables + esquema ErrorResponse
->     │   │   ├── 📁 controller
->     │   │   │   ├── ✏️ StudentController.java     solo el camino feliz · @ApiResponse con ref
->     │   │   │   └── ✏️ InternalController.java    seed con try/catch
->     │   │   ├── 📁 dto
->     │   │   │   ├── 🆕 ErrorResponse.java         el cuerpo de todo error
->     │   │   │   ├── ✏️ StudentRequest.java        mensajes de validación en español
->     │   │   │   ├── ✏️ StudentStatusRequest.java
->     │   │   │   ├── StudentResponse.java
->     │   │   │   └── PageResponse.java
->     │   │   ├── 📁 exception
->     │   │   │   └── 🆕 GlobalExceptionHandler.java  @RestControllerAdvice
->     │   │   └── 📁 mapper
->     │   │       └── StudentMapper.java
->     │   ├── 📁 business
->     │   │   ├── 📁 exception
->     │   │   │   ├── 🆕 StudentNotFoundException.java
->     │   │   │   └── 🆕 StudentEmailAlreadyExistsException.java
->     │   │   └── 📁 service
->     │   │       ├── ✏️ StudentService.java        lanza excepciones
->     │   │       ├── 🗑️ ServiceResult.java
->     │   │       └── 🗑️ ServiceStatus.java
->     │   └── 📁 persistence                        sin cambios
->     └── 📁 resources
->         └── 📄 application.properties             sin cambios
-> ```
->
-> | Capa | Qué aporta a las excepciones |
-> |---|---|
-> | `persistence` | **Nada**: sin cambios |
-> | `business` | **Lanza** las excepciones de dominio (`business.exception`) |
-> | `presentation` | **Traduce** cada excepción a HTTP (`GlobalExceptionHandler`) y define el cuerpo (`ErrorResponse`) |
+```text
+📁 com/academy
+├── 📁 presentation
+│   ├── 📁 config      ✏️ OpenApiConfig.java        respuestas de error reutilizables
+│   ├── 📁 controller  ✏️ StudentController.java    solo el camino feliz
+│   │                  ✏️ InternalController.java   seed con try/catch
+│   ├── 📁 dto         🆕 ErrorResponse.java        el cuerpo de todo error
+│   │                  ✏️ StudentRequest.java       mensajes en español
+│   └── 📁 exception   🆕 GlobalExceptionHandler.java
+├── 📁 business
+│   ├── 📁 exception   🆕 StudentNotFoundException.java
+│   │                  🆕 StudentEmailAlreadyExistsException.java
+│   └── 📁 service     ✏️ StudentService.java       lanza excepciones
+│                      🗑️ ServiceResult.java, ServiceStatus.java
+└── 📁 persistence     sin cambios
+```
 
 </details>
 
@@ -280,7 +167,7 @@
 <details>
 <summary><strong>🔎 Paso 1 — Ver los problemas del manejo manual</strong></summary>
 
-> > 🗣️ **Para abrir el paso.** Antes de cambiar nada se **provocan los errores** y se mira, **con `curl -i`**, qué recibe el cliente. Es la mejor forma de que el grupo sienta el problema.
+> > 💬 Antes de cambiar nada, se provocan errores y se mira qué recibe el cliente.
 >
 > <details>
 > <summary><strong>Paso 1.1 · Provocar nueve errores</strong></summary>
@@ -355,8 +242,6 @@
 > > ```
 > >
 > > </details>
-> >
-> > > 🧠 **Para preguntar:** si mañana se agrega un `CourseController`, ¿qué hay que copiar? *(El `switch`, el `respond` y el `ServiceResult` de cada servicio.)*
 >
 > </details>
 
@@ -367,7 +252,7 @@
 <details>
 <summary><strong>🏷️ Paso 2 — Excepciones propias y <code>@ResponseStatus</code></strong></summary>
 
-> > 🗣️ **Primer mecanismo.** `@ResponseStatus` se pone **sobre la clase de la excepción** y la asocia a un código HTTP. Es lo más simple que existe: ideal cuando una excepción siempre significa lo mismo.
+> > 💬 `@ResponseStatus` va **sobre la clase de la excepción** y le asigna un código HTTP. Es lo más simple.
 >
 > <details>
 > <summary><strong>Paso 2.1 · Dos excepciones de la capa de negocio</strong></summary>
@@ -636,8 +521,6 @@
 > > | `404` y `409` correctos, sin `switch` en el controlador | El cuerpo **no dice por qué**: el `message` de la excepción **no sale**. |
 > > | El servicio dice qué pasó (`throw`) | `@ResponseStatus` **no permite personalizar el cuerpo**. |
 > >
-> > > 🧠 **¿Y `server.error.include-message=always`?** Haría salir el mensaje, pero **para todas** las excepciones, incluidas las inesperadas, y eso puede **revelar detalles internos**. Por eso conviene controlar el cuerpo **a propósito**.
-> >
 > > > ⚠️ **Dependencia al revés.** `StudentNotFoundException` está en `business` pero importa `org.springframework.web`. La capa de negocio **conoce HTTP**. Se corrige en el Paso 4.
 >
 > </details>
@@ -649,7 +532,7 @@
 <details>
 <summary><strong>🎛️ Paso 3 — <code>@ExceptionHandler</code>: controlar el cuerpo</strong></summary>
 
-> > 🗣️ **Segundo mecanismo.** `@ExceptionHandler` es un **método dentro del controlador** que atrapa una excepción y construye la respuesta completa: código, mensaje y cuerpo.
+> > 💬 `@ExceptionHandler` es un **método del controlador** que atrapa una excepción y arma la respuesta completa.
 >
 > <details>
 > <summary><strong>Paso 3.1 · El cuerpo de error: <code>ErrorResponse</code></strong></summary>
@@ -776,7 +659,7 @@
 > >
 > > **Sigue con el cuerpo genérico de Spring**: no tiene `message` y su formato es otro.
 > >
-> > > 🧠 **Precedencia.** `StudentEmailAlreadyExistsException` **todavía** tiene `@ResponseStatus(CONFLICT)`. Cuando una excepción tiene las dos cosas, **gana `@ExceptionHandler`** (es más específico).
+> > > 🧠 Si una excepción tiene `@ResponseStatus` **y** un `@ExceptionHandler`, gana el `@ExceptionHandler`.
 >
 > </details>
 >
@@ -800,7 +683,7 @@
 <details>
 <summary><strong>🌐 Paso 4 — <code>@RestControllerAdvice</code>: el manejo global</strong></summary>
 
-> > 🗣️ **Tercer mecanismo.** `@ControllerAdvice` (en una API REST, **`@RestControllerAdvice`**, que además escribe el cuerpo como JSON) es **una clase** con métodos `@ExceptionHandler` que valen para **todos** los controladores.
+> > 💬 `@RestControllerAdvice` es **una clase** con métodos `@ExceptionHandler` que valen para **todos** los controladores.
 >
 > <details>
 > <summary><strong>Paso 4.1 · Mover el manejo a un solo lugar</strong></summary>
@@ -908,7 +791,7 @@
 > >
 > > > ⚠️ **Cambio de Spring Boot 4.** `PropertyReferenceException` ahora está en `org.springframework.data.core` (con Spring Boot 3 estaba en `org.springframework.data.mapping`). Con el `import` viejo, el proyecto **no compila**.
 > >
-> > > 🔎 **Cuál se elige.** Si una excepción encaja con varios manejadores, Spring usa **el más específico** (el de la clase más cercana). Por eso `Exception.class` solo atrapa lo que **nadie más** manejó.
+> > > 🔎 Si varios manejadores encajan, Spring usa el más específico. Por eso `Exception.class` solo atrapa lo que nadie más manejó.
 > >
 > > > ⚠️ **El `500` no cuenta nada.** Al cliente le llega un mensaje genérico; la **traza completa** va al *log* con `log.error(..., ex)` (RNF-05).
 >
@@ -960,7 +843,7 @@
 > > | ¿`business` importa `org.springframework.web`? | **Sí** | **No** (RNF-02) |
 > > | ¿Se puede cambiar el cuerpo? | No | Sí |
 > >
-> > > 🧠 **Regla.** La capa de negocio dice **qué pasó**; la de presentación decide **cómo se cuenta por HTTP**. Si mañana el negocio se usa desde un proceso por lotes, no arrastra Spring Web.
+> > > 🧠 El negocio dice **qué pasó**; la presentación decide **cómo contarlo por HTTP**.
 >
 > </details>
 >
@@ -1058,7 +941,7 @@
 <details>
 <summary><strong>🧰 Paso 5 — Las excepciones de Spring MVC: <code>ResponseEntityExceptionHandler</code></strong></summary>
 
-> > 🗣️ **La solución de Spring.** `ResponseEntityExceptionHandler` es una clase base que **ya sabe** el código correcto de unas quince excepciones de Spring MVC. Si el manejador global **la extiende**, esas excepciones dejan de caer en el `catch-all`, y solo hace falta **darles el cuerpo propio**.
+> > 💬 `ResponseEntityExceptionHandler` es una clase base que ya conoce el código correcto de las excepciones de Spring MVC. Basta con extenderla.
 >
 > <details>
 > <summary><strong>Paso 5.1 · Extender la clase base</strong></summary>
@@ -1206,8 +1089,6 @@
 > > ```
 > >
 > > </details>
-> >
-> > > 🔎 **Dos detalles.** (1) Los métodos devuelven `ResponseEntity<Object>` porque así los declara la clase base. (2) `handleExceptionInternal` conserva las **cabeceras** que la clase base calcula (por ejemplo `Allow` en un `405`).
 >
 > </details>
 >
@@ -1249,7 +1130,7 @@
 <details>
 <summary><strong>📚 Paso 6 — Documentar los errores en Swagger</strong></summary>
 
-> > 🗣️ **El vínculo con el Módulo 06.** En esa guía los `400`, `404` y `409` se documentaban **sin cuerpo** (`content = @Content`) porque aún no había un formato de error. Ahora existe `ErrorResponse`, y se documenta **una sola vez**.
+> > 💬 Antes los `400`, `404` y `409` se documentaban sin cuerpo. Ahora existe `ErrorResponse` y se documenta una sola vez.
 >
 > <details>
 > <summary><strong>Paso 6.1 · Respuestas de error reutilizables en el contrato</strong></summary>
@@ -1353,8 +1234,6 @@
 > > | Síntoma | Causa | Arreglo |
 > > |---|---|---|
 > > | En el *log* aparece `Json Processing Exception occurred: Java 8 date/time type java.time.OffsetDateTime not supported by default` al pedir `/api-docs` | El `timestamp` es un `Instant`: Swagger lo modela como `date-time` y su ejemplo se vuelve `OffsetDateTime`, que su serializador no sabe escribir | Declarar el campo como texto: `@Schema(type = "string", example = "2026-11-01T10:15:30.123Z")` (ya está en `ErrorResponse`) |
-> >
-> > > 💡 **Una versión menos de problemas.** Con springdoc **2.x** (Spring Boot 3) había un segundo tropiezo: el esquema `ErrorResponse` desaparecía del contrato porque solo lo usaban las respuestas de `components`, y hacía falta `springdoc.remove-broken-reference-definitions=false`. Con springdoc **3.2.0** (Spring Boot 4) ya **no** hace falta: `ErrorResponse` aparece solo.
 >
 > </details>
 >
@@ -1495,7 +1374,7 @@
 > | Evita repetir | Parcial | No | **Sí** |
 > | En esta guía | Paso 2 (luego se retira) | Paso 3 (luego se mueve) | Pasos 4 y 5 (queda) |
 >
-> > 🔎 **Lectura clave.** Los tres mecanismos **conviven** y se pasan la antorcha: se empezó con el más simple y se terminó con el más general, porque los **errores de toda la API** tienen que verse **iguales**.
+> > 🔎 Se empezó con el más simple y se terminó con el más general, porque los errores de toda la API deben verse iguales.
 
 </details>
 
