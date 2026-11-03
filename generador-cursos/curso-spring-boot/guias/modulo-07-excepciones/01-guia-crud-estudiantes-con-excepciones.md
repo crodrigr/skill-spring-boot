@@ -150,7 +150,9 @@ sequenceDiagram
 > > ```
 > >
 > > ```json
-> > {"created":3}
+> > {
+> >   "created": 3
+> > }
 > > ```
 > >
 > > > ✅ **Punto de control.** Hay tres estudiantes (Ana, Luis y María) y Swagger UI abre en `http://localhost:8080/swagger-ui.html`.
@@ -496,7 +498,12 @@ sequenceDiagram
 > > HTTP/1.1 404
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-01T23:55:43.737Z","status":404,"error":"Not Found","path":"/api/v1/students/999"}
+> > {
+> >   "timestamp": "2026-11-01T23:55:43.737Z",
+> >   "status": 404,
+> >   "error": "Not Found",
+> >   "path": "/api/v1/students/999"
+> > }
 > > ```
 > >
 > > ```bash
@@ -508,7 +515,12 @@ sequenceDiagram
 > > HTTP/1.1 409
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-01T23:55:43.862Z","status":409,"error":"Conflict","path":"/api/v1/students"}
+> > {
+> >   "timestamp": "2026-11-01T23:55:43.862Z",
+> >   "status": 409,
+> >   "error": "Conflict",
+> >   "path": "/api/v1/students"
+> > }
 > > ```
 > >
 > > Y `POST /internal/seed` repetido devuelve `{"created":0}`: no falla aunque los tres ya existen.
@@ -676,7 +688,13 @@ sequenceDiagram
 > > HTTP/1.1 409
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-01T23:56:30.132778218Z","status":409,"error":"Conflict","message":"El correo ana@mail.com ya está registrado","path":"/api/v1/students"}
+> > {
+> >   "timestamp": "2026-11-01T23:56:30.132778218Z",
+> >   "status": 409,
+> >   "error": "Conflict",
+> >   "message": "El correo ana@mail.com ya está registrado",
+> >   "path": "/api/v1/students"
+> > }
 > > ```
 > >
 > > El `PUT` con el correo de otro estudiante también responde con el mismo cuerpo. Y el `404`:
@@ -685,7 +703,12 @@ sequenceDiagram
 > > $ curl -i localhost:8080/api/v1/students/999
 > > HTTP/1.1 404
 > >
-> > {"timestamp":"2026-11-01T23:56:30.364Z","status":404,"error":"Not Found","path":"/api/v1/students/999"}
+> > {
+> >   "timestamp": "2026-11-01T23:56:30.364Z",
+> >   "status": 404,
+> >   "error": "Not Found",
+> >   "path": "/api/v1/students/999"
+> > }
 > > ```
 > >
 > > **Sigue con el cuerpo genérico de Spring**: no tiene `message` y su formato es otro.
@@ -985,11 +1008,23 @@ sequenceDiagram
 > >
 > > ```text
 > > HTTP/1.1 404
-> > {"timestamp":"2026-11-03T02:37:14.682Z","status":404,"error":"Not Found","message":"No existe el recurso solicitado","path":"/api/v1/nope"}
+> > {
+> >   "timestamp": "2026-11-03T02:37:14.682Z",
+> >   "status": 404,
+> >   "error": "Not Found",
+> >   "message": "No existe el recurso solicitado",
+> >   "path": "/api/v1/nope"
+> > }
 > >
 > > HTTP/1.1 405
 > > Allow: POST, GET
-> > {"timestamp":"2026-11-03T02:37:14.696Z","status":405,"error":"Method Not Allowed","message":"Ese método HTTP no está permitido en esta ruta","path":"/api/v1/students"}
+> > {
+> >   "timestamp": "2026-11-03T02:37:14.696Z",
+> >   "status": 405,
+> >   "error": "Method Not Allowed",
+> >   "message": "Ese método HTTP no está permitido en esta ruta",
+> >   "path": "/api/v1/students"
+> > }
 > > ```
 > >
 > > > ✅ **Punto de control.** Ya no hay ningún `500` falso: el `500` queda solo para fallos reales.
@@ -1178,7 +1213,13 @@ sequenceDiagram
 > >
 > > $ curl -i -X DELETE localhost:8080/api/v1/students/3
 > > HTTP/1.1 404
-> > {"timestamp":"2026-11-01T23:59:51.070Z","status":404,"error":"Not Found","message":"No existe un estudiante con id 3","path":"/api/v1/students/3"}
+> > {
+> >   "timestamp": "2026-11-01T23:59:51.070Z",
+> >   "status": 404,
+> >   "error": "Not Found",
+> >   "message": "No existe un estudiante con id 3",
+> >   "path": "/api/v1/students/3"
+> > }
 > > ```
 >
 > </details>
@@ -1199,7 +1240,13 @@ sequenceDiagram
 > > HTTP/1.1 500
 > > Content-Type: application/json
 > >
-> > {"timestamp":"2026-11-02T00:00:26.595Z","status":500,"error":"Internal Server Error","message":"Ocurrió un error inesperado. Intentar de nuevo más tarde.","path":"/api/v1/students/1"}
+> > {
+> >   "timestamp": "2026-11-02T00:00:26.595Z",
+> >   "status": 500,
+> >   "error": "Internal Server Error",
+> >   "message": "Ocurrió un error inesperado. Intentar de nuevo más tarde.",
+> >   "path": "/api/v1/students/1"
+> > }
 > > ```
 > >
 > > **Lo que ve el equipo, en el *log*:**
