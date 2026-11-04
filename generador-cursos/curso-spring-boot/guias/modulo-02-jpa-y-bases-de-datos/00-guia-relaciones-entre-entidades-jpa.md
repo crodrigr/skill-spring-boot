@@ -475,6 +475,72 @@
 > >
 > > - `mappedBy = "carnet"` = «la clave la maneja el atributo `carnet` de `EstudianteEntity`». **No crea columnas.**
 > >
+> > <details open>
+> > <summary><strong>🔍 Entender <code>@ToString.Exclude</code> y <code>@EqualsAndHashCode.Exclude</code></strong></summary>
+> >
+> > > **El problema en una frase:** con doble sentido, `Estudiante` conoce a `Carnet` y `Carnet` conoce a `Estudiante`. Al imprimir uno, Java imprime el otro, que imprime el primero, y así **sin fin**.
+> > >
+> > > **1. Qué hace `@Data`.** Esta anotación de Lombok escribe por usted tres métodos, y los arma con **todos los campos** de la clase:
+> > >
+> > > | Método | Para qué sirve |
+> > > |---|---|
+> > > | `toString()` | Convertir el objeto en **texto** (al hacer `System.out.println(ana)`) |
+> > > | `equals()` | Saber si **dos objetos son iguales** (comparando campo por campo) |
+> > > | `hashCode()` | Sacar un **número** a partir de los campos (lo usan `HashSet` y `HashMap`) |
+> > >
+> > > **2. Dónde está el bucle.** Cada objeto guarda al otro como un campo:
+> > >
+> > > ```text
+> > > ana.toString()
+> > >   └─ imprime sus campos:  id, nombre y carnet
+> > >        └─ carnet.toString()
+> > >             └─ imprime sus campos:  id, codigo y estudiante   ← es Ana otra vez
+> > >                  └─ ana.toString()
+> > >                       └─ imprime sus campos:  id, nombre y carnet
+> > >                            └─ …  (nunca termina)
+> > > ```
+> > >
+> > > Es como **dos espejos enfrentados**: cada uno refleja al otro hasta el infinito. Java termina con el error **`StackOverflowError`** (se llenó la memoria de llamadas). `equals()` y `hashCode()` caen en el mismo bucle, porque también recorren todos los campos.
+> > >
+> > > **3. La solución: cortar el bucle en un punto.** Se le dice a Lombok que **no use ese campo**:
+> > >
+> > > ```java
+> > > @OneToOne(mappedBy = "carnet")
+> > > @ToString.Exclude              // al convertir a texto, NO incluir este campo
+> > > @EqualsAndHashCode.Exclude     // al comparar y calcular el número, NO incluir este campo
+> > > private EstudianteEntity estudiante;
+> > > ```
+> > >
+> > > | Anotación | Qué le dice a Lombok | Qué evita |
+> > > |---|---|---|
+> > > | `@ToString.Exclude` | «Al escribir el texto del objeto, **sáltate** este campo» | El bucle en `toString()` |
+> > > | `@EqualsAndHashCode.Exclude` | «Al comparar o calcular el número, **sáltate** este campo» | El bucle en `equals()` y `hashCode()` |
+> > >
+> > > Con el campo excluido, el recorrido **se detiene**:
+> > >
+> > > ```text
+> > > ana.toString()
+> > >   └─ id, nombre y carnet
+> > >        └─ carnet.toString()
+> > >             └─ id y codigo        ← ya no incluye al estudiante: aquí termina
+> > > ```
+> > >
+> > > Resultado (aproximado): `EstudianteEntity(id=1, nombre=Ana, carnet=CarnetEntity(id=1, codigo=C-001))`.
+> > >
+> > > **4. ¿Por qué solo en el lado inverso?** Con cortar el bucle **en un lugar** basta. Se elige el lado **inverso** (`mappedBy`) porque es el que solo «mira de vuelta»; el dueño sigue mostrando a su carnet, que es lo más útil al imprimir.
+> > >
+> > > **5. ¿Cuándo hace falta?**
+> > >
+> > > | Situación | ¿Se necesita? |
+> > > |---|:-:|
+> > > | **Un sentido** (solo el dueño conoce al otro) | **No**: no hay bucle |
+> > > | **Doble sentido** y la clase usa `@Data` | **Sí**, en el campo inverso |
+> > > | **Doble sentido** y se escriben `toString`/`equals` a mano | Revisar que no se llamen entre sí |
+> > >
+> > > > 🔑 **No tiene nada que ver con la base de datos:** estas dos anotaciones no cambian tablas ni columnas. Solo evitan que Java se atrape a sí mismo al imprimir o comparar.
+> >
+> > </details>
+> >
 > > 🔎 Las tablas son **las mismas** que en un sentido: el lado inverso no crea columnas ni tablas.
 > >
 > > <details open>
@@ -1414,7 +1480,7 @@
 > 1. **Se empieza en un sentido.** El inverso se agrega solo si se va a usar.
 > 2. **Siempre se escribe del lado dueño.** El inverso solo sirve para **leer**.
 > 3. **`mappedBy` lleva el nombre exacto** del atributo del dueño (`"docente"`, `"carnet"`, `"cursos"`).
-> 4. **Con `@Data` y doble sentido, se excluye el lado inverso** con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude`: si no, `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Así están las clases de esta guía.
+> 4. **Con `@Data` y doble sentido, se excluye el lado inverso** con `@ToString.Exclude` y `@EqualsAndHashCode.Exclude` (se explican en «🔍 Entender `@ToString.Exclude`…», dentro de uno a uno, doble sentido): si no, `toString`, `equals` y `hashCode` se llaman entre sí **sin fin** (`StackOverflowError`). Así están las clases de esta guía.
 > 5. Al devolver entidades como **JSON**, el doble sentido genera un bucle infinito: por eso en la [guía 2 de la tienda](ejemplo-tienda/02-guia-tienda-2-uno-a-muchos.md) se usa `@JsonIgnore`, y en la [Fase II](ejemplo-tienda/04-guia-tienda-fase-2-buenas-practicas.md) se separan modelo y entidad.
 
 </details>
