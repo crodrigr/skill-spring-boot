@@ -1420,6 +1420,218 @@
 </details>
 
 <details open>
+<summary><strong>🔍 Métodos derivados: consultas que se arman con el nombre</strong></summary>
+
+> Hasta aquí se usaron métodos como `findByCarnetCodigo(...)` o `findByCursosNombre(...)` sin explicar de dónde salen. Esta sección explica **cómo funcionan**, **cómo se escriben** y **qué lógica sigue Spring** para entenderlos.
+
+> <details open>
+> <summary><strong>💡 La idea en una frase</strong></summary>
+>
+> > Un **método derivado** es un método del repositorio que **solo se declara, sin escribir su código**. Spring **lee su nombre** y, a partir de él, arma la consulta SQL.
+> >
+> > ```java
+> > public interface EstudianteJpaRepository extends JpaRepository<EstudianteEntity, Long> {
+> >
+> >     Optional<EstudianteEntity> findByCarnetCodigo(String codigo);   // sin cuerpo: solo el nombre
+> > }
+> > ```
+> >
+> > Es como pedirle algo a un camarero con una frase ordenada: «un café, con leche, sin azúcar». El camarero entiende el pedido porque la frase sigue un **orden fijo**. Spring entiende el nombre del método por lo mismo.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>🧩 La receta: cómo se arma el nombre</strong></summary>
+>
+> > Todo nombre tiene **tres partes**, siempre en este orden:
+> >
+> > ```text
+> >   find   By   Carnet Codigo   And   Nombre
+> >   └─1─┘ └2┘   └────3────┘   └4┘   └──3──┘
+> >
+> >   1 · Qué se quiere hacer      (find, exists, count, delete)
+> >   2 · Aquí empiezan las condiciones   (By)
+> >   3 · Sobre qué atributo se pregunta  (Carnet.Codigo, Nombre)
+> >   4 · Cómo se unen las condiciones    (And, Or)
+> > ```
+> >
+> > | Parte | Qué es | Ejemplo |
+> > |:-:|---|---|
+> > | **1** | El **verbo**: qué se quiere hacer | `find` = buscar |
+> > | **2** | La palabra **`By`**: separa el verbo de las condiciones (significa «donde») | `By` |
+> > | **3** | El **atributo** de la entidad, **con su primera letra en mayúscula** | `Nombre`, `Codigo` |
+> > | **4** | Un **conector** si hay más de una condición | `And`, `Or` |
+> >
+> > Leído en voz alta, el nombre es casi una oración: `findByCarnetCodigo` = «**buscar donde** el **carnet** tenga este **código**».
+>
+> </details>
+>
+> <details open>
+> <summary><strong>⚙️ La lógica: cómo lo lee Spring (paso a paso)</strong></summary>
+>
+> > Al **arrancar la aplicación**, Spring recorre cada método de la interfaz y hace esto:
+> >
+> > | Paso | Qué hace Spring | Con `findByCarnetCodigo` |
+> > |:-:|---|---|
+> > | 1 | Lee el **verbo** (lo que está antes de `By`) | `find` → «traer filas» |
+> > | 2 | Corta lo que viene **después de `By`** en palabras, usando las **mayúsculas** como separador | `Carnet` · `Codigo` |
+> > | 3 | **Busca cada palabra** como un atributo de la entidad | `EstudianteEntity` tiene `carnet` ✅ y `CarnetEntity` tiene `codigo` ✅ |
+> > | 4 | Arma el **`WHERE`** con esos atributos y el parámetro del método | `where carnet.codigo = ?` |
+> > | 5 | Pasa el **valor** que recibe el método al `?` y ejecuta | `findByCarnetCodigo("C-001")` → `'C-001'` |
+> >
+> > El SQL real que se obtiene (verificado en MySQL, ver el ejemplo de uno a uno):
+> >
+> > ```text
+> > select e.id, e.carnet_id, e.nombre
+> > from estudiante e left join carnet c on c.id = e.carnet_id
+> > where c.codigo = 'C-001'
+> > ```
+> >
+> > > 🔑 **Lo importante:** Spring **no adivina**. Compara cada palabra del nombre con los **atributos de la clase** (no con las columnas de la tabla). Si una palabra no coincide, no sabe qué hacer.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>🗣️ El verbo: qué hace y qué devuelve</strong></summary>
+>
+> > | Verbo | Qué hace | Devuelve | Ejemplo |
+> > |---|---|---|---|
+> > | `findBy` | **Busca** filas | `Optional<T>` (una o ninguna) o `List<T>` (varias) | `findByCarnetCodigo` |
+> > | `existsBy` | **Pregunta** si hay alguna | `boolean` | `existsByNombre` |
+> > | `countBy` | **Cuenta** cuántas hay | `long` | `countByDocenteId` |
+> > | `deleteBy` | **Borra** las que cumplan | nada (`void`) o cuántas borró | `deleteByNombre` |
+> >
+> > **Cuál tipo devolver** depende de cuántos resultados se esperan:
+> >
+> > | Se esperan… | Tipo de retorno | Por qué |
+> > |---|---|---|
+> > | **Como máximo uno** (por ejemplo, un carnet es único) | `Optional<T>` | Puede no existir; `Optional` obliga a decidir qué hacer en ese caso |
+> > | **Varios** (por ejemplo, los cursos de un docente) | `List<T>` | Una lista, que puede venir vacía |
+> > | **Solo saber si hay** | `boolean` | Más barato que traer la fila |
+>
+> </details>
+>
+> <details open>
+> <summary><strong>🧱 Las palabras que se pueden agregar</strong></summary>
+>
+> > Además del atributo, se pueden sumar **palabras clave** que cambian la condición. Las más usadas (los ejemplos usan las entidades de esta guía):
+> >
+> > | Palabra | Qué significa | Ejemplo | Se lee así |
+> > |---|---|---|---|
+> > | *(ninguna)* | Igual a | `findByNombre(n)` | nombre **es** `n` |
+> > | `And` | Las **dos** condiciones | `findByNombreAndDocenteNombre(c, d)` | nombre es `c` **y** docente se llama `d` |
+> > | `Or` | **Una u otra** | `findByNombreOrDocenteNombre(c, d)` | nombre del curso es `c` **o** el docente se llama `d` |
+> > | `Containing` | Contiene el texto | `findByNombreContaining(t)` | nombre **contiene** `t` |
+> > | `IgnoreCase` | No distingue mayúsculas | `findByNombreIgnoreCase(n)` | nombre es `n`, **da igual** `ANA` o `ana` |
+> > | `StartingWith` | Empieza con | `findByNombreStartingWith(t)` | nombre **empieza** con `t` |
+> > | `GreaterThan` / `LessThan` | Mayor / menor que | `findByIdGreaterThan(5)` | id **mayor que** 5 |
+> > | `Between` | Entre dos valores | `findByIdBetween(1, 10)` | id **entre** 1 y 10 |
+> > | `IsNull` / `IsNotNull` | Vacío / no vacío | `findByCarnetIsNull()` | **no tiene** carnet |
+> > | `OrderBy…Asc` / `Desc` | Ordenar el resultado | `findByDocenteNombreOrderByNombreAsc(d)` | ordenar por nombre, de la A a la Z |
+> >
+> > Las palabras **se pueden combinar**: `findByNombreContainingIgnoreCase(texto)` = «nombre que **contenga** el texto, **sin importar** mayúsculas».
+> >
+> > > 📌 Hay más palabras (`In`, `Not`, `True`, `First`, `Top`…). En la [guía del taller](01-guia-taller-gestion-de-cursos-con-bd.md) hay una tabla con todas, con su SQL.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>🔗 Recorrer una relación: la lógica de las mayúsculas</strong></summary>
+>
+> > Cuando el atributo está **dentro de otra entidad**, el nombre **recorre la relación** palabra por palabra. Cada mayúscula es un **salto con punto**:
+> >
+> > ```text
+> > findBy  Carnet  Codigo        →   estudiante . carnet . codigo
+> > findBy  Cursos  Nombre        →   docente    . cursos  . nombre
+> > findBy  Docente Nombre        →   curso      . docente . nombre
+> > ```
+> >
+> > | Método | Dónde se ejecuta | Se lee así | Salto |
+> > |---|---|---|---|
+> > | `findByCarnetCodigo(codigo)` | `EstudianteJpaRepository` | estudiante cuyo **carnet** tiene ese **código** | `estudiante → carnet → codigo` |
+> > | `findByCursosNombre(nombre)` | `DocenteJpaRepository` | docente que dicta un **curso** con ese **nombre** | `docente → cursos → nombre` |
+> > | `findByCursosNombre(nombre)` | `EstudianteJpaRepository` | estudiante inscrito en un **curso** con ese **nombre** | `estudiante → cursos → nombre` |
+> >
+> > Spring hace **un `join`** entre las tablas: no hay que escribirlo. En el segundo caso se obtuvo este SQL real:
+> >
+> > ```text
+> > select d.id, d.nombre
+> > from docente d left join curso c on d.id = c.docente_id
+> > where c.nombre = 'Java'
+> > ```
+> >
+> > > 🧠 **Si hay duda de dónde cortar:** Spring primero prueba el nombre completo como un solo atributo (`carnetCodigo`) y, si no existe, corta por las mayúsculas **de derecha a izquierda**. Cuando un atributo ya tiene mayúsculas dentro (por ejemplo `fechaAlta`), se puede separar a mano con guion bajo: `findByCarnet_Codigo`.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>🔢 Los parámetros: se pasan por orden</strong></summary>
+>
+> > Cada condición del nombre recibe **un parámetro**, **en el mismo orden** en que aparece:
+> >
+> > ```java
+> > List<CursoEntity> findByNombreAndDocenteNombre(String nombreCurso, String nombreDocente);
+> > //                          1º ──┘                   2º ────────────┘
+> > //                  primer parámetro: nombre del curso · segundo: nombre del docente
+> > ```
+> >
+> > - Lo que importa es la **posición**, no cómo se llame el parámetro.
+> > - Si el orden de los parámetros no coincide con el del nombre, las condiciones se **cruzan** sin dar error, y la consulta devuelve resultados equivocados.
+>
+> </details>
+>
+> <details open>
+> <summary><strong>⚠️ Errores frecuentes con métodos derivados</strong></summary>
+>
+> > | Síntoma | Causa | Solución |
+> > |---|---|---|
+> > | La aplicación **no arranca**: `PropertyReferenceException: No property '…' found for type '…'` | Una palabra del nombre **no es un atributo** de la entidad (error de escritura, o se usó el nombre de la columna) | Copiar el nombre **exacto** del atributo de la clase, con mayúscula inicial |
+> > | `findByNombre` devuelve **error al ejecutar** por haber varias filas | El tipo es `Optional<T>` pero hay más de un resultado | Usar `List<T>` |
+> > | Resultados **equivocados** con `And` | Parámetros en distinto orden que en el nombre | Alinear el orden de los parámetros con el del nombre |
+> > | El nombre se vuelve **larguísimo** (`findByNombreAndApellidoAndEdadGreaterThanAndCiudad…`) | Demasiadas condiciones para un nombre | Usar otra herramienta (`@Query`), que se verá más adelante |
+> >
+> > > 🔎 **Dato útil:** el error de un atributo mal escrito sale **al arrancar**, no al ejecutar el método. Es una ventaja: el fallo aparece de inmediato, antes de que un usuario lo encuentre.
+>
+> </details>
+>
+> <details>
+> <summary><strong>📝 Practicar: escribir el nombre del método</strong></summary>
+>
+> > Con las entidades de esta guía, escribir el método para cada pedido:
+> >
+> > | # | Pedido |
+> > |:-:|---|
+> > | 1 | Saber **si existe** un curso con un nombre dado. |
+> > | 2 | **Contar** los cursos de un docente (por el `id` del docente). |
+> > | 3 | Buscar estudiantes cuyo **nombre contenga** un texto, sin importar mayúsculas. |
+> > | 4 | Buscar los cursos de un docente por **el nombre del docente**, ordenados por nombre. |
+> >
+> > <details>
+> > <summary>🔑 Ver respuestas</summary>
+> >
+> > ```java
+> > // 1 · CursoJpaRepository
+> > boolean existsByNombre(String nombre);
+> >
+> > // 2 · CursoJpaRepository (doble sentido: CursoEntity tiene el atributo docente)
+> > long countByDocenteId(Long docenteId);
+> >
+> > // 3 · EstudianteJpaRepository
+> > List<EstudianteEntity> findByNombreContainingIgnoreCase(String texto);
+> >
+> > // 4 · CursoJpaRepository
+> > List<CursoEntity> findByDocenteNombreOrderByNombreAsc(String nombreDocente);
+> > ```
+> >
+> > Los números 2 y 4 solo funcionan con el **doble sentido**, porque `CursoEntity` necesita el atributo `docente` para que el nombre pueda recorrerlo.
+> >
+> > </details>
+>
+> </details>
+
+</details>
+
+<details open>
 <summary><strong>🐢⚡ LAZY y EAGER: cómo se cargan los datos</strong></summary>
 
 > Cuando JPA lee una entidad, hay que decidir **cuándo** trae lo que está relacionado con ella (el carnet de Ana, sus cursos…).
