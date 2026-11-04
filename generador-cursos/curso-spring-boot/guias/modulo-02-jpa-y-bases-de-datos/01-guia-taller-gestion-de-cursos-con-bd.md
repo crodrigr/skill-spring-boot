@@ -106,11 +106,23 @@
 > ├── 📄 AcademyApplication.java                  (la genera start.spring.io; no se modifica)
 > ├── 📁 presentation                              ← 1 · Paso 4
 > │   └── 📁 controller
+> │       ├── 📄 StudentController.java
+> │       ├── 📄 CourseController.java
+> │       └── 📄 EnrollmentController.java
 > ├── 📁 business                                  ← 2 · Paso 3
 > │   └── 📁 service
+> │       ├── 📄 StudentService.java
+> │       ├── 📄 CourseService.java
+> │       └── 📄 EnrollmentService.java
 > └── 📁 persistence                               ← 3 · Pasos 1 y 2
->     ├── 📁 repository    StudentJpaRepository · CourseJpaRepository · EnrollmentJpaRepository   (➕ Spring Data)
->     └── 📁 entity        StudentEntity · CourseEntity · EnrollmentEntity                         (➕ las @Entity)
+>     ├── 📁 repository                            (➕ Spring Data)
+>     │   ├── 📄 StudentJpaRepository.java
+>     │   ├── 📄 CourseJpaRepository.java
+>     │   └── 📄 EnrollmentJpaRepository.java
+>     └── 📁 entity                                (➕ las @Entity)
+>         ├── 📄 StudentEntity.java
+>         ├── 📄 CourseEntity.java
+>         └── 📄 EnrollmentEntity.java
 > 📁 src/main/resources
 > └── 📄 application.properties                    (➕ conexión a MySQL y JPA)
 > ```
@@ -1253,12 +1265,24 @@
 >     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
->     │   │   └── 📁 controller    StudentController · CourseController · EnrollmentController
+>     │   │   └── 📁 controller
+>     │   │       ├── 📄 StudentController.java
+>     │   │       ├── 📄 CourseController.java
+>     │   │       └── 📄 EnrollmentController.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service       StudentService · CourseService · EnrollmentService
+>     │   │   └── 📁 service
+>     │   │       ├── 📄 StudentService.java
+>     │   │       ├── 📄 CourseService.java
+>     │   │       └── 📄 EnrollmentService.java
 >     │   └── 📁 persistence
->     │       ├── 📁 repository    StudentJpaRepository · CourseJpaRepository · EnrollmentJpaRepository
->     │       └── 📁 entity        StudentEntity · CourseEntity · EnrollmentEntity
+>     │       ├── 📁 repository
+>     │       │   ├── 📄 StudentJpaRepository.java
+>     │       │   ├── 📄 CourseJpaRepository.java
+>     │       │   └── 📄 EnrollmentJpaRepository.java
+>     │       └── 📁 entity
+>     │           ├── 📄 StudentEntity.java
+>     │           ├── 📄 CourseEntity.java
+>     │           └── 📄 EnrollmentEntity.java
 >     └── 📁 resources
 >         └── 📄 application.properties
 > ```
