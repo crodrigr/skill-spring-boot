@@ -108,8 +108,9 @@ sequenceDiagram
 ├── 📁 business
 │   ├── 📁 exception   🆕 StudentNotFoundException.java
 │   │                  🆕 StudentEmailAlreadyExistsException.java
-│   └── 📁 service     ✏️ StudentService.java       lanza excepciones
-│                      🗑️ ServiceResult.java, ServiceStatus.java
+│   ├── 📁 service     ✏️ StudentService.java       interfaz: devuelve el dato o lanza
+│   │                  🗑️ ServiceResult.java, ServiceStatus.java
+│   └── 📁 impl        ✏️ StudentServiceImpl.java   lanza excepciones
 └── 📁 persistence     sin cambios
 ```
 
@@ -134,7 +135,7 @@ sequenceDiagram
 > > > | Lo que **ya existe** | Dónde |
 > > > |---|---|
 > > > | `StudentEntity`, `StudentStatus`, `StudentJpaRepository` | `persistence` |
-> > > | `StudentService` (devuelve `Optional` y `ServiceResult`) | `business.service` |
+> > > | `StudentService` (interfaz) y `StudentServiceImpl` (devuelven `Optional` y `ServiceResult`) | `business.service` · `business.impl` |
 > > > | `StudentController` e `InternalController` | `presentation.controller` |
 > > > | DTO con `@Schema` y validaciones, `StudentMapper` | `presentation.dto` · `presentation.mapper` |
 > > > | `OpenApiConfig` (Swagger, seguridad y grupos) | `presentation.config` |
@@ -315,18 +316,52 @@ sequenceDiagram
 > <details>
 > <summary><strong>Paso 2.2 · El servicio lanza en vez de devolver</strong></summary>
 >
-> > Se **eliminan** `ServiceResult` y `ServiceStatus`, y `StudentService` pasa a devolver el dato **o lanzar**:
+> > Se **eliminan** `ServiceResult` y `ServiceStatus`, y `StudentService` (la interfaz) y `StudentServiceImpl` (su implementación) pasan a devolver el dato **o lanzar**:
 > >
 > > <details>
-> > <summary><strong>📄 StudentService.java</strong></summary>
+> > <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.StudentEntity;
+> > import com.academy.persistence.entity.StudentStatus;
+> > import org.springframework.data.domain.Page;
+> > import org.springframework.data.domain.Pageable;
+> >
+> > public interface StudentService {
+> >
+> >     Page<StudentEntity> search(String name, Pageable pageable);
+> >
+> >     StudentEntity findById(Long id);
+> >
+> >     StudentEntity findByEmail(String email);
+> >
+> >     StudentEntity create(StudentEntity data);
+> >
+> >     StudentEntity update(Long id, StudentEntity data);
+> >
+> >     StudentEntity changeStatus(Long id, StudentStatus status);
+> >
+> >     void delete(Long id);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
 > > import com.academy.business.exception.StudentEmailAlreadyExistsException;
 > > import com.academy.business.exception.StudentNotFoundException;
+> > import com.academy.business.service.StudentService;
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.entity.StudentStatus;
 > > import com.academy.persistence.repository.StudentJpaRepository;
@@ -336,14 +371,15 @@ sequenceDiagram
 > > import org.springframework.transaction.annotation.Transactional;
 > >
 > > @Service
-> > public class StudentService {
+> > public class StudentServiceImpl implements StudentService {
 > >
 > >     private final StudentJpaRepository students;
 > >
-> >     public StudentService(StudentJpaRepository students) {
+> >     public StudentServiceImpl(StudentJpaRepository students) {
 > >         this.students = students;
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Page<StudentEntity> search(String name, Pageable pageable) {
 > >         if (name == null || name.isBlank()) {
@@ -352,18 +388,21 @@ sequenceDiagram
 > >         return students.findByNameContainingIgnoreCase(name, pageable);
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public StudentEntity findById(Long id) {
 > >         return students.findById(id)
 > >                 .orElseThrow(() -> StudentNotFoundException.byId(id));
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public StudentEntity findByEmail(String email) {
 > >         return students.findByEmailIgnoreCase(email)
 > >                 .orElseThrow(() -> StudentNotFoundException.byEmail(email));
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public StudentEntity create(StudentEntity data) {
 > >         if (students.existsByEmailIgnoreCase(data.getEmail())) {
@@ -373,6 +412,7 @@ sequenceDiagram
 > >                 null, data.getName(), data.getAge(), data.getEmail(), data.getStatus()));
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public StudentEntity update(Long id, StudentEntity data) {
 > >         if (!students.existsById(id)) {
@@ -385,6 +425,7 @@ sequenceDiagram
 > >                 id, data.getName(), data.getAge(), data.getEmail(), data.getStatus()));
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public StudentEntity changeStatus(Long id, StudentStatus status) {
 > >         StudentEntity student = findById(id);
@@ -392,6 +433,7 @@ sequenceDiagram
 > >                 id, student.getName(), student.getAge(), student.getEmail(), status));
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public void delete(Long id) {
 > >         if (!students.existsById(id)) {
@@ -403,6 +445,8 @@ sequenceDiagram
 > > ```
 > >
 > > </details>
+> >
+> > > 💡 **Interfaz e implementación:** `StudentService` es ahora un **contrato** (una `interface` con las operaciones) y `StudentServiceImpl` es la clase `@Service` que lo cumple. Los controladores siguen inyectando `StudentService`; Spring entrega la implementación. Así la capa de presentación depende del contrato y no de la clase concreta.
 > >
 > > | Antes | Ahora |
 > > |---|---|
@@ -1372,8 +1416,10 @@ sequenceDiagram
 >     │   │   ├── 📁 exception
 >     │   │   │   ├── 📄 StudentNotFoundException.java
 >     │   │   │   └── 📄 StudentEmailAlreadyExistsException.java
->     │   │   └── 📁 service
->     │   │       └── 📄 StudentService.java
+>     │   │   ├── 📁 service
+>     │   │   │   └── 📄 StudentService.java
+>     │   │   └── 📁 impl
+>     │   │       └── 📄 StudentServiceImpl.java
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity
 >     │       │   ├── 📄 StudentEntity.java
@@ -1692,15 +1738,53 @@ sequenceDiagram
 > #### 📁 service
 >
 > <details>
-> <summary><strong>📄 StudentService.java</strong></summary>
+> <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 >
 > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 >
 > ```java
 > package com.academy.business.service;
 >
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.entity.StudentStatus;
+> import org.springframework.data.domain.Page;
+> import org.springframework.data.domain.Pageable;
+>
+> public interface StudentService {
+>
+>     Page<StudentEntity> search(String name, Pageable pageable);
+>
+>     StudentEntity findById(Long id);
+>
+>     StudentEntity findByEmail(String email);
+>
+>     StudentEntity create(StudentEntity data);
+>
+>     StudentEntity update(Long id, StudentEntity data);
+>
+>     StudentEntity changeStatus(Long id, StudentStatus status);
+>
+>     void delete(Long id);
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 impl
+>
+> > 💡 Cada servicio es una `interface` en `business/service`; su clase `@Service` vive en `business/impl` con el sufijo `Impl`.
+>
+> <details>
+> <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+>
+> ```java
+> package com.academy.business.impl;
+>
 > import com.academy.business.exception.StudentEmailAlreadyExistsException;
 > import com.academy.business.exception.StudentNotFoundException;
+> import com.academy.business.service.StudentService;
 > import com.academy.persistence.entity.StudentEntity;
 > import com.academy.persistence.entity.StudentStatus;
 > import com.academy.persistence.repository.StudentJpaRepository;
@@ -1710,14 +1794,15 @@ sequenceDiagram
 > import org.springframework.transaction.annotation.Transactional;
 >
 > @Service
-> public class StudentService {
+> public class StudentServiceImpl implements StudentService {
 >
 >     private final StudentJpaRepository students;
 >
->     public StudentService(StudentJpaRepository students) {
+>     public StudentServiceImpl(StudentJpaRepository students) {
 >         this.students = students;
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public Page<StudentEntity> search(String name, Pageable pageable) {
 >         if (name == null || name.isBlank()) {
@@ -1726,18 +1811,21 @@ sequenceDiagram
 >         return students.findByNameContainingIgnoreCase(name, pageable);
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public StudentEntity findById(Long id) {
 >         return students.findById(id)
 >                 .orElseThrow(() -> StudentNotFoundException.byId(id));
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public StudentEntity findByEmail(String email) {
 >         return students.findByEmailIgnoreCase(email)
 >                 .orElseThrow(() -> StudentNotFoundException.byEmail(email));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public StudentEntity create(StudentEntity data) {
 >         if (students.existsByEmailIgnoreCase(data.getEmail())) {
@@ -1747,6 +1835,7 @@ sequenceDiagram
 >                 null, data.getName(), data.getAge(), data.getEmail(), data.getStatus()));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public StudentEntity update(Long id, StudentEntity data) {
 >         if (!students.existsById(id)) {
@@ -1759,6 +1848,7 @@ sequenceDiagram
 >                 id, data.getName(), data.getAge(), data.getEmail(), data.getStatus()));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public StudentEntity changeStatus(Long id, StudentStatus status) {
 >         StudentEntity student = findById(id);
@@ -1766,6 +1856,7 @@ sequenceDiagram
 >                 id, student.getName(), student.getAge(), student.getEmail(), status));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public void delete(Long id) {
 >         if (!students.existsById(id)) {

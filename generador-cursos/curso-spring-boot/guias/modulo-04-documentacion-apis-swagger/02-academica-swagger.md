@@ -128,9 +128,11 @@
 >     │   │   ├── 📁 dto                           ✏️ los ocho con @Schema
 >     │   │   └── 📁 mapper                        sin cambios
 >     │   ├── 📁 business
->     │   │   └── 📁 service
->     │   │       ├── ✏️ StudentService.java       un método más: findByEmail
->     │   │       └── …                            sin cambios
+>     │   │   ├── 📁 service
+>     │   │   │   ├── ✏️ StudentService.java       un método más: findByEmail
+>     │   │   │   └── …                            sin cambios
+>     │   │   └── 📁 impl
+>     │   │       └── ✏️ StudentServiceImpl.java       un método más: findByEmail
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity                        sin cambios (sin Swagger)
 >     │       └── 📁 repository
@@ -174,7 +176,8 @@
 > > > | Lo que **ya existe** | Dónde |
 > > > |---|---|
 > > > | Ocho DTO (`record`) y tres mapeadores | `presentation.dto` · `presentation.mapper` |
-> > > | `ServiceResult` y `ServiceStatus` | `business.service` |
+> > > | Interfaces `StudentService`, `CourseService`, `EnrollmentService`, más `ServiceResult` y `ServiceStatus` | `business.service` |
+> > > | Implementaciones `StudentServiceImpl`, `CourseServiceImpl`, `EnrollmentServiceImpl` | `business.impl` |
 > > > | Tres controladores en `/api/v1/…`, delgados | `presentation.controller` |
 > > > | Límites de paginación y de errores | `application.properties` |
 > > >
@@ -978,7 +981,7 @@
 > <details>
 > <summary><strong>Paso 7.1 · <code>deprecated</code>: avisar sin romper</strong></summary>
 >
-> > Se agrega una operación vieja para marcarla: `GET /api/v1/students/by-email`. Necesita un método en el repositorio y otro en el servicio (sin Swagger):
+> > Se agrega una operación vieja para marcarla: `GET /api/v1/students/by-email`. Necesita un método en el repositorio y otro en el servicio —primero en la interfaz y luego en su implementación— (sin Swagger):
 > >
 > > <details>
 > > <summary><strong>📄 StudentJpaRepository.java (agregar)</strong> <em>(solo el cambio)</em></summary>
@@ -992,11 +995,23 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>📄 StudentService.java (agregar)</strong> <em>(solo el cambio)</em></summary>
+> > <summary><strong>📄 StudentService.java (agregar)</strong> <em>(interfaz · solo el cambio)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 > >
 > > ```java
+> > Optional<StudentEntity> findByEmail(String email);
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 StudentServiceImpl.java (agregar)</strong> <em>(implementación · solo el cambio)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+> >
+> > ```java
+> > @Override
 > > @Transactional(readOnly = true)
 > > public Optional<StudentEntity> findByEmail(String email) {
 > >     return students.findByEmailIgnoreCase(email);

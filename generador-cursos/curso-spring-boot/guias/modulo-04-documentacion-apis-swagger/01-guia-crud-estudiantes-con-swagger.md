@@ -137,10 +137,12 @@
 >     │   │   └── 📁 mapper
 >     │   │       └── StudentMapper.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service
->     │   │       ├── ✏️ StudentService.java      un método más: findByEmail
->     │   │       ├── ServiceResult.java
->     │   │       └── ServiceStatus.java
+>     │   │   ├── 📁 service
+>     │   │   │   ├── ✏️ StudentService.java      un método más: findByEmail
+>     │   │   │   ├── ServiceResult.java
+>     │   │   │   └── ServiceStatus.java
+>     │   │   └── 📁 impl
+>     │   │       └── ✏️ StudentServiceImpl.java      un método más: findByEmail
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity
 >     │       │   ├── StudentEntity.java          sin cambios (sigue sin Swagger)
@@ -194,14 +196,14 @@
 > > > |---|---|
 > > > | `StudentRequest`, `StudentStatusRequest`, `StudentResponse`, `PageResponse<T>` | `presentation.dto` |
 > > > | `StudentMapper` | `presentation.mapper` |
-> > > | `ServiceResult` y `ServiceStatus` | `business.service` |
+> > > | Interfaz `StudentService`, `ServiceResult` y `ServiceStatus` | `business.service` |
+> > > | `StudentServiceImpl` (la clase `@Service`) | `business.impl` |
 > > > | `StudentController` delgado, en `/api/v1/students` | `presentation.controller` |
 > > > | `spring.data.web.pageable.max-page-size=50` | `application.properties` |
 > > >
 > > > **Swagger todavía no está**: es lo que se agrega ahora.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 0.2 · Comprobar que el CRUD funciona</strong></summary>
@@ -276,7 +278,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 1.2 · Qué se obtiene sin escribir nada más</strong></summary>
 >
@@ -321,7 +322,6 @@
 > > > 🗣️ **Pregunta:** ¿qué falta? *(El nombre y la versión de la API, una descripción de cada operación, los códigos de respuesta verdaderos, ejemplos y una paginación usable: eso lo sabe una persona, no el compilador.)*
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 1.3 · Probar una operación con <em>Try it out</em></strong></summary>
@@ -404,7 +404,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 2.2 · Ver el resultado</strong></summary>
 >
@@ -447,7 +446,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 3.2 · <code>@Operation</code></strong></summary>
 >
@@ -485,7 +483,6 @@
 > > > 💡 **Beneficio:** el equipo de frontend entiende **para qué sirve** cada operación sin leer el código. Aquí se anota, por ejemplo, el **tope de 50** por página, que el contrato no puede deducir.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 3.3 · <code>@ApiResponse</code>: documentar las respuestas</strong></summary>
@@ -551,7 +548,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 3.4 · Ver el resultado</strong></summary>
 >
@@ -599,7 +595,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 4.2 · <code>@ParameterObject</code>: la paginación</strong></summary>
 >
@@ -623,7 +618,6 @@
 > > > 💡 **Beneficio:** la paginación se prueba rellenando tres campos sencillos en vez de escribir un JSON a mano.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 4.3 · Ver el resultado</strong></summary>
@@ -798,7 +792,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 5.2 · Bean Validation pasa solo al contrato</strong></summary>
 >
@@ -832,7 +825,6 @@
 > > > ⚠️ **Lectura crítica.** Aun así, no todo pasa: un `int` (tipo primitivo) no se marca obligatorio, y el tope de 50 por página (`spring.data.web.pageable.max-page-size`) tampoco llega al contrato. Si importa que el cliente lo sepa, se agrega a mano con `@Schema(requiredMode = REQUIRED)` o se dice en la descripción.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 5.3 · Ver el resultado</strong></summary>
@@ -892,7 +884,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 6.2 · Ver el resultado</strong></summary>
 >
@@ -913,14 +904,26 @@
 > <details>
 > <summary><strong>Paso 7.1 · <code>deprecated</code>: avisar sin romper</strong></summary>
 >
-> > Se agrega una operación vieja para marcarla: `GET /api/v1/students/by-email`. Necesita un método más en el servicio (sin Swagger) que usa la consulta derivada que ya existe en el repositorio:
+> > Se agrega una operación vieja para marcarla: `GET /api/v1/students/by-email`. Necesita un método más en el servicio (sin Swagger), primero en la interfaz y luego en su implementación, que usa la consulta derivada que ya existe en el repositorio:
 > >
 > > <details>
-> > <summary><strong>📄 StudentService.java (agregar)</strong> <em>(solo el cambio)</em></summary>
+> > <summary><strong>📄 StudentService.java (agregar)</strong> <em>(interfaz · solo el cambio)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 > >
 > > ```java
+> > Optional<StudentEntity> findByEmail(String email);
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 StudentServiceImpl.java (agregar)</strong> <em>(implementación · solo el cambio)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+> >
+> > ```java
+> > @Override
 > > @Transactional(readOnly = true)
 > > public Optional<StudentEntity> findByEmail(String email) {
 > >     return students.findByEmailIgnoreCase(email);
@@ -956,7 +959,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 7.2 · <code>@Hidden</code>: funciona, pero no se documenta</strong></summary>
 >
@@ -989,7 +991,6 @@
 > > > 💡 **Beneficio:** el contrato público muestra solo lo que se quiere ofrecer.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 7.3 · Ver el resultado</strong></summary>
@@ -1060,7 +1061,6 @@
 > > > 💡 **Beneficio:** el contrato dice **cómo autenticarse**; cuando se agregue la seguridad, Swagger UI ya sabrá mandar el token.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 8.2 · Ver el resultado</strong></summary>
@@ -1228,7 +1228,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 9.2 · Ver el resultado</strong></summary>
 >
@@ -1301,7 +1300,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 10.2 · Exportar el contrato</strong></summary>
 >
@@ -1336,7 +1334,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 10.3 · Apagar Swagger donde no debe estar</strong></summary>
 >
@@ -1367,7 +1364,6 @@
 > > > ⚠️ **Y si se necesita en producción**, se protege con autenticación; apagarlo es lo más simple y seguro por defecto.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 10.4 · Prueba de punta a punta</strong></summary>
@@ -1676,10 +1672,12 @@
 >     │   │   └── 📁 mapper
 >     │   │       └── 📄 StudentMapper.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service
->     │   │       ├── 📄 StudentService.java
->     │   │       ├── 📄 ServiceResult.java
->     │   │       └── 📄 ServiceStatus.java
+>     │   │   ├── 📁 service
+>     │   │   │   ├── 📄 StudentService.java
+>     │   │   │   ├── 📄 ServiceResult.java
+>     │   │   │   └── 📄 ServiceStatus.java
+>     │   │   └── 📁 impl
+>     │   │       └── 📄 StudentServiceImpl.java
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity
 >     │       │   ├── 📄 StudentEntity.java
@@ -1994,13 +1992,54 @@
 > </details>
 >
 > <details>
-> <summary><strong>📄 StudentService.java</strong></summary>
+> <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 >
 > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 >
 > ```java
 > package com.academy.business.service;
 >
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.entity.StudentStatus;
+> import org.springframework.data.domain.Page;
+> import org.springframework.data.domain.Pageable;
+>
+> import java.util.Optional;
+>
+> public interface StudentService {
+>
+>     Page<StudentEntity> search(String name, Pageable pageable);
+>
+>     Optional<StudentEntity> findById(Long id);
+>
+>     Optional<StudentEntity> findByEmail(String email);
+>
+>     ServiceResult<StudentEntity> create(StudentEntity data);
+>
+>     ServiceResult<StudentEntity> update(Long id, StudentEntity data);
+>
+>     ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status);
+>
+>     boolean delete(Long id);
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 impl
+>
+> > 💡 Cada servicio es una `interface` en `business/service`; su clase `@Service` vive en `business/impl` con el sufijo `Impl`.
+>
+> <details>
+> <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+>
+> ```java
+> package com.academy.business.impl;
+>
+> import com.academy.business.service.ServiceResult;
+> import com.academy.business.service.StudentService;
 > import com.academy.persistence.entity.StudentEntity;
 > import com.academy.persistence.entity.StudentStatus;
 > import com.academy.persistence.repository.StudentJpaRepository;
@@ -2012,14 +2051,15 @@
 > import java.util.Optional;
 >
 > @Service
-> public class StudentService {
+> public class StudentServiceImpl implements StudentService {
 >
 >     private final StudentJpaRepository students;
 >
->     public StudentService(StudentJpaRepository students) {
+>     public StudentServiceImpl(StudentJpaRepository students) {
 >         this.students = students;
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public Page<StudentEntity> search(String name, Pageable pageable) {
 >         if (name == null || name.isBlank()) {
@@ -2028,16 +2068,19 @@
 >         return students.findByNameContainingIgnoreCase(name, pageable);
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public Optional<StudentEntity> findById(Long id) {
 >         return students.findById(id);
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public Optional<StudentEntity> findByEmail(String email) {
 >         return students.findByEmailIgnoreCase(email);
 >     }
 >
+>     @Override
 >     @Transactional
 >     public ServiceResult<StudentEntity> create(StudentEntity data) {
 >         if (students.existsByEmailIgnoreCase(data.getEmail())) {
@@ -2048,6 +2091,7 @@
 >         return ServiceResult.ok(students.save(toSave));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public ServiceResult<StudentEntity> update(Long id, StudentEntity data) {
 >         if (!students.existsById(id)) {
@@ -2061,6 +2105,7 @@
 >         return ServiceResult.ok(students.save(toSave));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status) {
 >         Optional<StudentEntity> current = students.findById(id);
@@ -2073,6 +2118,7 @@
 >         return ServiceResult.ok(students.save(toSave));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public boolean delete(Long id) {
 >         if (!students.existsById(id)) {

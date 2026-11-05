@@ -46,7 +46,8 @@ src/main/java/com/academy
 │   ├── controller/StudentController · CourseController · EnrollmentController
 │   ├── dto/StudentRequest · StudentResponse · CourseRequest · CourseResponse · EnrolledResponse · EnrollmentRequest · EnrollmentResponse · PageResponse
 │   └── mapper/StudentMapper · CourseMapper · EnrollmentMapper
-├── business/service/StudentService · CourseService · EnrollmentService · ServiceResult · ServiceStatus
+├── business/service/StudentService · CourseService · EnrollmentService (interfaces) · ServiceResult · ServiceStatus
+├── business/impl/StudentServiceImpl · CourseServiceImpl · EnrollmentServiceImpl
 └── persistence
     ├── entity/StudentEntity · CourseEntity · EnrollmentEntity
     └── repository/StudentJpaRepository · CourseJpaRepository · EnrollmentJpaRepository

@@ -44,7 +44,8 @@ src/main/java/com/academy
 │   ├── controller/StudentController.java
 │   ├── dto/StudentRequest · StudentStatusRequest · StudentResponse · PageResponse
 │   └── mapper/StudentMapper.java
-├── business/service/StudentService · ServiceResult · ServiceStatus
+├── business/service/StudentService (interfaz) · ServiceResult · ServiceStatus
+├── business/impl/StudentServiceImpl
 └── persistence
     ├── entity/StudentEntity · StudentStatus
     └── repository/StudentJpaRepository

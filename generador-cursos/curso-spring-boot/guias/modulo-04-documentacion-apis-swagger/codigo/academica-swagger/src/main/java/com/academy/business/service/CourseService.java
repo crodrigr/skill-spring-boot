@@ -1,46 +1,18 @@
 package com.academy.business.service;
 
 import com.academy.persistence.entity.CourseEntity;
-import com.academy.persistence.repository.CourseJpaRepository;
-import com.academy.persistence.repository.EnrollmentJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Service
-public class CourseService {
+public interface CourseService {
 
-    private final CourseJpaRepository courses;
-    private final EnrollmentJpaRepository enrollments;
+    Page<CourseEntity> findAll(Pageable pageable);
 
-    public CourseService(CourseJpaRepository courses, EnrollmentJpaRepository enrollments) {
-        this.courses = courses;
-        this.enrollments = enrollments;
-    }
+    Optional<CourseEntity> findById(Long id);
 
-    @Transactional(readOnly = true)
-    public Page<CourseEntity> findAll(Pageable pageable) {
-        return courses.findAll(pageable);
-    }
+    CourseEntity create(CourseEntity course);
 
-    @Transactional(readOnly = true)
-    public Optional<CourseEntity> findById(Long id) {
-        return courses.findById(id);
-    }
-
-    @Transactional
-    public CourseEntity create(CourseEntity course) {
-        return courses.save(course);
-    }
-
-    @Transactional(readOnly = true)
-    public ServiceResult<Long> countEnrolled(Long courseId) {
-        if (!courses.existsById(courseId)) {
-            return ServiceResult.notFound();
-        }
-        return ServiceResult.ok(enrollments.countByCourseId(courseId));
-    }
+    ServiceResult<Long> countEnrolled(Long courseId);
 }

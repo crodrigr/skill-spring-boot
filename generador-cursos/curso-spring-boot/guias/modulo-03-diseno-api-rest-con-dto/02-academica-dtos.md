@@ -21,6 +21,7 @@
 > - Mueve las **validaciones** de las reglas del servicio al DTO de entrada (`@Valid`).
 > - Escribe un **mapeador** por recurso.
 > - Hace que el servicio distinga `404` y `409` con `ServiceResult`.
+> - Convierte cada servicio en una **interfaz** (`business/service`) con su **implementación** `…Impl` (`business/impl`).
 > - Diseña los endpoints: **versión** en la ruta, `Location` al crear, **paginación** con tope y ids en el **cuerpo**.
 > - Prueba cada endpoint con `curl` y ve qué **método del controlador** atiende cada petición.
 
@@ -123,9 +124,11 @@
 >     │   │   └── 📁 mapper
 >     │   │       └── 🆕 StudentMapper.java · CourseMapper.java · EnrollmentMapper.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service
->     │   │       ├── ✏️ StudentService.java · CourseService.java · EnrollmentService.java
->     │   │       └── 🆕 ServiceResult.java · ServiceStatus.java
+>     │   │   ├── 📁 service
+>     │   │   │   ├── ✏️ StudentService.java · CourseService.java · EnrollmentService.java    ahora son interfaces
+>     │   │   │   └── 🆕 ServiceResult.java · ServiceStatus.java
+>     │   │   └── 📁 impl
+>     │   │       └── 🆕 StudentServiceImpl.java · CourseServiceImpl.java · EnrollmentServiceImpl.java
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity
 >     │       │   ├── ✏️ StudentEntity.java        + campo interno createdAt
@@ -784,6 +787,8 @@
 > <details>
 > <summary><strong>Paso 4.2 · Los tres servicios</strong></summary>
 >
+> > Cada servicio se separa en una **interfaz** (`StudentService`, `CourseService`, `EnrollmentService` en `business/service`) y una clase `@Service` que la implementa (`…ServiceImpl` en `business/impl`). Los controladores siguen inyectando la interfaz.
+> >
 > > Qué cambia en cada uno:
 > >
 > > | Servicio | Cambio |
@@ -793,13 +798,41 @@
 > > | `EnrollmentService` | `enroll` distingue `NOT_FOUND` (estudiante o curso inexistente) de `CONFLICT` (repetida o sin cupo); nuevo `findById` |
 > >
 > > <details>
-> > <summary><strong>📄 StudentService.java</strong></summary>
+> > <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.StudentEntity;
+> > import org.springframework.data.domain.Page;
+> > import org.springframework.data.domain.Pageable;
+> >
+> > import java.util.Optional;
+> >
+> > public interface StudentService {
+> >
+> >     Page<StudentEntity> findAll(Pageable pageable);
+> >
+> >     Optional<StudentEntity> findById(Long id);
+> >
+> >     ServiceResult<StudentEntity> create(StudentEntity student);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
+> > import com.academy.business.service.ServiceResult;
+> > import com.academy.business.service.StudentService;
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.repository.StudentJpaRepository;
 > > import org.springframework.data.domain.Page;
@@ -810,24 +843,27 @@
 > > import java.util.Optional;
 > >
 > > @Service
-> > public class StudentService {
+> > public class StudentServiceImpl implements StudentService {
 > >
 > >     private final StudentJpaRepository students;
 > >
-> >     public StudentService(StudentJpaRepository students) {
+> >     public StudentServiceImpl(StudentJpaRepository students) {
 > >         this.students = students;
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Page<StudentEntity> findAll(Pageable pageable) {
 > >         return students.findAll(pageable);
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Optional<StudentEntity> findById(Long id) {
 > >         return students.findById(id);
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public ServiceResult<StudentEntity> create(StudentEntity student) {
 > >         if (students.existsByEmailIgnoreCase(student.getEmail())) {
@@ -840,14 +876,46 @@
 > >
 > > </details>
 > >
+> > > 💡 **Interfaz e implementación:** `StudentService` es ahora un **contrato** (una `interface` con las operaciones) y `StudentServiceImpl` es la clase `@Service` que lo cumple. Los controladores siguen inyectando `StudentService`; Spring entrega la implementación. Así la capa de presentación depende del contrato y no de la clase concreta.
+> >
 > > <details>
-> > <summary><strong>📄 CourseService.java</strong></summary>
+> > <summary><strong>📄 CourseService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/CourseService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.CourseEntity;
+> > import org.springframework.data.domain.Page;
+> > import org.springframework.data.domain.Pageable;
+> >
+> > import java.util.Optional;
+> >
+> > public interface CourseService {
+> >
+> >     Page<CourseEntity> findAll(Pageable pageable);
+> >
+> >     Optional<CourseEntity> findById(Long id);
+> >
+> >     CourseEntity create(CourseEntity course);
+> >
+> >     ServiceResult<Long> countEnrolled(Long courseId);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 CourseServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/CourseServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
+> > import com.academy.business.service.CourseService;
+> > import com.academy.business.service.ServiceResult;
 > > import com.academy.persistence.entity.CourseEntity;
 > > import com.academy.persistence.repository.CourseJpaRepository;
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
@@ -859,31 +927,35 @@
 > > import java.util.Optional;
 > >
 > > @Service
-> > public class CourseService {
+> > public class CourseServiceImpl implements CourseService {
 > >
 > >     private final CourseJpaRepository courses;
 > >     private final EnrollmentJpaRepository enrollments;
 > >
-> >     public CourseService(CourseJpaRepository courses, EnrollmentJpaRepository enrollments) {
+> >     public CourseServiceImpl(CourseJpaRepository courses, EnrollmentJpaRepository enrollments) {
 > >         this.courses = courses;
 > >         this.enrollments = enrollments;
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Page<CourseEntity> findAll(Pageable pageable) {
 > >         return courses.findAll(pageable);
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Optional<CourseEntity> findById(Long id) {
 > >         return courses.findById(id);
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public CourseEntity create(CourseEntity course) {
 > >         return courses.save(course);
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public ServiceResult<Long> countEnrolled(Long courseId) {
 > >         if (!courses.existsById(courseId)) {
@@ -897,13 +969,37 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>📄 EnrollmentService.java</strong></summary>
+> > <summary><strong>📄 EnrollmentService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/EnrollmentService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.EnrollmentEntity;
+> >
+> > import java.util.Optional;
+> >
+> > public interface EnrollmentService {
+> >
+> >     Optional<EnrollmentEntity> findById(Long id);
+> >
+> >     ServiceResult<EnrollmentEntity> enroll(Long studentId, Long courseId);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 EnrollmentServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/EnrollmentServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
+> > import com.academy.business.service.EnrollmentService;
+> > import com.academy.business.service.ServiceResult;
 > > import com.academy.persistence.entity.CourseEntity;
 > > import com.academy.persistence.entity.EnrollmentEntity;
 > > import com.academy.persistence.entity.StudentEntity;
@@ -916,24 +1012,26 @@
 > > import java.util.Optional;
 > >
 > > @Service
-> > public class EnrollmentService {
+> > public class EnrollmentServiceImpl implements EnrollmentService {
 > >
 > >     private final StudentJpaRepository students;
 > >     private final CourseJpaRepository courses;
 > >     private final EnrollmentJpaRepository enrollments;
 > >
-> >     public EnrollmentService(StudentJpaRepository students, CourseJpaRepository courses,
-> >                              EnrollmentJpaRepository enrollments) {
+> >     public EnrollmentServiceImpl(StudentJpaRepository students, CourseJpaRepository courses,
+> >                                  EnrollmentJpaRepository enrollments) {
 > >         this.students = students;
 > >         this.courses = courses;
 > >         this.enrollments = enrollments;
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Optional<EnrollmentEntity> findById(Long id) {
 > >         return enrollments.findById(id);
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public ServiceResult<EnrollmentEntity> enroll(Long studentId, Long courseId) {
 > >         Optional<StudentEntity> student = students.findById(studentId);

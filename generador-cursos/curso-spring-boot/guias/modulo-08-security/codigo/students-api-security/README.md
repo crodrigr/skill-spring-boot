@@ -83,7 +83,8 @@ src/main/java/com/academy
 │   └── mapper/StudentMapper.java
 ├── business
 │   ├── exception/StudentNotFoundException · StudentEmailAlreadyExistsException
-│   └── service/StudentService.java
+│   ├── service/StudentService.java (interfaz)
+│   └── impl/StudentServiceImpl.java
 └── persistence
     ├── entity/Role · UserAccountEntity · StudentEntity · StudentStatus
     └── repository/UserAccountJpaRepository · StudentJpaRepository

@@ -23,6 +23,7 @@
 > - Diseña endpoints con **versión** en la ruta, **verbos** y **códigos** correctos, `Location` al crear y una **acción parcial** con `PATCH`.
 > - Devuelve **páginas** con un envoltorio y **limita** el tamaño máximo.
 > - Mantiene el controlador **delgado**: traduce HTTP, no decide reglas.
+> - Separa el servicio en una **interfaz** (el contrato) y su **implementación** (`…Impl`), de modo que el controlador depende del contrato.
 
 </details>
 
@@ -174,7 +175,7 @@
 > | 1 | 15 – 25 | **Ver los problemas** de exponer la entidad |
 > | 2 | 25 – 35 | Los DTO |
 > | 3 | 35 – 42 | El mapeador |
-> | 4 | 42 – 52 | El servicio informa el resultado (`ServiceResult`) |
+> | 4 | 42 – 52 | El servicio informa el resultado (`ServiceResult`) y se separa en interfaz + implementación |
 > | 5 | 52 – 65 | El controlador delgado |
 > | 6 | 65 – 72 | Diseño de endpoints: versión, `Location`, `PATCH` y límites |
 > | 7 | 72 – 90 | Probar la API |
@@ -200,10 +201,12 @@
 > │   └── 📁 mapper                            🆕
 > │       └── 🆕 StudentMapper.java            DTO ↔ entidad
 > ├── 📁 business
-> │   └── 📁 service
-> │       ├── ✏️ StudentService.java           devuelve un resultado, no un Optional ambiguo
-> │       ├── 🆕 ServiceResult.java
-> │       └── 🆕 ServiceStatus.java
+> │   ├── 📁 service
+> │   │   ├── ✏️ StudentService.java           devuelve un resultado, no un Optional ambiguo
+> │   │   ├── 🆕 ServiceResult.java
+> │   │   └── 🆕 ServiceStatus.java
+> │   └── 📁 impl
+> │       └── 🆕 StudentServiceImpl.java           devuelve un resultado, no un Optional ambiguo
 > └── 📁 persistence
 >     ├── 📁 entity
 >     │   ├── ✏️ StudentEntity.java            sin validaciones (pasan al DTO) y con campo interno
@@ -309,7 +312,6 @@
 > > ✅ **Punto de control 0.1:** la aplicación arranca (`Started AcademyApplication`) y sigue en ejecución.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 0.2 · Entidad, repositorio y servicio</strong></summary>
@@ -513,7 +515,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 0.3 · El controlador que devuelve la entidad</strong></summary>
 >
@@ -665,7 +666,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 1.2 · El cliente puede mandar campos que no debería</strong></summary>
 >
@@ -701,7 +701,6 @@
 > > > 🔎 **Concepto:** esto se llama **asignación masiva** (*mass assignment*): enviar campos de más que se enlazan al objeto sin que nadie los haya autorizado.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 1.3 · El resumen de problemas</strong></summary>
@@ -801,7 +800,6 @@
 >
 > </details>
 >
->
 > <details>
 > <summary><strong>Paso 2.2 · <code>StudentResponse</code> y <code>PageResponse</code>: lo que sale</strong></summary>
 >
@@ -848,7 +846,6 @@
 > > > 💡 **Beneficio de este paso:** los problemas 1 y 6 (campos internos y listados pobres) se resuelven. Además se puede **agregar un campo a la tabla sin que cambie la API**.
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 2.3 · Quitar las validaciones de la entidad</strong></summary>
@@ -1064,20 +1061,54 @@
 >
 > </details>
 >
->
 > <details>
-> <summary><strong>Paso 4.2 · <code>StudentService</code></strong></summary>
+> <summary><strong>Paso 4.2 · <code>StudentService</code> (interfaz) y <code>StudentServiceImpl</code></strong></summary>
 >
-> > Las reglas son las mismas; cambia lo que devuelven los métodos. Se agrega `changeStatus`, que cambia **solo** el estado.
+> > Las reglas son las mismas; cambia lo que devuelven los métodos. Se agrega `changeStatus`, que cambia **solo** el estado. Además, `StudentService` deja de ser una clase: pasa a ser una **interfaz** (el contrato) en `business/service`, y la lógica se mueve a `StudentServiceImpl`, en `business/impl`.
 > >
 > > <details>
-> > <summary><strong>📄 StudentService.java</strong></summary>
+> > <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.StudentEntity;
+> > import com.academy.persistence.entity.StudentStatus;
+> > import org.springframework.data.domain.Page;
+> > import org.springframework.data.domain.Pageable;
+> >
+> > import java.util.Optional;
+> >
+> > public interface StudentService {
+> >
+> >     Page<StudentEntity> search(String name, Pageable pageable);
+> >
+> >     Optional<StudentEntity> findById(Long id);
+> >
+> >     ServiceResult<StudentEntity> create(StudentEntity data);
+> >
+> >     ServiceResult<StudentEntity> update(Long id, StudentEntity data);
+> >
+> >     ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status);
+> >
+> >     boolean delete(Long id);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
+> > import com.academy.business.service.ServiceResult;
+> > import com.academy.business.service.StudentService;
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.entity.StudentStatus;
 > > import com.academy.persistence.repository.StudentJpaRepository;
@@ -1089,14 +1120,15 @@
 > > import java.util.Optional;
 > >
 > > @Service
-> > public class StudentService {
+> > public class StudentServiceImpl implements StudentService {
 > >
 > >     private final StudentJpaRepository students;
 > >
-> >     public StudentService(StudentJpaRepository students) {
+> >     public StudentServiceImpl(StudentJpaRepository students) {
 > >         this.students = students;
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Page<StudentEntity> search(String name, Pageable pageable) {
 > >         if (name == null || name.isBlank()) {
@@ -1105,11 +1137,13 @@
 > >         return students.findByNameContainingIgnoreCase(name, pageable);
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Optional<StudentEntity> findById(Long id) {
 > >         return students.findById(id);
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public ServiceResult<StudentEntity> create(StudentEntity data) {
 > >         if (students.existsByEmailIgnoreCase(data.getEmail())) {
@@ -1120,6 +1154,7 @@
 > >         return ServiceResult.ok(students.save(toSave));
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public ServiceResult<StudentEntity> update(Long id, StudentEntity data) {
 > >         if (!students.existsById(id)) {
@@ -1133,6 +1168,7 @@
 > >         return ServiceResult.ok(students.save(toSave));
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status) {
 > >         Optional<StudentEntity> current = students.findById(id);
@@ -1145,6 +1181,7 @@
 > >         return ServiceResult.ok(students.save(toSave));
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public boolean delete(Long id) {
 > >         if (!students.existsById(id)) {
@@ -1157,6 +1194,8 @@
 > > ```
 > >
 > > </details>
+> >
+> > > 💡 **Interfaz e implementación:** `StudentService` es ahora un **contrato** (una `interface` con las operaciones) y `StudentServiceImpl` es la clase `@Service` que lo cumple. Los controladores siguen inyectando `StudentService`; Spring entrega la implementación. Así la capa de presentación depende del contrato y no de la clase concreta.
 > >
 > > > | Método | Devuelve | Qué decide |
 > > > |---|---|---|
@@ -1333,7 +1372,6 @@
 > > > | **Paginación con envoltorio** | `content`, `page`, `size`, `totalElements`, `totalPages` | El cliente sabe cuántas páginas hay |
 >
 > </details>
->
 >
 > <details>
 > <summary><strong>Paso 6.2 · Limitar el tamaño de página</strong></summary>
@@ -2066,10 +2104,12 @@
 >     │   │   └── 📁 mapper
 >     │   │       └── 📄 StudentMapper.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service
->     │   │       ├── 📄 StudentService.java
->     │   │       ├── 📄 ServiceResult.java
->     │   │       └── 📄 ServiceStatus.java
+>     │   │   ├── 📁 service
+>     │   │   │   ├── 📄 StudentService.java
+>     │   │   │   ├── 📄 ServiceResult.java
+>     │   │   │   └── 📄 ServiceStatus.java
+>     │   │   └── 📁 impl
+>     │   │       └── 📄 StudentServiceImpl.java
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity
 >     │       │   ├── 📄 StudentEntity.java
@@ -2353,13 +2393,52 @@
 > </details>
 >
 > <details>
-> <summary><strong>📄 StudentService.java</strong></summary>
+> <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 >
 > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 >
 > ```java
 > package com.academy.business.service;
 >
+> import com.academy.persistence.entity.StudentEntity;
+> import com.academy.persistence.entity.StudentStatus;
+> import org.springframework.data.domain.Page;
+> import org.springframework.data.domain.Pageable;
+>
+> import java.util.Optional;
+>
+> public interface StudentService {
+>
+>     Page<StudentEntity> search(String name, Pageable pageable);
+>
+>     Optional<StudentEntity> findById(Long id);
+>
+>     ServiceResult<StudentEntity> create(StudentEntity data);
+>
+>     ServiceResult<StudentEntity> update(Long id, StudentEntity data);
+>
+>     ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status);
+>
+>     boolean delete(Long id);
+> }
+> ```
+>
+> </details>
+>
+> #### 📁 impl
+>
+> > 💡 Cada servicio es una `interface` en `business/service`; su clase `@Service` vive en `business/impl` con el sufijo `Impl`.
+>
+> <details>
+> <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+>
+> ```java
+> package com.academy.business.impl;
+>
+> import com.academy.business.service.ServiceResult;
+> import com.academy.business.service.StudentService;
 > import com.academy.persistence.entity.StudentEntity;
 > import com.academy.persistence.entity.StudentStatus;
 > import com.academy.persistence.repository.StudentJpaRepository;
@@ -2371,14 +2450,15 @@
 > import java.util.Optional;
 >
 > @Service
-> public class StudentService {
+> public class StudentServiceImpl implements StudentService {
 >
 >     private final StudentJpaRepository students;
 >
->     public StudentService(StudentJpaRepository students) {
+>     public StudentServiceImpl(StudentJpaRepository students) {
 >         this.students = students;
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public Page<StudentEntity> search(String name, Pageable pageable) {
 >         if (name == null || name.isBlank()) {
@@ -2387,11 +2467,13 @@
 >         return students.findByNameContainingIgnoreCase(name, pageable);
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public Optional<StudentEntity> findById(Long id) {
 >         return students.findById(id);
 >     }
 >
+>     @Override
 >     @Transactional
 >     public ServiceResult<StudentEntity> create(StudentEntity data) {
 >         if (students.existsByEmailIgnoreCase(data.getEmail())) {
@@ -2402,6 +2484,7 @@
 >         return ServiceResult.ok(students.save(toSave));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public ServiceResult<StudentEntity> update(Long id, StudentEntity data) {
 >         if (!students.existsById(id)) {
@@ -2415,6 +2498,7 @@
 >         return ServiceResult.ok(students.save(toSave));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public ServiceResult<StudentEntity> changeStatus(Long id, StudentStatus status) {
 >         Optional<StudentEntity> current = students.findById(id);
@@ -2427,6 +2511,7 @@
 >         return ServiceResult.ok(students.save(toSave));
 >     }
 >
+>     @Override
 >     @Transactional
 >     public boolean delete(Long id) {
 >         if (!students.existsById(id)) {
