@@ -6,6 +6,8 @@
 >
 > ✅ **Verificada.** El código de esta guía se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8: las tablas, las consultas derivadas y la persistencia entre reinicios que se muestran son salidas reales. ⚠️ **Los requisitos de esta guía ya están en Java 21 y Spring Boot 4.1.2, pero este código no se volvió a ejecutar con esa versión** (los proyectos Maven de los módulos 03 a 08 sí).
 >
+> 🪄 **Versión con Lombok.** El código final (entidades, servicios y controladores con `@Getter`, `@NoArgsConstructor` y `@RequiredArgsConstructor`) se compiló con **Spring Boot 4.1.2** y JDK 25 (`release 21`), y se ejecutó contra MySQL 8 comprobando `POST /api/students` (`201` y `409`), `POST /api/courses`, `POST /api/enrollments` (`201` y `409` por cupo) y `GET /api/courses/{id}/enrolled`. Las salidas de las consultas derivadas y de las tablas son las de la ejecución anterior (Spring Boot 3.3).
+>
 > 🧭 **Idea central.** Cada capa tiene una sola responsabilidad: `persistence` guarda (**entidades** y **repositorios de Spring Data**), `business` decide (**servicios** con las reglas) y `presentation` atiende HTTP (**controladores**).
 > El modelo del negocio (DTO) y los mapeadores **no se trabajan aquí**: se resuelven en otra guía.
 
@@ -52,7 +54,7 @@
 > | **RNF-01** | Java 21 o superior, Spring Boot 4 y Maven. |
 > | **RNF-02** | Persistencia con **Spring Data JPA** y **MySQL 8** (en Docker o instalado). La base `academy` debe existir antes de arrancar. |
 > | **RNF-03** | Tres capas: `presentation` → `business` → `persistence`. Las anotaciones de JPA van **solo** en `persistence.entity`; las de Spring Web, **solo** en `presentation.controller`. |
-> | **RNF-04** | Inyección por constructor. Todos los nombres del código (paquetes, clases, atributos, tablas) en **inglés**. |
+> | **RNF-04** | Inyección por constructor (generado con `@RequiredArgsConstructor`). Todos los nombres del código (paquetes, clases, atributos, tablas) en **inglés**. |
 > | **RNF-05** | La verificación se hace con `curl` contra la API, con el SQL que imprime Hibernate y con el cliente de MySQL. |
 > | **RNF-06** | Duración: 1 h 20 min. |
 >
@@ -188,9 +190,9 @@
 > <summary><strong>Paso 0.1 · Crear el proyecto con las dependencias</strong></summary>
 >
 > > Se crea un proyecto nuevo en [start.spring.io](https://start.spring.io): **Maven · Java 21 o superior · Group** `com.academy` · **Artifact** `academy` ·
-> > dependencias **Spring Web**, **Spring Data JPA**, **MySQL Driver** y **Spring Boot DevTools**.
+> > dependencias **Spring Web**, **Spring Data JPA**, **MySQL Driver**, **Lombok** y **Spring Boot DevTools**.
 > >
-> > En el `pom.xml` quedan estas cuatro dependencias:
+> > En el `pom.xml` quedan estas cinco dependencias:
 > >
 > > ```xml
 > > <dependency>
@@ -207,12 +209,21 @@
 > >     <scope>runtime</scope>
 > > </dependency>
 > > <dependency>
+> >     <groupId>org.projectlombok</groupId>
+> >     <artifactId>lombok</artifactId>
+> >     <optional>true</optional>
+> > </dependency>
+> > <dependency>
 > >     <groupId>org.springframework.boot</groupId>
 > >     <artifactId>spring-boot-devtools</artifactId>
 > >     <scope>runtime</scope>
 > >     <optional>true</optional>
 > > </dependency>
 > > ```
+> >
+> > > 🪄 **¿Qué es Lombok?** Una librería que **escribe por ti** el código repetitivo (getters, constructores) **al compilar**. En el archivo `.java` se ven solo anotaciones; en la clase compilada están los métodos. Se explica en el Paso 1.1.
+> >
+> > > ⚠️ **Con Java 23 o superior** (por ejemplo, JDK 25), Maven **no ejecuta** Lombok por sí solo y el proyecto falla con `cannot find symbol … getEmail()`. Se corrige con una configuración en el `pom.xml` (el `maven-compiler-plugin` con `annotationProcessorPaths`), que está en el **pom final** de esta guía. Con Java 21 no hace falta.
 > >
 > > > 🔎 **Concepto (M3 y M4):**
 > > >
@@ -347,9 +358,14 @@
 > > import jakarta.persistence.GenerationType;
 > > import jakarta.persistence.Id;
 > > import jakarta.persistence.Table;
+> > import lombok.AccessLevel;
+> > import lombok.Getter;
+> > import lombok.NoArgsConstructor;
 > >
 > > @Entity
 > > @Table(name = "student")
+> > @Getter
+> > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class StudentEntity {
 > >
 > >     @Id
@@ -363,19 +379,11 @@
 > >     @Column(unique = true)
 > >     private String email;
 > >
-> >     protected StudentEntity() {
-> >     }
-> >
 > >     public StudentEntity(String name, int age, String email) {
 > >         this.name = name;
 > >         this.age = age;
 > >         this.email = email;
 > >     }
-> >
-> >     public Long getId() { return id; }
-> >     public String getName() { return name; }
-> >     public int getAge() { return age; }
-> >     public String getEmail() { return email; }
 > > }
 > > ```
 > >
@@ -387,11 +395,38 @@
 > > | `@Table(name = "student")` | **Necesario:** sin él, la tabla se llamaría `student_entity` (el nombre de la clase). |
 > > | `@Id` + `@GeneratedValue(strategy = GenerationType.IDENTITY)` | `id` es la **clave primaria** y la **genera la base** (autoincremental). Es el equivalente a un contador que nunca repite. |
 > > | `@Column(unique = true)` en `email` | La base rechaza correos repetidos (dos estudiantes no pueden tener el mismo `email`). |
-> > | Constructor `protected` sin argumentos | JPA crea el objeto vacío y rellena los campos por reflexión (misma idea del JavaBean del M2). |
-> > | **Sin `setId`** | El `id` lo decide la base, no el código. |
+> > | `@Getter` *(Lombok)* | Genera `getId()`, `getName()`, `getAge()` y `getEmail()`. **No** se escriben a mano. |
+> > | `@NoArgsConstructor(access = AccessLevel.PROTECTED)` *(Lombok)* | Genera el constructor **vacío** y `protected`: JPA crea el objeto vacío y rellena los campos por reflexión (misma idea del JavaBean del M2), pero el código normal no puede usarlo. |
+> > | Constructor con `name`, `age`, `email` | Se **escribe a mano** a propósito: **no incluye `id`**, porque lo decide la base. (`@AllArgsConstructor` lo incluiría.) |
+> > | **Sin `@Setter`** | Tampoco hay `setId`: el `id` lo decide la base, no el código. |
 > >
 > > > 🔎 **Concepto (M3):** el nombre de cada columna sale del atributo (`age`, `name`); `maxCapacity` se convertirá en `max_capacity`.
 > > > Los tipos se mapean solos: `String` → `varchar`, `int` → `integer`, `Long` → `bigint`.
+> >
+> > <details>
+> > <summary><strong>🪄 Lombok: qué escribe por ti</strong></summary>
+> >
+> > > Sin Lombok, la entidad necesitaría esto a mano:
+> > >
+> > > ```java
+> > > protected StudentEntity() { }                       // lo genera @NoArgsConstructor(access = PROTECTED)
+> > > public Long getId() { return id; }                  // lo genera @Getter
+> > > public String getName() { return name; }           // lo genera @Getter
+> > > public int getAge() { return age; }                // lo genera @Getter
+> > > public String getEmail() { return email; }         // lo genera @Getter
+> > > ```
+> > >
+> > > | Anotación | Dónde | Qué genera |
+> > > |---|---|---|
+> > > | `@Getter` | Sobre la **clase** | Un `getX()` por cada atributo |
+> > > | `@NoArgsConstructor(access = AccessLevel.PROTECTED)` | Sobre la **clase** | Un constructor vacío `protected` |
+> > > | `@RequiredArgsConstructor` | Servicios y controladores (Pasos 3 y 4) | Un constructor con **todos los atributos `final`**, que es la inyección por constructor |
+> > >
+> > > Se ve el resultado con `javap` sobre la clase compilada, o en el panel de estructura del IDE: los métodos **existen** aunque no estén escritos.
+> > >
+> > > > ⚠️ En las entidades **no** se usa `@Data`: genera `equals`, `hashCode` y `toString` con todos los campos, y eso da problemas con relaciones y con el `id` que asigna la base. `@Getter` es suficiente.
+> >
+> > </details>
 >
 > </details>
 >
@@ -414,9 +449,14 @@
 > > import jakarta.persistence.GenerationType;
 > > import jakarta.persistence.Id;
 > > import jakarta.persistence.Table;
+> > import lombok.AccessLevel;
+> > import lombok.Getter;
+> > import lombok.NoArgsConstructor;
 > >
 > > @Entity
 > > @Table(name = "course")
+> > @Getter
+> > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class CourseEntity {
 > >
 > >     @Id
@@ -429,19 +469,11 @@
 > >
 > >     private int maxCapacity;
 > >
-> >     protected CourseEntity() {
-> >     }
-> >
 > >     public CourseEntity(String name, double price, int maxCapacity) {
 > >         this.name = name;
 > >         this.price = price;
 > >         this.maxCapacity = maxCapacity;
 > >     }
-> >
-> >     public Long getId() { return id; }
-> >     public String getName() { return name; }
-> >     public double getPrice() { return price; }
-> >     public int getMaxCapacity() { return maxCapacity; }
 > > }
 > > ```
 > >
@@ -462,9 +494,14 @@
 > > import jakarta.persistence.JoinColumn;
 > > import jakarta.persistence.ManyToOne;
 > > import jakarta.persistence.Table;
+> > import lombok.AccessLevel;
+> > import lombok.Getter;
+> > import lombok.NoArgsConstructor;
 > >
 > > @Entity
 > > @Table(name = "enrollment")
+> > @Getter
+> > @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > > public class EnrollmentEntity {
 > >
 > >     @Id
@@ -479,17 +516,10 @@
 > >     @JoinColumn(name = "course_id")
 > >     private CourseEntity course;
 > >
-> >     protected EnrollmentEntity() {
-> >     }
-> >
 > >     public EnrollmentEntity(StudentEntity student, CourseEntity course) {
 > >         this.student = student;
 > >         this.course = course;
 > >     }
-> >
-> >     public Long getId() { return id; }
-> >     public StudentEntity getStudent() { return student; }
-> >     public CourseEntity getCourse() { return course; }
 > > }
 > > ```
 > >
@@ -747,7 +777,7 @@
 > <details>
 > <summary><strong>Paso 3.1 · <code>StudentService</code> y <code>CourseService</code></strong></summary>
 >
-> > Cada servicio recibe sus repositorios **por constructor** y lleva `@Service` para que Spring lo cree.
+> > Cada servicio recibe sus repositorios **por constructor** y lleva `@Service` para que Spring lo cree. El constructor **lo genera Lombok** con `@RequiredArgsConstructor` (uno por cada atributo `final`).
 > >
 > > <details>
 > > <summary><strong>📄 StudentService.java</strong></summary>
@@ -759,6 +789,7 @@
 > >
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.repository.StudentJpaRepository;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.stereotype.Service;
 > > import org.springframework.transaction.annotation.Transactional;
 > >
@@ -766,13 +797,10 @@
 > > import java.util.Optional;
 > >
 > > @Service
+> > @RequiredArgsConstructor
 > > public class StudentService {
 > >
 > >     private final StudentJpaRepository students;
-> >
-> >     public StudentService(StudentJpaRepository students) {
-> >         this.students = students;
-> >     }
 > >
 > >     @Transactional(readOnly = true)
 > >     public List<StudentEntity> findAll() {
@@ -802,6 +830,7 @@
 > > import com.academy.persistence.entity.CourseEntity;
 > > import com.academy.persistence.repository.CourseJpaRepository;
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.stereotype.Service;
 > > import org.springframework.transaction.annotation.Transactional;
 > >
@@ -809,15 +838,11 @@
 > > import java.util.Optional;
 > >
 > > @Service
+> > @RequiredArgsConstructor
 > > public class CourseService {
 > >
 > >     private final CourseJpaRepository courses;
 > >     private final EnrollmentJpaRepository enrollments;
-> >
-> >     public CourseService(CourseJpaRepository courses, EnrollmentJpaRepository enrollments) {
-> >         this.courses = courses;
-> >         this.enrollments = enrollments;
-> >     }
 > >
 > >     @Transactional(readOnly = true)
 > >     public List<CourseEntity> findAll() {
@@ -873,24 +898,19 @@
 > > import com.academy.persistence.repository.CourseJpaRepository;
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
 > > import com.academy.persistence.repository.StudentJpaRepository;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.stereotype.Service;
 > > import org.springframework.transaction.annotation.Transactional;
 > >
 > > import java.util.Optional;
 > >
 > > @Service
+> > @RequiredArgsConstructor
 > > public class EnrollmentService {
 > >
 > >     private final StudentJpaRepository students;
 > >     private final CourseJpaRepository courses;
 > >     private final EnrollmentJpaRepository enrollments;
-> >
-> >     public EnrollmentService(StudentJpaRepository students, CourseJpaRepository courses,
-> >                              EnrollmentJpaRepository enrollments) {
-> >         this.students = students;
-> >         this.courses = courses;
-> >         this.enrollments = enrollments;
-> >     }
 > >
 > >     @Transactional
 > >     public Optional<EnrollmentEntity> enroll(Long studentId, Long courseId) {
@@ -951,7 +971,7 @@
 > <details>
 > <summary><strong>Paso 4.1 · Los controladores</strong></summary>
 >
-> > Cada controlador lleva `@RestController` y `@RequestMapping` con su ruta base, y recibe el servicio **por constructor**.
+> > Cada controlador lleva `@RestController` y `@RequestMapping` con su ruta base, y recibe el servicio **por constructor** (generado con `@RequiredArgsConstructor`).
 > >
 > > <details>
 > > <summary><strong>📄 StudentController.java</strong></summary>
@@ -963,6 +983,7 @@
 > >
 > > import com.academy.business.service.StudentService;
 > > import com.academy.persistence.entity.StudentEntity;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.http.ResponseEntity;
 > > import org.springframework.web.bind.annotation.GetMapping;
@@ -975,13 +996,10 @@
 > >
 > > @RestController
 > > @RequestMapping("/api/students")
+> > @RequiredArgsConstructor
 > > public class StudentController {
 > >
 > >     private final StudentService service;
-> >
-> >     public StudentController(StudentService service) {
-> >         this.service = service;
-> >     }
 > >
 > >     @GetMapping
 > >     public List<StudentEntity> findAll() {
@@ -1009,6 +1027,7 @@
 > >
 > > import com.academy.business.service.CourseService;
 > > import com.academy.persistence.entity.CourseEntity;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.http.ResponseEntity;
 > > import org.springframework.web.bind.annotation.GetMapping;
@@ -1022,13 +1041,10 @@
 > >
 > > @RestController
 > > @RequestMapping("/api/courses")
+> > @RequiredArgsConstructor
 > > public class CourseController {
 > >
 > >     private final CourseService service;
-> >
-> >     public CourseController(CourseService service) {
-> >         this.service = service;
-> >     }
 > >
 > >     @GetMapping
 > >     public List<CourseEntity> findAll() {
@@ -1063,6 +1079,7 @@
 > >
 > > import com.academy.business.service.EnrollmentService;
 > > import com.academy.persistence.entity.EnrollmentEntity;
+> > import lombok.RequiredArgsConstructor;
 > > import org.springframework.http.HttpStatus;
 > > import org.springframework.http.ResponseEntity;
 > > import org.springframework.web.bind.annotation.PostMapping;
@@ -1072,13 +1089,10 @@
 > >
 > > @RestController
 > > @RequestMapping("/api/enrollments")
+> > @RequiredArgsConstructor
 > > public class EnrollmentController {
 > >
 > >     private final EnrollmentService service;
-> >
-> >     public EnrollmentController(EnrollmentService service) {
-> >         this.service = service;
-> >     }
 > >
 > >     @PostMapping
 > >     public ResponseEntity<EnrollmentEntity> enroll(@RequestParam Long studentId, @RequestParam Long courseId) {
@@ -1128,10 +1142,10 @@
 > >
 > > | Petición | Respuesta real | Regla que se comprueba |
 > > |---|---|---|
-> > | `POST /api/students` (Ana) | `201` · `{"id":1,"name":"Ana Torres","age":22,"email":"ana@mail.com"}` | Crear |
+> > | `POST /api/students` (Ana) | `201` · `{"name":"Ana Torres","age":22,"email":"ana@mail.com","id":1}` | Crear |
 > > | `POST /api/students` con `ANA@mail.com` | `409` · sin cuerpo | Correo único, sin importar mayúsculas |
 > > | `POST /api/courses` con precio `0` | `409` · sin cuerpo | Precio y cupo válidos |
-> > | `POST /api/enrollments?studentId=1&courseId=1` | `201` · `{"id":1,"student":{…},"course":{…}}` | Matricular |
+> > | `POST /api/enrollments?studentId=1&courseId=1` | `201` · la matrícula, con los datos del estudiante y del curso | Matricular |
 > > | La misma matrícula otra vez | `409` · sin cuerpo | Sin duplicados |
 > > | `studentId=2&courseId=1` (cupo de 1) | `409` · sin cuerpo | Cupo |
 > > | `studentId=9&courseId=1` | `409` · sin cuerpo | Estudiante inexistente |
@@ -1225,7 +1239,8 @@
 > | `No suitable driver found for jdbc:mysql…` | Falta la dependencia `mysql-connector-j` | Agregarla al `pom.xml` |
 > | La tabla se llama `student_entity` | Falta `@Table(name = "student")` en la entidad | Agregar `@Table` |
 > | `Not a managed type: class …StudentEntity` | Falta `@Entity`, o la clase quedó **fuera** de `com.academy` (el escaneo no la ve) | Anotar la clase y dejarla bajo el paquete de `AcademyApplication` |
-> | `No default constructor for entity` | La entidad no tiene constructor **sin argumentos** | Agregar `protected StudentEntity() {}` |
+> | `cannot find symbol … getEmail()` al compilar | Lombok **no se está ejecutando**: falta la dependencia, o con Java 23+ falta `annotationProcessorPaths` en el `pom.xml` | Agregar la configuración del pom final; en el IDE, activar el plugin de Lombok y «annotation processing» |
+> | `No default constructor for entity` | La entidad no tiene constructor **sin argumentos** | Agregar `@NoArgsConstructor(access = AccessLevel.PROTECTED)` a la entidad |
 > | `PropertyReferenceException: No property 'x' found for type 'StudentEntity'` | El nombre del método derivado no coincide con un atributo de la **entidad** | Usar el nombre exacto: `existsByEmailIgnoreCase`, `countByCourseId` |
 > | `Table 'academy.student' doesn't exist` | `ddl-auto=none`, o la URL apunta a otra base | Usar `update` y revisar el nombre de la base en la URL |
 > | `DataIntegrityViolationException` al guardar un estudiante | El `email` ya existe y la comprobación del servicio no se ejecutó (se usó el repositorio directo) | Guardar siempre a través de `StudentService`, o usar otro correo |
@@ -1329,6 +1344,11 @@
 >             <scope>runtime</scope>
 >         </dependency>
 >         <dependency>
+>             <groupId>org.projectlombok</groupId>
+>             <artifactId>lombok</artifactId>
+>             <optional>true</optional>
+>         </dependency>
+>         <dependency>
 >             <groupId>org.springframework.boot</groupId>
 >             <artifactId>spring-boot-devtools</artifactId>
 >             <scope>runtime</scope>
@@ -1338,8 +1358,29 @@
 >     <build>
 >         <plugins>
 >             <plugin>
+>                 <groupId>org.apache.maven.plugins</groupId>
+>                 <artifactId>maven-compiler-plugin</artifactId>
+>                 <configuration>
+>                     <annotationProcessorPaths>
+>                         <path>
+>                             <groupId>org.projectlombok</groupId>
+>                             <artifactId>lombok</artifactId>
+>                             <version>${lombok.version}</version>
+>                         </path>
+>                     </annotationProcessorPaths>
+>                 </configuration>
+>             </plugin>
+>             <plugin>
 >                 <groupId>org.springframework.boot</groupId>
 >                 <artifactId>spring-boot-maven-plugin</artifactId>
+>                 <configuration>
+>                     <excludes>
+>                         <exclude>
+>                             <groupId>org.projectlombok</groupId>
+>                             <artifactId>lombok</artifactId>
+>                         </exclude>
+>                     </excludes>
+>                 </configuration>
 >             </plugin>
 >         </plugins>
 >     </build>
@@ -1408,9 +1449,14 @@
 > import jakarta.persistence.GenerationType;
 > import jakarta.persistence.Id;
 > import jakarta.persistence.Table;
+> import lombok.AccessLevel;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
 >
 > @Entity
 > @Table(name = "student")
+> @Getter
+> @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > public class StudentEntity {
 >
 >     @Id
@@ -1424,19 +1470,11 @@
 >     @Column(unique = true)
 >     private String email;
 >
->     protected StudentEntity() {
->     }
->
 >     public StudentEntity(String name, int age, String email) {
 >         this.name = name;
 >         this.age = age;
 >         this.email = email;
 >     }
->
->     public Long getId() { return id; }
->     public String getName() { return name; }
->     public int getAge() { return age; }
->     public String getEmail() { return email; }
 > }
 > ```
 >
@@ -1455,9 +1493,14 @@
 > import jakarta.persistence.GenerationType;
 > import jakarta.persistence.Id;
 > import jakarta.persistence.Table;
+> import lombok.AccessLevel;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
 >
 > @Entity
 > @Table(name = "course")
+> @Getter
+> @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > public class CourseEntity {
 >
 >     @Id
@@ -1470,19 +1513,11 @@
 >
 >     private int maxCapacity;
 >
->     protected CourseEntity() {
->     }
->
 >     public CourseEntity(String name, double price, int maxCapacity) {
 >         this.name = name;
 >         this.price = price;
 >         this.maxCapacity = maxCapacity;
 >     }
->
->     public Long getId() { return id; }
->     public String getName() { return name; }
->     public double getPrice() { return price; }
->     public int getMaxCapacity() { return maxCapacity; }
 > }
 > ```
 >
@@ -1503,9 +1538,14 @@
 > import jakarta.persistence.JoinColumn;
 > import jakarta.persistence.ManyToOne;
 > import jakarta.persistence.Table;
+> import lombok.AccessLevel;
+> import lombok.Getter;
+> import lombok.NoArgsConstructor;
 >
 > @Entity
 > @Table(name = "enrollment")
+> @Getter
+> @NoArgsConstructor(access = AccessLevel.PROTECTED)
 > public class EnrollmentEntity {
 >
 >     @Id
@@ -1520,17 +1560,10 @@
 >     @JoinColumn(name = "course_id")
 >     private CourseEntity course;
 >
->     protected EnrollmentEntity() {
->     }
->
 >     public EnrollmentEntity(StudentEntity student, CourseEntity course) {
 >         this.student = student;
 >         this.course = course;
 >     }
->
->     public Long getId() { return id; }
->     public StudentEntity getStudent() { return student; }
->     public CourseEntity getCourse() { return course; }
 > }
 > ```
 >
@@ -1611,6 +1644,7 @@
 >
 > import com.academy.persistence.entity.StudentEntity;
 > import com.academy.persistence.repository.StudentJpaRepository;
+> import lombok.RequiredArgsConstructor;
 > import org.springframework.stereotype.Service;
 > import org.springframework.transaction.annotation.Transactional;
 >
@@ -1618,13 +1652,10 @@
 > import java.util.Optional;
 >
 > @Service
+> @RequiredArgsConstructor
 > public class StudentService {
 >
 >     private final StudentJpaRepository students;
->
->     public StudentService(StudentJpaRepository students) {
->         this.students = students;
->     }
 >
 >     @Transactional(readOnly = true)
 >     public List<StudentEntity> findAll() {
@@ -1654,6 +1685,7 @@
 > import com.academy.persistence.entity.CourseEntity;
 > import com.academy.persistence.repository.CourseJpaRepository;
 > import com.academy.persistence.repository.EnrollmentJpaRepository;
+> import lombok.RequiredArgsConstructor;
 > import org.springframework.stereotype.Service;
 > import org.springframework.transaction.annotation.Transactional;
 >
@@ -1661,15 +1693,11 @@
 > import java.util.Optional;
 >
 > @Service
+> @RequiredArgsConstructor
 > public class CourseService {
 >
 >     private final CourseJpaRepository courses;
 >     private final EnrollmentJpaRepository enrollments;
->
->     public CourseService(CourseJpaRepository courses, EnrollmentJpaRepository enrollments) {
->         this.courses = courses;
->         this.enrollments = enrollments;
->     }
 >
 >     @Transactional(readOnly = true)
 >     public List<CourseEntity> findAll() {
@@ -1710,24 +1738,19 @@
 > import com.academy.persistence.repository.CourseJpaRepository;
 > import com.academy.persistence.repository.EnrollmentJpaRepository;
 > import com.academy.persistence.repository.StudentJpaRepository;
+> import lombok.RequiredArgsConstructor;
 > import org.springframework.stereotype.Service;
 > import org.springframework.transaction.annotation.Transactional;
 >
 > import java.util.Optional;
 >
 > @Service
+> @RequiredArgsConstructor
 > public class EnrollmentService {
 >
 >     private final StudentJpaRepository students;
 >     private final CourseJpaRepository courses;
 >     private final EnrollmentJpaRepository enrollments;
->
->     public EnrollmentService(StudentJpaRepository students, CourseJpaRepository courses,
->                              EnrollmentJpaRepository enrollments) {
->         this.students = students;
->         this.courses = courses;
->         this.enrollments = enrollments;
->     }
 >
 >     @Transactional
 >     public Optional<EnrollmentEntity> enroll(Long studentId, Long courseId) {
@@ -1766,6 +1789,7 @@
 >
 > import com.academy.business.service.StudentService;
 > import com.academy.persistence.entity.StudentEntity;
+> import lombok.RequiredArgsConstructor;
 > import org.springframework.http.HttpStatus;
 > import org.springframework.http.ResponseEntity;
 > import org.springframework.web.bind.annotation.GetMapping;
@@ -1778,13 +1802,10 @@
 >
 > @RestController
 > @RequestMapping("/api/students")
+> @RequiredArgsConstructor
 > public class StudentController {
 >
 >     private final StudentService service;
->
->     public StudentController(StudentService service) {
->         this.service = service;
->     }
 >
 >     @GetMapping
 >     public List<StudentEntity> findAll() {
@@ -1812,6 +1833,7 @@
 >
 > import com.academy.business.service.CourseService;
 > import com.academy.persistence.entity.CourseEntity;
+> import lombok.RequiredArgsConstructor;
 > import org.springframework.http.HttpStatus;
 > import org.springframework.http.ResponseEntity;
 > import org.springframework.web.bind.annotation.GetMapping;
@@ -1825,13 +1847,10 @@
 >
 > @RestController
 > @RequestMapping("/api/courses")
+> @RequiredArgsConstructor
 > public class CourseController {
 >
 >     private final CourseService service;
->
->     public CourseController(CourseService service) {
->         this.service = service;
->     }
 >
 >     @GetMapping
 >     public List<CourseEntity> findAll() {
@@ -1866,6 +1885,7 @@
 >
 > import com.academy.business.service.EnrollmentService;
 > import com.academy.persistence.entity.EnrollmentEntity;
+> import lombok.RequiredArgsConstructor;
 > import org.springframework.http.HttpStatus;
 > import org.springframework.http.ResponseEntity;
 > import org.springframework.web.bind.annotation.PostMapping;
@@ -1875,13 +1895,10 @@
 >
 > @RestController
 > @RequestMapping("/api/enrollments")
+> @RequiredArgsConstructor
 > public class EnrollmentController {
 >
 >     private final EnrollmentService service;
->
->     public EnrollmentController(EnrollmentService service) {
->         this.service = service;
->     }
 >
 >     @PostMapping
 >     public ResponseEntity<EnrollmentEntity> enroll(@RequestParam Long studentId, @RequestParam Long courseId) {
@@ -1914,13 +1931,15 @@
 > | `@RequestMapping` · `@GetMapping` · `@PostMapping` | Controladores | Cada método atiende una ruta y un verbo. | Enlaza la petición HTTP con el método Java. |
 > | `@RequestBody` · `@PathVariable` · `@RequestParam` | Parámetros de los controladores | Cada dato llega de un sitio distinto. | Cuerpo JSON, parte de la ruta y parámetro de consulta. |
 > | `ResponseEntity` *(clase, no anotación)* | Retorno de `create`, `enroll` y `countEnrolled` | La respuesta cambia según el caso. | Fija el código HTTP (`201`, `404`, `409`) y el cuerpo. |
+> | `@Getter` · `@NoArgsConstructor(access = PROTECTED)` *(Lombok)* | Las tres entidades | Evitar escribir getters y el constructor vacío. | Generan los `getX()` y un constructor vacío `protected` al compilar. |
+> | `@RequiredArgsConstructor` *(Lombok)* | Servicios y controladores | Reciben sus dependencias por constructor. | Genera el constructor con los atributos `final`. |
 > | `@SpringBootApplication` | `AcademyApplication` | Es la clase que arranca Spring. | Activa el escaneo de entidades y repositorios. |
 >
 > ```text
-> persistence   ──▶  @Entity · @Table · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn     (en persistence.entity)
+> persistence   ──▶  @Entity · @Table · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn · @Getter · @NoArgsConstructor     (en persistence.entity)
 >                    (las …JpaRepository no llevan anotaciones)
-business      ──▶  @Service · @Transactional                                                                   (en business.service)
-presentation  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping
+> business      ──▶  @Service · @Transactional · @RequiredArgsConstructor                          (en business.service)
+> presentation  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping · @RequiredArgsConstructor
 > arranque      ──▶  @SpringBootApplication
 > ```
 >
