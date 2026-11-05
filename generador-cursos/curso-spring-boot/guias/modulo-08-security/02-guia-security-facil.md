@@ -1,6 +1,6 @@
 # 🔐 Guía fácil — Proteger la API con usuario, contraseña y token
 
-> 👩‍🏫 **Versión sencilla y práctica.** Se parte de la API de estudiantes del [Módulo 07](../modulo-07-excepciones/01-guia-crud-estudiantes-con-excepciones.md) y se le agrega **login con token (JWT)**, en pasos cortos. Cada paso dice **qué se hace**, trae el **código** y termina con una **prueba** para comprobar que funciona.
+> 👩‍🏫 **Versión sencilla y práctica.** Se parte de la API de estudiantes del [Módulo 07](../modulo-07-excepciones/07-01-guia-crud-estudiantes-con-excepciones.md) y se le agrega **login con token (JWT)**, en pasos cortos. Cada paso dice **qué se hace**, trae el **código** y termina con una **prueba** para comprobar que funciona.
 > Si se quiere la explicación completa (arquitectura de Spring Security, HTTP Basic, Swagger a fondo), está la [guía completa](01-guia-crud-estudiantes-con-security.md).
 >
 > 📮 **Colección de Postman:** [`codigo/postman/`](codigo/postman/) (41 peticiones con sus pruebas).

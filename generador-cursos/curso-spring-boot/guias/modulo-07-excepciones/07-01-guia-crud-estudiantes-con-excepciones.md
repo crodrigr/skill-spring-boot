@@ -1,7 +1,7 @@
-# 🚨 Guía paso a paso — CRUD de estudiantes con manejo de excepciones
+# 🚨 07-01-Guía paso a paso — CRUD de estudiantes con manejo de excepciones
 
 > 👩‍🏫 **Material docente** (contiene el código completo; no se entrega antes de resolver el módulo).
-> Continúa la [guía del Módulo 06](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md). 📦 Proyecto terminado: [`students-api-excepciones/`](codigo/students-api-excepciones/) (`./mvnw spring-boot:run`).
+> Continúa la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md). 📦 Proyecto terminado: [`students-api-excepciones/`](codigo/students-api-excepciones/) (`./mvnw spring-boot:run`).
 > ✅ **Verificada** con Java 21, Spring Boot 4.1.2 y MySQL 8: las respuestas que se muestran son reales.
 
 ## 🧭 La idea en un minuto
@@ -23,7 +23,7 @@ Así el controlador solo cuenta el caso feliz, y todos los errores tienen **el m
 
 | Paso | Qué se aprende |
 |:-:|---|
-| 0 | Partir del proyecto del Módulo 06 |
+| 0 | Partir del proyecto del Módulo 04 |
 | 1 | Ver qué falla en el manejo manual |
 | 2 | Lanzar excepciones propias + `@ResponseStatus` |
 | 3 | Controlar el cuerpo con `@ExceptionHandler` |
@@ -89,7 +89,7 @@ sequenceDiagram
 - Los controladores no tienen `try/catch` (RNF-06) y los errores se documentan en Swagger (RNF-07).
 - Código en **inglés**; mensajes al cliente en **español** (RNF-08).
 
-> 💡 `@Valid` ya venía del Módulo 05: aquí solo se **maneja** su excepción. Quedan fuera `ProblemDetail`, internacionalización y autenticación.
+> 💡 `@Valid` ya venía del Módulo 03: aquí solo se **maneja** su excepción. Quedan fuera `ProblemDetail`, internacionalización y autenticación.
 
 </details>
 
@@ -119,12 +119,12 @@ sequenceDiagram
 ---
 
 <details>
-<summary><strong>🚀 Paso 0 — Punto de partida: el proyecto del Módulo 06</strong></summary>
+<summary><strong>🚀 Paso 0 — Punto de partida: el proyecto del Módulo 04</strong></summary>
 
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > Se parte del proyecto que se termina en la [guía del Módulo 06](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md) ([`students-api/`](../modulo-04-documentacion-apis-swagger/codigo/students-api/)). Se copia como `students-api-excepciones` y se levanta la base:
+> > Se parte del proyecto que se termina en la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md) ([`students-api/`](../modulo-04-documentacion-apis-swagger/codigo/students-api/)). Se copia como `students-api-excepciones` y se levanta la base:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
@@ -214,7 +214,7 @@ sequenceDiagram
 > > | 5 | **El servicio devuelve códigos.** `ServiceResult` y `ServiceStatus` son una forma de «lanzar» un error a mano, y cada controlador nuevo tiene que repetir la traducción. | Código de abajo |
 > >
 > > <details>
-> > <summary><strong>📄 El código que causa los problemas 4 y 5</strong> <em>(Módulo 06)</em></summary>
+> > <summary><strong>📄 El código que causa los problemas 4 y 5</strong> <em>(Módulo 04)</em></summary>
 > >
 > > ```java
 > > // StudentService
@@ -972,7 +972,7 @@ sequenceDiagram
 > <details>
 > <summary><strong>Paso 4.3 · Mensajes de validación en español</strong></summary>
 >
-> > `@Valid` ya estaba desde el Módulo 05, pero sus mensajes por defecto salen en el idioma de la máquina. Para que sean **siempre los mismos** se escriben en las anotaciones:
+> > `@Valid` ya estaba desde el Módulo 03, pero sus mensajes por defecto salen en el idioma de la máquina. Para que sean **siempre los mismos** se escriben en las anotaciones:
 > >
 > > <details>
 > > <summary><strong>📄 StudentRequest.java</strong> <em>(solo el cambio)</em></summary>

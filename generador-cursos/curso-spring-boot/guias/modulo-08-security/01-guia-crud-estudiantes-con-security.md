@@ -1,6 +1,6 @@
 # 🔐 Guía paso a paso — CRUD de estudiantes con Spring Security y JWT
 
-> 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 07 — CRUD de estudiantes con excepciones](../modulo-07-excepciones/01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
+> 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 07 — CRUD de estudiantes con excepciones](../modulo-07-excepciones/07-01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo.
 >
 > 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
@@ -228,7 +228,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > Se parte del proyecto que se termina en la [guía del Módulo 07](../modulo-07-excepciones/01-guia-crud-estudiantes-con-excepciones.md) ([`students-api-excepciones/`](../modulo-07-excepciones/codigo/students-api-excepciones/)). Se copia como `students-api-security` (y se cambia el `artifactId` del `pom.xml`) y se levanta la base:
+> > Se parte del proyecto que se termina en la [guía del Módulo 07](../modulo-07-excepciones/07-01-guia-crud-estudiantes-con-excepciones.md) ([`students-api-excepciones/`](../modulo-07-excepciones/codigo/students-api-excepciones/)). Se copia como `students-api-security` (y se cambia el `artifactId` del `pom.xml`) y se levanta la base:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
@@ -1425,7 +1425,7 @@
 <details>
 <summary><strong>📚 Paso 5 — Swagger: que <em>Authorize</em> funcione</strong></summary>
 
-> > 🗣️ **El vínculo con los Módulos 06 y 07.** Desde el Módulo 06 el contrato tenía el esquema `bearerAuth` y el botón **Authorize**, pero era **decorativo** (nadie validaba nada). Ahora el token **importa**, y hay que documentar tres cosas: que **toda** la API pide token, que el **login no**, y que existen los errores `401` y `403`.
+> > 🗣️ **El vínculo con los Módulos 04 y 07.** Desde el Módulo 04 el contrato tenía el esquema `bearerAuth` y el botón **Authorize**, pero era **decorativo** (nadie validaba nada). Ahora el token **importa**, y hay que documentar tres cosas: que **toda** la API pide token, que el **login no**, y que existen los errores `401` y `403`.
 >
 > <details>
 > <summary><strong>Paso 5.1 · Seguridad global y rutas públicas</strong></summary>
@@ -1544,7 +1544,7 @@
 > > 3. Probar `GET /api/v1/auth/me` en **Auth**: ahora responde con el usuario.
 > > 4. **Logout** en el diálogo y repetir: responde `401` con el cuerpo `ErrorResponse`.
 > >
-> > > ✅ El botón **Authorize**, decorativo en el Módulo 06, ahora **cambia el resultado**: sin token, `401`; con el token de `ana`, `DELETE` responde `403`; con el de `admin`, `204`. La propiedad `springdoc.swagger-ui.persist-authorization=true` conserva el token al recargar la página.
+> > > ✅ El botón **Authorize**, decorativo en el Módulo 04, ahora **cambia el resultado**: sin token, `401`; con el token de `ana`, `DELETE` responde `403`; con el de `admin`, `204`. La propiedad `springdoc.swagger-ui.persist-authorization=true` conserva el token al recargar la página.
 >
 > </details>
 

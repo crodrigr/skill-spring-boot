@@ -1,4 +1,4 @@
-# Colección de Postman — Módulo 05
+# Colección de Postman — Módulo 03
 
 Colecciones de Postman (formato v2.1) con las peticiones de los proyectos de este módulo.
 

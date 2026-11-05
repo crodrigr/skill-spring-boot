@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "Módulo 06 · academica-swagger",
+    "name": "Módulo 04 · academica-swagger",
     "description": "Academia con DTO y Swagger. Ejecutar en orden (Runner). Guía: modulo-04-documentacion-apis-swagger/04-02-academica-swagger.md",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
