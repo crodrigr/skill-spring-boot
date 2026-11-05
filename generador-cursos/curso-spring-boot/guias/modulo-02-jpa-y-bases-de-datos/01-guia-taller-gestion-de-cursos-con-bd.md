@@ -276,7 +276,7 @@
 > > spring.datasource.password=root
 > >
 > > # JPA and Hibernate
-> > spring.jpa.hibernate.ddl-auto=update
+> > spring.jpa.hibernate.ddl-auto=create
 > > spring.jpa.show-sql=true
 > > ```
 > >
