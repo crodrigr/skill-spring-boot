@@ -1,13 +1,13 @@
 # 📘 Guía paso a paso — Academia con DTO, mapeadores y controladores delgados
 
-> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 05](01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 03-04](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 03](01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 02](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
 > 📦 **Proyecto terminado:** [`academica-dtos/`](codigo/academica-dtos/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-dtos-codigo-completo.md`](03-academica-dtos-codigo-completo.md).
 >
 > ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2 y MySQL 8. Las respuestas HTTP, los encabezados y el contenido de la tabla que se muestran son salidas reales.
 >
-> 🧭 **Idea central.** El Módulo 05 enseñó el patrón con un solo recurso. Aquí se repite con **tres recursos relacionados**, y aparece un caso nuevo: la **matrícula**, que en la entidad lleva **dos entidades anidadas** y en el DTO se aplana.
+> 🧭 **Idea central.** El Módulo 03 enseñó el patrón con un solo recurso. Aquí se repite con **tres recursos relacionados**, y aparece un caso nuevo: la **matrícula**, que en la entidad lleva **dos entidades anidadas** y en el DTO se aplana.
 
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
@@ -28,12 +28,12 @@
 </details>
 
 <details>
-<summary><strong>📝 Introducción: qué cambia respecto al Módulo 05</strong></summary>
+<summary><strong>📝 Introducción: qué cambia respecto al Módulo 03</strong></summary>
 
 > <details>
 > <summary><strong>🔁 Lo que se repite</strong></summary>
 >
-> | Pieza | Igual que en el Módulo 05 |
+> | Pieza | Igual que en el Módulo 03 |
 > |---|---|
 > | DTO como `record` | `…Request` valida (`@NotBlank`, `@Min`…), `…Response` expone solo lo necesario |
 > | Mapeador estático | `toEntity`, `toResponse`, `toPageResponse` |
@@ -163,7 +163,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · El proyecto</strong></summary>
 >
-> > Se parte del proyecto que se termina en la [guía 01 del módulo 03-04](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) (su sección **Estructura final esperada** trae todo el código). Si hace falta, se crea la base:
+> > Se parte del proyecto que se termina en la [guía 01 del módulo 02](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) (su sección **Estructura final esperada** trae todo el código). Si hace falta, se crea la base:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
@@ -586,7 +586,7 @@
 > <details>
 > <summary><strong>Paso 2.5 · <code>PageResponse</code>: las páginas</strong></summary>
 >
-> > Un único envoltorio genérico para todos los listados, igual al del Módulo 05:
+> > Un único envoltorio genérico para todos los listados, igual al del Módulo 03:
 > >
 > > <details>
 > > <summary><strong>📄 PageResponse.java</strong></summary>
@@ -748,7 +748,7 @@
 > <details>
 > <summary><strong>Paso 4.1 · Un resultado en lugar de un <code>Optional</code> ambiguo</strong></summary>
 >
-> > Un `Optional` vacío no dice **por qué** falló. `ServiceResult` lleva el estado (`OK`, `NOT_FOUND` o `CONFLICT`) y el valor. Son las mismas dos clases del Módulo 05:
+> > Un `Optional` vacío no dice **por qué** falló. `ServiceResult` lleva el estado (`OK`, `NOT_FOUND` o `CONFLICT`) y el valor. Son las mismas dos clases del Módulo 03:
 > >
 > > <details>
 > > <summary><strong>📄 ServiceStatus.java</strong></summary>
@@ -2281,7 +2281,7 @@
 > 5. **Cupos disponibles.** Agregar `available` a `EnrolledResponse` (cupo máximo menos matriculados).
 > 6. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409`. ¿Qué cambiaría al llegar al Módulo 7?
 > 7. **MapStruct.** Reemplazar los tres mapeadores por interfaces de MapStruct y comparar.
-> 8. **Documentarla.** Agregar Swagger siguiendo la [guía del Módulo 06](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO.
+> 8. **Documentarla.** Agregar Swagger siguiendo la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO.
 
 </details>
 
@@ -2307,4 +2307,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía del Módulo 05 — DTO y estructura de controladores](01-guia-dto-y-estructura-de-controladores.md) · **Código completo:** [03-academica-dtos-codigo-completo.md](03-academica-dtos-codigo-completo.md)
+➡️ **Anterior:** [Guía del Módulo 03 — DTO y estructura de controladores](01-guia-dto-y-estructura-de-controladores.md) · **Código completo:** [03-academica-dtos-codigo-completo.md](03-academica-dtos-codigo-completo.md)

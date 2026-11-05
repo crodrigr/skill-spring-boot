@@ -1,6 +1,6 @@
 # 📘 Guía paso a paso — CRUD de estudiantes con DTO documentado con Swagger (OpenAPI)
 
-> 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 05 — DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/01-guia-dto-y-estructura-de-controladores.md): el proyecto de partida **ya tiene** DTO, mapeador, `ServiceResult`, rutas con versión (`/api/v1`) y un controlador delgado. Sobre él se agregan, **una por una**, las funcionalidades de Swagger.
+> 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 03 — DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/01-guia-dto-y-estructura-de-controladores.md): el proyecto de partida **ya tiene** DTO, mapeador, `ServiceResult`, rutas con versión (`/api/v1`) y un controlador delgado. Sobre él se agregan, **una por una**, las funcionalidades de Swagger.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.
 >
 > 📦 **Proyecto terminado:** [`students-api/`](codigo/students-api/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
@@ -12,7 +12,7 @@
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
 
-> Documentar con **OpenAPI** (usando **springdoc**) la API de estudiantes del Módulo 05, hasta cubrir las funcionalidades principales de Swagger.
+> Documentar con **OpenAPI** (usando **springdoc**) la API de estudiantes del Módulo 03, hasta cubrir las funcionalidades principales de Swagger.
 >
 > Al terminar, el estudiante:
 >
@@ -49,7 +49,7 @@
 > <details>
 > <summary><strong>🎓 El proyecto</strong></summary>
 >
-> La API de estudiantes del Módulo 05, con las tres capas (`presentation`, `business`, `persistence`), nombres en inglés y MySQL.
+> La API de estudiantes del Módulo 03, con las tres capas (`presentation`, `business`, `persistence`), nombres en inglés y MySQL.
 >
 > | Operación | Ruta | Cuerpo | Respuestas |
 > |---|---|---|---|
@@ -98,7 +98,7 @@
 
 > | Paso | Minutos | Actividad |
 > |---|---:|---|
-> | 0 | 0 – 10 | Punto de partida: el proyecto del Módulo 05 |
+> | 0 | 0 – 10 | Punto de partida: el proyecto del Módulo 03 |
 > | 1 | 10 – 20 | Primera documentación automática (y qué le falta) |
 > | 2 | 20 – 25 | Información general de la API |
 > | 3 | 25 – 38 | Etiquetas, operaciones y respuestas |
@@ -162,14 +162,14 @@
 > | `business` | **Nada** |
 > | `persistence` | **Nada**: la entidad no cambia |
 >
-> > ✅ **Lo que se gana con el Módulo 05.** En la versión sin DTO, `@Schema` había que ponerlo en la entidad y el contrato quedaba atado a la tabla. Ahora la entidad queda **intacta**.
+> > ✅ **Lo que se gana con el Módulo 03.** En la versión sin DTO, `@Schema` había que ponerlo en la entidad y el contrato quedaba atado a la tabla. Ahora la entidad queda **intacta**.
 
 </details>
 
 ---
 
 <details>
-<summary><strong>🚀 Paso 0 — Punto de partida: el proyecto del Módulo 05</strong></summary>
+<summary><strong>🚀 Paso 0 — Punto de partida: el proyecto del Módulo 03</strong></summary>
 
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
@@ -182,7 +182,7 @@
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >
-> > **Proyecto.** No se crea uno nuevo: se parte del que se terminó en la [guía del Módulo 05](../modulo-03-diseno-api-rest-con-dto/01-guia-dto-y-estructura-de-controladores.md) (carpeta [`students-api-dto`](../modulo-03-diseno-api-rest-con-dto/codigo/students-api-dto/)).
+> > **Proyecto.** No se crea uno nuevo: se parte del que se terminó en la [guía del Módulo 03](../modulo-03-diseno-api-rest-con-dto/01-guia-dto-y-estructura-de-controladores.md) (carpeta [`students-api-dto`](../modulo-03-diseno-api-rest-con-dto/codigo/students-api-dto/)).
 > >
 > > ```bash
 > > cp -r students-api-dto students-api
@@ -190,7 +190,7 @@
 > >
 > > En el `pom.xml` de la copia se cambia solo el nombre: `<artifactId>students-api</artifactId>`.
 > >
-> > > 💡 Quien no tenga el proyecto del Módulo 05 puede abrir [`students-api-dto/`](../modulo-03-diseno-api-rest-con-dto/codigo/students-api-dto/) y usarlo tal cual: es el punto de partida.
+> > > 💡 Quien no tenga el proyecto del Módulo 03 puede abrir [`students-api-dto/`](../modulo-03-diseno-api-rest-con-dto/codigo/students-api-dto/) y usarlo tal cual: es el punto de partida.
 > >
 > > > | Lo que **ya existe** | Dónde |
 > > > |---|---|
@@ -1642,7 +1642,7 @@
 > 4. **El tope de 50 en el contrato.** Buscar cómo declarar el máximo de `size` y comprobar que aparece en `/api-docs`.
 > 5. **Un tag por controlador.** Dar a `InternalController` la etiqueta «Internal» y comprobar el orden con `tags-sorter`.
 > 6. **Un segundo servidor.** Agregar `https://api.academy.com` como servidor de producción y probar el selector.
-> 7. **Un recurso nuevo.** Repetir el patrón del Módulo 05 para `Course` (DTO, mapeador, servicio, controlador), documentarlo con su propio tag y su grupo.
+> 7. **Un recurso nuevo.** Repetir el patrón del Módulo 03 para `Course` (DTO, mapeador, servicio, controlador), documentarlo con su propio tag y su grupo.
 > 8. **Seguridad real.** Agregar Spring Security con un token fijo y comprobar que *Authorize* ahora **sí** cambia el resultado de `DELETE`.
 > 9. **Generar un cliente.** Con el YAML exportado, generar un cliente con OpenAPI Generator.
 > 10. **Modelo de error.** Cuando se estudien las excepciones (Módulo 7), crear un `ErrorResponse` y documentarlo en `400`, `404` y `409` con `content = @Content(schema = @Schema(implementation = ErrorResponse.class))`.
@@ -2647,4 +2647,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía del Módulo 05 — DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/01-guia-dto-y-estructura-de-controladores.md)
+➡️ **Anterior:** [Guía del Módulo 03 — DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/01-guia-dto-y-estructura-de-controladores.md)

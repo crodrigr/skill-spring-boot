@@ -2080,7 +2080,7 @@
 > 5. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409` del controlador. ¿Qué cambiaría al llegar a las excepciones del Módulo 7?
 > 6. **Un recurso nuevo.** Repetir el patrón completo para `Course` (DTO, mapeador, servicio, controlador) y comprobar cuánto código se puede **reutilizar** (`PageResponse`, `ServiceResult`).
 > 7. **MapStruct.** Reemplazar `StudentMapper` por una interfaz de MapStruct y comparar.
-> 8. **Contrato de la API.** Documentar este proyecto con Swagger siguiendo la [guía del Módulo 06](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO y la entidad no se toca.
+> 8. **Contrato de la API.** Documentar este proyecto con Swagger siguiendo la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO y la entidad no se toca.
 
 </details>
 
@@ -2785,4 +2785,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía 01 del módulo 03-04 — Taller «Gestión de cursos» con base de datos](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) · **Siguiente:** [Guía del Módulo 06 — CRUD de estudiantes con Swagger](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md)
+➡️ **Anterior:** [Guía 01 del módulo 02 — Taller «Gestión de cursos» con base de datos](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) · **Siguiente:** [Guía del Módulo 04 — CRUD de estudiantes con Swagger](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md)

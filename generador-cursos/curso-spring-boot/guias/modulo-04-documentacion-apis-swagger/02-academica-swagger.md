@@ -1,6 +1,6 @@
 # 📘 Guía paso a paso — Academia con DTO documentada con Swagger (OpenAPI)
 
-> 👩‍🏫 **Material docente.** Aplica la [guía del Módulo 06](01-guia-crud-estudiantes-con-swagger.md) al proyecto de la academia ya con DTO ([`02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md), Módulo 05): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica la [guía del Módulo 04](01-guia-crud-estudiantes-con-swagger.md) al proyecto de la academia ya con DTO ([`02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md), Módulo 03): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.
 >
 > 📦 **Proyecto terminado:** [`academica-swagger/`](codigo/academica-swagger/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-swagger-codigo-completo.md`](03-academica-swagger-codigo-completo.md).
@@ -12,7 +12,7 @@
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
 
-> Documentar con **OpenAPI** (usando **springdoc**) la API de la academia del Módulo 05, hasta cubrir las funcionalidades principales de Swagger.
+> Documentar con **OpenAPI** (usando **springdoc**) la API de la academia del Módulo 03, hasta cubrir las funcionalidades principales de Swagger.
 >
 > Al terminar, el estudiante:
 >
@@ -26,12 +26,12 @@
 </details>
 
 <details>
-<summary><strong>📝 Introducción: qué cambia respecto al Módulo 06</strong></summary>
+<summary><strong>📝 Introducción: qué cambia respecto al Módulo 04</strong></summary>
 
 > <details>
 > <summary><strong>🔁 Lo que se repite</strong></summary>
 >
-> | Pieza | Igual que en la [guía 01 del módulo 06](01-guia-crud-estudiantes-con-swagger.md) |
+> | Pieza | Igual que en la [guía 01 del módulo 04](01-guia-crud-estudiantes-con-swagger.md) |
 > |---|---|
 > | Dependencia | `springdoc-openapi-starter-webmvc-ui` 3.2.0 |
 > | Anotaciones | `@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`, `@ParameterObject`, `@Hidden`, `@SecurityRequirement` |
@@ -130,9 +130,10 @@
 >     │   ├── 📁 business
 >     │   │   ├── 📁 service
 >     │   │   │   ├── ✏️ StudentService.java       un método más: findByEmail
->     │   │   │   └── …                            sin cambios
+>     │   │   │   └── …                            sin cambios (otras interfaces, ServiceResult, ServiceStatus)
 >     │   │   └── 📁 impl
->     │   │       └── ✏️ StudentServiceImpl.java       un método más: findByEmail
+>     │   │       ├── ✏️ StudentServiceImpl.java   un método más: findByEmail
+>     │   │       └── …                            sin cambios (CourseServiceImpl, EnrollmentServiceImpl)
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity                        sin cambios (sin Swagger)
 >     │       └── 📁 repository
@@ -159,7 +160,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · El proyecto</strong></summary>
 >
-> > No se crea un proyecto nuevo: se parte de [`academica-dtos`](../modulo-03-diseno-api-rest-con-dto/codigo/academica-dtos/), que se termina en la [guía `02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md) del Módulo 05.
+> > No se crea un proyecto nuevo: se parte de [`academica-dtos`](../modulo-03-diseno-api-rest-con-dto/codigo/academica-dtos/), que se termina en la [guía `02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md) del Módulo 03.
 > >
 > > ```bash
 > > cp -r academica-dtos academica-swagger
@@ -2357,4 +2358,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía `02-academica-dtos` del Módulo 05](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md) · **Código completo:** [03-academica-swagger-codigo-completo.md](03-academica-swagger-codigo-completo.md)
+➡️ **Anterior:** [Guía `02-academica-dtos` del Módulo 03](../modulo-03-diseno-api-rest-con-dto/02-academica-dtos.md) · **Código completo:** [03-academica-swagger-codigo-completo.md](03-academica-swagger-codigo-completo.md)

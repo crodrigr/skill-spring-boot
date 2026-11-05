@@ -59,7 +59,7 @@
 >         └── 🆕 application-prod.properties
 > ```
 >
-> 🆕 archivo nuevo · ✏️ archivo de `academica-dtos` (Módulo 05) que cambia · 📄 sin cambios respecto a `academica-dtos`
+> 🆕 archivo nuevo · ✏️ archivo de `academica-dtos` (Módulo 03) que cambia · 📄 sin cambios respecto a `academica-dtos`
 >
 > **Código final, paso a paso**
 >
