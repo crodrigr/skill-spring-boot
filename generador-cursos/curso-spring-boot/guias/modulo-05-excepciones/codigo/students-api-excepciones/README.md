@@ -2,7 +2,7 @@
 
 CRUD de estudiantes con **manejo de excepciones**: Spring Boot 4.1.2, Spring Data JPA y MySQL 8, documentado con Swagger (springdoc-openapi 3.2.0).
 Parte del proyecto del módulo 04 ([`students-api`](../../../modulo-04-documentacion-apis-swagger/codigo/students-api/)) y reemplaza `ServiceResult` por **excepciones**.
-Código final de la guía [`07-01-guia-crud-estudiantes-con-excepciones.md`](../../07-01-guia-crud-estudiantes-con-excepciones.md).
+Código final de la guía [`05-01-guia-crud-estudiantes-con-excepciones.md`](../../05-01-guia-crud-estudiantes-con-excepciones.md).
 
 ## Requisitos
 

@@ -1,6 +1,6 @@
 # 🔐 Guía fácil — Proteger la API con usuario, contraseña y token
 
-> 👩‍🏫 **Versión sencilla y práctica.** Se parte de la API de estudiantes del [Módulo 07](../modulo-07-excepciones/07-01-guia-crud-estudiantes-con-excepciones.md) y se le agrega **login con token (JWT)**, en pasos cortos. Cada paso dice **qué se hace**, trae el **código** y termina con una **prueba** para comprobar que funciona.
+> 👩‍🏫 **Versión sencilla y práctica.** Se parte de la API de estudiantes del [Módulo 05](../modulo-05-excepciones/05-01-guia-crud-estudiantes-con-excepciones.md) y se le agrega **login con token (JWT)**, en pasos cortos. Cada paso dice **qué se hace**, trae el **código** y termina con una **prueba** para comprobar que funciona.
 > Si se quiere la explicación completa (arquitectura de Spring Security, HTTP Basic, Swagger a fondo), está la [guía completa](01-guia-crud-estudiantes-con-security.md).
 >
 > 📮 **Colección de Postman:** [`codigo/postman/`](codigo/postman/) (41 peticiones con sus pruebas).
@@ -26,7 +26,7 @@
 > | Un `USER` que intenta borrar | `403` — «no tiene permisos» |
 > | Alguien con **usuario o contraseña mal** | `401` — «usuario o contraseña incorrectos» |
 >
-> Y todos los errores salen con el **mismo formato** (`ErrorResponse`) que ya se hizo en el Módulo 07.
+> Y todos los errores salen con el **mismo formato** (`ErrorResponse`) que ya se hizo en el Módulo 05.
 
 </details>
 
@@ -233,9 +233,9 @@
 <details>
 <summary><strong>🚀 Paso 0 — Preparar el proyecto</strong></summary>
 
-> **🎯 Qué se hace.** Copiar el proyecto del Módulo 07 con otro nombre y levantar MySQL.
+> **🎯 Qué se hace.** Copiar el proyecto del Módulo 05 con otro nombre y levantar MySQL.
 >
-> 1. Copiar la carpeta [`students-api-excepciones`](../modulo-07-excepciones/codigo/students-api-excepciones/) como `students-api-security-facil`.
+> 1. Copiar la carpeta [`students-api-excepciones`](../modulo-05-excepciones/codigo/students-api-excepciones/) como `students-api-security-facil`.
 > 2. En el `pom.xml`, cambiar el `artifactId` a `students-api-security-facil`.
 > 3. Levantar la base:
 >
@@ -1018,7 +1018,7 @@
 > <details>
 > <summary><strong>📄 GlobalExceptionHandler.java (agregar un método)</strong></summary>
 >
-> El login incorrecto **sí** pasa por el controlador, así que se maneja en el manejador del Módulo 07:
+> El login incorrecto **sí** pasa por el controlador, así que se maneja en el manejador del Módulo 05:
 >
 > ```java
 >     // La contraseña incorrecta del login se lanza dentro de un controlador, así que se maneja aquí.
@@ -1056,7 +1056,7 @@
 > {"timestamp":"2026-11-02T01:46:42.528Z","status":400,"error":"Bad Request","message":"Los datos enviados no son válidos","path":"/api/v1/auth/login","details":[{"field":"password","message":"es obligatoria"},{"field":"username","message":"es obligatorio"}]}
 > ```
 >
-> Y los errores del Módulo 07 **siguen igual**: con token de `admin`, `GET /api/v1/students/999` responde `404` con `No existe un estudiante con id 999`.
+> Y los errores del Módulo 05 **siguen igual**: con token de `admin`, `GET /api/v1/students/999` responde `404` con `No existe un estudiante con id 999`.
 >
 > ✅ **Listo si** el login con contraseña mala da `401` (ya no `500`) y los errores de token dan `401` o `403` **con mensaje**.
 

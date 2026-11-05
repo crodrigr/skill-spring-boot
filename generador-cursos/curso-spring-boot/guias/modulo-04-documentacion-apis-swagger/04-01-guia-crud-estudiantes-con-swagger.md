@@ -87,7 +87,7 @@
 > | **RNF-04** | Todos los nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-05** | Duración: 1 h 30 min. |
 >
-> > 💡 **Alcance.** Quedan fuera: la autenticación real (el esquema de seguridad solo se **documenta**), el manejo de errores con excepciones y un formato de error uniforme (Módulo 7), y la generación de clientes a partir del contrato.
+> > 💡 **Alcance.** Quedan fuera: la autenticación real (el esquema de seguridad solo se **documenta**), el manejo de errores con excepciones y un formato de error uniforme (Módulo 05), y la generación de clientes a partir del contrato.
 >
 > </details>
 
@@ -1610,7 +1610,7 @@
 > 5. ¿`@Hidden` protege una ruta? *(No: solo la quita de la documentación.)*
 > 6. ¿Qué hace realmente el botón *Authorize* aquí? *(Guarda un token y lo envía; como no hay Spring Security, nadie lo valida.)*
 > 7. ¿Por qué se apaga Swagger en producción? *(Revela la API completa; se desactiva con propiedades y un perfil.)*
-> 8. ¿Qué respuestas siguen sin cuerpo explicativo? *(`400`, `404` y `409`: un formato de error uniforme se estudia en el Módulo 7.)*
+> 8. ¿Qué respuestas siguen sin cuerpo explicativo? *(`400`, `404` y `409`: un formato de error uniforme se estudia en el Módulo 05.)*
 
 </details>
 
@@ -1645,7 +1645,7 @@
 > 7. **Un recurso nuevo.** Repetir el patrón del Módulo 03 para `Course` (DTO, mapeador, servicio, controlador), documentarlo con su propio tag y su grupo.
 > 8. **Seguridad real.** Agregar Spring Security con un token fijo y comprobar que *Authorize* ahora **sí** cambia el resultado de `DELETE`.
 > 9. **Generar un cliente.** Con el YAML exportado, generar un cliente con OpenAPI Generator.
-> 10. **Modelo de error.** Cuando se estudien las excepciones (Módulo 7), crear un `ErrorResponse` y documentarlo en `400`, `404` y `409` con `content = @Content(schema = @Schema(implementation = ErrorResponse.class))`.
+> 10. **Modelo de error.** Cuando se estudien las excepciones (Módulo 05), crear un `ErrorResponse` y documentarlo en `400`, `404` y `409` con `content = @Content(schema = @Schema(implementation = ErrorResponse.class))`.
 
 </details>
 

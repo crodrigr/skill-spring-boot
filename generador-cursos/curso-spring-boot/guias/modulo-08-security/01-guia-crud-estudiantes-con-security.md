@@ -1,6 +1,6 @@
 # 🔐 Guía paso a paso — CRUD de estudiantes con Spring Security y JWT
 
-> 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 07 — CRUD de estudiantes con excepciones](../modulo-07-excepciones/07-01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
+> 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 05 — CRUD de estudiantes con excepciones](../modulo-05-excepciones/05-01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo.
 >
 > 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
@@ -18,7 +18,7 @@
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
 
-> Proteger la API de estudiantes del Módulo 07 con **Spring Security**, primero con HTTP Basic y luego con **JWT** (autenticación sin sesión), y mantener el formato de error uniforme del módulo anterior.
+> Proteger la API de estudiantes del Módulo 05 con **Spring Security**, primero con HTTP Basic y luego con **JWT** (autenticación sin sesión), y mantener el formato de error uniforme del módulo anterior.
 >
 > Al terminar, el estudiante:
 >
@@ -84,7 +84,7 @@
 > <details>
 > <summary><strong>🎓 El proyecto</strong></summary>
 >
-> La API de estudiantes del Módulo 07, con las tres capas, MySQL, Swagger y `ErrorResponse`. Se agregan dos rutas (`/api/v1/auth/...`) y un paquete `security`.
+> La API de estudiantes del Módulo 05, con las tres capas, MySQL, Swagger y `ErrorResponse`. Se agregan dos rutas (`/api/v1/auth/...`) y un paquete `security`.
 >
 > | Ruta | Quién puede |
 > |---|---|
@@ -100,7 +100,7 @@
 > <details>
 > <summary><strong>🔁 Antes y después</strong></summary>
 >
-> | Pieza | Módulo 07 | Esta guía |
+> | Pieza | Módulo 05 | Esta guía |
 > |---|---|---|
 > | Acceso | Todo público | Todo protegido salvo lo declarado público |
 > | Sesión | — | Ninguna (*stateless*) |
@@ -152,7 +152,7 @@
 
 > | Paso | Minutos | Actividad |
 > |---|---:|---|
-> | 0 | 0 – 10 | Punto de partida: el proyecto del Módulo 07 |
+> | 0 | 0 – 10 | Punto de partida: el proyecto del Módulo 05 |
 > | 1 | 10 – 35 | Una dependencia: Spring Security y HTTP Basic |
 > | 2 | 35 – 80 | Cuentas propias, BCrypt y la `SecurityFilterChain` |
 > | 3 | 80 – 140 | JWT: login, servicio de tokens y filtro |
@@ -223,12 +223,12 @@
 ---
 
 <details>
-<summary><strong>🚀 Paso 0 — Punto de partida: el proyecto del Módulo 07</strong></summary>
+<summary><strong>🚀 Paso 0 — Punto de partida: el proyecto del Módulo 05</strong></summary>
 
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > Se parte del proyecto que se termina en la [guía del Módulo 07](../modulo-07-excepciones/07-01-guia-crud-estudiantes-con-excepciones.md) ([`students-api-excepciones/`](../modulo-07-excepciones/codigo/students-api-excepciones/)). Se copia como `students-api-security` (y se cambia el `artifactId` del `pom.xml`) y se levanta la base:
+> > Se parte del proyecto que se termina en la [guía del Módulo 05](../modulo-05-excepciones/05-01-guia-crud-estudiantes-con-excepciones.md) ([`students-api-excepciones/`](../modulo-05-excepciones/codigo/students-api-excepciones/)). Se copia como `students-api-security` (y se cambia el `artifactId` del `pom.xml`) y se levanta la base:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
@@ -1148,9 +1148,9 @@
 > > | Causa | Detalle |
 > > |---|---|
 > > | **No hay mecanismo de autenticación configurado.** Sin `httpBasic` ni `formLogin`, Spring Security no sabe qué contestar a un anónimo y usa una entrada por defecto que responde `403`. | Hace falta un `AuthenticationEntryPoint` propio |
-> > | **El login falla dentro de un controlador.** `BadCredentialsException` llega al `@ExceptionHandler(Exception.class)` del Módulo 07 y se vuelve `500`. | Hace falta un manejador para `AuthenticationException` |
+> > | **El login falla dentro de un controlador.** `BadCredentialsException` llega al `@ExceptionHandler(Exception.class)` del Módulo 05 y se vuelve `500`. | Hace falta un manejador para `AuthenticationException` |
 > >
-> > En el *log*: `ERROR … GlobalExceptionHandler : Error inesperado en /api/v1/auth/login` seguido de `org.springframework.security.authentication.BadCredentialsException: Bad credentials`. Es el **mismo tipo de trampa** del Módulo 07: el `catch-all` se traga excepciones que **no son inesperadas**.
+> > En el *log*: `ERROR … GlobalExceptionHandler : Error inesperado en /api/v1/auth/login` seguido de `org.springframework.security.authentication.BadCredentialsException: Bad credentials`. Es el **mismo tipo de trampa** del Módulo 05: el `catch-all` se traga excepciones que **no son inesperadas**.
 >
 > </details>
 
@@ -1343,7 +1343,7 @@
 > <details>
 > <summary><strong>Paso 4.5 · El login: otra vez el <code>GlobalExceptionHandler</code></strong></summary>
 >
-> > El login **sí** pasa por Spring MVC (la excepción nace dentro del controlador), así que se arregla en el manejador del Módulo 07:
+> > El login **sí** pasa por Spring MVC (la excepción nace dentro del controlador), así que se arregla en el manejador del Módulo 05:
 > >
 > > <details>
 > > <summary><strong>📄 GlobalExceptionHandler.java (agregar)</strong> <em>(solo el cambio)</em></summary>
@@ -1399,7 +1399,7 @@
 > > {"timestamp":"2026-11-02T00:44:16.434Z","status":401,"error":"Unauthorized","message":"Usuario o contraseña incorrectos","path":"/api/v1/auth/login"}
 > > ```
 > >
-> > Y los errores del Módulo 07 **siguen igual**: con un token válido, `GET /students/999` da `404` con `No existe un estudiante con id 999` y `GET /api/v1/nope` da `404` con `No existe el recurso solicitado`. **Sin** token, `GET /api/v1/nope` da `401`: **primero** se pregunta quién eres, **después** si la ruta existe.
+> > Y los errores del Módulo 05 **siguen igual**: con un token válido, `GET /students/999` da `404` con `No existe un estudiante con id 999` y `GET /api/v1/nope` da `404` con `No existe el recurso solicitado`. **Sin** token, `GET /api/v1/nope` da `401`: **primero** se pregunta quién eres, **después** si la ruta existe.
 > >
 > > **El token vencido.** Con la propiedad `app.jwt.expiration-seconds=2`, se inicia sesión, se espera 3 segundos y se repite la petición:
 > >
@@ -1414,7 +1414,7 @@
 > > {"timestamp":"2026-11-02T00:45:53.054Z","status":401,"error":"Unauthorized","message":"El token expiró","path":"/api/v1/auth/me"}
 > > ```
 > >
-> > > ✅ **Mismo formato, mismo lugar.** Los seis escenarios de seguridad (RN-01 a RN-06) usan el `ErrorResponse` del Módulo 07: el cliente escribe **un solo** código para leer cualquier error de la API.
+> > > ✅ **Mismo formato, mismo lugar.** Los seis escenarios de seguridad (RN-01 a RN-06) usan el `ErrorResponse` del Módulo 05: el cliente escribe **un solo** código para leer cualquier error de la API.
 >
 > </details>
 
@@ -1425,7 +1425,7 @@
 <details>
 <summary><strong>📚 Paso 5 — Swagger: que <em>Authorize</em> funcione</strong></summary>
 
-> > 🗣️ **El vínculo con los Módulos 04 y 07.** Desde el Módulo 04 el contrato tenía el esquema `bearerAuth` y el botón **Authorize**, pero era **decorativo** (nadie validaba nada). Ahora el token **importa**, y hay que documentar tres cosas: que **toda** la API pide token, que el **login no**, y que existen los errores `401` y `403`.
+> > 🗣️ **El vínculo con los Módulos 04 y 05.** Desde el Módulo 04 el contrato tenía el esquema `bearerAuth` y el botón **Authorize**, pero era **decorativo** (nadie validaba nada). Ahora el token **importa**, y hay que documentar tres cosas: que **toda** la API pide token, que el **login no**, y que existen los errores `401` y `403`.
 >
 > <details>
 > <summary><strong>Paso 5.1 · Seguridad global y rutas públicas</strong></summary>
@@ -1474,7 +1474,7 @@
 > <details>
 > <summary><strong>Paso 5.2 · Las respuestas <code>401</code> y <code>403</code>, sin repetirlas operación por operación</strong></summary>
 >
-> > Se reutiliza la técnica del Módulo 07 (`components.responses`) y un **personalizador** que agrega el `401` a **toda** operación protegida y el `403` a las del rol `ADMIN`:
+> > Se reutiliza la técnica del Módulo 05 (`components.responses`) y un **personalizador** que agrega el `401` a **toda** operación protegida y el `403` a las del rol `ADMIN`:
 > >
 > > <details>
 > > <summary><strong>📄 OpenApiConfig.java</strong> <em>(solo el cambio)</em></summary>
@@ -1590,7 +1590,7 @@
 > > HTTP/1.1 204
 > > ```
 > >
-> > > 🔎 **Lo que no se tocó.** El CRUD, las validaciones, el paginado y los errores del Módulo 07 funcionan **exactamente igual**: la seguridad rodea al negocio, no lo modifica (RNF-05).
+> > > 🔎 **Lo que no se tocó.** El CRUD, las validaciones, el paginado y los errores del Módulo 05 funcionan **exactamente igual**: la seguridad rodea al negocio, no lo modifica (RNF-05).
 >
 > </details>
 
@@ -1616,7 +1616,7 @@
 > | Manejadores de `AuthenticationException` y `AccessDeniedException` | Errores que nacen **dentro** de MVC | `GlobalExceptionHandler` | 4 |
 > | `SecurityRequirement`, `@SecurityRequirements` | Qué operaciones piden token en Swagger | `OpenApiConfig` y controladores | 5 |
 >
-> > 🔎 **Lectura clave.** Hay **dos mundos de errores**: los de **antes** de MVC (filtros de seguridad) y los de **dentro** (controladores y servicios). El formato uniforme del Módulo 07 solo se logra si **los dos** escriben el mismo `ErrorResponse`.
+> > 🔎 **Lectura clave.** Hay **dos mundos de errores**: los de **antes** de MVC (filtros de seguridad) y los de **dentro** (controladores y servicios). El formato uniforme del Módulo 05 solo se logra si **los dos** escriben el mismo `ErrorResponse`.
 
 </details>
 
@@ -1660,7 +1660,7 @@
 <details>
 <summary><strong>🚀 Retos finales (para quien termine antes)</strong></summary>
 
-> 1. **Registro.** Agregar `POST /api/v1/auth/register` (público) que cree una cuenta `USER` con la contraseña cifrada. ¿Qué `409` debería lanzar si el usuario ya existe? Manejarlo como en el Módulo 07.
+> 1. **Registro.** Agregar `POST /api/v1/auth/register` (público) que cree una cuenta `USER` con la contraseña cifrada. ¿Qué `409` debería lanzar si el usuario ya existe? Manejarlo como en el Módulo 05.
 > 2. **Contraseña mínima.** Validar con `@Size(min = 8)` en el registro y ver el `400` con su detalle.
 > 3. **Un token por tiempo corto.** Bajar la vigencia a 60 s y comprobar qué pasa en Swagger UI al vencer.
 > 4. **Rol en la base, no en el token.** Hoy el rol sale del token. ¿Qué pasa si se cambia el rol de `ana` en la base y ella conserva su token viejo? Proponer cómo evitarlo.

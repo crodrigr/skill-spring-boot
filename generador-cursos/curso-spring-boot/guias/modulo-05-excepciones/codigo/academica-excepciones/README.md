@@ -2,7 +2,7 @@
 
 Taller de gestión de cursos (estudiantes, cursos y matrículas) con **DTO**, documentado con **Swagger** y con **manejo de excepciones**: el servicio **lanza** excepciones propias y un `@RestControllerAdvice` responde siempre con el mismo cuerpo (`ErrorResponse`).
 Parte del proyecto [`academica-swagger`](../../../modulo-04-documentacion-apis-swagger/codigo/academica-swagger/) del Módulo 04 y reemplaza `ServiceResult`/`ServiceStatus` por excepciones.
-Guía: [`07-02-academica-excepciones.md`](../../07-02-academica-excepciones.md) · Código completo: [`07-03-academica-excepciones-codigo-completo.md`](../../07-03-academica-excepciones-codigo-completo.md) · Versión de un solo recurso: [`07-01-guia-crud-estudiantes-con-excepciones.md`](../../07-01-guia-crud-estudiantes-con-excepciones.md).
+Guía: [`05-02-academica-excepciones.md`](../../05-02-academica-excepciones.md) · Código completo: [`05-03-academica-excepciones-codigo-completo.md`](../../05-03-academica-excepciones-codigo-completo.md) · Versión de un solo recurso: [`05-01-guia-crud-estudiantes-con-excepciones.md`](../../05-01-guia-crud-estudiantes-con-excepciones.md).
 
 ## Requisitos
 

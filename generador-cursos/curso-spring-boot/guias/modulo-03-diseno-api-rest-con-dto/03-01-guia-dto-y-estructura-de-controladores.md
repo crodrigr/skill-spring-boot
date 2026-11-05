@@ -83,7 +83,7 @@
 > | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. MySQL 8 con la base `academy`. |
 > | **RNF-02** | **El controlador no importa nada de `jakarta.persistence`** y nunca devuelve una entidad. |
 > | **RNF-03** | Los DTO son `record` (inmutables). Las validaciones viven **solo** en el DTO de entrada. |
-> | **RNF-04** | Los errores de negocio se informan con un **resultado** (`ServiceResult`); traducirlos con excepciones y un manejador global se estudia en el Módulo 7. |
+> | **RNF-04** | Los errores de negocio se informan con un **resultado** (`ServiceResult`); traducirlos con excepciones y un manejador global se estudia en el Módulo 05. |
 > | **RNF-05** | Todos los nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-06** | Duración: 1 h 30 min. |
 >
@@ -132,7 +132,7 @@
 >
 > Un controlador hace tres cosas: **recibe** la petición, **llama** al servicio y **responde**. No contiene reglas de negocio. El servicio devuelve un `ServiceResult` (`OK`, `NOT_FOUND` o `CONFLICT`) y el método `respond(...)` lo traduce a un código HTTP.
 >
-> > 💡 `ServiceResult` es una solución **temporal**: en el Módulo 7 se reemplaza por excepciones y un manejador global.
+> > 💡 `ServiceResult` es una solución **temporal**: en el Módulo 05 se reemplaza por excepciones y un manejador global.
 >
 > </details>
 >
@@ -1207,7 +1207,7 @@
 > > >
 > > > 💡 **Beneficio de este paso:** **una sola llamada** responde a la pregunta «¿qué pasó?». Se acaba la doble consulta del controlador (problema 5) y las reglas siguen en el servicio.
 > > >
-> > > ⚠️ **Es un puente.** `ServiceResult` resuelve el problema **ahora**. En el Módulo 7 se reemplaza por excepciones y un manejador global, que quitan incluso el `if` del controlador.
+> > > ⚠️ **Es un puente.** `ServiceResult` resuelve el problema **ahora**. En el Módulo 05 se reemplaza por excepciones y un manejador global, que quitan incluso el `if` del controlador.
 >
 > </details>
 >
@@ -2033,7 +2033,7 @@
 >
 > > 🔎 **Lectura clave.** El DTO no hace la API «más corta»: la hace **más segura de cambiar**. Cuanto más grande es el proyecto y más equipos consumen la API, más se nota.
 > >
-> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` de validación trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme (por ejemplo `ProblemDetail`) y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-02-jpa-y-bases-de-datos/02-guia-taller-gestion-de-cursos-una-version-profesional.md).
+> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` de validación trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme (por ejemplo `ProblemDetail`) y las excepciones propias se estudian en el Módulo 05. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-02-jpa-y-bases-de-datos/02-guia-taller-gestion-de-cursos-una-version-profesional.md).
 
 </details>
 
@@ -2077,7 +2077,7 @@
 > 2. **Un campo nuevo.** Agregar `phone` (opcional) a `StudentEntity` y exponerlo solo en `StudentResponse`; comprobar que `StudentRequest` no lo acepta hasta que se agregue.
 > 3. **Respuesta resumida.** Crear `StudentSummaryResponse` (`id`, `name`) y usarlo en el listado, dejando `StudentResponse` para el detalle.
 > 4. **`PUT` frente a `PATCH`.** Agregar `PATCH /students/{id}` con un `StudentPatchRequest` de campos opcionales y aplicar solo los que lleguen.
-> 5. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409` del controlador. ¿Qué cambiaría al llegar a las excepciones del Módulo 7?
+> 5. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409` del controlador. ¿Qué cambiaría al llegar a las excepciones del Módulo 05?
 > 6. **Un recurso nuevo.** Repetir el patrón completo para `Course` (DTO, mapeador, servicio, controlador) y comprobar cuánto código se puede **reutilizar** (`PageResponse`, `ServiceResult`).
 > 7. **MapStruct.** Reemplazar `StudentMapper` por una interfaz de MapStruct y comparar.
 > 8. **Contrato de la API.** Documentar este proyecto con Swagger siguiendo la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO y la entidad no se toca.

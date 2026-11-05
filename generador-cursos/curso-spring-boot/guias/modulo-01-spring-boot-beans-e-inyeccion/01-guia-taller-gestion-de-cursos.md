@@ -128,7 +128,7 @@
 > > | **RNF-02** | **Sin base de datos ni JPA**: los datos viven en listas en memoria y se pierden al reiniciar. |
 > > | **RNF-03** | Organización en **tres capas** (presentación, negocio y persistencia), con la regla de dependencia presentación → negocio → persistencia. |
 > > | **RNF-04** | Las dependencias se resuelven con **inyección por constructor** y los repositorios se usan a través de **interfaces**. |
-> > | **RNF-05** | Los errores de negocio se señalan con excepciones estándar de Java (`NoSuchElementException`, `IllegalArgumentException`, `IllegalStateException`) y `201` al crear. Traducirlas a `400`, `404` y `409` se estudia en el Módulo 7; mientras tanto Spring responde `500`. |
+> > | **RNF-05** | Los errores de negocio se señalan con excepciones estándar de Java (`NoSuchElementException`, `IllegalArgumentException`, `IllegalStateException`) y `201` al crear. Traducirlas a `400`, `404` y `409` se estudia en el Módulo 05; mientras tanto Spring responde `500`. |
 > > | **RNF-06** | La API se prueba con Postman y se conservan evidencias de cada escenario. |
 > > | **RNF-07** | Duración: 1 h 30 min, trabajo individual. El objetivo es practicar la **lógica de programación** (listas, ciclos, condicionales, contadores) dentro de una API REST, no construir un sistema completo. |
 > >
@@ -679,7 +679,7 @@
 > > > 🔎 **Errores en el servicio.** El servicio usa excepciones estándar de Java, sin nada de
 > > > HTTP: `NoSuchElementException` («no existe»), `IllegalArgumentException` («dato inválido»)
 > > > e `IllegalStateException` («conflicto»). Por ahora Spring las responde como `500`; el
-> > > mensaje se lee en la consola. Convertirlas en `404`, `400` y `409` es el tema del Módulo 7.
+> > > mensaje se lee en la consola. Convertirlas en `404`, `400` y `409` es el tema del Módulo 05.
 > >
 > > > 🔎 **Concepto (M2) — el momento central de la sesión.** El servicio **declara** lo que
 > > > necesita (un constructor con `RepositorioEstudiantes`) y Spring **se lo entrega**. Eso es

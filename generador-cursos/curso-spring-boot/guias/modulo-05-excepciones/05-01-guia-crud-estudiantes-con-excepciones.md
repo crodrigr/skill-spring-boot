@@ -1,4 +1,4 @@
-# 🚨 07-01-Guía paso a paso — CRUD de estudiantes con manejo de excepciones
+# 🚨 05-01-Guía paso a paso — CRUD de estudiantes con manejo de excepciones
 
 > 👩‍🏫 **Material docente** (contiene el código completo; no se entrega antes de resolver el módulo).
 > Continúa la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md). 📦 Proyecto terminado: [`students-api-excepciones/`](codigo/students-api-excepciones/) (`./mvnw spring-boot:run`).

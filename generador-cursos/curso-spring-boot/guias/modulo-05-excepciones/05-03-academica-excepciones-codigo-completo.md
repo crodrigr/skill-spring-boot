@@ -1,6 +1,6 @@
-# 📘 07-03-Academia con excepciones — Código completo
+# 📘 05-03-Academia con excepciones — Código completo
 
-> 🧾 **Solo el código.** Versión final de la [guía `07-02-academica-excepciones`](07-02-academica-excepciones.md), con el árbol (🆕 nuevo · ✏️ cambia · 🗑️ se elimina) y el código completo sin explicaciones, seguido del **Paso 6 — Probar la API de punta a punta**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
+> 🧾 **Solo el código.** Versión final de la [guía `05-02-academica-excepciones`](05-02-academica-excepciones.md), con el árbol (🆕 nuevo · ✏️ cambia · 🗑️ se elimina) y el código completo sin explicaciones, seguido del **Paso 6 — Probar la API de punta a punta**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
 > 📦 **Código fuente:** [`academica-excepciones/`](codigo/academica-excepciones/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8.
 
@@ -1903,7 +1903,7 @@
 > > }
 > > ```
 > >
-> > Y la traza completa queda en el *log* del servidor (`log.error("Error inesperado en {}", …)`). La guía [07-01](07-01-guia-crud-estudiantes-con-excepciones.md) muestra la prueba paso a paso con el cierre real de la base.
+> > Y la traza completa queda en el *log* del servidor (`log.error("Error inesperado en {}", …)`). La guía [05-01](05-01-guia-crud-estudiantes-con-excepciones.md) muestra la prueba paso a paso con el cierre real de la base.
 >
 > </details>
 
@@ -1911,4 +1911,4 @@
 
 ---
 
-➡️ **Guía completa:** [07-02-academica-excepciones.md](07-02-academica-excepciones.md)
+➡️ **Guía completa:** [05-02-academica-excepciones.md](05-02-academica-excepciones.md)

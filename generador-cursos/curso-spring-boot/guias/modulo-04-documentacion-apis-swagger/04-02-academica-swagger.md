@@ -82,7 +82,7 @@
 > | **RNF-04** | Nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-05** | Duración: 1 h 30 min. |
 >
-> > 💡 **Alcance.** Quedan fuera: la autenticación real (el esquema de seguridad solo se **documenta**), el formato de error uniforme y las excepciones (Módulo 7), y la generación de clientes.
+> > 💡 **Alcance.** Quedan fuera: la autenticación real (el esquema de seguridad solo se **documenta**), el formato de error uniforme y las excepciones (Módulo 05), y la generación de clientes.
 >
 > </details>
 
@@ -2327,7 +2327,7 @@
 > 6. **Un segundo servidor.** Agregar `https://api.academy.com` como servidor de producción y probar el selector.
 > 7. **Seguridad real.** Agregar Spring Security con un token fijo y comprobar que *Authorize* ahora **sí** cambia el resultado de `POST /courses`.
 > 8. **Generar un cliente.** Con el YAML exportado, generar un cliente con OpenAPI Generator y ver los nombres de método (`listStudents`, `enroll`…).
-> 9. **Modelo de error.** Cuando se estudien las excepciones (Módulo 7), crear un `ErrorResponse` y documentarlo en `400`, `404` y `409`.
+> 9. **Modelo de error.** Cuando se estudien las excepciones (Módulo 05), crear un `ErrorResponse` y documentarlo en `400`, `404` y `409`.
 
 </details>
 

@@ -64,7 +64,7 @@
 >         └── 📄 application-prod.properties
 > ```
 >
-> 🆕 archivo nuevo · ✏️ archivo de `students-api-excepciones` (Módulo 07) que cambia · 📄 sin cambios respecto a `students-api-excepciones`
+> 🆕 archivo nuevo · ✏️ archivo de `students-api-excepciones` (Módulo 05) que cambia · 📄 sin cambios respecto a `students-api-excepciones`
 >
 > **Código final, paso a paso**
 >

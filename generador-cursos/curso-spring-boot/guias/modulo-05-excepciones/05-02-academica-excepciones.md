@@ -1,9 +1,9 @@
-# 🚨 07-02-Guía paso a paso — Academia con manejo de excepciones
+# 🚨 05-02-Guía paso a paso — Academia con manejo de excepciones
 
-> 👩‍🏫 **Material docente.** Aplica la [guía 07-01](07-01-guia-crud-estudiantes-con-excepciones.md) (excepciones propias, `@RestControllerAdvice` y errores documentados en Swagger) al proyecto de la academia ya documentado ([`04-02-academica-swagger`](../modulo-04-documentacion-apis-swagger/04-02-academica-swagger.md), Módulo 04): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica la [guía 05-01](05-01-guia-crud-estudiantes-con-excepciones.md) (excepciones propias, `@RestControllerAdvice` y errores documentados en Swagger) al proyecto de la academia ya documentado ([`04-02-academica-swagger`](../modulo-04-documentacion-apis-swagger/04-02-academica-swagger.md), Módulo 04): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.
 >
-> 📦 **Proyecto terminado:** [`academica-excepciones/`](codigo/academica-excepciones/) · 🧾 **Todo el código final, listo para copiar:** [`07-03-academica-excepciones-codigo-completo.md`](07-03-academica-excepciones-codigo-completo.md).
+> 📦 **Proyecto terminado:** [`academica-excepciones/`](codigo/academica-excepciones/) · 🧾 **Todo el código final, listo para copiar:** [`05-03-academica-excepciones-codigo-completo.md`](05-03-academica-excepciones-codigo-completo.md).
 >
 > ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8. Todas las respuestas que se muestran son salidas reales de la aplicación.
 >
@@ -35,9 +35,9 @@ El controlador solo cuenta el **caso feliz**; todos los errores de los tres recu
 </details>
 
 <details>
-<summary><strong>📝 Introducción: qué cambia respecto a la guía 07-01</strong></summary>
+<summary><strong>📝 Introducción: qué cambia respecto a la guía 05-01</strong></summary>
 
-> | Pieza | Igual que en la [guía 07-01](07-01-guia-crud-estudiantes-con-excepciones.md) |
+> | Pieza | Igual que en la [guía 05-01](05-01-guia-crud-estudiantes-con-excepciones.md) |
 > |---|---|
 > | La idea | El servicio lanza y un manejador global responde |
 > | `ErrorResponse` | Mismo cuerpo para todo error |
@@ -52,7 +52,7 @@ El controlador solo cuenta el **caso feliz**; todos los errores de los tres recu
 > | La matrícula tiene **dos** `404` y **dos** `409` | Estudiante o curso inexistente; matrícula repetida o curso sin cupo: el **mensaje** dice cuál |
 > | `ServiceResult<Long>` desaparece | `countEnrolled` devuelve un `long` o lanza |
 >
-> > 💡 `@ResponseStatus` y el manejador local en un controlador se estudian en la [guía 07-01](07-01-guia-crud-estudiantes-con-excepciones.md); aquí se va directo al **manejo global**.
+> > 💡 `@ResponseStatus` y el manejador local en un controlador se estudian en la [guía 05-01](05-01-guia-crud-estudiantes-con-excepciones.md); aquí se va directo al **manejo global**.
 
 </details>
 
@@ -1831,7 +1831,7 @@ El controlador solo cuenta el **caso feliz**; todos los errores de los tres recu
 > > }
 > > ```
 > >
-> > Y la traza completa queda en el *log* del servidor (`log.error("Error inesperado en {}", …)`). La guía [07-01](07-01-guia-crud-estudiantes-con-excepciones.md) muestra la prueba paso a paso con el cierre real de la base.
+> > Y la traza completa queda en el *log* del servidor (`log.error("Error inesperado en {}", …)`). La guía [05-01](05-01-guia-crud-estudiantes-con-excepciones.md) muestra la prueba paso a paso con el cierre real de la base.
 >
 > </details>
 
@@ -1890,4 +1890,4 @@ El controlador solo cuenta el **caso feliz**; todos los errores de los tres recu
 
 ---
 
-➡️ **Anterior:** [Guía 07-01 — CRUD de estudiantes con manejo de excepciones](07-01-guia-crud-estudiantes-con-excepciones.md) · **Código completo:** [07-03-academica-excepciones-codigo-completo.md](07-03-academica-excepciones-codigo-completo.md)
+➡️ **Anterior:** [Guía 05-01 — CRUD de estudiantes con manejo de excepciones](05-01-guia-crud-estudiantes-con-excepciones.md) · **Código completo:** [05-03-academica-excepciones-codigo-completo.md](05-03-academica-excepciones-codigo-completo.md)

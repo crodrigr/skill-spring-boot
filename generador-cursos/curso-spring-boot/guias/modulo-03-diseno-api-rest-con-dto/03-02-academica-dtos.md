@@ -37,7 +37,7 @@
 > |---|---|
 > | DTO como `record` | `…Request` valida (`@NotBlank`, `@Min`…), `…Response` expone solo lo necesario |
 > | Mapeador estático | `toEntity`, `toResponse`, `toPageResponse` |
-> | `ServiceResult` / `ServiceStatus` | `OK`, `NOT_FOUND`, `CONFLICT`; se reemplaza por excepciones en el Módulo 7 |
+> | `ServiceResult` / `ServiceStatus` | `OK`, `NOT_FOUND`, `CONFLICT`; se reemplaza por excepciones en el Módulo 05 |
 > | Controlador delgado | Recibe, llama al servicio, traduce a HTTP |
 > | Rutas | `/api/v1/…`, `Location` al crear, `spring.data.web.pageable.*` |
 >
@@ -76,7 +76,7 @@
 > | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2, Maven y MySQL 8 (base `academy`). |
 > | **RNF-02** | **Ningún controlador importa nada de `jakarta.persistence`** ni devuelve una entidad. |
 > | **RNF-03** | Los DTO son `record`. Las validaciones de forma viven **solo** en los DTO de entrada. |
-> | **RNF-04** | Los errores de negocio se informan con `ServiceResult`; las excepciones propias y un manejador global se estudian en el Módulo 7. |
+> | **RNF-04** | Los errores de negocio se informan con `ServiceResult`; las excepciones propias y un manejador global se estudian en el Módulo 05. |
 > | **RNF-05** | Nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-06** | Duración: 1 h 30 min. |
 >
@@ -793,7 +793,7 @@
 > >
 > > </details>
 > >
-> > > 💡 **Beneficio:** el servicio **decide** el motivo y el controlador solo lo **traduce** a HTTP. Cuando lleguen las excepciones (Módulo 7), este puente se reemplaza sin tocar las reglas.
+> > > 💡 **Beneficio:** el servicio **decide** el motivo y el controlador solo lo **traduce** a HTTP. Cuando lleguen las excepciones (Módulo 05), este puente se reemplaza sin tocar las reglas.
 >
 > </details>
 >
@@ -1365,7 +1365,7 @@
 > > >
 > > > ⚠️ **Detalle real.** Sin estas tres líneas, el `400` de validación incluía un campo `trace` con la **traza completa** de la excepción, porque DevTools activa esos datos en desarrollo.
 > > >
-> > > 💡 **Beneficio:** la API se protege de pedidos enormes y no filtra su interior. Un formato de error propio y uniforme se estudia en el Módulo 7.
+> > > 💡 **Beneficio:** la API se protege de pedidos enormes y no filtra su interior. Un formato de error propio y uniforme se estudia en el Módulo 05.
 >
 > </details>
 >
@@ -2239,7 +2239,7 @@
 > | Listados | Todo el contenido | Página con tope de 50 |
 > | Cambiar una columna | Rompe a los clientes | Solo cambia el mapeador |
 >
-> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme y las excepciones propias se estudian en el Módulo 7. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-02-jpa-y-bases-de-datos/02-guia-taller-gestion-de-cursos-una-version-profesional.md).
+> > ⚠️ **Lo que aún no está resuelto.** Los `404` y `409` **no traen cuerpo**, y el `400` trae solo un mensaje genérico que **no dice qué campo falló**. Un formato de error uniforme y las excepciones propias se estudian en el Módulo 05. Y la entidad todavía llega al servicio: separar también un **modelo** del negocio se ve en la [guía de la Fase II](../modulo-02-jpa-y-bases-de-datos/02-guia-taller-gestion-de-cursos-una-version-profesional.md).
 
 </details>
 
@@ -2279,7 +2279,7 @@
 > 3. **Matrículas de un estudiante.** `GET /students/{id}/enrollments` que devuelva una lista de `EnrollmentResponse`.
 > 4. **Respuesta resumida.** `CourseSummaryResponse` (`id`, `name`) para el listado y `CourseResponse` para el detalle.
 > 5. **Cupos disponibles.** Agregar `available` a `EnrolledResponse` (cupo máximo menos matriculados).
-> 6. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409`. ¿Qué cambiaría al llegar al Módulo 7?
+> 6. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409`. ¿Qué cambiaría al llegar al Módulo 05?
 > 7. **MapStruct.** Reemplazar los tres mapeadores por interfaces de MapStruct y comparar.
 > 8. **Documentarla.** Agregar Swagger siguiendo la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO.
 

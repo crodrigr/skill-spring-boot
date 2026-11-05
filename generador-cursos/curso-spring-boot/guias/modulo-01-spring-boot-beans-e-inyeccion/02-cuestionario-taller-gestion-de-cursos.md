@@ -565,7 +565,7 @@ los `GET` no? ¿Qué código devolvería un `POST` sin esa anotación y qué sig
 - **B.** Spring devuelve `404 Not Found` automáticamente.
 - **C.** La excepción sube hasta el contenedor web y el cliente recibe `500 Internal Server
   Error`; el mensaje queda en la consola. Convertirla en `404` exige un manejo explícito
-  (tema del Módulo 7).
+  (tema del Módulo 05).
 - **D.** El método devuelve `null`.
 
 <details>

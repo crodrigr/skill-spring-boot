@@ -377,7 +377,7 @@
 > | 4 | Consultar | `GET /productos/2` | — | `200` |
 > | 5 | Actualizar | `PUT /productos/2` | `{"nombre":"Ratón inalámbrico","precio":55000,"stock":40}` | `200` con los datos nuevos |
 > | 6 | Eliminar | `DELETE /productos/2` | — | `204` |
-> | 7 | Inexistente | `GET /productos/99` | — | `500` *(la consola muestra `NoSuchElementException`; el `404` llega en el Módulo 7)* |
+> | 7 | Inexistente | `GET /productos/99` | — | `500` *(la consola muestra `NoSuchElementException`; el `404` llega en el Módulo 05)* |
 >
 > ### 💻 Los mismos pasos con `curl`
 >
