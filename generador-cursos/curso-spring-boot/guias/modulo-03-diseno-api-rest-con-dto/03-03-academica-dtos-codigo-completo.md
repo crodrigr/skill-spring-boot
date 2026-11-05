@@ -1,6 +1,6 @@
 # 📘 03-03-Academia con DTO — Código completo
 
-> 🧾 **Solo el código.** Versión final de la [guía `02-academica-dtos`](02-academica-dtos.md), con el árbol (🆕 nuevo · ✏️ cambia) y el código completo sin explicaciones, seguido del **Paso 7 — Probar la API**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
+> 🧾 **Solo el código.** Versión final de la [guía `03-02-academica-dtos`](03-02-academica-dtos.md), con el árbol (🆕 nuevo · ✏️ cambia) y el código completo sin explicaciones, seguido del **Paso 7 — Probar la API**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
 > 📦 **Código fuente:** [`academica-dtos/`](codigo/academica-dtos/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2 y MySQL 8.
 
@@ -2022,4 +2022,4 @@
 
 ---
 
-➡️ **Guía completa:** [02-academica-dtos.md](02-academica-dtos.md)
+➡️ **Guía completa:** [03-02-academica-dtos.md](03-02-academica-dtos.md)

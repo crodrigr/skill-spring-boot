@@ -1,7 +1,7 @@
 # students-api-dto
 
 CRUD de estudiantes con Spring Boot 4.1.2, Spring Data JPA y MySQL 8, con **DTO** y controladores delgados.
-Código final de la guía [`01-guia-dto-y-estructura-de-controladores.md`](../../01-guia-dto-y-estructura-de-controladores.md).
+Código final de la guía [`03-01-guia-dto-y-estructura-de-controladores.md`](../../03-01-guia-dto-y-estructura-de-controladores.md).
 
 Colección de Postman: [`students-api-dto.postman_collection.json`](../postman/students-api-dto.postman_collection.json) (con su [entorno](../postman/academy-local.postman_environment.json) y [README](../postman/README.md)).
 

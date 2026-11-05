@@ -1,9 +1,9 @@
 # 📘 03-02-Guía paso a paso — Academia con DTO, mapeadores y controladores delgados
 
-> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 03](01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 02](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 03](03-01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 02](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
-> 📦 **Proyecto terminado:** [`academica-dtos/`](codigo/academica-dtos/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-dtos-codigo-completo.md`](03-academica-dtos-codigo-completo.md).
+> 📦 **Proyecto terminado:** [`academica-dtos/`](codigo/academica-dtos/) · 🧾 **Todo el código final, listo para copiar:** [`03-03-academica-dtos-codigo-completo.md`](03-03-academica-dtos-codigo-completo.md).
 >
 > ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2 y MySQL 8. Las respuestas HTTP, los encabezados y el contenido de la tabla que se muestran son salidas reales.
 >
@@ -2307,4 +2307,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía del Módulo 03 — DTO y estructura de controladores](01-guia-dto-y-estructura-de-controladores.md) · **Código completo:** [03-academica-dtos-codigo-completo.md](03-academica-dtos-codigo-completo.md)
+➡️ **Anterior:** [Guía del Módulo 03 — DTO y estructura de controladores](03-01-guia-dto-y-estructura-de-controladores.md) · **Código completo:** [03-03-academica-dtos-codigo-completo.md](03-03-academica-dtos-codigo-completo.md)

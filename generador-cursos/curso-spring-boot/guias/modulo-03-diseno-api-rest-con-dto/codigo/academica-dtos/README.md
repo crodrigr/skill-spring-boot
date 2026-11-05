@@ -1,8 +1,8 @@
 # academica-dtos
 
 Taller de gestión de cursos (estudiantes, cursos y matrículas) con **DTO**, mapeadores y controladores delgados.
-Es el proyecto de la [guía 01 del módulo 03-04](../../../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) con las mejoras del [Módulo 05](../../01-guia-dto-y-estructura-de-controladores.md).
-Guía: [`02-academica-dtos.md`](../../02-academica-dtos.md) · Código completo: [`03-academica-dtos-codigo-completo.md`](../../03-academica-dtos-codigo-completo.md).
+Es el proyecto de la [guía 01 del módulo 03-04](../../../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) con las mejoras del [Módulo 05](../../03-01-guia-dto-y-estructura-de-controladores.md).
+Guía: [`03-02-academica-dtos.md`](../../03-02-academica-dtos.md) · Código completo: [`03-03-academica-dtos-codigo-completo.md`](../../03-03-academica-dtos-codigo-completo.md).
 
 Colección de Postman: [`academica-dtos.postman_collection.json`](../postman/academica-dtos.postman_collection.json) (con su [entorno](../postman/academy-local.postman_environment.json) y [README](../postman/README.md)).
 

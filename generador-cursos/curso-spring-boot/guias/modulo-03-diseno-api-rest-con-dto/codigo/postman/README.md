@@ -4,8 +4,8 @@ Colecciones de Postman (formato v2.1) con las peticiones de los proyectos de est
 
 | Archivo | Proyecto | Guía |
 |---|---|---|
-| `students-api-dto.postman_collection.json` | `students-api-dto` | [01-guia-dto-y-estructura-de-controladores.md](../../01-guia-dto-y-estructura-de-controladores.md) |
-| `academica-dtos.postman_collection.json` | `academica-dtos` | [02-academica-dtos.md](../../02-academica-dtos.md) |
+| `students-api-dto.postman_collection.json` | `students-api-dto` | [03-01-guia-dto-y-estructura-de-controladores.md](../../03-01-guia-dto-y-estructura-de-controladores.md) |
+| `academica-dtos.postman_collection.json` | `academica-dtos` | [03-02-academica-dtos.md](../../03-02-academica-dtos.md) |
 | `academy-local.postman_environment.json` | Entorno con `baseUrl` (`http://localhost:8080`) y `token` | |
 
 ## Cómo usarlas
