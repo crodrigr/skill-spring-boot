@@ -1,9 +1,9 @@
-# 📘 Guía paso a paso — Academia con DTO documentada con Swagger (OpenAPI)
+# 📘 04-02-Guía paso a paso — Academia con DTO documentada con Swagger (OpenAPI)
 
-> 👩‍🏫 **Material docente.** Aplica la [guía del Módulo 04](01-guia-crud-estudiantes-con-swagger.md) al proyecto de la academia ya con DTO ([`03-02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/03-02-academica-dtos.md), Módulo 03): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica la [guía del Módulo 04](04-01-guia-crud-estudiantes-con-swagger.md) al proyecto de la academia ya con DTO ([`03-02-academica-dtos`](../modulo-03-diseno-api-rest-con-dto/03-02-academica-dtos.md), Módulo 03): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.
 >
-> 📦 **Proyecto terminado:** [`academica-swagger/`](codigo/academica-swagger/) · 🧾 **Todo el código final, listo para copiar:** [`03-academica-swagger-codigo-completo.md`](03-academica-swagger-codigo-completo.md).
+> 📦 **Proyecto terminado:** [`academica-swagger/`](codigo/academica-swagger/) · 🧾 **Todo el código final, listo para copiar:** [`04-03-academica-swagger-codigo-completo.md`](04-03-academica-swagger-codigo-completo.md).
 >
 > ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
 >
@@ -31,7 +31,7 @@
 > <details>
 > <summary><strong>🔁 Lo que se repite</strong></summary>
 >
-> | Pieza | Igual que en la [guía 01 del módulo 04](01-guia-crud-estudiantes-con-swagger.md) |
+> | Pieza | Igual que en la [guía 01 del módulo 04](04-01-guia-crud-estudiantes-con-swagger.md) |
 > |---|---|
 > | Dependencia | `springdoc-openapi-starter-webmvc-ui` 3.2.0 |
 > | Anotaciones | `@Tag`, `@Operation`, `@ApiResponse`, `@Parameter`, `@ParameterObject`, `@Hidden`, `@SecurityRequirement` |
@@ -2358,4 +2358,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía `03-02-academica-dtos` del Módulo 03](../modulo-03-diseno-api-rest-con-dto/03-02-academica-dtos.md) · **Código completo:** [03-academica-swagger-codigo-completo.md](03-academica-swagger-codigo-completo.md)
+➡️ **Anterior:** [Guía `03-02-academica-dtos` del Módulo 03](../modulo-03-diseno-api-rest-con-dto/03-02-academica-dtos.md) · **Código completo:** [04-03-academica-swagger-codigo-completo.md](04-03-academica-swagger-codigo-completo.md)

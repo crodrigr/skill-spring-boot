@@ -2281,7 +2281,7 @@
 > 5. **Cupos disponibles.** Agregar `available` a `EnrolledResponse` (cupo máximo menos matriculados).
 > 6. **Error con cuerpo.** Devolver un `ProblemDetail` en los `404` y `409`. ¿Qué cambiaría al llegar al Módulo 7?
 > 7. **MapStruct.** Reemplazar los tres mapeadores por interfaces de MapStruct y comparar.
-> 8. **Documentarla.** Agregar Swagger siguiendo la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO.
+> 8. **Documentarla.** Agregar Swagger siguiendo la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md): los `@Schema` van en los DTO.
 
 </details>
 

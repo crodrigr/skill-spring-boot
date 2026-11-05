@@ -1,4 +1,4 @@
-# 📘 Guía paso a paso — CRUD de estudiantes con DTO documentado con Swagger (OpenAPI)
+# 📘 04-01-Guía paso a paso — CRUD de estudiantes con DTO documentado con Swagger (OpenAPI)
 
 > 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 03 — DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/03-01-guia-dto-y-estructura-de-controladores.md): el proyecto de partida **ya tiene** DTO, mapeador, `ServiceResult`, rutas con versión (`/api/v1`) y un controlador delgado. Sobre él se agregan, **una por una**, las funcionalidades de Swagger.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.

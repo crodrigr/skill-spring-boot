@@ -4,8 +4,8 @@ Colecciones de Postman (formato v2.1) con las peticiones de los proyectos de est
 
 | Archivo | Proyecto | Guía |
 |---|---|---|
-| `students-api.postman_collection.json` | `students-api` | [01-guia-crud-estudiantes-con-swagger.md](../../01-guia-crud-estudiantes-con-swagger.md) |
-| `academica-swagger.postman_collection.json` | `academica-swagger` | [02-academica-swagger.md](../../02-academica-swagger.md) |
+| `students-api.postman_collection.json` | `students-api` | [04-01-guia-crud-estudiantes-con-swagger.md](../../04-01-guia-crud-estudiantes-con-swagger.md) |
+| `academica-swagger.postman_collection.json` | `academica-swagger` | [04-02-academica-swagger.md](../../04-02-academica-swagger.md) |
 | `academy-local.postman_environment.json` | Entorno con `baseUrl` (`http://localhost:8080`) y `token` | |
 
 ## Cómo usarlas

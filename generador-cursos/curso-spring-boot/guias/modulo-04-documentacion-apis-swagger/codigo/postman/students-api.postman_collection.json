@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Módulo 06 · students-api",
-    "description": "Estudiantes con DTO y Swagger. Ejecutar en orden (Runner). Guía: modulo-04-documentacion-apis-swagger/01-guia-crud-estudiantes-con-swagger.md",
+    "description": "Estudiantes con DTO y Swagger. Ejecutar en orden (Runner). Guía: modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
