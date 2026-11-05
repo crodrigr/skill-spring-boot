@@ -107,36 +107,50 @@
 
 > ```text
 > 📁 academica-dtos
-> ├── ✏️ pom.xml                                  + spring-boot-starter-validation
+> ├── ✏️ pom.xml                                   + spring-boot-starter-validation
 > └── 📁 src/main
 >     ├── 📁 java/com/academy
 >     │   ├── 📄 AcademyApplication.java
 >     │   ├── 📁 presentation
 >     │   │   ├── 📁 controller
->     │   │   │   ├── ✏️ StudentController.java    DTO · Location · página
+>     │   │   │   ├── ✏️ StudentController.java     DTO · Location · página
 >     │   │   │   ├── ✏️ CourseController.java
->     │   │   │   └── ✏️ EnrollmentController.java cuerpo JSON · 404 / 409
+>     │   │   │   └── ✏️ EnrollmentController.java  cuerpo JSON · 404 / 409
 >     │   │   ├── 📁 dto
->     │   │   │   ├── 🆕 StudentRequest.java · StudentResponse.java
->     │   │   │   ├── 🆕 CourseRequest.java · CourseResponse.java · EnrolledResponse.java
->     │   │   │   ├── 🆕 EnrollmentRequest.java · EnrollmentResponse.java
+>     │   │   │   ├── 🆕 StudentRequest.java
+>     │   │   │   ├── 🆕 StudentResponse.java
+>     │   │   │   ├── 🆕 CourseRequest.java
+>     │   │   │   ├── 🆕 CourseResponse.java
+>     │   │   │   ├── 🆕 EnrolledResponse.java
+>     │   │   │   ├── 🆕 EnrollmentRequest.java
+>     │   │   │   ├── 🆕 EnrollmentResponse.java
 >     │   │   │   └── 🆕 PageResponse.java
 >     │   │   └── 📁 mapper
->     │   │       └── 🆕 StudentMapper.java · CourseMapper.java · EnrollmentMapper.java
+>     │   │       ├── 🆕 StudentMapper.java
+>     │   │       ├── 🆕 CourseMapper.java
+>     │   │       └── 🆕 EnrollmentMapper.java
 >     │   ├── 📁 business
 >     │   │   ├── 📁 service
->     │   │   │   ├── ✏️ StudentService.java · CourseService.java · EnrollmentService.java    ahora son interfaces
->     │   │   │   └── 🆕 ServiceResult.java · ServiceStatus.java
+>     │   │   │   ├── ✏️ StudentService.java         ahora es una interfaz
+>     │   │   │   ├── ✏️ CourseService.java          ahora es una interfaz
+>     │   │   │   ├── ✏️ EnrollmentService.java      ahora es una interfaz
+>     │   │   │   ├── 🆕 ServiceResult.java
+>     │   │   │   └── 🆕 ServiceStatus.java
 >     │   │   └── 📁 impl
->     │   │       └── 🆕 StudentServiceImpl.java · CourseServiceImpl.java · EnrollmentServiceImpl.java
+>     │   │       ├── 🆕 StudentServiceImpl.java
+>     │   │       ├── 🆕 CourseServiceImpl.java
+>     │   │       └── 🆕 EnrollmentServiceImpl.java
 >     │   └── 📁 persistence
 >     │       ├── 📁 entity
->     │       │   ├── ✏️ StudentEntity.java        + campo interno createdAt
->     │       │   ├── CourseEntity.java
->     │       │   └── EnrollmentEntity.java
->     │       └── 📁 repository                    sin cambios
+>     │       │   ├── ✏️ StudentEntity.java          + campo interno createdAt
+>     │       │   ├── 📄 CourseEntity.java
+>     │       │   └── 📄 EnrollmentEntity.java
+>     │       └── 📁 repository                      sin cambios
+>     │           ├── 📄 StudentJpaRepository.java
+>     │           ├── 📄 CourseJpaRepository.java
+>     │           └── 📄 EnrollmentJpaRepository.java
 >     └── 📁 resources
->         └── ✏️ application.properties            límites de paginación y errores
+>         └── ✏️ application.properties             límites de paginación y errores
 > ```
 
 </details>
