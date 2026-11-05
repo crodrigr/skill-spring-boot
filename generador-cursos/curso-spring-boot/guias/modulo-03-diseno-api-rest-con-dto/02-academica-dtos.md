@@ -1,4 +1,4 @@
-# 📘 Guía paso a paso — Academia con DTO, mapeadores y controladores delgados
+# 📘 03-02-Guía paso a paso — Academia con DTO, mapeadores y controladores delgados
 
 > 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 03](01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 02](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.

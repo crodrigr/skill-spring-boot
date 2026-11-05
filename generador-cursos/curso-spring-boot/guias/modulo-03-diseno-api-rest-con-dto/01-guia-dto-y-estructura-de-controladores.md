@@ -1,4 +1,4 @@
-# 🧱 Guía paso a paso — DTO y una mejor estructura de controladores (endpoints)
+# 🧱 03-01-Guía paso a paso — DTO y una mejor estructura de controladores (endpoints)
 
 > 👩‍🏫 **Material docente.** Se parte de un CRUD de **estudiantes** con Spring Data JPA y MySQL (el estilo de la [guía 01 del taller de cursos](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md)) cuyo controlador **recibe y devuelve la entidad**, y se mejora paso a paso: **DTO**, mapeador, servicio que informa el resultado y controlador delgado con endpoints bien diseñados.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
