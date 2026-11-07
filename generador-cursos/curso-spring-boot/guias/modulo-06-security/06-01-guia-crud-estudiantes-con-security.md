@@ -3,6 +3,8 @@
 > 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 05 — CRUD de estudiantes con excepciones](../modulo-05-excepciones/05-01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo.
 >
+> 🚦 **Punto de partida.** Esta guía se puede iniciar directamente desde la guía anterior, [05-01 · CRUD de estudiantes con excepciones](../modulo-05-excepciones/05-01-guia-crud-estudiantes-con-excepciones.md). Si no se hizo, se descarga su código terminado desde [`curso-spring-boot-src/05-01-students-api-excepciones`](../../../../../curso-spring-boot-src/05-01-students-api-excepciones/) (incluye `migrate.sql` con 100 estudiantes y la colección de Postman), se abre como proyecto y se continúa desde el primer paso de esta guía.
+>
 > 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](06-02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
 >
 > 📮 **Colección de Postman:** [`codigo/postman/`](codigo/postman/) (41 peticiones con sus pruebas).
