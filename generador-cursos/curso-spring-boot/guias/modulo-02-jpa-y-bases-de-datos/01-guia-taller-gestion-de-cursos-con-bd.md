@@ -21,7 +21,8 @@
 > - Declara **entidades JPA** (`@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@ManyToOne`, `@JoinColumn`) en `persistence.entity` (M3 y M4).
 > - Configura la conexión a **MySQL** en `application.properties` y lee el SQL que genera Hibernate (M3 y M4).
 > - Crea interfaces `JpaRepository` con **métodos derivados** (`existsBy…`, `countBy…`) (M3).
-> - Escribe **servicios** (`@Service`) que aplican reglas del negocio y devuelven un `Optional` cuando no se cumplen.
+> - Define cada servicio como una **interfaz** (`business.service`) con su **implementación** `@Service` (`business.impl`), para que el controlador dependa del contrato y no de la clase concreta.
+> - Aplica en las implementaciones las reglas del negocio y devuelve un `Optional` cuando no se cumplen.
 > - Expone una **API REST** con controladores (`@RestController`) y elige el código HTTP (`201`, `404`, `409`) a partir de lo que devuelve el servicio.
 > - Comprueba que las **tablas y los datos persisten** en MySQL entre reinicios.
 > - Verifica que los datos **sobreviven al reinicio** en MySQL: la base vive en un servidor, no dentro de la aplicación.
@@ -54,6 +55,7 @@
 > | **RNF-01** | Java 21 o superior, Spring Boot 4 y Maven. |
 > | **RNF-02** | Persistencia con **Spring Data JPA** y **MySQL 8** (en Docker o instalado). La base `academia` se crea sola al arrancar (`createDatabaseIfNotExist=true`). |
 > | **RNF-03** | Tres capas: `presentation` → `business` → `persistence`. Las anotaciones de JPA van **solo** en `persistence.entity`; las de Spring Web, **solo** en `presentation.controller`. |
+> | **RNF-06** | Capa `business` desacoplada: cada servicio es una **interfaz** en `business.service` y su implementación (`@Service`, `…Impl`) está en `business.impl`. Los controladores inyectan la **interfaz**. |
 > | **RNF-04** | Inyección por constructor (generado con `@RequiredArgsConstructor`). Todos los nombres del código (paquetes, clases, atributos, tablas) en **inglés**. |
 > | **RNF-05** | La verificación se hace con `curl` contra la API, con el SQL que imprime Hibernate y con el cliente de MySQL. |
 > | **RNF-06** | Duración: 1 h 20 min. |
@@ -112,10 +114,14 @@
 > │       ├── 📄 CourseController.java
 > │       └── 📄 EnrollmentController.java
 > ├── 📁 business                                  ← 2 · Paso 3
-> │   └── 📁 service
-> │       ├── 📄 StudentService.java
-> │       ├── 📄 CourseService.java
-> │       └── 📄 EnrollmentService.java
+> │   ├── 📁 service                               (➕ las interfaces: el contrato)
+> │   │   ├── 📄 StudentService.java
+> │   │   ├── 📄 CourseService.java
+> │   │   └── 📄 EnrollmentService.java
+> │   └── 📁 impl                                  (➕ las implementaciones @Service)
+> │       ├── 📄 StudentServiceImpl.java
+> │       ├── 📄 CourseServiceImpl.java
+> │       └── 📄 EnrollmentServiceImpl.java
 > └── 📁 persistence                               ← 3 · Pasos 1 y 2
 >     ├── 📁 repository                            (➕ Spring Data)
 >     │   ├── 📄 StudentJpaRepository.java
@@ -132,12 +138,12 @@
 > | Capa | Paquetes | Qué contiene | En esta guía |
 > |---|---|---|---|
 > | Presentación | `presentation.controller` | Controladores REST: reciben HTTP y eligen el código de respuesta. | **Paso 4** |
-> | Negocio | `business.service` | Servicios con las reglas del negocio. | **Paso 3** |
+> | Negocio | `business.service`, `business.impl` | Interfaces de los servicios (el contrato) e implementaciones con las reglas del negocio. | **Paso 3** |
 > | Persistencia | `persistence.repository`, `persistence.entity` | Repositorios de Spring Data y entidades JPA. | **Pasos 1 y 2** |
 >
 > ```text
-> @RestController ─▶ @Service ─▶ …JpaRepository ─▶ Hibernate ─▶ MySQL
->  HTTP / JSON       reglas      Spring Data lo genera   genera el SQL   la base
+> @RestController ─▶ XService ─▶ XServiceImpl ─▶ …JpaRepository ─▶ Hibernate ─▶ MySQL
+>  HTTP / JSON       interfaz     @Service reglas  Spring Data lo genera   genera el SQL   la base
 > ```
 >
 > > 🔎 **Qué no está.** El modelo del negocio (DTO) y los mapeadores no se crean aquí; pertenecen a otra guía. Todos los nombres del proyecto (paquetes, clases, atributos, tablas y columnas) están en **inglés** para mantener un solo idioma en el código.
@@ -302,13 +308,14 @@
 > > ```text
 > > com.academy
 > > ├── presentation.controller
-> > ├── business.service
+> > ├── business.service      (interfaces)
+> > ├── business.impl         (implementaciones)
 > > └── persistence
 > >     ├── repository
 > >     └── entity
 > > ```
 > >
-> > Los paquetes se llenan en orden: primero `persistence.entity` y `persistence.repository` (Pasos 1 y 2), después `business` (Paso 3) y por último `presentation.controller` (Paso 4).
+> > Los paquetes se llenan en orden: primero `persistence.entity` y `persistence.repository` (Pasos 1 y 2), después `business.service` y `business.impl` (Paso 3) y por último `presentation.controller` (Paso 4).
 > >
 > > > 💡 Los paquetes se crean desde el IDE (*New → Package*). Un paquete vacío no aparece en Git ni en el `.jar` hasta que tenga una clase.
 >
@@ -761,32 +768,57 @@
 ---
 
 <details>
-<summary><strong>⚙️ Paso 3 — Capa de negocio (<code>business.service</code>)</strong></summary>
+<summary><strong>⚙️ Paso 3 — Capa de negocio (<code>business.service</code> y <code>business.impl</code>)</strong></summary>
 
 > El **servicio** aplica las **reglas del negocio** y decide cuándo se guarda algo. Usa los repositorios del Paso 2 y **no sabe nada de HTTP**: ni de rutas, ni de códigos de estado.
+> Cada servicio se separa en dos piezas: una **interfaz** (`business.service`, el contrato: qué operaciones existen) y una **implementación** (`business.impl`, clase `…Impl` con `@Service`: cómo se cumplen). El controlador solo conoce la interfaz, así que se puede cambiar o probar la implementación sin tocar la capa de presentación.
 > Cuando una regla no se cumple, devuelve un **`Optional` vacío**: «no hay resultado». Quien lo recibe decide qué responder.
 >
 > | Regla del taller | Dónde se aplica | Qué repositorio usa |
 > |---|---|---|
-> | El correo de un estudiante no puede repetirse (sin importar mayúsculas) | `StudentService.create` | `existsByEmailIgnoreCase` |
-> | Un curso necesita precio y cupo mayores que cero | `CourseService.create` | *(solo valida)* |
-> | El estudiante y el curso deben existir | `EnrollmentService.enroll` | `findById` |
-> | Un estudiante no se matricula dos veces en el mismo curso | `EnrollmentService.enroll` | `existsByStudentIdAndCourseId` |
-> | No se matricula si el curso ya llegó a su cupo | `EnrollmentService.enroll` | `countByCourseId` |
+> | El correo de un estudiante no puede repetirse (sin importar mayúsculas) | `StudentServiceImpl.create` | `existsByEmailIgnoreCase` |
+> | Un curso necesita precio y cupo mayores que cero | `CourseServiceImpl.create` | *(solo valida)* |
+> | El estudiante y el curso deben existir | `EnrollmentServiceImpl.enroll` | `findById` |
+> | Un estudiante no se matricula dos veces en el mismo curso | `EnrollmentServiceImpl.enroll` | `existsByStudentIdAndCourseId` |
+> | No se matricula si el curso ya llegó a su cupo | `EnrollmentServiceImpl.enroll` | `countByCourseId` |
 >
 > <details>
-> <summary><strong>Paso 3.1 · <code>StudentService</code> y <code>CourseService</code></strong></summary>
+> <summary><strong>Paso 3.1 · <code>StudentService</code> y <code>CourseService</code> (interfaz + <code>Impl</code>)</strong></summary>
 >
-> > Cada servicio recibe sus repositorios **por constructor** y lleva `@Service` para que Spring lo cree. El constructor **lo genera Lombok** con `@RequiredArgsConstructor` (uno por cada atributo `final`).
+> > Cada servicio tiene una **interfaz** (sin anotaciones, solo las firmas) y una clase `…Impl` que la implementa. La `Impl` recibe sus repositorios **por constructor** y lleva `@Service` para que Spring la cree. El constructor **lo genera Lombok** con `@RequiredArgsConstructor` (uno por cada atributo `final`).
 > >
 > > <details>
-> > <summary><strong>📄 StudentService.java</strong></summary>
+> > <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.StudentEntity;
+> >
+> > import java.util.List;
+> > import java.util.Optional;
+> >
+> > public interface StudentService {
+> >
+> >     List<StudentEntity> findAll();
+> >
+> >     Optional<StudentEntity> create(StudentEntity student);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
+> > import com.academy.business.service.StudentService;
 > > import com.academy.persistence.entity.StudentEntity;
 > > import com.academy.persistence.repository.StudentJpaRepository;
 > > import lombok.RequiredArgsConstructor;
@@ -798,15 +830,17 @@
 > >
 > > @Service
 > > @RequiredArgsConstructor
-> > public class StudentService {
+> > public class StudentServiceImpl implements StudentService {
 > >
 > >     private final StudentJpaRepository students;
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public List<StudentEntity> findAll() {
 > >         return students.findAll();
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public Optional<StudentEntity> create(StudentEntity student) {
 > >         if (students.existsByEmailIgnoreCase(student.getEmail())) {
@@ -820,13 +854,39 @@
 > > </details>
 > >
 > > <details>
-> > <summary><strong>📄 CourseService.java</strong></summary>
+> > <summary><strong>📄 CourseService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/CourseService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.CourseEntity;
+> >
+> > import java.util.List;
+> > import java.util.Optional;
+> >
+> > public interface CourseService {
+> >
+> >     List<CourseEntity> findAll();
+> >
+> >     Optional<CourseEntity> create(CourseEntity course);
+> >
+> >     Optional<Long> countEnrolled(Long courseId);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 CourseServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/CourseServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
+> > import com.academy.business.service.CourseService;
 > > import com.academy.persistence.entity.CourseEntity;
 > > import com.academy.persistence.repository.CourseJpaRepository;
 > > import com.academy.persistence.repository.EnrollmentJpaRepository;
@@ -839,16 +899,18 @@
 > >
 > > @Service
 > > @RequiredArgsConstructor
-> > public class CourseService {
+> > public class CourseServiceImpl implements CourseService {
 > >
 > >     private final CourseJpaRepository courses;
 > >     private final EnrollmentJpaRepository enrollments;
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public List<CourseEntity> findAll() {
 > >         return courses.findAll();
 > >     }
 > >
+> >     @Override
 > >     @Transactional
 > >     public Optional<CourseEntity> create(CourseEntity course) {
 > >         if (course.getPrice() <= 0 || course.getMaxCapacity() <= 0) {
@@ -857,6 +919,7 @@
 > >         return Optional.of(courses.save(course));
 > >     }
 > >
+> >     @Override
 > >     @Transactional(readOnly = true)
 > >     public Optional<Long> countEnrolled(Long courseId) {
 > >         if (!courses.existsById(courseId)) {
@@ -869,29 +932,54 @@
 > >
 > > </details>
 > >
-> > - **`@Service`** registra la clase como *bean* de la capa de negocio (el mismo mecanismo de inyección del M2).
+> > - **`interface`** define el contrato (`findAll`, `create`, `countEnrolled`); no tiene lógica ni anotaciones.
+> > - **`implements` + `@Override`** en la `Impl`: el compilador verifica que cada método del contrato esté cumplido.
+> > - **`@Service`** va en la `Impl` y la registra como *bean* de la capa de negocio. Al haber una sola implementación, Spring la entrega donde se pida la interfaz.
 > > - `create` **valida antes de guardar**: si la regla falla devuelve `Optional.empty()` y no se ejecuta ningún `insert`.
-> > - **`@Transactional`** (de `org.springframework.transaction.annotation`) abre una transacción al entrar al método y la cierra al salir: si algo falla, se deshace todo (*rollback*). Va en los **servicios**, nunca en el controlador.
+> > - **`@Transactional`** (de `org.springframework.transaction.annotation`), en los métodos de la `Impl`, abre una transacción al entrar al método y la cierra al salir: si algo falla, se deshace todo (*rollback*). Va en los **servicios**, nunca en el controlador.
 > > - **`@Transactional(readOnly = true)`** en las consultas (`findAll`, `countEnrolled`): indica que no se escribe, y Hibernate evita trabajo innecesario.
 > > - `save` devuelve la entidad con su `id` ya generado; se envuelve en `Optional.of(…)`.
 > > - `countEnrolled` devuelve vacío cuando el curso no existe, para no confundirlo con «cero inscritos».
+> >
+> > > 💡 **Desacoplamiento.** Los controladores (Paso 4) declaran `private final StudentService service;` —el tipo es la **interfaz**—, nunca `StudentServiceImpl`. Spring inyecta la `Impl` en tiempo de ejecución. Así `presentation` no importa nada de `business.impl`, y la lógica se puede reemplazar (otra implementación, un doble para pruebas) sin cambiar los controladores.
 >
 > </details>
 >
 >
 > <details>
-> <summary><strong>Paso 3.2 · <code>EnrollmentService</code>: la regla más completa</strong></summary>
+> <summary><strong>Paso 3.2 · <code>EnrollmentService</code> y <code>EnrollmentServiceImpl</code>: la regla más completa</strong></summary>
 >
 > > Matricular junta tres repositorios y **cuatro** comprobaciones, en este orden: existen el estudiante y el curso, no está ya matriculado y hay cupo.
 > >
 > > <details>
-> > <summary><strong>📄 EnrollmentService.java</strong></summary>
+> > <summary><strong>📄 EnrollmentService.java</strong> <em>(interfaz)</em></summary>
 > >
 > > **Ruta:** `src/main/java/com/academy/business/service/EnrollmentService.java`
 > >
 > > ```java
 > > package com.academy.business.service;
 > >
+> > import com.academy.persistence.entity.EnrollmentEntity;
+> >
+> > import java.util.Optional;
+> >
+> > public interface EnrollmentService {
+> >
+> >     Optional<EnrollmentEntity> enroll(Long studentId, Long courseId);
+> > }
+> > ```
+> >
+> > </details>
+> >
+> > <details>
+> > <summary><strong>📄 EnrollmentServiceImpl.java</strong> <em>(implementación)</em></summary>
+> >
+> > **Ruta:** `src/main/java/com/academy/business/impl/EnrollmentServiceImpl.java`
+> >
+> > ```java
+> > package com.academy.business.impl;
+> >
+> > import com.academy.business.service.EnrollmentService;
 > > import com.academy.persistence.entity.CourseEntity;
 > > import com.academy.persistence.entity.EnrollmentEntity;
 > > import com.academy.persistence.entity.StudentEntity;
@@ -906,12 +994,13 @@
 > >
 > > @Service
 > > @RequiredArgsConstructor
-> > public class EnrollmentService {
+> > public class EnrollmentServiceImpl implements EnrollmentService {
 > >
 > >     private final StudentJpaRepository students;
 > >     private final CourseJpaRepository courses;
 > >     private final EnrollmentJpaRepository enrollments;
 > >
+> >     @Override
 > >     @Transactional
 > >     public Optional<EnrollmentEntity> enroll(Long studentId, Long courseId) {
 > >         Optional<StudentEntity> student = students.findById(studentId);
@@ -1245,8 +1334,8 @@
 > | `Table 'academia.student' doesn't exist` | `ddl-auto=none`, o la URL apunta a otra base | Usar `create` y revisar el nombre de la base en la URL |
 > | `DataIntegrityViolationException` al guardar un estudiante | El `email` ya existe y la comprobación del servicio no se ejecutó (se usó el repositorio directo) | Guardar siempre a través de `StudentService`, o usar otro correo |
 > | Los datos desaparecen al reiniciar | `ddl-auto=create` o `create-drop` (es lo esperado en el taller) | Usar `update` si se quieren conservar |
-> | `Parameter 0 of constructor in …Service required a bean of type …Repository` | El repositorio no está bajo `com.academy`, o no es una interfaz que extienda `JpaRepository` | Revisar el paquete y la herencia |
-> | `No qualifying bean` para un servicio | Falta `@Service` en la clase | Agregar `@Service` |
+> | `Parameter 0 of constructor in …ServiceImpl required a bean of type …Repository` | El repositorio no está bajo `com.academy`, o no es una interfaz que extienda `JpaRepository` | Revisar el paquete y la herencia |
+> | `No qualifying bean` para un servicio | Falta `@Service` en la clase `…Impl` (la interfaz no lleva anotación) | Agregar `@Service` a la `Impl` |
 > | `404` en una ruta que sí existe | El controlador no tiene `@RestController`, o la ruta de `@RequestMapping` no coincide | Revisar anotaciones y la ruta |
 > | `415 Unsupported Media Type` al hacer `POST` | Falta el encabezado `Content-Type: application/json` | Agregar `-H "Content-Type: application/json"` |
 > | `400 Bad Request` con un JSON válido | Un nombre del JSON no coincide con un atributo de la entidad (`maxCapacity`, no `max_capacity`) | Usar los nombres de los atributos |
@@ -1260,7 +1349,7 @@
 > 1. **Restricción en la base:** en `EnrollmentEntity`, agregar `@Table(name = "enrollment", uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "course_id"}))`
 >    y comprobar que guardar dos veces la misma matrícula lanza `DataIntegrityViolationException`. ¿Para qué sirve si el código ya puede preguntar con `existsByStudentIdAndCourseId`?
 >    *(Dos peticiones simultáneas podrían pasar ambas la pregunta; la restricción es la última defensa.)*
-> 2. **Filtro de punta a punta:** agregar `findByPriceLessThan(double price)` en `CourseJpaRepository`, un método en `CourseService` y `GET /api/courses?maxPrice=200000` en `CourseController`; probarlo con `curl`. Probarlo con datos queda para la capa de servicio.
+> 2. **Filtro de punta a punta:** agregar `findByPriceLessThan(double price)` en `CourseJpaRepository`, un método en la interfaz `CourseService`, su implementación en `CourseServiceImpl` y `GET /api/courses?maxPrice=200000` en `CourseController`; probarlo con `curl`. Probarlo con datos queda para la capa de servicio.
 > 3. **Consulta con JPQL:** reescribir `countByCourseId` con `@Query("SELECT COUNT(e) FROM EnrollmentEntity e WHERE e.course.id = :courseId")`.
 > 4. **Otro motor:** reemplazar MySQL por **PostgreSQL** (dependencia del driver + `spring.datasource.*`) y comprobar que **ninguna** entidad ni repositorio cambia.
 > 5. **Excepciones propias:** reemplazar los `Optional` vacíos por excepciones (`NotFoundException`, `BusinessRuleException`) con mensaje, y un `@RestControllerAdvice` que las traduzca a `404`/`409` con cuerpo JSON. ¿Qué información se gana?
@@ -1285,10 +1374,14 @@
 >     │   │       ├── 📄 CourseController.java
 >     │   │       └── 📄 EnrollmentController.java
 >     │   ├── 📁 business
->     │   │   └── 📁 service
->     │   │       ├── 📄 StudentService.java
->     │   │       ├── 📄 CourseService.java
->     │   │       └── 📄 EnrollmentService.java
+>     │   │   ├── 📁 service
+>     │   │   │   ├── 📄 StudentService.java
+>     │   │   │   ├── 📄 CourseService.java
+>     │   │   │   └── 📄 EnrollmentService.java
+>     │   │   └── 📁 impl
+>     │   │       ├── 📄 StudentServiceImpl.java
+>     │   │       ├── 📄 CourseServiceImpl.java
+>     │   │       └── 📄 EnrollmentServiceImpl.java
 >     │   └── 📁 persistence
 >     │       ├── 📁 repository
 >     │       │   ├── 📄 StudentJpaRepository.java
@@ -1635,13 +1728,37 @@
 > #### 📁 service
 >
 > <details>
-> <summary><strong>📄 StudentService.java</strong></summary>
+> <summary><strong>📄 StudentService.java</strong> <em>(interfaz)</em></summary>
 >
 > **Ruta:** `src/main/java/com/academy/business/service/StudentService.java`
 >
 > ```java
 > package com.academy.business.service;
 >
+> import com.academy.persistence.entity.StudentEntity;
+>
+> import java.util.List;
+> import java.util.Optional;
+>
+> public interface StudentService {
+>
+>     List<StudentEntity> findAll();
+>
+>     Optional<StudentEntity> create(StudentEntity student);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 StudentServiceImpl.java</strong> <em>(implementación)</em></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/impl/StudentServiceImpl.java`
+>
+> ```java
+> package com.academy.business.impl;
+>
+> import com.academy.business.service.StudentService;
 > import com.academy.persistence.entity.StudentEntity;
 > import com.academy.persistence.repository.StudentJpaRepository;
 > import lombok.RequiredArgsConstructor;
@@ -1653,15 +1770,17 @@
 >
 > @Service
 > @RequiredArgsConstructor
-> public class StudentService {
+> public class StudentServiceImpl implements StudentService {
 >
 >     private final StudentJpaRepository students;
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public List<StudentEntity> findAll() {
 >         return students.findAll();
 >     }
 >
+>     @Override
 >     @Transactional
 >     public Optional<StudentEntity> create(StudentEntity student) {
 >         if (students.existsByEmailIgnoreCase(student.getEmail())) {
@@ -1675,13 +1794,39 @@
 > </details>
 >
 > <details>
-> <summary><strong>📄 CourseService.java</strong></summary>
+> <summary><strong>📄 CourseService.java</strong> <em>(interfaz)</em></summary>
 >
 > **Ruta:** `src/main/java/com/academy/business/service/CourseService.java`
 >
 > ```java
 > package com.academy.business.service;
 >
+> import com.academy.persistence.entity.CourseEntity;
+>
+> import java.util.List;
+> import java.util.Optional;
+>
+> public interface CourseService {
+>
+>     List<CourseEntity> findAll();
+>
+>     Optional<CourseEntity> create(CourseEntity course);
+>
+>     Optional<Long> countEnrolled(Long courseId);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 CourseServiceImpl.java</strong> <em>(implementación)</em></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/impl/CourseServiceImpl.java`
+>
+> ```java
+> package com.academy.business.impl;
+>
+> import com.academy.business.service.CourseService;
 > import com.academy.persistence.entity.CourseEntity;
 > import com.academy.persistence.repository.CourseJpaRepository;
 > import com.academy.persistence.repository.EnrollmentJpaRepository;
@@ -1694,16 +1839,18 @@
 >
 > @Service
 > @RequiredArgsConstructor
-> public class CourseService {
+> public class CourseServiceImpl implements CourseService {
 >
 >     private final CourseJpaRepository courses;
 >     private final EnrollmentJpaRepository enrollments;
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public List<CourseEntity> findAll() {
 >         return courses.findAll();
 >     }
 >
+>     @Override
 >     @Transactional
 >     public Optional<CourseEntity> create(CourseEntity course) {
 >         if (course.getPrice() <= 0 || course.getMaxCapacity() <= 0) {
@@ -1712,6 +1859,7 @@
 >         return Optional.of(courses.save(course));
 >     }
 >
+>     @Override
 >     @Transactional(readOnly = true)
 >     public Optional<Long> countEnrolled(Long courseId) {
 >         if (!courses.existsById(courseId)) {
@@ -1725,13 +1873,34 @@
 > </details>
 >
 > <details>
-> <summary><strong>📄 EnrollmentService.java</strong></summary>
+> <summary><strong>📄 EnrollmentService.java</strong> <em>(interfaz)</em></summary>
 >
 > **Ruta:** `src/main/java/com/academy/business/service/EnrollmentService.java`
 >
 > ```java
 > package com.academy.business.service;
 >
+> import com.academy.persistence.entity.EnrollmentEntity;
+>
+> import java.util.Optional;
+>
+> public interface EnrollmentService {
+>
+>     Optional<EnrollmentEntity> enroll(Long studentId, Long courseId);
+> }
+> ```
+>
+> </details>
+>
+> <details>
+> <summary><strong>📄 EnrollmentServiceImpl.java</strong> <em>(implementación)</em></summary>
+>
+> **Ruta:** `src/main/java/com/academy/business/impl/EnrollmentServiceImpl.java`
+>
+> ```java
+> package com.academy.business.impl;
+>
+> import com.academy.business.service.EnrollmentService;
 > import com.academy.persistence.entity.CourseEntity;
 > import com.academy.persistence.entity.EnrollmentEntity;
 > import com.academy.persistence.entity.StudentEntity;
@@ -1746,12 +1915,13 @@
 >
 > @Service
 > @RequiredArgsConstructor
-> public class EnrollmentService {
+> public class EnrollmentServiceImpl implements EnrollmentService {
 >
 >     private final StudentJpaRepository students;
 >     private final CourseJpaRepository courses;
 >     private final EnrollmentJpaRepository enrollments;
 >
+>     @Override
 >     @Transactional
 >     public Optional<EnrollmentEntity> enroll(Long studentId, Long courseId) {
 >         Optional<StudentEntity> student = students.findById(studentId);
@@ -1925,20 +2095,20 @@
 > | `@Column(unique = true)` | `StudentEntity.email` | Un correo no puede repetirse. | Crea una restricción `UNIQUE` en la columna. |
 > | `@ManyToOne` | `EnrollmentEntity.student`, `.course` | Muchas matrículas apuntan a **un** estudiante o curso. | Declara la relación de muchos a uno. |
 > | `@JoinColumn(name = "…")` | Esos mismos dos atributos | Hay que nombrar la **clave foránea**. | Define `student_id` / `course_id`; `EnrollmentEntity` es el **lado dueño**. |
-> | `@Service` | `StudentService`, `CourseService`, `EnrollmentService` | Son la capa de negocio. | Registra la clase como *bean* para inyectarla. |
-> | `@Transactional` · `@Transactional(readOnly = true)` | Métodos de los servicios (`create`, `enroll` · `findAll`, `countEnrolled`) | Una operación del negocio debe cumplirse completa o no cumplirse. | Abre y cierra la transacción; `readOnly` marca las consultas. |
+> | `@Service` | `StudentServiceImpl`, `CourseServiceImpl`, `EnrollmentServiceImpl` | Son la implementación de la capa de negocio (las interfaces no se anotan). | Registra la clase como *bean* para inyectarla donde se pida la interfaz. |
+> | `@Transactional` · `@Transactional(readOnly = true)` | Métodos de las implementaciones (`create`, `enroll` · `findAll`, `countEnrolled`) | Una operación del negocio debe cumplirse completa o no cumplirse. | Abre y cierra la transacción; `readOnly` marca las consultas. |
 > | `@RestController` | Los tres controladores | Atienden HTTP y devuelven JSON. | Combina `@Controller` y `@ResponseBody`. |
 > | `@RequestMapping` · `@GetMapping` · `@PostMapping` | Controladores | Cada método atiende una ruta y un verbo. | Enlaza la petición HTTP con el método Java. |
 > | `@RequestBody` · `@PathVariable` · `@RequestParam` | Parámetros de los controladores | Cada dato llega de un sitio distinto. | Cuerpo JSON, parte de la ruta y parámetro de consulta. |
 > | `ResponseEntity` *(clase, no anotación)* | Retorno de `create`, `enroll` y `countEnrolled` | La respuesta cambia según el caso. | Fija el código HTTP (`201`, `404`, `409`) y el cuerpo. |
 > | `@Getter` · `@NoArgsConstructor(access = PROTECTED)` *(Lombok)* | Las tres entidades | Evitar escribir getters y el constructor vacío. | Generan los `getX()` y un constructor vacío `protected` al compilar. |
-> | `@RequiredArgsConstructor` *(Lombok)* | Servicios y controladores | Reciben sus dependencias por constructor. | Genera el constructor con los atributos `final`. |
+> | `@RequiredArgsConstructor` *(Lombok)* | Implementaciones de servicios y controladores | Reciben sus dependencias por constructor. | Genera el constructor con los atributos `final`. |
 > | `@SpringBootApplication` | `AcademyApplication` | Es la clase que arranca Spring. | Activa el escaneo de entidades y repositorios. |
 >
 > ```text
 > persistence   ──▶  @Entity · @Table · @Id · @GeneratedValue · @Column · @ManyToOne · @JoinColumn · @Getter · @NoArgsConstructor     (en persistence.entity)
 >                    (las …JpaRepository no llevan anotaciones)
-> business      ──▶  @Service · @Transactional · @RequiredArgsConstructor                          (en business.service)
+> business      ──▶  @Service · @Transactional · @RequiredArgsConstructor                          (en business.impl)
 > presentation  ──▶  @RestController · @RequestMapping · @GetMapping · @PostMapping · @RequiredArgsConstructor
 > arranque      ──▶  @SpringBootApplication
 > ```

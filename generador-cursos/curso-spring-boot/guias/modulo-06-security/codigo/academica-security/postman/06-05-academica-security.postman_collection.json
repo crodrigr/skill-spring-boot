@@ -1,0 +1,2019 @@
+{
+  "info": {
+    "name": "06-05 · academica-security",
+    "description": "API de la academia (estudiantes, cursos y matrículas) protegida con Spring Security y JWT. Ejecutar en orden (Runner) con la aplicación en marcha. Cuentas de práctica (solo educativas): admin/admin123 (ADMIN) y ana/ana123 (USER). La carpeta 2 guarda los tokens; las demás los envían como Authorization: Bearer. Se puede repetir sin vaciar la base: los correos llevan el sufijo {{run}}. Guía: modulo-06-security/06-05-academica-security.md",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "tokenFalso",
+      "value": "basura"
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "tokenAna",
+      "value": ""
+    },
+    {
+      "key": "run",
+      "value": ""
+    },
+    {
+      "key": "courseId",
+      "value": ""
+    },
+    {
+      "key": "studentId",
+      "value": ""
+    },
+    {
+      "key": "studentId2",
+      "value": ""
+    },
+    {
+      "key": "enrollmentId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Público (sin token)",
+      "description": "Rutas abiertas: no piden token.",
+      "item": [
+        {
+          "name": "Estado del servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"UP\", function () { pm.expect(pm.response.json().status).to.eql(\"UP\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/internal/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "internal",
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Contrato OpenAPI: academia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api-docs/academy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-docs",
+                "academy"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Contrato OpenAPI: internal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api-docs/internal",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-docs",
+                "internal"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Login (guarda los tokens)",
+      "description": "Iniciar sesión guarda tokenAdmin y tokenAna como variables de la colección.",
+      "item": [
+        {
+          "name": "Login: admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('run', Date.now().toString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Token Bearer\", function () { var j = pm.response.json(); pm.expect(j.token).to.be.a(\"string\"); pm.expect(j.tokenType).to.eql(\"Bearer\"); });",
+                  "pm.collectionVariables.set(\"tokenAdmin\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login: ana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set(\"tokenAna\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"ana\",\n  \"password\": \"ana123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login: contraseña incorrecta → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });",
+                  "pm.test(\"Mensaje esperado\", function () { pm.expect(pm.response.json().message).to.eql(\"Usuario o contraseña incorrectos\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"mala\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login: usuario inexistente → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });",
+                  "pm.test(\"Mensaje esperado\", function () { pm.expect(pm.response.json().message).to.eql(\"Usuario o contraseña incorrectos\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nadie\",\n  \"password\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login: sin campos → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(400); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Quién soy: admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Rol ADMIN\", function () { pm.expect(pm.response.json().role).to.eql(\"ADMIN\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Quién soy: ana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Rol USER\", function () { pm.expect(pm.response.json().role).to.eql(\"USER\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Sin token o con token malo (401)",
+      "description": "Todo lo protegido responde 401.",
+      "item": [
+        {
+          "name": "Listar estudiantes sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });",
+                  "pm.test(\"Mensaje esperado\", function () { pm.expect(pm.response.json().message).to.eql(\"Se requiere autenticación para acceder a este recurso\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar cursos sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Matricular sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 1,\n  \"courseId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Quién soy sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Seed sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/internal/seed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "internal",
+                "seed"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Token falso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(401); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });",
+                  "pm.test(\"Mensaje esperado\", function () { pm.expect(pm.response.json().message).to.eql(\"El token no es válido\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenFalso}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Cargar datos de ejemplo (solo ADMIN)",
+      "description": "El administrador carga estudiantes y cursos; un USER recibe 403.",
+      "item": [
+        {
+          "name": "Seed como ana (USER) → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(403); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });",
+                  "pm.test(\"Mensaje esperado\", function () { pm.expect(pm.response.json().message).to.eql(\"No tiene permisos para realizar esta operación\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/internal/seed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "internal",
+                "seed"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Seed como admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Cuenta lo creado\", function () { var j = pm.response.json(); pm.expect(j).to.have.property(\"students\"); pm.expect(j).to.have.property(\"courses\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/internal/seed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "internal",
+                "seed"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Cursos",
+      "description": "Leer: cualquier cuenta. Crear: solo ADMIN.",
+      "item": [
+        {
+          "name": "Listar cursos (ana)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Es una página\", function () { pm.expect(pm.response.json()).to.have.property(\"content\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear curso como ana (USER) → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(403); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });",
+                  "pm.test(\"Mensaje esperado\", function () { pm.expect(pm.response.json().message).to.eql(\"No tiene permisos para realizar esta operación\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Curso de ana\",\n  \"price\": 1000,\n  \"maxCapacity\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear curso como admin → 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Location presente\", function () { pm.response.to.have.header(\"Location\"); });",
+                  "pm.collectionVariables.set(\"courseId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Curso {{run}}\",\n  \"price\": 90000,\n  \"maxCapacity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear curso inválido → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(400); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"price\": 0,\n  \"maxCapacity\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Buscar curso por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                "{{courseId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar curso inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(404); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar curso con id no numérico → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(400); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                "abc"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ordenar por campo inexistente → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(400); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses?sort=noExiste,asc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "noExiste,asc"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Estudiantes",
+      "description": "Cualquier cuenta autenticada lee y registra estudiantes.",
+      "item": [
+        {
+          "name": "Registrar estudiante (ana) → 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Location presente\", function () { pm.response.to.have.header(\"Location\"); });",
+                  "pm.collectionVariables.set(\"studentId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prueba Uno\",\n  \"age\": 22,\n  \"email\": \"uno.{{run}}@academy.test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar un segundo estudiante → 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"studentId2\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prueba Dos\",\n  \"age\": 25,\n  \"email\": \"dos.{{run}}@academy.test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar con correo repetido → 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(409); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Otra\",\n  \"age\": 22,\n  \"email\": \"uno.{{run}}@academy.test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registrar con datos inválidos → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(400); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });",
+                  "pm.test(\"details por campo\", function () { pm.expect(pm.response.json().details.length).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"age\": 10,\n  \"email\": \"no-es-correo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar estudiantes paginado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students?page=0&size=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar filtrando por nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students?name=prueba",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "prueba"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar estudiante por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/{{studentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "{{studentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar estudiante inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(404); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar por correo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/by-email?email=uno.{{run}}@academy.test",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "by-email"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "uno.{{run}}@academy.test"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar por correo inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(404); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/by-email?email=nadie@academy.test",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "by-email"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "nadie@academy.test"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar por correo sin parámetro → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(400); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students/by-email",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students",
+                "by-email"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Matrículas",
+      "description": "Matricular exige token. El curso creado en la carpeta 5 tiene cupo 1.",
+      "item": [
+        {
+          "name": "Matricular → 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Location presente\", function () { pm.response.to.have.header(\"Location\"); });",
+                  "pm.collectionVariables.set(\"enrollmentId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": {{studentId}},\n  \"courseId\": {{courseId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Matricular de nuevo → 409 (ya matriculado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(409); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": {{studentId}},\n  \"courseId\": {{courseId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Matricular a otro en el curso lleno → 409 (sin cupo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(409); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": {{studentId2}},\n  \"courseId\": {{courseId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Matricular en curso inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(404); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": {{studentId}},\n  \"courseId\": 999999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Matricular a estudiante inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(404); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 999999,\n  \"courseId\": {{courseId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Matricular sin datos → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(400); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Buscar matrícula por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments/{{enrollmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments",
+                "{{enrollmentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar matrícula inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(404); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments",
+                "999999"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cantidad de matriculados del curso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Un matriculado\", function () { pm.expect(pm.response.json().enrolled).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/{{courseId}}/enrolled",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                "{{courseId}}",
+                "enrolled"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Rutas que no existen",
+      "description": "Ya autenticado, Spring MVC responde 404 o 405 con ErrorResponse.",
+      "item": [
+        {
+          "name": "Ruta inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(404); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/no-existe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "no-existe"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Método no permitido → 405",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado 405\", function () { pm.response.to.have.status(405); });",
+                  "pm.test(\"Cuerpo ErrorResponse\", function () { var j = pm.response.json(); pm.expect(j.status).to.eql(405); pm.expect(j).to.have.property(\"message\"); pm.expect(j).to.have.property(\"path\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAna}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "students"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
