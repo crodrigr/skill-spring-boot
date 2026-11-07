@@ -3,11 +3,11 @@
 > 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 05 — CRUD de estudiantes con excepciones](../modulo-05-excepciones/05-01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo.
 >
-> 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
+> 🪶 **¿Se busca algo más corto?** Hay una [versión sencilla y práctica](06-02-guia-security-facil.md) con su propio proyecto ([`students-api-security-facil/`](codigo/students-api-security-facil/)).
 >
 > 📮 **Colección de Postman:** [`codigo/postman/`](codigo/postman/) (41 peticiones con sus pruebas).
 >
-> 🧪 **Probar todas las rutas con `curl`:** [`04-curl-probar-todas-las-apis.md`](04-curl-probar-todas-las-apis.md) (y el script [`probar-apis.sh`](codigo/probar-apis.sh)).
+> 🧪 **Probar todas las rutas con `curl`:** [`06-04-curl-probar-todas-las-apis.md`](06-04-curl-probar-todas-las-apis.md) (y el script [`probar-apis.sh`](codigo/probar-apis.sh)).
 >
 > 📦 **Proyecto terminado:** [`students-api-security/`](codigo/students-api-security/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >

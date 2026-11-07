@@ -125,4 +125,4 @@ curl -X DELETE http://localhost:8080/api/v1/students/4 -H "Authorization: Bearer
 
 ---
 
-➡️ [Guía completa](01-guia-crud-estudiantes-con-security.md) · [Guía fácil](02-guia-security-facil.md)
+➡️ [Guía completa](06-01-guia-crud-estudiantes-con-security.md) · [Guía fácil](06-02-guia-security-facil.md)

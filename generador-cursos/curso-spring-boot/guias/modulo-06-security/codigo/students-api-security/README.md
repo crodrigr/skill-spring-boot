@@ -2,7 +2,7 @@
 
 CRUD de estudiantes protegido con **Spring Security y JWT**: Spring Boot 4.1.2, Spring Data JPA, MySQL 8, JJWT 0.12.6 y Swagger (springdoc-openapi 3.2.0).
 Parte del proyecto del módulo 05 ([`students-api-excepciones`](../../../modulo-05-excepciones/codigo/students-api-excepciones/)) y le agrega la seguridad.
-Código final de la guía [`01-guia-crud-estudiantes-con-security.md`](../../01-guia-crud-estudiantes-con-security.md).
+Código final de la guía [`06-01-guia-crud-estudiantes-con-security.md`](../../06-01-guia-crud-estudiantes-con-security.md).
 
 ## Requisitos
 

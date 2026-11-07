@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Módulo 08 · students-api-security",
-    "description": "CRUD de estudiantes protegido con Spring Security y JWT. Ejecutar en orden (Runner) con la aplicación en marcha y la base vacía. Cuentas de práctica (solo educativas): admin/admin123 (ADMIN) y ana/ana123 (USER). Guías: modulo-08-security/01-guia-crud-estudiantes-con-security.md y 02-guia-security-facil.md",
+    "description": "CRUD de estudiantes protegido con Spring Security y JWT. Ejecutar en orden (Runner) con la aplicación en marcha y la base vacía. Cuentas de práctica (solo educativas): admin/admin123 (ADMIN) y ana/ana123 (USER). Guías: modulo-08-security/06-01-guia-crud-estudiantes-con-security.md y 06-02-guia-security-facil.md",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

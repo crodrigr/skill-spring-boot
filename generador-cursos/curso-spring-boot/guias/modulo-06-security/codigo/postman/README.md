@@ -9,7 +9,7 @@ Colección de Postman (formato v2.1) para probar **todas las rutas** de la API d
 
 Sirve para [`students-api-security`](../students-api-security/) (versión completa) y para [`students-api-security-facil`](../students-api-security-facil/) (versión fácil). En la fácil, la petición **«Quién soy»** falla porque `GET /api/v1/auth/me` no existe allí: es lo esperado.
 
-Guías: [01-guia-crud-estudiantes-con-security.md](../../01-guia-crud-estudiantes-con-security.md) · [02-guia-security-facil.md](../../02-guia-security-facil.md) · [04-curl-probar-todas-las-apis.md](../../04-curl-probar-todas-las-apis.md)
+Guías: [06-01-guia-crud-estudiantes-con-security.md](../../06-01-guia-crud-estudiantes-con-security.md) · [06-02-guia-security-facil.md](../../06-02-guia-security-facil.md) · [06-04-curl-probar-todas-las-apis.md](../../06-04-curl-probar-todas-las-apis.md)
 
 ## Cómo usarla
 

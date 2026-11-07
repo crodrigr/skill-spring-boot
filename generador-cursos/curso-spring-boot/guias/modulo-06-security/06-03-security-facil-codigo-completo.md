@@ -1,6 +1,6 @@
 # 📘 Seguridad fácil (usuario, contraseña y token) — Código completo
 
-> 🧾 **Solo el código.** Versión final de la [guía fácil `02-guia-security-facil`](02-guia-security-facil.md), con el árbol (🆕 nuevo · ✏️ cambia · 📄 sin cambios) y el código completo sin explicaciones, seguido de las pruebas. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
+> 🧾 **Solo el código.** Versión final de la [guía fácil `06-02-guia-security-facil`](06-02-guia-security-facil.md), con el árbol (🆕 nuevo · ✏️ cambia · 📄 sin cambios) y el código completo sin explicaciones, seguido de las pruebas. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
 > 📦 **Código fuente:** [`students-api-security-facil/`](codigo/students-api-security-facil/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2, JJWT 0.12.6 y MySQL 8.
 >
@@ -1826,4 +1826,4 @@
 
 ---
 
-➡️ **Guía fácil:** [02-guia-security-facil.md](02-guia-security-facil.md) · **Guía completa:** [01-guia-crud-estudiantes-con-security.md](01-guia-crud-estudiantes-con-security.md)
+➡️ **Guía fácil:** [06-02-guia-security-facil.md](06-02-guia-security-facil.md) · **Guía completa:** [06-01-guia-crud-estudiantes-con-security.md](06-01-guia-crud-estudiantes-con-security.md)

@@ -2,7 +2,7 @@
 
 Versión **sencilla** de la API de estudiantes con **login y token (JWT)**: Spring Boot 4.1.2, Spring Data JPA, MySQL 8 y JJWT 0.12.6.
 Parte del proyecto del módulo 05 ([`students-api-excepciones`](../../../modulo-05-excepciones/codigo/students-api-excepciones/)).
-Código final de la guía [`02-guia-security-facil.md`](../../02-guia-security-facil.md). La versión completa está en [`students-api-security`](../students-api-security/).
+Código final de la guía [`06-02-guia-security-facil.md`](../../06-02-guia-security-facil.md). La versión completa está en [`students-api-security`](../students-api-security/).
 
 ## Ejecutar
 
