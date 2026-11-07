@@ -2,7 +2,7 @@
 
 > 🧾 **Solo el código.** Versión final de la [guía `04-02-academica-swagger`](04-02-academica-swagger.md), con el árbol (🆕 nuevo · ✏️ cambia) y el código completo sin explicaciones, seguido del **Paso 11 — Probar la documentación**. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >
-> 📦 **Código fuente:** [`academica-swagger/`](codigo/academica-swagger/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8.
+> 📦 **Código fuente:** [`academica-swagger/`](codigo/04-03-academica-swagger/) (proyecto Maven completo; cada archivo de abajo enlaza a su original) · ✅ compilado para Java 21 y ejecutado con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8.
 
 <details>
 <summary><strong>📁 Estructura final esperada</strong></summary>
