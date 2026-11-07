@@ -174,7 +174,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > **MySQL.** Hibernate crea las tablas, pero no la base `academia`. Con Docker:
+> > **MySQL.** Hibernate crea las tablas y la URL (`createDatabaseIfNotExist=true`) crea la base `academia` si no existe; solo hace falta un MySQL en marcha. Con Docker:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \

@@ -466,7 +466,7 @@
 > >
 > > </details>
 > >
-> > > 💡 Es una entidad **más**, como `StudentEntity`: no hay nada «mágico». Hibernate crea la tabla `user_account` al arrancar (`ddl-auto=update`).
+> > > 💡 Es una entidad **más**, como `StudentEntity`: no hay nada «mágico». Hibernate crea la tabla `user_account` al arrancar (`ddl-auto=create`).
 >
 > </details>
 >

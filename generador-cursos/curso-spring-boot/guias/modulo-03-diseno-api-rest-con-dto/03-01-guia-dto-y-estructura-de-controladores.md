@@ -244,7 +244,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > **MySQL.** Hibernate crea las tablas, pero no la base `academia`:
+> > **MySQL.** Hibernate crea las tablas y la URL (`createDatabaseIfNotExist=true`) crea la base `academia` si no existe; solo hace falta un MySQL en marcha. Con Docker:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
@@ -624,7 +624,7 @@
 > <details>
 > <summary><strong>Paso 1.1 · Un campo interno aparece en el JSON</strong></summary>
 >
-> > Un requisito normal: **auditar** cuándo se creó cada estudiante. Se agrega un campo a la entidad (y a la tabla, con `ddl-auto=update`):
+> > Un requisito normal: **auditar** cuándo se creó cada estudiante. Se agrega un campo a la entidad (y a la tabla, con `ddl-auto=create`, que recrea las tablas al arrancar):
 > >
 > > <details>
 > > <summary><strong>📄 StudentEntity.java (agregar)</strong> <em>(solo el cambio)</em></summary>
