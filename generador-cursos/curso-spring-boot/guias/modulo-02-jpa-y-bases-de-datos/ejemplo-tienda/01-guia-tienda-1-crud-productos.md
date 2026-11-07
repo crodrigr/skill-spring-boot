@@ -159,7 +159,7 @@
 > > spring.datasource.url=jdbc:mysql://localhost:3306/tienda?createDatabaseIfNotExist=true
 > > spring.datasource.username=root
 > > spring.datasource.password=root
-> > spring.jpa.hibernate.ddl-auto=update
+> > spring.jpa.hibernate.ddl-auto=create
 > > spring.jpa.show-sql=true
 > > ```
 > >

@@ -15,7 +15,7 @@ Guías: [01-guia-crud-estudiantes-con-security.md](../../01-guia-crud-estudiante
 
 1. En Postman: **Import** y seleccionar los dos archivos `.json` de esta carpeta.
 2. Elegir el entorno **Academy local** (arriba a la derecha).
-3. Arrancar la aplicación (`./mvnw spring-boot:run`) con MySQL en marcha y la base `academy` **vacía**.
+3. Arrancar la aplicación (`./mvnw spring-boot:run`) con MySQL en marcha y la base `academia` **vacía**.
 4. Abrir la colección → **Run collection** y ejecutar **en orden**.
 
 ## Qué hay en la colección

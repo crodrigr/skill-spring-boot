@@ -77,7 +77,7 @@
 > | Código | Requerimiento |
 > |---|---|
 > | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. |
-> | **RNF-02** | MySQL 8 (en Docker o instalado); la base `academy` debe existir. |
+> | **RNF-02** | MySQL 8 (en Docker o instalado); la base `academia` debe existir. |
 > | **RNF-03** | Las anotaciones de Swagger van **solo en `presentation`**: controladores, DTO y configuración. `business` y `persistence` **no saben** que existe Swagger. |
 > | **RNF-04** | Nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-05** | Duración: 1 h 30 min. |
@@ -170,7 +170,7 @@
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
-> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia \
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >

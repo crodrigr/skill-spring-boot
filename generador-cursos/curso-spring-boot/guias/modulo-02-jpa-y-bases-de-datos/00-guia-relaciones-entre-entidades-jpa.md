@@ -326,7 +326,7 @@
 > > <details open>
 > > <summary><strong>🛠️ Al iniciar el servidor: lo que genera MySQL</strong></summary>
 > >
-> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=update`). Este es el SQL que genera:
+> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=create`). Este es el SQL que genera:
 > >
 > > ```text
 > > create table carnet (id bigint not null auto_increment, codigo varchar(255), primary key (id))
@@ -724,7 +724,7 @@
 > > <details open>
 > > <summary><strong>🛠️ Al iniciar el servidor: lo que genera MySQL</strong></summary>
 > >
-> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=update`). Este es el SQL que genera:
+> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=create`). Este es el SQL que genera:
 > >
 > > ```text
 > > create table docente (id bigint not null auto_increment, nombre varchar(255), primary key (id))
@@ -1102,7 +1102,7 @@
 > > <details open>
 > > <summary><strong>🛠️ Al iniciar el servidor: lo que genera MySQL</strong></summary>
 > >
-> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=update`). Este es el SQL que genera:
+> > Al **iniciar la aplicación**, Spring Data JPA (Hibernate) **crea las tablas** a partir de las entidades (con `spring.jpa.hibernate.ddl-auto=create`). Este es el SQL que genera:
 > >
 > > ```text
 > > create table estudiante_curso (curso_id bigint not null, estudiante_id bigint not null, primary key (curso_id, estudiante_id))

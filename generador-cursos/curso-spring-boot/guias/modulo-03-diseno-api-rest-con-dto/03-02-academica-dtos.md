@@ -73,7 +73,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2, Maven y MySQL 8 (base `academy`). |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2, Maven y MySQL 8 (base `academia`). |
 > | **RNF-02** | **Ningún controlador importa nada de `jakarta.persistence`** ni devuelve una entidad. |
 > | **RNF-03** | Los DTO son `record`. Las validaciones de forma viven **solo** en los DTO de entrada. |
 > | **RNF-04** | Los errores de negocio se informan con `ServiceResult`; las excepciones propias y un manejador global se estudian en el Módulo 05. |
@@ -167,7 +167,7 @@
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
-> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia \
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >

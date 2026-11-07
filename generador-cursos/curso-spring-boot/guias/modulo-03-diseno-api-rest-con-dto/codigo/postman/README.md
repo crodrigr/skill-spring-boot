@@ -12,7 +12,7 @@ Colecciones de Postman (formato v2.1) con las peticiones de los proyectos de est
 
 1. En Postman: **Import** y seleccionar los archivos `.json` de esta carpeta.
 2. Elegir el entorno **Academy local** (arriba a la derecha).
-3. Arrancar el proyecto (`./mvnw spring-boot:run`) con MySQL en marcha (base `academy`).
+3. Arrancar el proyecto (`./mvnw spring-boot:run`) con MySQL en marcha (base `academia`).
 4. Abrir la colección → **Run collection** y ejecutar **en orden**. Cada petición guarda los ids que necesita la siguiente (`studentId`, `courseId`…).
 
 > 💡 Las peticiones se pueden repetir sin reiniciar la base: los correos llevan un sufijo (`{{run}}`) que cambia en cada ejecución. Cada petición trae sus pruebas (`pm.test`) con el código HTTP esperado.

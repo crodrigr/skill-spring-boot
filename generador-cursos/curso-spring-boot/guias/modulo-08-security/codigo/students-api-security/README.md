@@ -8,11 +8,11 @@ Código final de la guía [`01-guia-crud-estudiantes-con-security.md`](../../01-
 
 - Java 21 o superior
 - Maven 3.9+ (o el wrapper `./mvnw`)
-- MySQL 8 con la base `academy`
+- MySQL 8 con la base `academia`
 
 ```bash
 docker run -d --name academy-mysql \
-  -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+  -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia \
   -p 3306:3306 mysql:8.0
 ```
 

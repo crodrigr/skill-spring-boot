@@ -52,7 +52,7 @@
 > | Código | Requerimiento |
 > |---|---|
 > | **RNF-01** | Java 21 o superior, Spring Boot 4 y Maven. |
-> | **RNF-02** | Persistencia con **Spring Data JPA** y **MySQL 8** (en Docker o instalado). La base `academy` debe existir antes de arrancar. |
+> | **RNF-02** | Persistencia con **Spring Data JPA** y **MySQL 8** (en Docker o instalado). La base `academia` debe existir antes de arrancar. |
 > | **RNF-03** | Tres capas: `presentation` → `business` → `persistence`. Las anotaciones de JPA van **solo** en `persistence.entity`; las de Spring Web, **solo** en `presentation.controller`. |
 > | **RNF-04** | Inyección por constructor (generado con `@RequiredArgsConstructor`). Todos los nombres del código (paquetes, clases, atributos, tablas) en **inglés**. |
 > | **RNF-05** | La verificación se hace con `curl` contra la API, con el SQL que imprime Hibernate y con el cliente de MySQL. |
@@ -237,18 +237,18 @@
 > <details>
 > <summary><strong>Paso 0.2 · Tener un MySQL con la base <code>academy</code></strong></summary>
 >
-> > Hibernate crea las **tablas**, pero **no la base de datos**: `academy` debe existir antes de arrancar. La forma más rápida es un contenedor de Docker:
+> > Hibernate crea las **tablas**, pero **no la base de datos**: `academia` debe existir antes de arrancar. La forma más rápida es un contenedor de Docker:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
-> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia \
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >
 > > Con un MySQL ya instalado, se crea desde el cliente (`mysql -u root -p`):
 > >
 > > ```sql
-> > CREATE DATABASE academy CHARACTER SET utf8mb4;
+> > CREATE DATABASE academia CHARACTER SET utf8mb4;
 > > ```
 > >
 > > | Dato | Valor en esta guía |
@@ -271,7 +271,7 @@
 > >
 > > ```properties
 > > # MySQL connection
-> > spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> > spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
 > > spring.datasource.username=root
 > > spring.datasource.password=root
 > >
@@ -286,7 +286,7 @@
 > > |---|---|
 > > | `spring.datasource.url` | Dirección de la base: `jdbc:mysql://` + servidor + puerto + nombre de la base (`academy`, creada en el Paso 0.2). |
 > > | `spring.datasource.username`, `password` | Credenciales del servidor MySQL. El driver se deduce de la URL: no hace falta `driver-class-name`. |
-> > | `spring.jpa.hibernate.ddl-auto=update` | Hibernate **crea o actualiza las tablas** al arrancar, sin borrar datos ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
+> > | `spring.jpa.hibernate.ddl-auto=create` | Hibernate **crea o actualiza las tablas** al arrancar, sin borrar datos ([Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
 > > | `spring.jpa.show-sql=true` | Imprime en la consola **el SQL** que ejecuta Hibernate: sirve para ver el ORM trabajando. |
 > >
 > > > 💡 **Diferencia con el Módulo 3.** Allí se declaraba `spring.jpa.database-platform=…` con el dialecto. Con Hibernate 7 (Spring Boot 4)
@@ -328,7 +328,7 @@
 > > >
 > > > - `Failed to configure a DataSource: 'url' attribute is not specified`: `application.properties` no está en `src/main/resources`.
 > > > - `Communications link failure` o `Connection refused`: MySQL no está arrancado, o el puerto de la URL no es el del servidor.
-> > > - `Unknown database 'academy'`: falta crear la base (Paso 0.2). `Access denied for user`: usuario o contraseña distintos de los del servidor.
+> > > - `Unknown database 'academia'`: falta crear la base (Paso 0.2). `Access denied for user`: usuario o contraseña distintos de los del servidor.
 > >
 > > ✅ **Punto de control 0:** los paquetes existen, la aplicación se conecta a MySQL sin errores y no se crea ninguna tabla (`show tables;` en `academy` devuelve vacío).
 >
@@ -1205,7 +1205,7 @@
 > |---|---|
 > | ¿Por qué no se crean de nuevo las tablas al reiniciar? | Ya existen en MySQL; `ddl-auto=update` solo agrega lo que falte y **no borra datos**. |
 > | ¿Qué pasaría con `ddl-auto=create`? | Borraría y recrearía las tablas en **cada arranque**: se perdería todo ([tabla de valores en el Ejemplo 07 del M3](../../03-introduccion-a-jpa/material/ejemplos/07-uso-basico-de-spring-data-jpa.md)). |
-> | ¿Cómo se empieza de cero? | `docker exec academy-mysql mysql -uroot -proot -e "drop database academy; create database academy"`. |
+> | ¿Cómo se empieza de cero? | `docker exec academy-mysql mysql -uroot -proot -e "drop database `academia; create database academia"`. |
 > | ¿Y si se borra el contenedor? | Se pierden los datos, porque viven dentro de él. Para conservarlos se monta un volumen (`-v academy-data:/var/lib/mysql`). |
 >
 > > 💡 **Y con otro motor:** si se cambia a PostgreSQL u otro, cambian el **driver** (dependencia) y las propiedades `spring.datasource.*`; las entidades y los repositorios
@@ -1223,7 +1223,7 @@
 > 3. ¿Por qué `EnrollmentEntity` es el lado dueño? *(Tiene las dos `@JoinColumn`: las claves foráneas viven en la tabla `enrollment`.)*
 > 4. ¿Quién decide que un correo repetido es un error y quién lo convierte en `409`? *(El servicio detecta la regla y devuelve un `Optional` vacío; el controlador lo traduce a `409`.)*
 > 5. ¿Por qué el controlador no llama directamente al repositorio? *(Para que las reglas vivan en un solo lugar y se puedan reutilizar sin HTTP.)*
-> 6. ¿Quién crea la base `academy` y quién crea las tablas? *(La base se crea a mano en MySQL; las tablas las crea Hibernate al arrancar.)*
+> 6. ¿Quién crea la base `academia` y quién crea las tablas? *(La base se crea a mano en MySQL; las tablas las crea Hibernate al arrancar.)*
 
 </details>
 
@@ -1234,7 +1234,7 @@
 > |---|---|---|
 > | `Failed to configure a DataSource: 'url' attribute is not specified` | `application.properties` no se encuentra | Revisar que esté en `src/main/resources` |
 > | `Communications link failure` / `Connection refused` | MySQL no está arrancado o el puerto es otro | `docker ps`; arrancar el contenedor; revisar el puerto en la URL |
-> | `Unknown database 'academy'` | No se creó la base | `create database academy` (Paso 0.2) |
+> | `Unknown database 'academia'` | No se creó la base | `create database academia` (Paso 0.2) |
 > | `Access denied for user 'root'@…` | Usuario o contraseña distintos de los del servidor | Corregir `spring.datasource.username` / `password` |
 > | `No suitable driver found for jdbc:mysql…` | Falta la dependencia `mysql-connector-j` | Agregarla al `pom.xml` |
 > | La tabla se llama `student_entity` | Falta `@Table(name = "student")` en la entidad | Agregar `@Table` |
@@ -1242,7 +1242,7 @@
 > | `cannot find symbol … getEmail()` al compilar | Lombok **no se está ejecutando**: falta la dependencia, o con Java 23+ falta `annotationProcessorPaths` en el `pom.xml` | Agregar la configuración del pom final; en el IDE, activar el plugin de Lombok y «annotation processing» |
 > | `No default constructor for entity` | La entidad no tiene constructor **sin argumentos** | Agregar `@NoArgsConstructor(access = AccessLevel.PROTECTED)` a la entidad |
 > | `PropertyReferenceException: No property 'x' found for type 'StudentEntity'` | El nombre del método derivado no coincide con un atributo de la **entidad** | Usar el nombre exacto: `existsByEmailIgnoreCase`, `countByCourseId` |
-> | `Table 'academy.student' doesn't exist` | `ddl-auto=none`, o la URL apunta a otra base | Usar `update` y revisar el nombre de la base en la URL |
+> | `Table 'academia.student' doesn't exist` | `ddl-auto=none`, o la URL apunta a otra base | Usar `update` y revisar el nombre de la base en la URL |
 > | `DataIntegrityViolationException` al guardar un estudiante | El `email` ya existe y la comprobación del servicio no se ejecutó (se usó el repositorio directo) | Guardar siempre a través de `StudentService`, o usar otro correo |
 > | Los datos desaparecen al reiniciar | `ddl-auto=create` o `create-drop` | Usar `update` |
 > | `Parameter 0 of constructor in …Service required a bean of type …Repository` | El repositorio no está bajo `com.academy`, o no es una interfaz que extienda `JpaRepository` | Revisar el paquete y la herencia |
@@ -1396,12 +1396,12 @@
 >
 > ```properties
 > # MySQL connection
-> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
 > spring.datasource.username=root
 > spring.datasource.password=root
 >
 > # JPA and Hibernate
-> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.hibernate.ddl-auto=create
 > spring.jpa.show-sql=true
 > ```
 >

@@ -80,7 +80,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. MySQL 8 con la base `academy`. |
+> | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. MySQL 8 con la base `academia`. |
 > | **RNF-02** | **El controlador no importa nada de `jakarta.persistence`** y nunca devuelve una entidad. |
 > | **RNF-03** | Los DTO son `record` (inmutables). Las validaciones viven **solo** en el DTO de entrada. |
 > | **RNF-04** | Los errores de negocio se informan con un **resultado** (`ServiceResult`); traducirlos con excepciones y un manejador global se estudia en el Módulo 05. |
@@ -244,11 +244,11 @@
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > **MySQL.** Hibernate crea las tablas, pero no la base `academy`:
+> > **MySQL.** Hibernate crea las tablas, pero no la base `academia`:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
-> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia \
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >
@@ -2187,12 +2187,12 @@
 >
 > ```properties
 > # MySQL connection
-> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
 > spring.datasource.username=root
 > spring.datasource.password=root
 >
 > # JPA and Hibernate
-> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.hibernate.ddl-auto=create
 > spring.jpa.show-sql=true
 >
 > # Pagination limits (protect the API)

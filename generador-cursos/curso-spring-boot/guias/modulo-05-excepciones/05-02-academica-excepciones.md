@@ -157,7 +157,7 @@ El controlador solo cuenta el **caso feliz**; todos los errores de los tres recu
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
-> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia \
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >

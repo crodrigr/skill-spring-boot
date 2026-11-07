@@ -160,12 +160,12 @@
 >
 > ```properties
 > # MySQL connection
-> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
 > spring.datasource.username=root
 > spring.datasource.password=root
 >
 > # JPA and Hibernate
-> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.hibernate.ddl-auto=create
 > spring.jpa.show-sql=true
 >
 > # Pagination limits (protect the API)
@@ -1792,7 +1792,7 @@
 > **Levantar** MySQL y la aplicación:
 >
 > ```bash
-> docker run -d --name academy-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy -p 3306:3306 mysql:8.0
+> docker run -d --name academy-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia -p 3306:3306 mysql:8.0
 > ./mvnw spring-boot:run
 > ```
 >

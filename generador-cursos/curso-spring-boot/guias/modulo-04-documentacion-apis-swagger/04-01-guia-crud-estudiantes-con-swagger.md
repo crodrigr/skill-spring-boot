@@ -82,7 +82,7 @@
 > | Código | Requerimiento |
 > |---|---|
 > | **RNF-01** | Java 21 o superior, Spring Boot 4.1.2 y Maven. |
-> | **RNF-02** | MySQL 8 (en Docker o instalado); la base `academy` debe existir. |
+> | **RNF-02** | MySQL 8 (en Docker o instalado); la base `academia` debe existir. |
 > | **RNF-03** | Las anotaciones de Swagger van **solo en `presentation`**: controladores, DTO y configuración. `business` y `persistence` **no saben** que existe Swagger. |
 > | **RNF-04** | Todos los nombres del código en **inglés**. Inyección por constructor. |
 > | **RNF-05** | Duración: 1 h 30 min. |
@@ -174,11 +174,11 @@
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > **MySQL.** Hibernate crea las tablas, pero no la base `academy`. Con Docker:
+> > **MySQL.** Hibernate crea las tablas, pero no la base `academia`. Con Docker:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
-> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy \
+> >   -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia \
 > >   -p 3306:3306 mysql:8.0
 > > ```
 > >
@@ -1761,12 +1761,12 @@
 >
 > ```properties
 > # MySQL connection
-> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
 > spring.datasource.username=root
 > spring.datasource.password=root
 >
 > # JPA and Hibernate
-> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.hibernate.ddl-auto=create
 > spring.jpa.show-sql=true
 >
 > # Pagination limits (protect the API)

@@ -138,12 +138,12 @@
 >
 > ```properties
 > # MySQL connection
-> spring.datasource.url=jdbc:mysql://localhost:3306/academy
+> spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
 > spring.datasource.username=root
 > spring.datasource.password=root
 >
 > # JPA and Hibernate
-> spring.jpa.hibernate.ddl-auto=update
+> spring.jpa.hibernate.ddl-auto=create
 > spring.jpa.show-sql=true
 >
 > # Pagination limits (protect the API)

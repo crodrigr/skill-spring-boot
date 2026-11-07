@@ -7,7 +7,7 @@ Código final de la guía [`02-guia-security-facil.md`](../../02-guia-security-f
 ## Ejecutar
 
 ```bash
-docker run -d --name academy-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academy -p 3306:3306 mysql:8.0
+docker run -d --name academy-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=academia -p 3306:3306 mysql:8.0
 ./mvnw spring-boot:run
 ```
 
