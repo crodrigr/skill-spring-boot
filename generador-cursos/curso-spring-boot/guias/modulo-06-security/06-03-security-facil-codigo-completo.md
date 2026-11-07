@@ -1,4 +1,4 @@
-# 📘 Seguridad fácil (usuario, contraseña y token) — Código completo
+# 📘 06-03 · Seguridad fácil (usuario, contraseña y token) — Código completo
 
 > 🧾 **Solo el código.** Versión final de la [guía fácil `06-02-guia-security-facil`](06-02-guia-security-facil.md), con el árbol (🆕 nuevo · ✏️ cambia · 📄 sin cambios) y el código completo sin explicaciones, seguido de las pruebas. Cada archivo es un bloque que se despliega. Los grupos van en **orden de dependencia**: cada archivo aparece después de lo que necesita.
 >

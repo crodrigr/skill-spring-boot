@@ -1,4 +1,4 @@
-# 🧪 curl para probar la API — resumen
+# 🧪 06-04 · curl para probar la API — resumen
 
 > Una línea de `curl` por endpoint, sin variables. Con la aplicación en marcha en `http://localhost:8080` y la base **vacía**.
 >

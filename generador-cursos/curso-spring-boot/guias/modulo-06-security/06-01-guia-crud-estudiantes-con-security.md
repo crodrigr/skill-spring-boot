@@ -1,4 +1,4 @@
-# 🔐 Guía paso a paso — CRUD de estudiantes con Spring Security y JWT
+# 🔐 06-01 · Guía paso a paso — CRUD de estudiantes con Spring Security y JWT
 
 > 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 05 — CRUD de estudiantes con excepciones](../modulo-05-excepciones/05-01-guia-crud-estudiantes-con-excepciones.md): el proyecto de partida **ya tiene** DTO, un manejo uniforme de errores (`ErrorResponse`), documentación con Swagger y MySQL. Sobre él se agrega **seguridad**, **una pieza por vez**, con las ideas del [Módulo 08](../../08-spring-boot-security-jwt/material/ejemplos/explicacion-conceptual.md): Spring Security, HTTP Basic como primer paso y autenticación *stateless* con JWT.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo.
