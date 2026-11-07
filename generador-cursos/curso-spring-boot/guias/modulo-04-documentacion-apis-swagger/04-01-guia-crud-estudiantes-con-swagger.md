@@ -3,7 +3,7 @@
 > 👩‍🏫 **Material docente.** Continúa la [guía del Módulo 03 — DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/03-01-guia-dto-y-estructura-de-controladores.md): el proyecto de partida **ya tiene** DTO, mapeador, `ServiceResult`, rutas con versión (`/api/v1`) y un controlador delgado. Sobre él se agregan, **una por una**, las funcionalidades de Swagger.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el módulo anterior.
 >
-> 📦 **Proyecto terminado:** [`students-api/`](codigo/students-api/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
+> 📦 **Proyecto terminado:** [`students-api/`](codigo/04-03-students-api/) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
 >
 > ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2, springdoc-openapi 3.2.0 y MySQL 8. Las respuestas, el contrato OpenAPI y la lista de operaciones que se muestran son salidas reales de la aplicación. Lo que se cuenta de la pantalla de Swagger UI se deduce de ese contrato.
 >
