@@ -1,7 +1,7 @@
 # 🚨 05-01-Guía paso a paso — CRUD de estudiantes con manejo de excepciones
 
 > 👩‍🏫 **Material docente** (contiene el código completo; no se entrega antes de resolver el módulo).
-> Continúa la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md). 📦 Proyecto terminado: [`students-api-excepciones/`](codigo/students-api-excepciones/) (`./mvnw spring-boot:run`).
+> Continúa la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md). 📥 Para empezar, descarga la guía terminada del Módulo 04: [`04-01-students-api-swagger`](https://github.com/crodrigr/skill-spring-boot-codigo-fuente/tree/master/04-01-students-api-swagger). 📦 Proyecto terminado: [`students-api-excepciones/`](codigo/students-api-excepciones/) (`./mvnw spring-boot:run`).
 > ✅ **Verificada** con Java 21, Spring Boot 4.1.2 y MySQL 8: las respuestas que se muestran son reales.
 
 ## 🧭 La idea en un minuto
@@ -124,7 +124,7 @@ sequenceDiagram
 > <details>
 > <summary><strong>Paso 0.1 · MySQL y el proyecto</strong></summary>
 >
-> > Se parte del proyecto que se termina en la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md) ([`students-api/`](../modulo-04-documentacion-apis-swagger/codigo/students-api/)). Se copia como `students-api-excepciones` y se levanta la base:
+> > Se parte del proyecto que se termina en la [guía del Módulo 04](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md) ([`04-01-students-api-swagger`](https://github.com/crodrigr/skill-spring-boot-codigo-fuente/tree/master/04-01-students-api-swagger)). Se copia como `students-api-excepciones` y se levanta la base:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \
