@@ -1,9 +1,19 @@
 -- Datos iniciales: 100 estudiantes, 20 cursos y 30 matrículas.
 -- Se ejecuta al iniciar Spring Boot (ver spring.sql.init.* en application.properties).
--- La tabla student la crea Hibernate; course y enrollment se crean aquí.
+-- Este script crea todo el esquema (student, course, enrollment) y no depende de Hibernate.
 
 DROP TABLE IF EXISTS enrollment;
 DROP TABLE IF EXISTS course;
+DROP TABLE IF EXISTS student;
+
+CREATE TABLE student (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(255) NOT NULL,
+    age        INT NOT NULL,
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    status     VARCHAR(20) NOT NULL,
+    created_at DATETIME(6)
+);
 
 CREATE TABLE course (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
