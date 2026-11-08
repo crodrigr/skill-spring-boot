@@ -55,7 +55,7 @@
 >         └── ✏️ application.properties             límites de paginación y errores
 > ```
 >
-> 🆕 archivo nuevo · ✏️ archivo del taller que cambia · 📄 sin cambios respecto al taller (guía 01 del módulo 02)
+> 🆕 archivo nuevo · ✏️ archivo del taller que cambia · 📄 sin cambios respecto al taller (guía 02-02 del módulo 02)
 >
 > **Código final, paso a paso**
 >

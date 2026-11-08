@@ -1,6 +1,6 @@
 # students-base — CRUD de estudiantes (punto de partida del Módulo 03)
 
-Código de [`03-guia-taller-students-punto-de-partida.md`](../../03-guia-taller-students-punto-de-partida.md). Es la base de [`03-01-guia-dto-y-estructura-de-controladores.md`](../../../modulo-03-diseno-api-rest-con-dto/03-01-guia-dto-y-estructura-de-controladores.md).
+Código de [`02-01-guia-students-jpa.md`](../../02-01-guia-students-jpa.md). Es la base de [`03-01-guia-dto-y-estructura-de-controladores.md`](../../../modulo-03-diseno-api-rest-con-dto/03-01-guia-dto-y-estructura-de-controladores.md).
 
 Capas: `presentation.controller` → `business` (interfaz `StudentService` en `service`, `StudentServiceImpl` en `impl`) → `persistence` (`entity`, `repository`).
 

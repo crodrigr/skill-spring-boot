@@ -1,6 +1,6 @@
 # 🧱 03-01-Guía paso a paso — DTO y una mejor estructura de controladores (endpoints)
 
-> 👩‍🏫 **Material docente.** Se parte de un CRUD de **estudiantes** con Spring Data JPA y MySQL (el estilo de la [guía 01 del taller de cursos](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md)) cuyo controlador **recibe y devuelve la entidad**, y se mejora paso a paso: **DTO**, mapeador, servicio que informa el resultado y controlador delgado con endpoints bien diseñados.
+> 👩‍🏫 **Material docente.** Se parte de un CRUD de **estudiantes** con Spring Data JPA y MySQL (el estilo de la [guía 02-02 (proyecto académico JPA completo)](../modulo-02-jpa-y-bases-de-datos/02-02-guia-proyecto-academico-jpa-completo.md)) cuyo controlador **recibe y devuelve la entidad**, y se mejora paso a paso: **DTO**, mapeador, servicio que informa el resultado y controlador delgado con endpoints bien diseñados.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
 > 📦 **Proyecto terminado:** [`03-01-students-api-dto/`](https://github.com/crodrigr/skill-spring-boot-codigo-fuente/tree/master/03-01-students-api-dto) (código final, listo para ejecutar con `./mvnw spring-boot:run`).
@@ -2785,4 +2785,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía 01 del módulo 02 — Taller «Gestión de cursos» con base de datos](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) · **Siguiente:** [Guía del Módulo 04 — CRUD de estudiantes con Swagger](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md)
+➡️ **Anterior:** [Guía 02-02 del módulo 02 — Proyecto académico JPA completo](../modulo-02-jpa-y-bases-de-datos/02-02-guia-proyecto-academico-jpa-completo.md) · **Siguiente:** [Guía del Módulo 04 — CRUD de estudiantes con Swagger](../modulo-04-documentacion-apis-swagger/04-01-guia-crud-estudiantes-con-swagger.md)

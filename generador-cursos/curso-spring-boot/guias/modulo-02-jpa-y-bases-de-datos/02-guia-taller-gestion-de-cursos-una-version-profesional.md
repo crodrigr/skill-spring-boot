@@ -1,6 +1,6 @@
 # 🧩 Guía paso a paso — Taller «Gestión de cursos» con base de datos · Fase II: una versión profesional (modelo, mapeo y repositorio adaptador)
 
-> 👩‍🏫 **Material docente.** Continúa la [guía 01](01-guia-taller-gestion-de-cursos-con-bd.md): se parte de su proyecto terminado y se separa **el modelo del negocio** de **la entidad de la base de datos**.
+> 👩‍🏫 **Material docente.** Continúa la [guía 02-02](02-02-guia-proyecto-academico-jpa-completo.md): se parte de su proyecto terminado y se separa **el modelo del negocio** de **la entidad de la base de datos**.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
 > ✅ **Verificada.** El código se compiló y se ejecutó con Spring Boot 3.3 y MySQL 8. Las respuestas de la API, el fallo de seguridad de la Fase I y las pruebas unitarias que se muestran son salidas reales. ⚠️ **Los requisitos de esta guía ya están en Java 21 y Spring Boot 4.1.2, pero este código no se volvió a ejecutar con esa versión** (los proyectos Maven de los módulos 03 a 08 sí).
@@ -11,7 +11,7 @@
 <details>
 <summary><strong>🎯 Objetivo</strong></summary>
 
-> Refactorizar el proyecto de la guía 01 para que el **negocio no dependa de JPA**: crear los **modelos**, los **mapeadores**, los **contratos de repositorio** y sus **adaptadores**, sin cambiar lo que ve el cliente de la API.
+> Refactorizar el proyecto de la guía 02-02 para que el **negocio no dependa de JPA**: crear los **modelos**, los **mapeadores**, los **contratos de repositorio** y sus **adaptadores**, sin cambiar lo que ve el cliente de la API.
 >
 > Al terminar, el estudiante:
 >
@@ -29,7 +29,7 @@
 
 > ### 🔍 Los síntomas
 >
-> En la guía 01 todo funciona. Pero la misma clase cumple tres trabajos y eso deja problemas que se pueden ver y probar:
+> En la guía 02-02 todo funciona. Pero la misma clase cumple tres trabajos y eso deja problemas que se pueden ver y probar:
 >
 > | # | Síntoma en la Fase I | Dónde se ve |
 > |---|---|---|
@@ -61,7 +61,7 @@
 >
 > | Código | Requerimiento |
 > |---|---|
-> | **RNF-01** | Se parte del proyecto terminado de la [guía 01](01-guia-taller-gestion-de-cursos-con-bd.md) (Pasos 0 a 4), con MySQL en marcha. |
+> | **RNF-01** | Se parte del proyecto terminado de la [guía 02-02](02-02-guia-proyecto-academico-jpa-completo.md) (Pasos 0 a 4), con MySQL en marcha. |
 > | **RNF-02** | **La API no cambia**: mismas rutas, mismos códigos y mismo JSON que en la Fase I. |
 > | **RNF-03** | `business` no importa nada de `jakarta.persistence` ni de `persistence.entity`. |
 > | **RNF-04** | Todos los nombres del código en **inglés**. Inyección por constructor. |
@@ -194,12 +194,12 @@
 > <details>
 > <summary><strong>Paso 0.1 · Comprobar que la Fase I funciona</strong></summary>
 >
-> > Se parte del proyecto de la guía 01 con MySQL en marcha (Paso 0.2 de esa guía). Se arranca la aplicación y se repiten las **nueve peticiones** del Paso 4.2 de la guía 01.
+> > Se parte del proyecto de la guía 02-02 con MySQL en marcha (Paso 0.2 de esa guía). Se arranca la aplicación y se repiten las **nueve peticiones** del Paso 4.2 de la guía 02-02.
 > > Sus respuestas son la **referencia**: al final de esta guía deben ser **idénticas**.
 > >
 > > > 💡 **Beneficio de este paso: una red de seguridad.** Un refactor cambia la estructura **sin cambiar el comportamiento**. Si se conoce el comportamiento de antes, se puede demostrar que no se rompió nada.
 > >
-> > ✅ **Punto de control 0:** las nueve peticiones responden `201`, `409`, `404` y `200` como en la guía 01.
+> > ✅ **Punto de control 0:** las nueve peticiones responden `201`, `409`, `404` y `200` como en la guía 02-02.
 >
 > </details>
 >
@@ -1339,7 +1339,7 @@
 <details>
 <summary><strong>⚖️ Balance: Fase I frente a Fase II</strong></summary>
 
-> | Aspecto | Fase I (guía 01) | Fase II (esta guía) |
+> | Aspecto | Fase I (guía 02-02) | Fase II (esta guía) |
 > |---|---|---|
 > | Clases por concepto | 2 | 6 |
 > | ¿`business` conoce JPA? | Sí | **No** (comprobable con `grep`) |
@@ -1447,4 +1447,4 @@
 
 </details>
 
-➡️ **Anterior:** [Guía 01 — Taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) · **Misma idea en otro proyecto:** [Guía 05 — Tienda, Fase II](ejemplo-tienda/04-guia-tienda-fase-2-buenas-practicas.md)
+➡️ **Anterior:** [Guía 02-02 — Proyecto académico JPA completo](02-02-guia-proyecto-academico-jpa-completo.md) · **Misma idea en otro proyecto:** [Guía 05 — Tienda, Fase II](ejemplo-tienda/04-guia-tienda-fase-2-buenas-practicas.md)

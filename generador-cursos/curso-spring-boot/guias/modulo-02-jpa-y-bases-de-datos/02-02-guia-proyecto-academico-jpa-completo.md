@@ -1,4 +1,4 @@
-# 🗄️ Guía paso a paso — Taller «Gestión de cursos» con base de datos (JPA): entidades y repositorios
+# 🗄️ 02-02-Guía paso a paso — Proyecto académico JPA completo: «Gestión de cursos» con base de datos (entidades, repositorios, servicios y API)
 
 > 👩‍🏫 **Material docente.** Guía para resolver **junto con los estudiantes**, en vivo, las **tres capas** del taller «Gestión de cursos» con base de datos: persistencia, negocio y presentación.
 > Aplica lo visto en el [Módulo 03](../../03-introduccion-a-jpa/) y el [Módulo 04](../../04-gestion-de-bases-de-datos-mediante-jpa/).

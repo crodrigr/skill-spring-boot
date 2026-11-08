@@ -1,6 +1,6 @@
 # academia-bd — Taller de gestión de cursos con base de datos (M2)
 
-Código de [`01-guia-taller-gestion-de-cursos-con-bd.md`](../../01-guia-taller-gestion-de-cursos-con-bd.md).
+Código de [`02-02-guia-proyecto-academico-jpa-completo.md`](../../02-02-guia-proyecto-academico-jpa-completo.md).
 
 Tres capas: `presentation.controller` → `business` (interfaz en `service`, implementación `…Impl` en `impl`) → `persistence` (`repository`, `entity`).
 

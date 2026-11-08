@@ -2,7 +2,7 @@
 
 > 🎯 **Qué vas a hacer:** mejorar la tienda terminada en las guías 1 a 3 separando el **modelo** del negocio de las **entidades** de la base de datos, con **mapeadores** y repositorios que **delegan** en Spring Data. La API **no cambia**: mismos endpoints, mismas respuestas.
 > ⏱️ **Tiempo:** 45 a 60 minutos. 🧱 **Parte de:** el proyecto de las [guías 1, 2 y 3](03-guia-tienda-3-muchos-a-muchos.md).
-> 📚 **Es el mismo diseño** de la [guía del taller «Gestión de cursos» con base de datos](../01-guia-taller-gestion-de-cursos-con-bd.md), aplicado a la tienda.
+> 📚 **Es el mismo diseño** de la [guía 02-02, proyecto académico JPA completo](../02-02-guia-proyecto-academico-jpa-completo.md), aplicado a la tienda.
 
 <details open>
 <summary><strong>🤔 ¿Por qué una Fase II? El problema de la Fase I</strong></summary>
@@ -31,7 +31,7 @@
 > <details>
 > <summary><strong>✅ ¿Es correcto que <code>RepositorioProductosEnBD</code> delegue en <code>ProductoJpaRepository</code> y use un mapeador?</strong></summary>
 >
-> > **Sí.** Es el patrón *Repository* implementado como **puerto y adaptador**: el contrato pertenece al negocio y el adaptador (`…EnBD`) pertenece a la persistencia. Tiene tres matices que esta guía corrige respecto de la [guía de «Gestión de cursos»](../01-guia-taller-gestion-de-cursos-con-bd.md):
+> > **Sí.** Es el patrón *Repository* implementado como **puerto y adaptador**: el contrato pertenece al negocio y el adaptador (`…EnBD`) pertenece a la persistencia. Tiene tres matices que esta guía corrige respecto de la [guía de «Gestión de cursos»](../02-02-guia-proyecto-academico-jpa-completo.md):
 > >
 > > | Matiz | Cómo lo resuelve la Fase II |
 > > |---|---|

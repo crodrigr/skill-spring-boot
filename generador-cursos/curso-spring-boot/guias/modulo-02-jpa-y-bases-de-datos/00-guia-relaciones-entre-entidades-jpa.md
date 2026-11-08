@@ -4,7 +4,7 @@
 
 🎯 **Qué se aprende:** a declarar las tres relaciones de JPA, **desde las entidades**, en **un sentido** y en **doble sentido**, y qué significa cada notación.
 
-⏱️ **Tiempo:** unos 20 minutos de lectura y 25 de práctica. 📚 **Va antes de** la [guía del taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md) y de las [guías de la tienda](ejemplo-tienda/02-guia-tienda-2-uno-a-muchos.md).
+⏱️ **Tiempo:** unos 20 minutos de lectura y 25 de práctica. 📚 **Va antes de** la [guía 02-02, proyecto académico JPA completo](02-02-guia-proyecto-academico-jpa-completo.md) y de las [guías de la tienda](ejemplo-tienda/02-guia-tienda-2-uno-a-muchos.md).
 
 ✅ **Verificada:** el código se compiló y se ejecutó con Spring Boot 3.3 y **MySQL 8**; las tablas, los resultados y los errores que se muestran son reales. ⚠️ **Los requisitos de esta guía ya están en Java 21 y Spring Boot 4.1.2, pero este código no se volvió a ejecutar con esa versión** (los proyectos Maven de los módulos 03 a 08 sí).
 
@@ -223,7 +223,7 @@
 <details open>
 <summary><strong>🗺️ El ejemplo: la academia</strong></summary>
 
-> Se usan cuatro entidades del mundo de la [guía del taller](01-guia-taller-gestion-de-cursos-con-bd.md), todas en `persistence.entity` (solo entidades: sin servicios ni API). Cada relación trae su **diagrama** y las **clases completas**.
+> Se usan cuatro entidades del mundo de la [guía del taller](02-02-guia-proyecto-academico-jpa-completo.md), todas en `persistence.entity` (solo entidades: sin servicios ni API). Cada relación trae su **diagrama** y las **clases completas**.
 >
 > | Relación | Ejemplo | Lado **dueño** (tiene la clave) | Qué crea en MySQL |
 > |---|---|---|---|
@@ -1597,7 +1597,7 @@
 > >
 > > Las palabras **se pueden combinar**: `findByNombreContainingIgnoreCase(texto)` = «nombre que **contenga** el texto, **sin importar** mayúsculas».
 > >
-> > > 📌 Hay más palabras (`In`, `Not`, `True`, `First`, `Top`…). En la [guía del taller](01-guia-taller-gestion-de-cursos-con-bd.md) hay una tabla con todas, con su SQL.
+> > > 📌 Hay más palabras (`In`, `Not`, `True`, `First`, `Top`…). En la [guía del taller](02-02-guia-proyecto-academico-jpa-completo.md) hay una tabla con todas, con su SQL.
 >
 > </details>
 >
@@ -2544,4 +2544,4 @@
 
 </details>
 
-➡️ **Siguiente:** [Guía 01 — Taller «Gestión de cursos» con base de datos](01-guia-taller-gestion-de-cursos-con-bd.md)
+➡️ **Siguiente:** [Guía 02-02 — Proyecto académico JPA completo](02-02-guia-proyecto-academico-jpa-completo.md)

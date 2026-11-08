@@ -1,6 +1,6 @@
 # 📘 03-02-Guía paso a paso — Academia con DTO, mapeadores y controladores delgados
 
-> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 03](03-01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 01 del módulo 02](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
+> 👩‍🏫 **Material docente.** Aplica las mejoras de la [guía del Módulo 03](03-01-guia-dto-y-estructura-de-controladores.md) (DTO, mapeador, `ServiceResult`, rutas con versión y controladores delgados) al proyecto de la [guía 02-02 del módulo 02](../modulo-02-jpa-y-bases-de-datos/02-02-guia-proyecto-academico-jpa-completo.md): **estudiantes**, **cursos** y **matrículas** con MySQL.
 > Contiene código completo: no se entrega a los estudiantes antes de resolver el taller.
 >
 > 📦 **Proyecto terminado:** [`academica-dtos/`](codigo/academica-dtos/) · 🧾 **Todo el código final, listo para copiar:** [`03-03-academica-dtos-codigo-completo.md`](03-03-academica-dtos-codigo-completo.md).
@@ -163,7 +163,7 @@
 > <details>
 > <summary><strong>Paso 0.1 · El proyecto</strong></summary>
 >
-> > Se parte del proyecto que se termina en la [guía 01 del módulo 02](../modulo-02-jpa-y-bases-de-datos/01-guia-taller-gestion-de-cursos-con-bd.md) (su sección **Estructura final esperada** trae todo el código). Si hace falta, se crea la base:
+> > Se parte del proyecto que se termina en la [guía 02-02 del módulo 02](../modulo-02-jpa-y-bases-de-datos/02-02-guia-proyecto-academico-jpa-completo.md) (su sección **Estructura final esperada** trae todo el código). Si hace falta, se crea la base:
 > >
 > > ```bash
 > > docker run -d --name academy-mysql \

@@ -1,8 +1,8 @@
-# 🧱 03-Guía paso a paso — Taller de estudiantes (punto de partida del Módulo 03)
+# 🧱 02-01-Guía paso a paso — Taller de estudiantes (punto de partida del Módulo 03)
 
-> 👩‍🏫 **Material docente.** Es la versión **reducida** de la [guía 01 del taller de cursos](01-guia-taller-gestion-de-cursos-con-bd.md): se conserva **solo `Student`** y se completa con un CRUD (crear, listar, buscar, reemplazar y borrar). El resultado es el **punto de partida** de la guía [03-01 DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/03-01-guia-dto-y-estructura-de-controladores.md).
+> 👩‍🏫 **Material docente.** Es la versión **reducida** de la [guía 02-02 (proyecto académico JPA completo)](02-02-guia-proyecto-academico-jpa-completo.md): se conserva **solo `Student`** y se completa con un CRUD (crear, listar, buscar, reemplazar y borrar). El resultado es el **punto de partida** de la guía [03-01 DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/03-01-guia-dto-y-estructura-de-controladores.md).
 >
-> 📦 **Proyecto terminado:** [`codigo/students-base/`](codigo/students-base/) (listo para ejecutar con `./mvnw spring-boot:run`).
+> 📦 **Proyecto terminado:** [`codigo/02-01-students-base/`](codigo/02-01-students-base/) (listo para ejecutar con `./mvnw spring-boot:run`).
 >
 > ✅ **Verificada.** El código se compiló para Java 21 y se ejecutó con Spring Boot 4.1.2 y MySQL 8; las respuestas HTTP de la tabla del Paso 5 son salidas reales.
 >
