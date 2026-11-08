@@ -1,4 +1,4 @@
-# 🧱 02-01-Guía paso a paso — Taller de estudiantes (punto de partida del Módulo 03)
+# 🧱 02-01-Guía paso a paso — Estudiantes JPA
 
 > 👩‍🏫 **Material docente.** Es la versión **reducida** de la [guía 02-02 (proyecto académico JPA completo)](02-02-guia-proyecto-academico-jpa-completo.md): se conserva **solo `Student`** y se completa con un CRUD (crear, listar, buscar, reemplazar y borrar). El resultado es el **punto de partida** de la guía [03-01 DTO y estructura de controladores](../modulo-03-diseno-api-rest-con-dto/03-01-guia-dto-y-estructura-de-controladores.md).
 >
