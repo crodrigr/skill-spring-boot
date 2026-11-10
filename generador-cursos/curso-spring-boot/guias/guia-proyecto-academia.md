@@ -193,7 +193,26 @@ docker run -d --name academy-mysql -e MYSQL_ROOT_PASSWORD=root \
   -e MYSQL_DATABASE=academia -p 3306:3306 mysql:8.0
 ```
 
-Crear el proyecto en <https://start.spring.io>: Maven · Java 21 · Spring Boot 4.1.x · group `com.academy` · artifact `academy`. Dependencias: **Spring Web, Spring Data JPA, Validation, MySQL Driver, Spring Security, DevTools**. Luego añade a mano (Swagger y JWT):
+Crear el proyecto en <https://start.spring.io>: Maven · Java 21 · Spring Boot 4.1.2 · group `com.academy` · artifact `academy`. Estas son **todas** las dependencias del proyecto:
+
+| # | Dependencia (`groupId:artifactId`) | Versión | Scope | Initializr | Para qué se usa | Paso |
+|---|---|---|---|---|---|---|
+| 1 | `org.springframework.boot:spring-boot-starter-webmvc` | la de Boot (4.1.2) | compile | Spring Web | Controladores REST, JSON | 6 |
+| 2 | `org.springframework.boot:spring-boot-starter-data-jpa` | la de Boot | compile | Spring Data JPA | Entidades, repositorios, Hibernate | 2 |
+| 3 | `org.springframework.boot:spring-boot-starter-validation` | la de Boot | compile | Validation | `@Valid`, `@NotBlank`, `@Email`… | 4 |
+| 4 | `org.springframework.boot:spring-boot-starter-security` | la de Boot | compile | Spring Security | Autenticación, roles, BCrypt | 9 |
+| 5 | `org.springdoc:springdoc-openapi-starter-webmvc-ui` | 3.2.0 | compile | — (a mano) | Swagger UI y OpenAPI | 8 |
+| 6 | `io.jsonwebtoken:jjwt-api` | 0.12.6 | compile | — (a mano) | API para crear y leer JWT | 10 |
+| 7 | `io.jsonwebtoken:jjwt-impl` | 0.12.6 | runtime | — (a mano) | Implementación de JJWT | 10 |
+| 8 | `io.jsonwebtoken:jjwt-jackson` | 0.12.6 | runtime | — (a mano) | JSON de JJWT con Jackson | 10 |
+| 9 | `com.mysql:mysql-connector-j` | la de Boot | runtime | MySQL Driver | Conexión con MySQL | 1 |
+| 10 | `org.springframework.boot:spring-boot-devtools` | la de Boot | runtime, `optional` | Spring Boot DevTools | Reinicio automático al editar | — |
+
+Además, el plugin `spring-boot-maven-plugin` (`build`) para ejecutar con `./mvnw spring-boot:run`.
+
+> 💡 «La de Boot» = no se escribe `<version>`: la gestiona el `spring-boot-starter-parent` 4.1.2. Solo las filas 5-8 llevan versión.
+
+Marca en Initializr las filas 1-4, 9 y 10; añade a mano las filas 5-8 (Swagger y JWT):
 
 ```xml
 <dependency>
