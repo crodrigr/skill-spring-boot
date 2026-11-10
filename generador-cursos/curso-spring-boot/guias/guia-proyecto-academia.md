@@ -7,6 +7,86 @@
 
 ---
 
+## 📁 Estructura final del proyecto
+
+<details>
+<summary><strong>📁 Árbol de archivos (con el paso que crea cada uno)</strong></summary>
+
+```text
+📁 academica-security
+├── 📄 pom.xml                                   Paso 0
+├── 📄 migrate.sql                               datos de ejemplo (opcional)
+├── 📄 probar-apis.sh                            pruebas por consola (opcional)
+└── 📁 src/main
+    ├── 📁 java/com/academy
+    │   ├── 📄 AcademyApplication.java           Paso 0
+    │   ├── 📁 persistence
+    │   │   ├── 📁 entity
+    │   │   │   ├── 📄 StudentEntity.java        Paso 2
+    │   │   │   ├── 📄 CourseEntity.java         Paso 2
+    │   │   │   ├── 📄 EnrollmentEntity.java     Paso 2
+    │   │   │   ├── 📄 Role.java                 Paso 9
+    │   │   │   └── 📄 UserAccountEntity.java    Paso 9
+    │   │   └── 📁 repository
+    │   │       ├── 📄 StudentJpaRepository.java      Paso 2
+    │   │       ├── 📄 CourseJpaRepository.java       Paso 2
+    │   │       ├── 📄 EnrollmentJpaRepository.java   Paso 2
+    │   │       └── 📄 UserAccountJpaRepository.java  Paso 9
+    │   ├── 📁 business
+    │   │   ├── 📁 exception                     Paso 3
+    │   │   │   ├── 📄 StudentNotFoundException.java
+    │   │   │   ├── 📄 StudentEmailAlreadyExistsException.java
+    │   │   │   ├── 📄 CourseNotFoundException.java
+    │   │   │   ├── 📄 EnrollmentNotFoundException.java
+    │   │   │   ├── 📄 AlreadyEnrolledException.java
+    │   │   │   └── 📄 CourseFullException.java
+    │   │   ├── 📁 service                       Paso 3 (interfaces)
+    │   │   │   ├── 📄 StudentService.java
+    │   │   │   ├── 📄 CourseService.java
+    │   │   │   └── 📄 EnrollmentService.java
+    │   │   └── 📁 impl                          Paso 3 (implementaciones)
+    │   │       ├── 📄 StudentServiceImpl.java
+    │   │       ├── 📄 CourseServiceImpl.java
+    │   │       └── 📄 EnrollmentServiceImpl.java
+    │   ├── 📁 presentation
+    │   │   ├── 📁 dto
+    │   │   │   ├── 📄 StudentRequest · CourseRequest · EnrollmentRequest        Paso 4
+    │   │   │   ├── 📄 StudentResponse · CourseResponse · EnrollmentResponse     Paso 4
+    │   │   │   ├── 📄 EnrolledResponse · PageResponse · ErrorResponse           Paso 4
+    │   │   │   └── 📄 LoginRequest · LoginResponse · MeResponse                 Paso 12
+    │   │   ├── 📁 mapper                        Paso 5
+    │   │   │   ├── 📄 StudentMapper.java
+    │   │   │   ├── 📄 CourseMapper.java
+    │   │   │   └── 📄 EnrollmentMapper.java
+    │   │   ├── 📁 controller
+    │   │   │   ├── 📄 StudentController.java    Paso 6
+    │   │   │   ├── 📄 CourseController.java     Paso 6
+    │   │   │   ├── 📄 EnrollmentController.java Paso 6
+    │   │   │   ├── 📄 InternalController.java   Paso 6
+    │   │   │   └── 📄 AuthController.java       Paso 12
+    │   │   ├── 📁 exception
+    │   │   │   └── 📄 GlobalExceptionHandler.java   Paso 7
+    │   │   └── 📁 config
+    │   │       └── 📄 OpenApiConfig.java        Paso 8
+    │   └── 📁 security
+    │       ├── 📄 AccountSeeder.java            Paso 9
+    │       ├── 📄 JpaUserDetailsService.java    Paso 9
+    │       ├── 📄 JwtProperties.java            Paso 10
+    │       ├── 📄 JwtService.java               Paso 10
+    │       ├── 📄 AuthService.java              Paso 10
+    │       ├── 📄 JwtAuthenticationFilter.java  Paso 10
+    │       ├── 📄 SecurityErrorWriter.java      Paso 10
+    │       ├── 📄 RestAuthenticationEntryPoint.java  Paso 10
+    │       ├── 📄 RestAccessDeniedHandler.java  Paso 10
+    │       └── 📄 SecurityConfig.java           Paso 11
+    └── 📁 resources
+        └── 📄 application.properties            Paso 1 (+ app.jwt.* en el Paso 10)
+```
+
+</details>
+
+---
+
 ## 1. 🧩 Diagrama de clases (entidades)
 
 ```mermaid
@@ -104,7 +184,9 @@ Base: `http://localhost:8080` · Cabecera: `Authorization: Bearer <token>`
 
 ## 3. 🛠️ Paso a paso
 
-### Paso 0 · Preparar el entorno
+<details>
+<summary><strong>Paso 0 · Preparar el entorno</strong></summary>
+
 
 ```bash
 docker run -d --name academy-mysql -e MYSQL_ROOT_PASSWORD=root \
@@ -133,7 +215,11 @@ security
 
 > ⚠️ Mientras no hagas el Paso 9, **deja Security comentada/excluida** o recibirás 401 en todo. Alternativa: haz los pasos 1-8 y agrega la dependencia de Security al final.
 
-### Paso 1 · `application.properties`
+</details>
+
+<details>
+<summary><strong>Paso 1 · <code>application.properties</code></strong></summary>
+
 
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/academia?createDatabaseIfNotExist=true
@@ -157,7 +243,11 @@ springdoc.swagger-ui.path=/swagger-ui.html
 
 ✅ **Checkpoint:** `./mvnw spring-boot:run` arranca y crea la base `academia`.
 
-### Paso 2 · Persistencia: entidades y repositorios
+</details>
+
+<details>
+<summary><strong>Paso 2 · Persistencia: entidades y repositorios</strong></summary>
+
 
 ```java
 @Entity @Table(name = "student")
@@ -205,7 +295,11 @@ public interface EnrollmentJpaRepository extends JpaRepository<EnrollmentEntity,
 
 ✅ **Checkpoint:** al arrancar, Hibernate crea las tablas `student`, `course`, `enrollment` (mira el SQL en consola).
 
-### Paso 3 · Negocio: excepciones y servicios
+</details>
+
+<details>
+<summary><strong>Paso 3 · Negocio: excepciones y servicios</strong></summary>
+
 
 Excepciones (todas `extends RuntimeException`, con mensaje claro):
 
@@ -242,7 +336,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
 `StudentServiceImpl.create` valida `existsByEmailIgnoreCase` → `StudentEmailAlreadyExistsException`. `CourseServiceImpl.countEnrolled` valida que el curso exista y retorna `enrollments.countByCourseId`.
 
-### Paso 4 · DTO con validaciones
+</details>
+
+<details>
+<summary><strong>Paso 4 · DTO con validaciones</strong></summary>
+
 
 Los DTO son `record`: lo que el cliente **envía** (Request) y lo que **ve** (Response).
 
@@ -269,7 +367,11 @@ public record EnrollmentRequest(@NotNull Long studentId, @NotNull Long courseId)
 | `PageResponse<T>` | `content, page, size, totalElements, totalPages` |
 | `ErrorResponse` | `timestamp, status, error, message, path, details[]` |
 
-### Paso 5 · Mappers (entidad ⇄ DTO)
+</details>
+
+<details>
+<summary><strong>Paso 5 · Mappers (entidad ⇄ DTO)</strong></summary>
+
 
 Clases `final` con métodos estáticos, sin lógica de negocio:
 
@@ -286,7 +388,11 @@ public final class StudentMapper {
 
 Haz lo mismo con `CourseMapper` y `EnrollmentMapper` (este último aplana estudiante y curso).
 
-### Paso 6 · Controladores
+</details>
+
+<details>
+<summary><strong>Paso 6 · Controladores</strong></summary>
+
 
 Patrón para todos: `@RestController` + `@RequestMapping` + servicio inyectado por constructor + `@Valid @RequestBody` + `ResponseEntity`.
 
@@ -326,7 +432,11 @@ public class StudentController {
 
 ✅ **Checkpoint (sin Security):** `POST /api/v1/students` crea; con `email` repetido todavía revienta con 500. Eso se arregla en el siguiente paso.
 
-### Paso 7 · Manejo global de errores
+</details>
+
+<details>
+<summary><strong>Paso 7 · Manejo global de errores</strong></summary>
+
 
 Un solo `@RestControllerAdvice` que extiende `ResponseEntityExceptionHandler` y responde siempre con `ErrorResponse`:
 
@@ -370,7 +480,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 ✅ **Checkpoint:** correo repetido → **409**; `age: 5` → **400** con `details`; `/students/999` → **404**.
 
-### Paso 8 · Swagger (documentación)
+</details>
+
+<details>
+<summary><strong>Paso 8 · Swagger (documentación)</strong></summary>
+
 
 ```java
 @Configuration
@@ -390,7 +504,11 @@ En los controladores: `@Tag` (agrupa), `@Operation(summary=…)`, `@ApiResponse(
 
 ✅ **Checkpoint:** <http://localhost:8080/swagger-ui.html> muestra todos los endpoints y el botón **Authorize**.
 
-### Paso 9 · Seguridad: cuenta, rol y BCrypt
+</details>
+
+<details>
+<summary><strong>Paso 9 · Seguridad: cuenta, rol y BCrypt</strong></summary>
+
 
 Si aún no agregaste la dependencia `spring-boot-starter-security`, ahora es el momento.
 
@@ -439,7 +557,11 @@ public class AccountSeeder implements CommandLineRunner {
 }
 ```
 
-### Paso 10 · Seguridad: JWT
+</details>
+
+<details>
+<summary><strong>Paso 10 · Seguridad: JWT</strong></summary>
+
 
 ```properties
 app.jwt.secret=${JWT_SECRET:academy-clave-solo-educativa-cambiar-en-produccion-0123456789}
@@ -503,7 +625,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 **401 y 403 en JSON:** los filtros corren *antes* de Spring MVC, así que el `@RestControllerAdvice` no los ve. Crea `SecurityErrorWriter` (escribe un `ErrorResponse` con `ObjectMapper`), `RestAuthenticationEntryPoint` (→ 401, cabecera `WWW-Authenticate: Bearer`) y `RestAccessDeniedHandler` (→ 403).
 
-### Paso 11 · Seguridad: reglas de acceso
+</details>
+
+<details>
+<summary><strong>Paso 11 · Seguridad: reglas de acceso</strong></summary>
+
 
 ```java
 @Configuration @EnableWebSecurity
@@ -535,7 +661,11 @@ public class SecurityConfig {
 
 ⚠️ **El orden importa:** reglas específicas primero, `anyRequest()` al final.
 
-### Paso 12 · `AuthController`
+</details>
+
+<details>
+<summary><strong>Paso 12 · <code>AuthController</code></strong></summary>
+
 
 ```java
 @RestController @RequestMapping("/api/v1/auth")
@@ -554,6 +684,8 @@ public class AuthController {
 
 DTO: `LoginRequest(username, password)` · `LoginResponse(token, tokenType, expiresIn)` · `MeResponse(username, role)`.
 
+</details>
+
 ---
 
 ## 4. ▶️ Probar todo
@@ -569,7 +701,9 @@ curl -s -X POST localhost:8080/api/v1/enrollments -H "Authorization: Bearer $TOK
   -H 'Content-Type: application/json' -d '{"studentId":1,"courseId":1}'
 ```
 
-### ✅ Matriz de verificación
+<details>
+<summary><strong>✅ Matriz de verificación</strong></summary>
+
 
 | Prueba | Esperado |
 |---|---|
@@ -585,6 +719,8 @@ curl -s -X POST localhost:8080/api/v1/enrollments -H "Authorization: Bearer $TOK
 | `POST /enrollments` en curso sin cupo | 409 |
 | `POST /courses` con `ana` / `admin` | 403 / 201 |
 | `POST /internal/seed` con `ana` / `admin` | 403 / 200 |
+
+</details>
 
 Más pruebas: **Swagger UI** (botón *Authorize*), [`postman/`](../../../../curso-spring-boot-src/07-01-proyecto-academico/backend/academica-security/postman/) y [`probar-apis.sh`](../../../../curso-spring-boot-src/07-01-proyecto-academico/backend/academica-security/probar-apis.sh). Datos masivos de ejemplo: [`migrate.sql`](../../../../curso-spring-boot-src/07-01-proyecto-academico/backend/academica-security/migrate.sql) (100 estudiantes, 20 cursos, 30 matrículas).
 
