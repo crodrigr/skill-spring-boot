@@ -1030,6 +1030,66 @@
 >
 > > Tres cambios en `SecurityConfig`: **quitar `httpBasic`**, **agregar el filtro** antes del filtro de usuario y contraseña de Spring, y **exponer el `AuthenticationManager`**. También se hace pública la ruta de login.
 > >
+> > **✏️ Qué cambia respecto al Paso 2**
+> >
+> > Se parte del `SecurityConfig` del Paso 2. Las líneas con `-` **se borran** y las líneas con `+` **se agregan**; lo demás queda igual.
+> >
+> > ```diff
+> >  // ── Imports ──
+> > -import org.springframework.security.config.Customizer;
+> > +import org.springframework.boot.context.properties.EnableConfigurationProperties;
+> > +import org.springframework.security.authentication.AuthenticationManager;
+> > +import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+> > +import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+> >
+> >  @Configuration
+> >  @EnableWebSecurity
+> > +@EnableConfigurationProperties(JwtProperties.class)          // ① activa las propiedades jwt.*
+> >  public class SecurityConfig {
+> >
+> >      @Bean
+> > -    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+> > +    public SecurityFilterChain filterChain(HttpSecurity http, JwtService jwtService) throws Exception {   // ② recibe JwtService
+> >          http
+> >                  .csrf(csrf -> csrf.disable())
+> >                  .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+> >                  .authorizeHttpRequests(auth -> auth
+> > -                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**", "/internal/health").permitAll()
+> > +                        .requestMatchers("/api/v1/auth/login", "/internal/health").permitAll()          // ③ el login es público
+> > +                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
+> >                          .requestMatchers(HttpMethod.DELETE, "/api/v1/students/**").hasRole("ADMIN")
+> >                          .requestMatchers("/internal/**").hasRole("ADMIN")
+> >                          .anyRequest().authenticated())
+> > -                .httpBasic(Customizer.withDefaults());
+> > +                .addFilterBefore(new JwtAuthenticationFilter(jwtService),                             // ④ JWT reemplaza a Basic
+> > +                        UsernamePasswordAuthenticationFilter.class);
+> >          return http.build();
+> >      }
+> >
+> > +    @Bean                                                                                          // ⑤ lo usa AuthService en el login
+> > +    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+> > +        return configuration.getAuthenticationManager();
+> > +    }
+> > +
+> >      @Bean
+> >      public PasswordEncoder passwordEncoder() {      // sin cambios
+> >          return new BCryptPasswordEncoder();
+> >      }
+> >  }
+> > ```
+> >
+> > | # | Cambio | Por qué |
+> > |---|---|---|
+> > | ① | `@EnableConfigurationProperties(JwtProperties.class)` | Sin esto, `JwtProperties` (Paso 3.2) no se llena desde `application.properties` y `JwtService` falla al arrancar |
+> > | ② | `filterChain` recibe `JwtService` | El filtro necesita el servicio para verificar el token; Spring lo inyecta como parámetro |
+> > | ③ | `/api/v1/auth/login` en `permitAll()` | Quien pide el token **todavía no tiene token**: si el login exigiera autenticación, nadie podría entrar |
+> > | ④ | `.httpBasic(...)` → `.addFilterBefore(new JwtAuthenticationFilter(...), UsernamePasswordAuthenticationFilter.class)` | Se **cambia el mecanismo**: ya no se lee `Authorization: Basic`, sino `Authorization: Bearer <token>`. Va *antes* del filtro de usuario y contraseña para dejar al usuario en el `SecurityContext` primero |
+> > | ⑤ | Bean `AuthenticationManager` | Spring Boot no lo expone solo; `AuthService` (Paso 3.4) lo necesita para validar usuario y contraseña |
+> >
+> > ✅ **Lo que NO cambia:** `csrf`, `STATELESS`, las reglas de `ADMIN`, `anyRequest().authenticated()` y el `PasswordEncoder`.
+> >
+> > Abajo queda el archivo **completo** por si se prefiere copiarlo entero.
+> >
 > > <details>
 > > <summary><strong>📄 SecurityConfig.java (versión del Paso 3)</strong></summary>
 > >
