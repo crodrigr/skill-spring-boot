@@ -1,4 +1,4 @@
-# 🏆 Proyecto final — CoWorkHub
+# 🏆 Proyecto final Spring Boot - R2 — CoWorkHub
 
 > **Trabajo**: individual · **Integra**: módulos 01 a 08 · **Se evalúa con**: la [rúbrica](rubrica.md)
 
