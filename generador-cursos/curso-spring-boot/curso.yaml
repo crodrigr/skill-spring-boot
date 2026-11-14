@@ -1,0 +1,29 @@
+spec_version: "1.0"
+
+course:
+  id: "curso-spring-boot"
+  title: "Spring Boot para Aplicaciones Empresariales"
+  description: "Curso de desarrollo backend con Spring Boot: inyección de dependencias, JPA, APIs REST, documentación con Swagger, manejo de excepciones y seguridad con JWT."
+
+  category: "PROGRAMMING"
+  level: "INTERMEDIATE"
+  language: "es"
+  version: "1.0.0"
+
+  author: "Docente"
+
+  tags:
+    - java
+    - spring-boot
+    - backend
+    - api-rest
+    - jpa
+
+settings:
+  allow_student_downloads: true
+  track_progress: true
+
+repository:
+  structure: "CONVENTIONAL"
+  module_pattern: "^[0-9]{2}-"
+  module_sort: "NAME"
