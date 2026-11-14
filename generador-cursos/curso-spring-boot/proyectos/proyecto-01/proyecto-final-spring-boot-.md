@@ -179,7 +179,7 @@ es `0..1` de los dos lados. Qué lado es el dueño de cada relación lo decidís
 | RF | El sistema debe… |
 |---|---|
 | **RF-01** | Permitir crear, consultar, actualizar y eliminar sedes, salas (con su equipamiento), equipamiento, servicios adicionales y planes. |
-| **RF-02** | Registrar un miembro junto con su usuario, y consultarlo, listarlo (paginado y con filtros), actualizarlo, suspenderlo, reactivarlo y eliminarlo. |
+| **RF-02** | Registrar un miembro junto con su usuario, y consultarlo, listarlo (con filtros por nombre y estado), actualizarlo, suspenderlo, reactivarlo y eliminarlo. |
 | **RF-03** | Mostrar las salas libres de una sede en una fecha y un rango horario, con filtros opcionales de capacidad mínima y equipamiento. |
 | **RF-04** | Crear una reserva con sus servicios adicionales y devolver el costo calculado. |
 | **RF-05** | Consultar una reserva, y listar reservas por miembro, por sala y fecha, o por estado. |
@@ -233,7 +233,7 @@ y `/api/planes`. Cada uno tiene los mismos cinco endpoints:
 
 | Método | Ruta | Acceso | Qué hace | RF |
 |---|---|---|---|---|
-| `GET` | `/api/miembros?nombre=&estado=&page=&size=&sort=` | `ADMIN`, `RECEPTIONIST` | Lista paginada | RF-02 |
+| `GET` | `/api/miembros?nombre=&estado=` | `ADMIN`, `RECEPTIONIST` | Lista, con filtros opcionales | RF-02 |
 | `GET` | `/api/miembros/{id}` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo el suyo) | Consulta uno | RF-02 |
 | `POST` | `/api/miembros` | `ADMIN`, `RECEPTIONIST` | Registra miembro y usuario | RF-02 |
 | `PUT` | `/api/miembros/{id}` | `ADMIN`, `RECEPTIONIST` | Actualiza nombre, email y plan | RF-02 |
@@ -375,7 +375,7 @@ Cada módulo del curso debe verse en el código:
 |---|---|
 | **01** Spring Boot | Proyecto creado con Spring Initializr y sus *starters*; DTO como `record`; `Optional` y streams; inyección por constructor; Actuator |
 | **02** Dependencias y beans | Servicios como interfaz + implementación; `@Configuration` con `@Bean` (`Clock`, `PasswordEncoder`); `@Value`; un `@Qualifier` o `@Primary`; un `@PostConstruct` que valide la configuración |
-| **03** JPA | Entidades con sus anotaciones; repositorios con consultas derivadas, una `@Query` en JPQL y una consulta paginada |
+| **03** JPA | Entidades con sus anotaciones; repositorios con consultas derivadas |
 | **04** Base de datos y relaciones JPA | Conexión a MySQL en `application.properties`; las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval` justificados; datos de prueba en `import.sql`; listados sin el problema N+1 |
 | **05** API REST | Capas `presentation` → `business` → `persistence`; DTO de entrada validados con `@Valid` y DTO de salida (nunca entidades); `@Transactional` en las escrituras |
 | **06** Swagger | Swagger UI con grupos, descripciones, respuestas de error, ejemplos y botón **Authorize**; `openapi.json` exportado |
@@ -402,7 +402,7 @@ y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) �
 | 11 | Eliminar una sala con reservas futuras | `409` |
 | 12 | Crear una sede sin nombre | `400` |
 | 13 | Enviar dos solicitudes simultáneas para la misma sala y horario | Una `201` y la otra `409` |
-| 14 | Listar miembros con `?page=0&size=2` | `200` con el total de elementos y de páginas |
+| 14 | Listar miembros con `?estado=SUSPENDED` | `200` solo con los miembros suspendidos |
 
 ## 8. Entregables
 
