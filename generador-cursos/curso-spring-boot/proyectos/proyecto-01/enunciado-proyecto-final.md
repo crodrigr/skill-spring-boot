@@ -154,15 +154,59 @@ de error:
 
 ## 6. Requisitos técnicos
 
-Java 21, Spring Boot 4.1.x, Maven y H2. El proyecto arranca con `mvn spring-boot:run`,
-sin instalar nada más. Cada módulo del curso debe verse en el código:
+Java 21, Spring Boot 4.1.x, Maven y **MySQL 8**. Con la base de datos corriendo, el
+proyecto arranca con `mvn spring-boot:run`.
+
+### Base de datos
+
+La base de datos es **MySQL**. La conexión se configura en `application.properties` y
+usa el driver `mysql-connector-j`:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/coworkhub
+spring.datasource.username=coworkhub
+spring.datasource.password=coworkhub
+```
+
+Para crear la base tenés dos opciones:
+
+| Opción | Cómo |
+|---|---|
+| **A. MySQL instalado** en tu equipo | Creá la base `coworkhub` y un usuario `coworkhub` con permisos sobre ella. |
+| **B. Docker** | Guardá el `docker-compose.yml` de abajo en la raíz del proyecto y ejecutá `docker compose up -d`. No hace falta instalar MySQL. |
+
+```yaml
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: coworkhub-mysql
+    environment:
+      MYSQL_DATABASE: coworkhub
+      MYSQL_USER: coworkhub
+      MYSQL_PASSWORD: coworkhub        # solo para desarrollo
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - coworkhub-datos:/var/lib/mysql
+volumes:
+  coworkhub-datos:
+```
+
+Para detener el contenedor: `docker compose down` (agregá `-v` para borrar también los
+datos). Si el puerto 3306 ya está ocupado, por ejemplo por un MySQL instalado, cambiá el
+de la izquierda (`"3307:3306"`) y también el puerto en la URL de conexión.
+
+### Qué debe verse de cada módulo
+
+Cada módulo del curso debe verse en el código:
 
 | Módulo | Qué debe tener tu proyecto |
 |---|---|
 | **01** Spring Boot | Proyecto creado con Spring Initializr y sus *starters*; DTO como `record`; `Optional` y streams; inyección por constructor; Actuator |
 | **02** Dependencias y beans | Servicios como interfaz + implementación; `@Configuration` con `@Bean` (`Clock`, `PasswordEncoder`); `@Value`; un `@Qualifier` o `@Primary`; un `@PostConstruct` que valide la configuración |
 | **03** JPA | Entidades con sus anotaciones; repositorios con consultas derivadas, una `@Query` en JPQL y una consulta paginada |
-| **04** Relaciones JPA | Las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval` justificados; datos de prueba al arrancar; listados sin el problema N+1 |
+| **04** Base de datos y relaciones JPA | Conexión a MySQL en `application.properties`; las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval` justificados; datos de prueba al arrancar; listados sin el problema N+1 |
 | **05** API REST | Capas `presentacion` → `negocio` → `persistence`; DTO de entrada validados con `@Valid` y DTO de salida (nunca entidades); `@Transactional` en las escrituras |
 | **06** Swagger | Swagger UI con grupos, descripciones, respuestas de error, ejemplos y botón **Authorize**; `openapi.json` exportado |
 | **07** Excepciones | Excepciones propias en la capa de negocio; un `@RestControllerAdvice` con el cuerpo de error único; ninguna regla de negocio responde `500` |
@@ -172,7 +216,7 @@ sin instalar nada más. Cada módulo del curso debe verse en el código:
 3 planes, 5 miembros (uno suspendido), 4 usuarios (un `ADMIN`, un `RECEPCION` y dos
 `MIEMBRO`) y 15 reservas en distintos estados.
 
-**Orden sugerido**: análisis → proyecto base (01, 02) → modelo JPA (03, 04) → servicios
+**Orden sugerido**: análisis → base de datos MySQL y proyecto base (01, 02) → modelo JPA (03, 04) → servicios
 y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) → pruebas.
 
 ## 7. Escenarios de aceptación
@@ -198,10 +242,11 @@ y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) �
 
 1. `docs/analisis.md`: casos de uso, diagrama entidad-relación (con lado dueño, `fetch` y
    `cascade`), matriz RF → RN → endpoint y los supuestos que hayas tomado.
-2. El repositorio, con un commit por fase.
+2. El repositorio, con un commit por fase (y el `docker-compose.yml`, si usaste Docker).
 3. Una colección de Postman o Insomnia con los 14 escenarios.
 4. `docs/openapi.json`.
-5. `README.md`: cómo ejecutar, usuarios de prueba y dirección de Swagger UI.
+5. `README.md`: cómo crear la base de datos (con MySQL instalado o con Docker), cómo
+   ejecutar el proyecto, usuarios de prueba y dirección de Swagger UI.
 
 ## 9. Evaluación
 
@@ -219,6 +264,13 @@ El detalle está en la [rúbrica](rubrica.md).
 
 ## 💡 Pistas
 
+- **`data.sql` en MySQL.** Con MySQL, Spring Boot no ejecuta `data.sql` por defecto
+  (solo lo hace con bases en memoria). Necesitás `spring.sql.init.mode=always`, y
+  `spring.jpa.defer-datasource-initialization=true` para que corra después de que
+  Hibernate cree las tablas. Además, MySQL guarda los datos entre un arranque y otro:
+  si el script se ejecuta cada vez, los datos de prueba se duplican o chocan con las
+  restricciones de unicidad. Decidí cómo evitarlo (por ejemplo, con `ddl-auto=create`
+  durante el desarrollo) y explicalo en el análisis.
 - **La hora actual.** RN-03 y RN-08 dependen de "ahora". Inyectá un `Clock` en lugar de
   llamar a `LocalDateTime.now()`, así podés fijar la hora en las pruebas.
 - **Reservas del pasado.** Las reservas `COMPLETADA` de los datos de prueba no pasan las
