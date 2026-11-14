@@ -19,6 +19,28 @@ No hay interfaz gráfica: la API se prueba con Swagger UI, Postman (o Insomnia) 
 | `RECEPTIONIST` | Gestiona los miembros y todas las reservas. |
 | `MEMBER` | Consulta catálogos y disponibilidad. Crea, ve, modifica y cancela **solo sus** reservas, y ve **solo su** consumo. |
 
+### ¿Qué es un miembro?
+
+Un **miembro** es un **cliente del coworking**: una persona que contrata un **plan de
+membresía** para usar las salas. Es a nombre de quien se hacen las reservas y quien
+consume las horas que su plan incluye cada mes.
+
+- **Sus datos** (documento, nombre, email, estado y plan) se guardan en la entidad `Member`.
+- **Su cuenta** para iniciar sesión en la API es otra entidad, `UserAccount`, con el rol
+  `MEMBER`. Miembro y cuenta están unidos 1 a 1. Cuando el `ADMIN` o el `RECEPTIONIST`
+  registra un miembro con `POST /api/miembros`, se crean los dos a la vez.
+- **Puede no tener cuenta** (por ejemplo, algunos de los cargados en `import.sql`). En ese
+  caso no inicia sesión, y el `ADMIN` o el `RECEPTIONIST` reserva a su nombre.
+- **Su estado** es `ACTIVE` o `SUSPENDED`. Un miembro suspendido sigue existiendo, pero no
+  puede reservar (RN-05).
+- **Los empleados no son miembros.** El `ADMIN` y el `RECEPTIONIST` tienen cuenta, pero no
+  tienen plan, no reservan a su nombre y no consumen horas.
+
+> **Ejemplo.** Ana Gómez contrata un plan con 10 horas al mes. La recepcionista la
+> registra, y el sistema crea su `Member` y su `UserAccount` (usuario `ana`, rol `MEMBER`).
+> Ana inicia sesión, reserva una sala para el viernes y consulta cuántas horas de su plan
+> le quedan. No puede ver las reservas de otros miembros.
+
 ## 2. Modelo de datos
 
 Las entidades, sus atributos y las tablas de la base de datos se nombran en inglés.
@@ -29,8 +51,8 @@ Las entidades, sus atributos y las tablas de la base de datos se nombran en ingl
 | `Room` · `rooms` | Sala | name, type, capacity, hourlyRate, active | N ↔ N `Equipment` (tabla intermedia `room_equipment`) |
 | `Equipment` · `equipment` | Equipamiento | name | — |
 | `MembershipPlan` · `membership_plans` | Plan de membresía | name, includedHoursPerMonth, overageDiscount (%), maxActiveBookings | 1 → N `Member` |
-| `Member` · `members` | Miembro | documentNumber, fullName, email, status | 1 ↔ 1 `UserAccount` |
-| `UserAccount` · `user_accounts` | Usuario de acceso | username, password (BCrypt), role | — |
+| `Member` · `members` | Miembro: cliente del coworking con un plan | documentNumber, fullName, email, status | 1 ↔ 1 `UserAccount` |
+| `UserAccount` · `user_accounts` | Cuenta para iniciar sesión (de un miembro o de un empleado) | username, password (BCrypt), role | — |
 | `Booking` · `bookings` | Reserva | startTime, endTime, attendees, status, roomCost, servicesCost, totalCost, cancellationFee | N → 1 `Room`, N → 1 `Member`, 1 → N `BookingItem` |
 | `AdditionalService` · `additional_services` | Servicio adicional | name, unitPrice | 1 → N `BookingItem` |
 | `BookingItem` · `booking_items` | Detalle de una reserva | quantity, appliedUnitPrice | Entidad intermedia, con `cascade` y `orphanRemoval` desde `Booking` |
@@ -154,7 +176,7 @@ Cómo leerlo: los números son las multiplicidades (`0..*` = ninguno o muchos). 
 negro (`*--`) indica que los detalles pertenecen a la reserva: se guardan y se borran
 con ella. Un miembro puede no tener usuario todavía, y los usuarios `ADMIN` y
 `RECEPTIONIST` tienen usuario pero no son miembros: por eso `Member`–`UserAccount`
-es `0..1` de los dos lados. Qué lado es el dueño de cada relación lo decidís vos y lo justificás en el análisis.
+es `0..1` de los dos lados. Qué lado es el dueño de cada relación lo decidís vos.
 
 ## 3. Reglas de negocio
 
@@ -376,14 +398,14 @@ Cada módulo del curso debe verse en el código:
 | **01** Spring Boot | Proyecto creado con Spring Initializr y sus *starters*; DTO como `record`; `Optional` y streams; inyección por constructor; Actuator |
 | **02** Dependencias y beans | Servicios como interfaz + implementación; `@Configuration` con `@Bean` (`Clock`, `PasswordEncoder`); `@Value`; un `@Qualifier` o `@Primary`; un `@PostConstruct` que valide la configuración |
 | **03** JPA | Entidades con sus anotaciones; repositorios con consultas derivadas |
-| **04** Base de datos y relaciones JPA | Conexión a MySQL en `application.properties`; las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval` justificados; datos de prueba en `import.sql`; listados sin el problema N+1 |
+| **04** Base de datos y relaciones JPA | Conexión a MySQL en `application.properties`; las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval`; datos de prueba en `import.sql`; listados sin el problema N+1 |
 | **05** API REST | Capas `presentation` → `business` → `persistence`; DTO de entrada validados con `@Valid` y DTO de salida (nunca entidades); `@Transactional` en las escrituras |
 | **06** Swagger | Swagger UI con grupos, descripciones, respuestas de error, ejemplos y botón **Authorize**; `openapi.json` exportado |
 | **07** Excepciones | Excepciones propias en la capa de negocio; un `@RestControllerAdvice` con el cuerpo de error único; ninguna regla de negocio responde `500` |
 | **08** Seguridad | Primero Basic Auth y después JWT *stateless*; contraseñas con BCrypt; roles y dueño del recurso con `@PreAuthorize`; `401` y `403` con el cuerpo de error |
 
-**Orden sugerido**: análisis → base de datos MySQL y proyecto base (01, 02) → modelo JPA e `import.sql` (03, 04) → servicios
-y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) → pruebas.
+**Orden sugerido**: base de datos MySQL y proyecto base (01, 02) → modelo JPA e `import.sql`
+(03, 04) → servicios y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) → pruebas.
 
 ## 7. Escenarios de aceptación
 
@@ -406,25 +428,22 @@ y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) �
 
 ## 8. Entregables
 
-1. `docs/analisis.md`: casos de uso, diagrama entidad-relación (con lado dueño, `fetch` y
-   `cascade`), matriz RF → RN → endpoint y los supuestos que hayas tomado.
-2. El repositorio, con un commit por fase y el `src/main/resources/import.sql` con los
+1. El repositorio, con un commit por fase y el `src/main/resources/import.sql` con los
    datos de prueba.
-3. Una colección de Postman o Insomnia con los 14 escenarios.
-4. `docs/openapi.json`.
-5. `README.md`: cómo crear la base de datos (con MySQL instalado o con Docker), cómo
+2. Una colección de Postman o Insomnia con los 14 escenarios.
+3. `docs/openapi.json`.
+4. `README.md`: cómo crear la base de datos (con MySQL instalado o con Docker), cómo
    ejecutar el proyecto, usuarios de prueba y dirección de Swagger UI.
 
 ## 9. Evaluación
 
 | Criterio | Peso |
 |---|---|
-| Análisis | 15 % |
-| Modelo JPA | 15 % |
-| Reglas de negocio | 25 % |
+| Modelo JPA | 20 % |
+| Reglas de negocio | 30 % |
 | Arquitectura y calidad del código | 15 % |
 | Excepciones y códigos HTTP | 10 % |
-| Seguridad | 10 % |
+| Seguridad | 15 % |
 | Swagger, README y pruebas | 10 % |
 
 El detalle está en la [rúbrica](rubrica.md).
