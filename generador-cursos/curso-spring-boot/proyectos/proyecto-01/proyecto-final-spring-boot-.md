@@ -19,8 +19,6 @@ No hay interfaz gráfica: la API se prueba con Swagger UI, Postman (o Insomnia) 
 | `RECEPTIONIST` | Gestiona los miembros y todas las reservas. |
 | `MEMBER` | Consulta catálogos y disponibilidad. Crea, ve, modifica y cancela **solo sus** reservas, y ve **solo su** consumo. |
 
-**Personal** = `ADMIN` o `RECEPTIONIST`.
-
 ## 2. Modelo de datos
 
 Las entidades, sus atributos y las tablas de la base de datos se nombran en inglés.
@@ -154,9 +152,9 @@ classDiagram
 
 Cómo leerlo: los números son las multiplicidades (`0..*` = ninguno o muchos). El rombo
 negro (`*--`) indica que los detalles pertenecen a la reserva: se guardan y se borran
-con ella. Un miembro puede no tener usuario todavía, y el personal tiene usuario pero
-no es miembro: por eso `Member`–`UserAccount` es `0..1` de los dos lados. Qué lado es el
-dueño de cada relación lo decidís vos y lo justificás en el análisis.
+con ella. Un miembro puede no tener usuario todavía, y los usuarios `ADMIN` y
+`RECEPTIONIST` tienen usuario pero no son miembros: por eso `Member`–`UserAccount`
+es `0..1` de los dos lados. Qué lado es el dueño de cada relación lo decidís vos y lo justificás en el análisis.
 
 ## 3. Reglas de negocio
 
@@ -201,6 +199,14 @@ dueño de cada relación lo decidís vos y lo justificás en el análisis.
 Base: `http://localhost:8080`. Salvo los públicos, todos llevan el encabezado
 `Authorization: Bearer <token>`.
 
+Cómo leer la columna **Acceso**:
+
+- **Público**: cualquiera, sin token.
+- **Autenticado**: cualquier usuario con token válido, sea cual sea su rol.
+- **Roles listados** (por ejemplo `ADMIN`, `RECEPTIONIST`): solo esos roles. Los demás reciben `403`.
+- **`MEMBER` (solo …)**: el miembro puede usarlo únicamente sobre sus propios datos. Si pide
+  los de otro miembro, recibe `403`.
+
 ### Autenticación y plataforma
 
 | Método | Ruta | Acceso | Qué hace | RF |
@@ -227,14 +233,14 @@ y `/api/planes`. Cada uno tiene los mismos cinco endpoints:
 
 | Método | Ruta | Acceso | Qué hace | RF |
 |---|---|---|---|---|
-| `GET` | `/api/miembros?nombre=&estado=&page=&size=&sort=` | Personal | Lista paginada | RF-02 |
-| `GET` | `/api/miembros/{id}` | Personal o el propio miembro | Consulta uno | RF-02 |
-| `POST` | `/api/miembros` | Personal | Registra miembro y usuario | RF-02 |
-| `PUT` | `/api/miembros/{id}` | Personal | Actualiza nombre, email y plan | RF-02 |
-| `PATCH` | `/api/miembros/{id}/suspender` | Personal | Suspende | RF-02 |
-| `PATCH` | `/api/miembros/{id}/activar` | Personal | Reactiva | RF-02 |
-| `DELETE` | `/api/miembros/{id}` | Personal | Elimina | RF-02 |
-| `GET` | `/api/miembros/{id}/consumo?mes=yyyy-MM` | Personal o el propio miembro | Consumo del mes | RF-10 |
+| `GET` | `/api/miembros?nombre=&estado=&page=&size=&sort=` | `ADMIN`, `RECEPTIONIST` | Lista paginada | RF-02 |
+| `GET` | `/api/miembros/{id}` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo el suyo) | Consulta uno | RF-02 |
+| `POST` | `/api/miembros` | `ADMIN`, `RECEPTIONIST` | Registra miembro y usuario | RF-02 |
+| `PUT` | `/api/miembros/{id}` | `ADMIN`, `RECEPTIONIST` | Actualiza nombre, email y plan | RF-02 |
+| `PATCH` | `/api/miembros/{id}/suspender` | `ADMIN`, `RECEPTIONIST` | Suspende | RF-02 |
+| `PATCH` | `/api/miembros/{id}/activar` | `ADMIN`, `RECEPTIONIST` | Reactiva | RF-02 |
+| `DELETE` | `/api/miembros/{id}` | `ADMIN`, `RECEPTIONIST` | Elimina | RF-02 |
+| `GET` | `/api/miembros/{id}/consumo?mes=yyyy-MM` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo el suyo) | Consumo del mes | RF-10 |
 
 ### Disponibilidad
 
@@ -246,14 +252,14 @@ y `/api/planes`. Cada uno tiene los mismos cinco endpoints:
 
 | Método | Ruta | Acceso | Qué hace | RF |
 |---|---|---|---|---|
-| `POST` | `/api/reservas` | Personal, o el miembro a su nombre | Crea la reserva | RF-04 |
-| `GET` | `/api/reservas/{id}` | Personal o el dueño | Consulta una | RF-05 |
-| `GET` | `/api/reservas?miembroId=` · `?salaId=&fecha=` · `?estado=` | Personal (el miembro, solo con su `miembroId`) | Lista con un filtro | RF-05 |
-| `POST` | `/api/reservas/{id}/servicios` | Personal o el dueño | Agrega un servicio | RF-06 |
-| `DELETE` | `/api/reservas/{id}/servicios/{servicioId}` | Personal o el dueño | Quita un servicio | RF-06 |
-| `POST` | `/api/reservas/{id}/confirmar` | Personal | Confirma | RF-07 |
-| `POST` | `/api/reservas/{id}/cancelar` | Personal o el dueño | Cancela | RF-08 |
-| `POST` | `/api/reservas/{id}/completar` | Personal | Completa | RF-09 |
+| `POST` | `/api/reservas` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo a su nombre) | Crea la reserva | RF-04 |
+| `GET` | `/api/reservas/{id}` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo si la reserva es suya) | Consulta una | RF-05 |
+| `GET` | `/api/reservas?miembroId=` · `?salaId=&fecha=` · `?estado=` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo con su propio `miembroId`) | Lista con un filtro | RF-05 |
+| `POST` | `/api/reservas/{id}/servicios` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo si la reserva es suya) | Agrega un servicio | RF-06 |
+| `DELETE` | `/api/reservas/{id}/servicios/{servicioId}` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo si la reserva es suya) | Quita un servicio | RF-06 |
+| `POST` | `/api/reservas/{id}/confirmar` | `ADMIN`, `RECEPTIONIST` | Confirma | RF-07 |
+| `POST` | `/api/reservas/{id}/cancelar` | `ADMIN`, `RECEPTIONIST`, `MEMBER` (solo si la reserva es suya) | Cancela | RF-08 |
+| `POST` | `/api/reservas/{id}/completar` | `ADMIN`, `RECEPTIONIST` | Completa | RF-09 |
 
 ### Respuestas
 
