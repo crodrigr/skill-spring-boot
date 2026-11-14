@@ -16,152 +16,163 @@ No hay interfaz gráfica: la API se prueba con Swagger UI, Postman (o Insomnia) 
 | Rol | Qué puede hacer |
 |---|---|
 | `ADMIN` | Todo. Es el único que crea, modifica o elimina catálogos. |
-| `RECEPCION` | Gestiona los miembros y todas las reservas. |
-| `MIEMBRO` | Consulta catálogos y disponibilidad. Crea, ve, modifica y cancela **solo sus** reservas, y ve **solo su** consumo. |
+| `RECEPTIONIST` | Gestiona los miembros y todas las reservas. |
+| `MEMBER` | Consulta catálogos y disponibilidad. Crea, ve, modifica y cancela **solo sus** reservas, y ve **solo su** consumo. |
 
-**Personal** = `ADMIN` o `RECEPCION`.
+**Personal** = `ADMIN` o `RECEPTIONIST`.
 
 ## 2. Modelo de datos
 
-| Entidad | Atributos | Relaciones |
-|---|---|---|
-| `Sede` | nombre, ciudad, dirección, horaApertura, horaCierre | 1 → N `Sala` |
-| `Sala` | nombre, tipo (`SALA_REUNION`, `OFICINA_PRIVADA`, `ESCRITORIO`), capacidad, tarifaPorHora, activa | N ↔ N `Equipamiento` |
-| `Equipamiento` | nombre | — |
-| `PlanMembresia` | nombre, horasIncluidasMes, descuentoExcedente (%), maxReservasActivas | 1 → N `Miembro` |
-| `Miembro` | documento, nombre, email, estado (`ACTIVO`, `SUSPENDIDO`) | 1 ↔ 1 `Usuario` |
-| `Usuario` | nombreUsuario, contraseña (BCrypt), rol | — |
-| `Reserva` | inicio, fin, asistentes, estado, costoSala, costoServicios, costoTotal, cargoCancelacion | N → 1 `Sala`, N → 1 `Miembro`, 1 → N `DetalleReserva` |
-| `ServicioAdicional` | nombre, precioUnitario | 1 → N `DetalleReserva` |
-| `DetalleReserva` | cantidad, precioUnitarioAplicado | Entidad intermedia, con `cascade` y `orphanRemoval` desde `Reserva` |
+Las entidades, sus atributos y las tablas de la base de datos se nombran en inglés.
 
-Estados de una reserva: `PENDIENTE`, `CONFIRMADA`, `COMPLETADA`, `CANCELADA`.
+| Entidad · tabla | Qué es | Atributos | Relaciones |
+|---|---|---|---|
+| `Location` · `locations` | Sede | name, city, address, openingTime, closingTime | 1 → N `Room` |
+| `Room` · `rooms` | Sala | name, type, capacity, hourlyRate, active | N ↔ N `Equipment` (tabla intermedia `room_equipment`) |
+| `Equipment` · `equipment` | Equipamiento | name | — |
+| `MembershipPlan` · `membership_plans` | Plan de membresía | name, includedHoursPerMonth, overageDiscount (%), maxActiveBookings | 1 → N `Member` |
+| `Member` · `members` | Miembro | documentNumber, fullName, email, status | 1 ↔ 1 `UserAccount` |
+| `UserAccount` · `user_accounts` | Usuario de acceso | username, password (BCrypt), role | — |
+| `Booking` · `bookings` | Reserva | startTime, endTime, attendees, status, roomCost, servicesCost, totalCost, cancellationFee | N → 1 `Room`, N → 1 `Member`, 1 → N `BookingItem` |
+| `AdditionalService` · `additional_services` | Servicio adicional | name, unitPrice | 1 → N `BookingItem` |
+| `BookingItem` · `booking_items` | Detalle de una reserva | quantity, appliedUnitPrice | Entidad intermedia, con `cascade` y `orphanRemoval` desde `Booking` |
+
+| Enumeración | Valores |
+|---|---|
+| `RoomType` | `MEETING_ROOM`, `PRIVATE_OFFICE`, `DESK` |
+| `MemberStatus` | `ACTIVE`, `SUSPENDED` |
+| `BookingStatus` | `PENDING`, `CONFIRMED`, `COMPLETED`, `CANCELLED` |
+| `Role` | `ADMIN`, `RECEPTIONIST`, `MEMBER` |
+
+Los nombres de tabla se fijan con `@Table(name = "...")`. Las columnas van en `snake_case`
+(`opening_time`, `hourly_rate`…): Spring Boot las genera así a partir de los atributos. La entidad del usuario se llama `UserAccount` y no
+`User` para no confundirse con la clase `User` de Spring Security.
 
 ### Diagrama de clases de las entidades
 
 ```mermaid
 classDiagram
-    class Sede {
+    class Location {
         -Long id
-        -String nombre
-        -String ciudad
-        -String direccion
-        -LocalTime horaApertura
-        -LocalTime horaCierre
+        -String name
+        -String city
+        -String address
+        -LocalTime openingTime
+        -LocalTime closingTime
     }
-    class Sala {
+    class Room {
         -Long id
-        -String nombre
-        -TipoSala tipo
-        -int capacidad
-        -BigDecimal tarifaPorHora
-        -boolean activa
+        -String name
+        -RoomType type
+        -int capacity
+        -BigDecimal hourlyRate
+        -boolean active
     }
-    class Equipamiento {
+    class Equipment {
         -Long id
-        -String nombre
+        -String name
     }
-    class PlanMembresia {
+    class MembershipPlan {
         -Long id
-        -String nombre
-        -int horasIncluidasMes
-        -int descuentoExcedente
-        -int maxReservasActivas
+        -String name
+        -int includedHoursPerMonth
+        -int overageDiscount
+        -int maxActiveBookings
     }
-    class Miembro {
+    class Member {
         -Long id
-        -String documento
-        -String nombre
+        -String documentNumber
+        -String fullName
         -String email
-        -EstadoMiembro estado
+        -MemberStatus status
     }
-    class Usuario {
+    class UserAccount {
         -Long id
-        -String nombreUsuario
-        -String contrasena
-        -Rol rol
+        -String username
+        -String password
+        -Role role
     }
-    class Reserva {
+    class Booking {
         -Long id
-        -LocalDateTime inicio
-        -LocalDateTime fin
-        -int asistentes
-        -EstadoReserva estado
-        -BigDecimal costoSala
-        -BigDecimal costoServicios
-        -BigDecimal costoTotal
-        -BigDecimal cargoCancelacion
+        -LocalDateTime startTime
+        -LocalDateTime endTime
+        -int attendees
+        -BookingStatus status
+        -BigDecimal roomCost
+        -BigDecimal servicesCost
+        -BigDecimal totalCost
+        -BigDecimal cancellationFee
     }
-    class ServicioAdicional {
+    class AdditionalService {
         -Long id
-        -String nombre
-        -BigDecimal precioUnitario
+        -String name
+        -BigDecimal unitPrice
     }
-    class DetalleReserva {
+    class BookingItem {
         -Long id
-        -int cantidad
-        -BigDecimal precioUnitarioAplicado
+        -int quantity
+        -BigDecimal appliedUnitPrice
     }
-    class TipoSala {
+    class RoomType {
         <<enumeration>>
-        SALA_REUNION
-        OFICINA_PRIVADA
-        ESCRITORIO
+        MEETING_ROOM
+        PRIVATE_OFFICE
+        DESK
     }
-    class EstadoMiembro {
+    class MemberStatus {
         <<enumeration>>
-        ACTIVO
-        SUSPENDIDO
+        ACTIVE
+        SUSPENDED
     }
-    class Rol {
+    class Role {
         <<enumeration>>
         ADMIN
-        RECEPCION
-        MIEMBRO
+        RECEPTIONIST
+        MEMBER
     }
-    class EstadoReserva {
+    class BookingStatus {
         <<enumeration>>
-        PENDIENTE
-        CONFIRMADA
-        COMPLETADA
-        CANCELADA
+        PENDING
+        CONFIRMED
+        COMPLETED
+        CANCELLED
     }
 
-    Sede "1" -- "0..*" Sala : tiene
-    Sala "0..*" -- "0..*" Equipamiento : cuenta con
-    PlanMembresia "1" -- "0..*" Miembro : suscribe
-    Miembro "0..1" -- "0..1" Usuario : inicia sesión con
-    Miembro "1" -- "0..*" Reserva : hace
-    Sala "1" -- "0..*" Reserva : se reserva en
-    Reserva "1" *-- "0..*" DetalleReserva : contiene
-    ServicioAdicional "1" -- "0..*" DetalleReserva : se cobra en
+    Location "1" -- "0..*" Room : has
+    Room "0..*" -- "0..*" Equipment : equipped with
+    MembershipPlan "1" -- "0..*" Member : subscribed by
+    Member "0..1" -- "0..1" UserAccount : logs in with
+    Member "1" -- "0..*" Booking : makes
+    Room "1" -- "0..*" Booking : booked in
+    Booking "1" *-- "0..*" BookingItem : contains
+    AdditionalService "1" -- "0..*" BookingItem : charged in
 
-    Sala ..> TipoSala
-    Miembro ..> EstadoMiembro
-    Usuario ..> Rol
-    Reserva ..> EstadoReserva
+    Room ..> RoomType
+    Member ..> MemberStatus
+    UserAccount ..> Role
+    Booking ..> BookingStatus
 ```
 
 Cómo leerlo: los números son las multiplicidades (`0..*` = ninguno o muchos). El rombo
 negro (`*--`) indica que los detalles pertenecen a la reserva: se guardan y se borran
 con ella. Un miembro puede no tener usuario todavía, y el personal tiene usuario pero
-no es miembro: por eso `Miembro`–`Usuario` es `0..1` de los dos lados. Qué lado es el
+no es miembro: por eso `Member`–`UserAccount` es `0..1` de los dos lados. Qué lado es el
 dueño de cada relación lo decidís vos y lo justificás en el análisis.
 
 ## 3. Reglas de negocio
 
 | Código | Regla |
 |---|---|
-| **RN-01** | Una sala no puede tener dos reservas `PENDIENTE` o `CONFIRMADA` que se crucen, ni siquiera si llegan dos solicitudes al mismo tiempo. Si una termina justo cuando empieza la otra, no se cruzan. |
+| **RN-01** | Una sala no puede tener dos reservas `PENDING` o `CONFIRMED` que se crucen, ni siquiera si llegan dos solicitudes al mismo tiempo. Si una termina justo cuando empieza la otra, no se cruzan. |
 | **RN-02** | Una reserva dura entre 30 min y 8 h, en múltiplos de 30 min, y empieza y termina el mismo día. |
 | **RN-03** | Debe caer dentro del horario de la sede, ser futura y hacerse con al menos 1 h de anticipación. |
 | **RN-04** | La sala debe estar activa y los asistentes no pueden superar su capacidad. |
-| **RN-05** | Solo reserva un miembro `ACTIVO`. |
-| **RN-06** | Un miembro no puede tener más reservas activas futuras que las que permite su plan. |
-| **RN-07** | **Costo.** Las horas que el plan incluye en el mes no se cobran; las excedentes valen `tarifaPorHora × (1 − descuento)`. Los servicios suman `cantidad × precio`, con el precio vigente al agregarlos. |
+| **RN-05** | Solo reserva un miembro `ACTIVE`. |
+| **RN-06** | Un miembro no puede tener más reservas activas futuras que las que permite su plan (`maxActiveBookings`). |
+| **RN-07** | **Costo.** Las horas que el plan incluye en el mes no se cobran; las excedentes valen `hourlyRate × (1 − overageDiscount)`. Los servicios suman `quantity × unitPrice`, y `appliedUnitPrice` guarda el precio vigente al agregarlos. |
 | **RN-08** | **Cancelación.** Con 24 h o más de anticipación, sin cargo y se devuelven las horas. Entre 24 h y 2 h, se cobra el 50 % del costo de la sala. Con menos de 2 h, o si ya empezó, no se puede cancelar. |
-| **RN-09** | **Estados.** `PENDIENTE → CONFIRMADA → COMPLETADA`, o `PENDIENTE/CONFIRMADA → CANCELADA`. Ninguna otra transición. |
-| **RN-10** | Los servicios de una reserva solo se cambian mientras está `PENDIENTE`. |
+| **RN-09** | **Estados.** `PENDING → CONFIRMED → COMPLETED`, o `PENDING/CONFIRMED → CANCELLED`. Ninguna otra transición. |
+| **RN-10** | Los servicios de una reserva solo se cambian mientras está `PENDING`. |
 | **RN-11** | Son únicos: el documento, el email y el usuario del miembro; el nombre de la sala dentro de su sede; y el nombre del equipamiento, del servicio y del plan. |
 | **RN-12** | No se elimina nada que esté en uso: una sede con salas, un plan con miembros, una sala o un miembro con reservas, un equipamiento o un servicio usado. |
 | **RN-13** | Cada rol solo hace lo que indica la sección 1. |
@@ -175,7 +186,7 @@ dueño de cada relación lo decidís vos y lo justificás en el análisis.
 | **RF-03** | Mostrar las salas libres de una sede en una fecha y un rango horario, con filtros opcionales de capacidad mínima y equipamiento. |
 | **RF-04** | Crear una reserva con sus servicios adicionales y devolver el costo calculado. |
 | **RF-05** | Consultar una reserva, y listar reservas por miembro, por sala y fecha, o por estado. |
-| **RF-06** | Agregar o quitar servicios de una reserva `PENDIENTE` y recalcular su costo. |
+| **RF-06** | Agregar o quitar servicios de una reserva `PENDING` y recalcular su costo. |
 | **RF-07** | Confirmar una reserva. |
 | **RF-08** | Cancelar una reserva aplicando RN-08 y devolver el cargo. |
 | **RF-09** | Marcar una reserva como completada. |
@@ -325,14 +336,14 @@ Cada módulo del curso debe verse en el código:
 | **02** Dependencias y beans | Servicios como interfaz + implementación; `@Configuration` con `@Bean` (`Clock`, `PasswordEncoder`); `@Value`; un `@Qualifier` o `@Primary`; un `@PostConstruct` que valide la configuración |
 | **03** JPA | Entidades con sus anotaciones; repositorios con consultas derivadas, una `@Query` en JPQL y una consulta paginada |
 | **04** Base de datos y relaciones JPA | Conexión a MySQL en `application.properties`; las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval` justificados; datos de prueba al arrancar; listados sin el problema N+1 |
-| **05** API REST | Capas `presentacion` → `negocio` → `persistence`; DTO de entrada validados con `@Valid` y DTO de salida (nunca entidades); `@Transactional` en las escrituras |
+| **05** API REST | Capas `presentation` → `business` → `persistence`; DTO de entrada validados con `@Valid` y DTO de salida (nunca entidades); `@Transactional` en las escrituras |
 | **06** Swagger | Swagger UI con grupos, descripciones, respuestas de error, ejemplos y botón **Authorize**; `openapi.json` exportado |
 | **07** Excepciones | Excepciones propias en la capa de negocio; un `@RestControllerAdvice` con el cuerpo de error único; ninguna regla de negocio responde `500` |
 | **08** Seguridad | Primero Basic Auth y después JWT *stateless*; contraseñas con BCrypt; roles y dueño del recurso con `@PreAuthorize`; `401` y `403` con el cuerpo de error |
 
 **Datos de prueba** (cargados al arrancar): al menos 2 sedes, 6 salas (una inactiva),
-3 planes, 5 miembros (uno suspendido), 4 usuarios (un `ADMIN`, un `RECEPCION` y dos
-`MIEMBRO`) y 15 reservas en distintos estados.
+3 planes, 5 miembros (uno suspendido), 4 usuarios (un `ADMIN`, un `RECEPTIONIST` y dos
+`MEMBER`) y 15 reservas en distintos estados.
 
 **Orden sugerido**: análisis → base de datos MySQL y proyecto base (01, 02) → modelo JPA (03, 04) → servicios
 y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) → pruebas.
@@ -391,7 +402,7 @@ El detalle está en la [rúbrica](rubrica.md).
   durante el desarrollo) y explicalo en el análisis.
 - **La hora actual.** RN-03 y RN-08 dependen de "ahora". Inyectá un `Clock` en lugar de
   llamar a `LocalDateTime.now()`, así podés fijar la hora en las pruebas.
-- **Reservas del pasado.** Las reservas `COMPLETADA` de los datos de prueba no pasan las
+- **Reservas del pasado.** Las reservas `COMPLETED` de los datos de prueba no pasan las
   reglas de una reserva nueva: cargalas sin usar el servicio de reservas.
 - **Solicitudes simultáneas.** Revisar el cruce de horarios y después guardar no alcanza
   para cumplir RN-01 si llegan dos solicitudes a la vez.
