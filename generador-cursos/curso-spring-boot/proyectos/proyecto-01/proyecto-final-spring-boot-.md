@@ -44,9 +44,8 @@ Las entidades, sus atributos y las tablas de la base de datos se nombran en ingl
 | `BookingStatus` | `PENDING`, `CONFIRMED`, `COMPLETED`, `CANCELLED` |
 | `Role` | `ADMIN`, `RECEPTIONIST`, `MEMBER` |
 
-Los nombres de tabla se fijan con `@Table(name = "...")`. Las columnas van en `snake_case`
-(`opening_time`, `hourly_rate`…): Spring Boot las genera así a partir de los atributos. La entidad del usuario se llama `UserAccount` y no
-`User` para no confundirse con la clase `User` de Spring Security.
+Los nombres de tabla se fijan con `@Table(name = "...")`. La entidad del usuario se llama
+`UserAccount` y no `User` para no confundirse con la clase `User` de Spring Security.
 
 ### Diagrama de clases de las entidades
 
@@ -326,6 +325,42 @@ muestre `ready for connections` antes de arrancar el proyecto.
 Si el puerto 3306 ya está ocupado, por ejemplo por un MySQL instalado, usá
 `-p 3307:3306` y cambiá el puerto también en la URL de conexión.
 
+### Datos de prueba: `import.sql` (obligatorio)
+
+Todo proyecto debe tener el archivo **`src/main/resources/import.sql`** con los datos de
+prueba iniciales. Hibernate lo ejecuta solo al arrancar, justo después de crear las
+tablas, siempre que `ddl-auto` sea `create` (o `create-drop`):
+
+```properties
+spring.jpa.hibernate.ddl-auto=create
+```
+
+Con `create`, cada arranque borra las tablas, las vuelve a crear y ejecuta `import.sql`:
+siempre empezás con los mismos datos, sin duplicados. Con `update` o `none`, el archivo
+no se ejecuta.
+
+El `import.sql` debe cargar, como mínimo:
+
+| Datos | Mínimo |
+|---|---|
+| Sedes (`locations`) | 2 |
+| Salas (`rooms`) | 6, una inactiva, con su equipamiento |
+| Equipamiento (`equipment`) | 4 |
+| Servicios adicionales (`additional_services`) | 3 |
+| Planes (`membership_plans`) | 3 |
+| Miembros (`members`) | 5, uno suspendido |
+| Usuarios (`user_accounts`) | 4: un `ADMIN`, un `RECEPTIONIST` y dos `MEMBER` vinculados a su miembro |
+| Reservas (`bookings` y `booking_items`) | 15 en distintos estados, algunas con servicios |
+
+Reglas del archivo:
+
+- Usa los nombres de tabla de la sección 2 (`locations`, `rooms`…) y los nombres de columna
+  tal como quedan creados en la base (los ves con `DESCRIBE locations;`).
+- Cada sentencia va en **una sola línea** y termina en `;`.
+- Las contraseñas van ya codificadas con BCrypt, nunca en texto plano.
+- Cada fila se inserta después de las filas a las que apunta su clave foránea (por
+  ejemplo, las sedes antes que las salas).
+
 ### Qué debe verse de cada módulo
 
 Cada módulo del curso debe verse en el código:
@@ -335,17 +370,13 @@ Cada módulo del curso debe verse en el código:
 | **01** Spring Boot | Proyecto creado con Spring Initializr y sus *starters*; DTO como `record`; `Optional` y streams; inyección por constructor; Actuator |
 | **02** Dependencias y beans | Servicios como interfaz + implementación; `@Configuration` con `@Bean` (`Clock`, `PasswordEncoder`); `@Value`; un `@Qualifier` o `@Primary`; un `@PostConstruct` que valide la configuración |
 | **03** JPA | Entidades con sus anotaciones; repositorios con consultas derivadas, una `@Query` en JPQL y una consulta paginada |
-| **04** Base de datos y relaciones JPA | Conexión a MySQL en `application.properties`; las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval` justificados; datos de prueba al arrancar; listados sin el problema N+1 |
+| **04** Base de datos y relaciones JPA | Conexión a MySQL en `application.properties`; las relaciones de la sección 2 con lado dueño, `fetch` (`LAZY` en colecciones), `cascade` y `orphanRemoval` justificados; datos de prueba en `import.sql`; listados sin el problema N+1 |
 | **05** API REST | Capas `presentation` → `business` → `persistence`; DTO de entrada validados con `@Valid` y DTO de salida (nunca entidades); `@Transactional` en las escrituras |
 | **06** Swagger | Swagger UI con grupos, descripciones, respuestas de error, ejemplos y botón **Authorize**; `openapi.json` exportado |
 | **07** Excepciones | Excepciones propias en la capa de negocio; un `@RestControllerAdvice` con el cuerpo de error único; ninguna regla de negocio responde `500` |
 | **08** Seguridad | Primero Basic Auth y después JWT *stateless*; contraseñas con BCrypt; roles y dueño del recurso con `@PreAuthorize`; `401` y `403` con el cuerpo de error |
 
-**Datos de prueba** (cargados al arrancar): al menos 2 sedes, 6 salas (una inactiva),
-3 planes, 5 miembros (uno suspendido), 4 usuarios (un `ADMIN`, un `RECEPTIONIST` y dos
-`MEMBER`) y 15 reservas en distintos estados.
-
-**Orden sugerido**: análisis → base de datos MySQL y proyecto base (01, 02) → modelo JPA (03, 04) → servicios
+**Orden sugerido**: análisis → base de datos MySQL y proyecto base (01, 02) → modelo JPA e `import.sql` (03, 04) → servicios
 y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) → pruebas.
 
 ## 7. Escenarios de aceptación
@@ -371,7 +402,8 @@ y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) �
 
 1. `docs/analisis.md`: casos de uso, diagrama entidad-relación (con lado dueño, `fetch` y
    `cascade`), matriz RF → RN → endpoint y los supuestos que hayas tomado.
-2. El repositorio, con un commit por fase.
+2. El repositorio, con un commit por fase y el `src/main/resources/import.sql` con los
+   datos de prueba.
 3. Una colección de Postman o Insomnia con los 14 escenarios.
 4. `docs/openapi.json`.
 5. `README.md`: cómo crear la base de datos (con MySQL instalado o con Docker), cómo
@@ -393,16 +425,11 @@ El detalle está en la [rúbrica](rubrica.md).
 
 ## 💡 Pistas
 
-- **`data.sql` en MySQL.** Con MySQL, Spring Boot no ejecuta `data.sql` por defecto
-  (solo lo hace con bases en memoria). Necesitás `spring.sql.init.mode=always`, y
-  `spring.jpa.defer-datasource-initialization=true` para que corra después de que
-  Hibernate cree las tablas. Además, MySQL guarda los datos entre un arranque y otro:
-  si el script se ejecuta cada vez, los datos de prueba se duplican o chocan con las
-  restricciones de unicidad. Decidí cómo evitarlo (por ejemplo, con `ddl-auto=create`
-  durante el desarrollo) y explicalo en el análisis.
 - **La hora actual.** RN-03 y RN-08 dependen de "ahora". Inyectá un `Clock` en lugar de
   llamar a `LocalDateTime.now()`, así podés fijar la hora en las pruebas.
-- **Reservas del pasado.** Las reservas `COMPLETED` de los datos de prueba no pasan las
-  reglas de una reserva nueva: cargalas sin usar el servicio de reservas.
+- **Fechas en `import.sql`.** Si escribís fechas fijas, las reservas futuras se vuelven
+  pasadas con el tiempo. Calculalas a partir de hoy con funciones de MySQL:
+  `TIMESTAMP(CURDATE() + INTERVAL 1 DAY, '10:00:00')` es mañana a las 10:00. Si en las
+  pruebas fijás la hora con el `Clock`, usá la misma fecha.
 - **Solicitudes simultáneas.** Revisar el cruce de horarios y después guardar no alcanza
   para cumplir RN-01 si llegan dos solicitudes a la vez.
