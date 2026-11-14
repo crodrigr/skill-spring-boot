@@ -37,6 +37,117 @@ No hay interfaz gráfica: la API se prueba con Swagger UI, Postman (o Insomnia) 
 
 Estados de una reserva: `PENDIENTE`, `CONFIRMADA`, `COMPLETADA`, `CANCELADA`.
 
+### Diagrama de clases de las entidades
+
+```mermaid
+classDiagram
+    class Sede {
+        -Long id
+        -String nombre
+        -String ciudad
+        -String direccion
+        -LocalTime horaApertura
+        -LocalTime horaCierre
+    }
+    class Sala {
+        -Long id
+        -String nombre
+        -TipoSala tipo
+        -int capacidad
+        -BigDecimal tarifaPorHora
+        -boolean activa
+    }
+    class Equipamiento {
+        -Long id
+        -String nombre
+    }
+    class PlanMembresia {
+        -Long id
+        -String nombre
+        -int horasIncluidasMes
+        -int descuentoExcedente
+        -int maxReservasActivas
+    }
+    class Miembro {
+        -Long id
+        -String documento
+        -String nombre
+        -String email
+        -EstadoMiembro estado
+    }
+    class Usuario {
+        -Long id
+        -String nombreUsuario
+        -String contrasena
+        -Rol rol
+    }
+    class Reserva {
+        -Long id
+        -LocalDateTime inicio
+        -LocalDateTime fin
+        -int asistentes
+        -EstadoReserva estado
+        -BigDecimal costoSala
+        -BigDecimal costoServicios
+        -BigDecimal costoTotal
+        -BigDecimal cargoCancelacion
+    }
+    class ServicioAdicional {
+        -Long id
+        -String nombre
+        -BigDecimal precioUnitario
+    }
+    class DetalleReserva {
+        -Long id
+        -int cantidad
+        -BigDecimal precioUnitarioAplicado
+    }
+    class TipoSala {
+        <<enumeration>>
+        SALA_REUNION
+        OFICINA_PRIVADA
+        ESCRITORIO
+    }
+    class EstadoMiembro {
+        <<enumeration>>
+        ACTIVO
+        SUSPENDIDO
+    }
+    class Rol {
+        <<enumeration>>
+        ADMIN
+        RECEPCION
+        MIEMBRO
+    }
+    class EstadoReserva {
+        <<enumeration>>
+        PENDIENTE
+        CONFIRMADA
+        COMPLETADA
+        CANCELADA
+    }
+
+    Sede "1" -- "0..*" Sala : tiene
+    Sala "0..*" -- "0..*" Equipamiento : cuenta con
+    PlanMembresia "1" -- "0..*" Miembro : suscribe
+    Miembro "0..1" -- "0..1" Usuario : inicia sesión con
+    Miembro "1" -- "0..*" Reserva : hace
+    Sala "1" -- "0..*" Reserva : se reserva en
+    Reserva "1" *-- "0..*" DetalleReserva : contiene
+    ServicioAdicional "1" -- "0..*" DetalleReserva : se cobra en
+
+    Sala ..> TipoSala
+    Miembro ..> EstadoMiembro
+    Usuario ..> Rol
+    Reserva ..> EstadoReserva
+```
+
+Cómo leerlo: los números son las multiplicidades (`0..*` = ninguno o muchos). El rombo
+negro (`*--`) indica que los detalles pertenecen a la reserva: se guardan y se borran
+con ella. Un miembro puede no tener usuario todavía, y el personal tiene usuario pero
+no es miembro: por eso `Miembro`–`Usuario` es `0..1` de los dos lados. Qué lado es el
+dueño de cada relación lo decidís vos y lo justificás en el análisis.
+
 ## 3. Reglas de negocio
 
 | Código | Regla |
@@ -173,29 +284,36 @@ Para crear la base tenés dos opciones:
 | Opción | Cómo |
 |---|---|
 | **A. MySQL instalado** en tu equipo | Creá la base `coworkhub` y un usuario `coworkhub` con permisos sobre ella. |
-| **B. Docker** | Guardá el `docker-compose.yml` de abajo en la raíz del proyecto y ejecutá `docker compose up -d`. No hace falta instalar MySQL. |
+| **B. Docker** | Creá un contenedor de MySQL con el comando de abajo. No hace falta instalar MySQL. |
 
-```yaml
-services:
-  mysql:
-    image: mysql:8.4
-    container_name: coworkhub-mysql
-    environment:
-      MYSQL_DATABASE: coworkhub
-      MYSQL_USER: coworkhub
-      MYSQL_PASSWORD: coworkhub        # solo para desarrollo
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
-    volumes:
-      - coworkhub-datos:/var/lib/mysql
-volumes:
-  coworkhub-datos:
+Este comando crea el contenedor `coworkhub-mysql`, con la base, el usuario y la
+contraseña `coworkhub` (solo para desarrollo). Los datos quedan en el volumen
+`coworkhub-datos` y se conservan aunque detengas el contenedor:
+
+```bash
+docker run -d --name coworkhub-mysql \
+  -e MYSQL_DATABASE=coworkhub \
+  -e MYSQL_USER=coworkhub \
+  -e MYSQL_PASSWORD=coworkhub \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -p 3306:3306 \
+  -v coworkhub-datos:/var/lib/mysql \
+  mysql:8.4
 ```
 
-Para detener el contenedor: `docker compose down` (agregá `-v` para borrar también los
-datos). Si el puerto 3306 ya está ocupado, por ejemplo por un MySQL instalado, cambiá el
-de la izquierda (`"3307:3306"`) y también el puerto en la URL de conexión.
+En Windows (PowerShell o CMD), escribilo en una sola línea, sin las `\`. La primera vez
+tarda unos segundos en preparar la base: esperá a que `docker logs coworkhub-mysql`
+muestre `ready for connections` antes de arrancar el proyecto.
+
+| Para… | Comando |
+|---|---|
+| Ver si está corriendo | `docker ps` |
+| Detenerlo y volver a iniciarlo | `docker stop coworkhub-mysql` · `docker start coworkhub-mysql` |
+| Abrir la consola de MySQL (contraseña `coworkhub`) | `docker exec -it coworkhub-mysql mysql -u coworkhub -p coworkhub` |
+| Borrarlo, con todos sus datos | `docker rm -f coworkhub-mysql` y después `docker volume rm coworkhub-datos` |
+
+Si el puerto 3306 ya está ocupado, por ejemplo por un MySQL instalado, usá
+`-p 3307:3306` y cambiá el puerto también en la URL de conexión.
 
 ### Qué debe verse de cada módulo
 
@@ -242,7 +360,7 @@ y controladores (05) → excepciones (07) → Swagger (06) → seguridad (08) �
 
 1. `docs/analisis.md`: casos de uso, diagrama entidad-relación (con lado dueño, `fetch` y
    `cascade`), matriz RF → RN → endpoint y los supuestos que hayas tomado.
-2. El repositorio, con un commit por fase (y el `docker-compose.yml`, si usaste Docker).
+2. El repositorio, con un commit por fase.
 3. Una colección de Postman o Insomnia con los 14 escenarios.
 4. `docs/openapi.json`.
 5. `README.md`: cómo crear la base de datos (con MySQL instalado o con Docker), cómo
