@@ -64,7 +64,7 @@ para autoevaluarte antes de entregar.
 ## 3. ⚙️ Reglas de negocio — 25 puntos
 
 Cada regla se otorga si está **implementada en la capa de negocio (`negocio/service`)** y hay una prueba que
-la demuestra (idealmente uno de los [escenarios de aceptación](enunciado.md#10-escenarios-de-aceptación-mínimos)).
+la demuestra (idealmente uno de los [escenarios de aceptación](enunciado.md#15-escenarios-de-aceptación-mínimos)).
 
 | Regla | Qué se demuestra | Pts |
 |---|---|---|
