@@ -1,0 +1,86 @@
+spec_version: "1.0"
+
+# ─────────────────────────────────────────────────────────────
+# Datos del curso
+# ─────────────────────────────────────────────────────────────
+course:
+  id: "curso-spring-boot"                 # identificador estable: no cambiarlo una vez publicado
+  title: "Spring Boot para Aplicaciones Empresariales"
+  description: "Curso de desarrollo backend con Spring Boot: inyección de dependencias, JPA, APIs REST, documentación con Swagger, manejo de excepciones y seguridad con JWT."
+
+  category: "PROGRAMMING"
+  level: "INTERMEDIATE"
+  language: "es"
+  version: "1.0.0"
+
+  author: "Docente"
+
+  tags:
+    - java
+    - spring-boot
+    - backend
+    - api-rest
+    - jpa
+
+# ─────────────────────────────────────────────────────────────
+# Comportamiento en la plataforma
+# ─────────────────────────────────────────────────────────────
+settings:
+  allow_student_downloads: true
+  track_progress: true
+
+# ─────────────────────────────────────────────────────────────
+# Repositorio
+# La URL no va aquí: es el dato que recibe la aplicación.
+# ─────────────────────────────────────────────────────────────
+repository:
+  default_branch: "master"
+  content_root: "."                # raíz del repositorio (donde está este archivo)
+  structure: "TREE"                # exploración libre del árbol de directorios
+
+# ─────────────────────────────────────────────────────────────
+# Descubrimiento de contenido
+# ─────────────────────────────────────────────────────────────
+discovery:
+  unit_level: 1                    # cada carpeta de la raíz = una unidad, sin importar su nombre
+  root_files: "IGNORE"             # los archivos sueltos en la raíz (README, LICENSE...) no son contenido
+  skip_hidden: true                # omite carpetas y archivos que empiezan con punto
+  recursive: true                 # recorre todas las subcarpetas de la unidad
+  max_depth: 10
+  folders_as: "SECTION"            # cada subcarpeta se muestra como sección anidada
+  skip_empty_folders: true
+
+  sort: "NATURAL"                  # 01, 02, ... 10, 11; lo que no tiene número va al final
+  strip_order_prefix: true         # "01-introduccion" se muestra como "Introducción"
+  title_from:                      # de dónde sale el título de cada contenido
+    - "H1"                         # primer encabezado del .md
+    - "FILENAME"                   # si no hay, el nombre del archivo
+
+  # Clasificación por extensión
+  file_types:
+    - ext: [md]
+      type: "PAGE"                 # se renderiza en la plataforma
+    - ext: [pdf]
+      type: "DOCUMENT"             # visor embebido
+    - ext: [ppt, pptx]
+      type: "SLIDES"
+    - ext: [jpg, jpeg, png, gif, svg]
+      type: "IMAGE"
+    - ext: [mp4, webm]
+      type: "VIDEO"
+    - ext: [zip, java, sql, yml, yaml, xml, properties, json, xlsx]
+      type: "DOWNLOAD"             # solo descarga
+
+  unknown_files: "IGNORE"          # IGNORE | DOWNLOAD
+  hide_linked_images: true         # no listar imágenes que ya están enlazadas desde un .md
+
+  # Archivos y carpetas que nunca se cargan
+  ignore:
+    - "**/*.jar"
+
+  # Excepciones por ruta
+  rules:
+    - match: "**/soluciones/**"
+      visibility: "INSTRUCTOR"     # solo el docente
+    - match: "proyectos/*/solucion/**"
+      visibility: "INSTRUCTOR"
